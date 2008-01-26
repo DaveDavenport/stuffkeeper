@@ -67,7 +67,7 @@ void interface_item_add(void)
  */
 void interface_item_remove(void)
 {
-    GtkWidget *tree = glade_xml_get_widget(xml, "treeview1");
+    GtkWidget *tree = glade_xml_get_widget(xml, "treeview2");
     GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
     GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
     GtkTreeIter iter;
