@@ -70,6 +70,11 @@ class StuffKeeper:Data:Backend from G:Object
     void
     remove_item(self, gint id)
     {
+        StuffKeeperDataItem *item = g_hash_table_lookup(self->_priv->items, &id);
+        if(item)
+        {
+            stuffkeeper_data_item_delete_yourself(item); 
+        }
         if(g_hash_table_remove(self->_priv->items, &id) == FALSE)
         {
             printf("failed to remove: %i\n", id);
@@ -96,6 +101,14 @@ class StuffKeeper:Data:Backend from G:Object
         /* Load items */
     }
 
+    private
+    void
+    finalize_item(gint *key, StuffKeeperDataItem *item, gpointer user_data)
+    {
+        stuffkeeper_data_item_save_yourself(item);
+    }
+
+
     override (G:Object)
     void
     finalize (G:Object *obj)
@@ -105,6 +118,7 @@ class StuffKeeper:Data:Backend from G:Object
 
         if(self->_priv->items)
         {
+            g_hash_table_foreach(self->_priv->items, (GHFunc)self_finalize_item, NULL);
             g_hash_table_destroy(self->_priv->items);
 
             self->_priv->items = NULL;

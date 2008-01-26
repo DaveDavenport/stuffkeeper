@@ -30,6 +30,31 @@ class StuffKeeper:Data:Item from G:Object
         printf("destroying item\n");
         PARENT_HANDLER(obj);
     }
+    /**
+     * Functions to manage 
+     */
+    public
+    void
+    save_yourself(self)
+    {
+
+        if(self->_priv->id == -1)
+        {
+            printf("Cannot save a deleted item\n");
+            return;
+        }
+        printf("Saving myself: %i\n", self->_priv->id);
+        /* ToDo */
+
+    }
+
+    public
+    void
+    delete_yourself(self)
+    {
+        printf("Deleting myself: %i\n", self->_priv->id);
+        self->_priv->id = -1;
+    }
 
     /* Create new StuffKeeperDataBackend */
     public 

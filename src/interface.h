@@ -4,7 +4,7 @@
 #include "stuffkeeper-data-backend.h"
 
 /* Create the main interface */
-void initialize_interface(const StuffKeeperDataBackend *skdb);
+void initialize_interface(StuffKeeperDataBackend *skdb);
 
 
 #endif

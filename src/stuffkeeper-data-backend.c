@@ -40,7 +40,8 @@ static void stuffkeeper_data_backend_class_init (StuffKeeperDataBackendClass * c
 static void ___real_stuffkeeper_data_backend_item_changed (StuffKeeperDataBackend * self, StuffKeeperDataItem * item);
 static void ___real_stuffkeeper_data_backend_item_added (StuffKeeperDataBackend * self, StuffKeeperDataItem * item);
 static void ___real_stuffkeeper_data_backend_item_removed (StuffKeeperDataBackend * self, gint id);
-static void ___8_stuffkeeper_data_backend_finalize (GObject * obj) G_GNUC_UNUSED;
+static void stuffkeeper_data_backend_finalize_item (gint * key, StuffKeeperDataItem * item, gpointer user_data) G_GNUC_UNUSED;
+static void ___9_stuffkeeper_data_backend_finalize (GObject * obj) G_GNUC_UNUSED;
 
 /*
  * Signal connection wrapper macro shortcuts
@@ -139,6 +140,7 @@ static GObjectClass *parent_class = NULL;
 #define self_new_item stuffkeeper_data_backend_new_item
 #define self_remove_item stuffkeeper_data_backend_remove_item
 #define self_load stuffkeeper_data_backend_load
+#define self_finalize_item stuffkeeper_data_backend_finalize_item
 #define self_new stuffkeeper_data_backend_new
 GType
 stuffkeeper_data_backend_get_type (void)
@@ -189,9 +191,9 @@ ___finalize(GObject *obj_self)
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::finalize"
 	StuffKeeperDataBackend *self G_GNUC_UNUSED = STUFFKEEPER_DATA_BACKEND (obj_self);
 	gpointer priv G_GNUC_UNUSED = self->_priv;
-#line 99 "stuffkeeper-data-backend.gob"
-	___8_stuffkeeper_data_backend_finalize(obj_self);
-#line 195 "stuffkeeper-data-backend.c"
+#line 112 "stuffkeeper-data-backend.gob"
+	___9_stuffkeeper_data_backend_finalize(obj_self);
+#line 197 "stuffkeeper-data-backend.c"
 }
 #undef __GOB_FUNCTION__
 
@@ -202,7 +204,7 @@ stuffkeeper_data_backend_init (StuffKeeperDataBackend * o G_GNUC_UNUSED)
 	o->_priv = G_TYPE_INSTANCE_GET_PRIVATE(o,STUFFKEEPER_TYPE_DATA_BACKEND,StuffKeeperDataBackendPrivate);
 #line 13 "stuffkeeper-data-backend.gob"
 	o->_priv->items = g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref);
-#line 206 "stuffkeeper-data-backend.c"
+#line 208 "stuffkeeper-data-backend.c"
 }
 #undef __GOB_FUNCTION__
 static void 
@@ -258,9 +260,9 @@ stuffkeeper_data_backend_class_init (StuffKeeperDataBackendClass * c G_GNUC_UNUS
 	c->item_added = ___real_stuffkeeper_data_backend_item_added;
 #line 33 "stuffkeeper-data-backend.gob"
 	c->item_removed = ___real_stuffkeeper_data_backend_item_removed;
-#line 99 "stuffkeeper-data-backend.gob"
+#line 112 "stuffkeeper-data-backend.gob"
 	g_object_class->finalize = ___finalize;
-#line 264 "stuffkeeper-data-backend.c"
+#line 266 "stuffkeeper-data-backend.c"
 }
 #undef __GOB_FUNCTION__
 
@@ -269,7 +271,7 @@ stuffkeeper_data_backend_class_init (StuffKeeperDataBackendClass * c G_GNUC_UNUS
 #line 18 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_item_changed (StuffKeeperDataBackend * self, StuffKeeperDataItem * item)
-#line 273 "stuffkeeper-data-backend.c"
+#line 275 "stuffkeeper-data-backend.c"
 {
 	GValue ___param_values[2];
 	GValue ___return_val;
@@ -281,7 +283,7 @@ memset (&___param_values, 0, sizeof (___param_values));
 	g_return_if_fail (self != NULL);
 #line 18 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
-#line 285 "stuffkeeper-data-backend.c"
+#line 287 "stuffkeeper-data-backend.c"
 
 	___param_values[0].g_type = 0;
 	g_value_init (&___param_values[0], G_TYPE_FROM_INSTANCE (self));
@@ -302,7 +304,7 @@ memset (&___param_values, 0, sizeof (___param_values));
 #line 18 "stuffkeeper-data-backend.gob"
 static void 
 ___real_stuffkeeper_data_backend_item_changed (StuffKeeperDataBackend * self G_GNUC_UNUSED, StuffKeeperDataItem * item)
-#line 306 "stuffkeeper-data-backend.c"
+#line 308 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::item_changed"
 {
@@ -310,13 +312,13 @@ ___real_stuffkeeper_data_backend_item_changed (StuffKeeperDataBackend * self G_G
 	
         printf("Item changed\n");
     }}
-#line 314 "stuffkeeper-data-backend.c"
+#line 316 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
 #line 25 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_item_added (StuffKeeperDataBackend * self, StuffKeeperDataItem * item)
-#line 320 "stuffkeeper-data-backend.c"
+#line 322 "stuffkeeper-data-backend.c"
 {
 	GValue ___param_values[2];
 	GValue ___return_val;
@@ -328,7 +330,7 @@ memset (&___param_values, 0, sizeof (___param_values));
 	g_return_if_fail (self != NULL);
 #line 25 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
-#line 332 "stuffkeeper-data-backend.c"
+#line 334 "stuffkeeper-data-backend.c"
 
 	___param_values[0].g_type = 0;
 	g_value_init (&___param_values[0], G_TYPE_FROM_INSTANCE (self));
@@ -349,7 +351,7 @@ memset (&___param_values, 0, sizeof (___param_values));
 #line 25 "stuffkeeper-data-backend.gob"
 static void 
 ___real_stuffkeeper_data_backend_item_added (StuffKeeperDataBackend * self G_GNUC_UNUSED, StuffKeeperDataItem * item)
-#line 353 "stuffkeeper-data-backend.c"
+#line 355 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::item_added"
 {
@@ -359,13 +361,13 @@ ___real_stuffkeeper_data_backend_item_added (StuffKeeperDataBackend * self G_GNU
         g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), self);
 
     }}
-#line 363 "stuffkeeper-data-backend.c"
+#line 365 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
 #line 33 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_item_removed (StuffKeeperDataBackend * self, gint id)
-#line 369 "stuffkeeper-data-backend.c"
+#line 371 "stuffkeeper-data-backend.c"
 {
 	GValue ___param_values[2];
 	GValue ___return_val;
@@ -377,7 +379,7 @@ memset (&___param_values, 0, sizeof (___param_values));
 	g_return_if_fail (self != NULL);
 #line 33 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
-#line 381 "stuffkeeper-data-backend.c"
+#line 383 "stuffkeeper-data-backend.c"
 
 	___param_values[0].g_type = 0;
 	g_value_init (&___param_values[0], G_TYPE_FROM_INSTANCE (self));
@@ -398,7 +400,7 @@ memset (&___param_values, 0, sizeof (___param_values));
 #line 33 "stuffkeeper-data-backend.gob"
 static void 
 ___real_stuffkeeper_data_backend_item_removed (StuffKeeperDataBackend * self G_GNUC_UNUSED, gint id)
-#line 402 "stuffkeeper-data-backend.c"
+#line 404 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::item_removed"
 {
@@ -406,20 +408,20 @@ ___real_stuffkeeper_data_backend_item_removed (StuffKeeperDataBackend * self G_G
 	
         printf("Item removed signal: '%i'\n",id); 
     }}
-#line 410 "stuffkeeper-data-backend.c"
+#line 412 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
 #line 43 "stuffkeeper-data-backend.gob"
 StuffKeeperDataItem * 
 stuffkeeper_data_backend_get_item (StuffKeeperDataBackend * self, gint id)
-#line 416 "stuffkeeper-data-backend.c"
+#line 418 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::get_item"
 #line 43 "stuffkeeper-data-backend.gob"
 	g_return_val_if_fail (self != NULL, (StuffKeeperDataItem * )0);
 #line 43 "stuffkeeper-data-backend.gob"
 	g_return_val_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self), (StuffKeeperDataItem * )0);
-#line 423 "stuffkeeper-data-backend.c"
+#line 425 "stuffkeeper-data-backend.c"
 {
 #line 46 "stuffkeeper-data-backend.gob"
 	
@@ -427,20 +429,20 @@ stuffkeeper_data_backend_get_item (StuffKeeperDataBackend * self, gint id)
         item = g_hash_table_lookup(self->_priv->items, &id);
         return item;
     }}
-#line 431 "stuffkeeper-data-backend.c"
+#line 433 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
 #line 52 "stuffkeeper-data-backend.gob"
 StuffKeeperDataItem * 
 stuffkeeper_data_backend_new_item (StuffKeeperDataBackend * self)
-#line 437 "stuffkeeper-data-backend.c"
+#line 439 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::new_item"
 #line 52 "stuffkeeper-data-backend.gob"
 	g_return_val_if_fail (self != NULL, (StuffKeeperDataItem * )0);
 #line 52 "stuffkeeper-data-backend.gob"
 	g_return_val_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self), (StuffKeeperDataItem * )0);
-#line 444 "stuffkeeper-data-backend.c"
+#line 446 "stuffkeeper-data-backend.c"
 {
 #line 55 "stuffkeeper-data-backend.gob"
 	
@@ -456,23 +458,28 @@ stuffkeeper_data_backend_new_item (StuffKeeperDataBackend * self)
         self_item_added(self, item);
         return item;
     }}
-#line 460 "stuffkeeper-data-backend.c"
+#line 462 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
 #line 69 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_remove_item (StuffKeeperDataBackend * self, gint id)
-#line 466 "stuffkeeper-data-backend.c"
+#line 468 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::remove_item"
 #line 69 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (self != NULL);
 #line 69 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
-#line 473 "stuffkeeper-data-backend.c"
+#line 475 "stuffkeeper-data-backend.c"
 {
 #line 72 "stuffkeeper-data-backend.gob"
 	
+        StuffKeeperDataItem *item = g_hash_table_lookup(self->_priv->items, &id);
+        if(item)
+        {
+            stuffkeeper_data_item_delete_yourself(item); 
+        }
         if(g_hash_table_remove(self->_priv->items, &id) == FALSE)
         {
             printf("failed to remove: %i\n", id);
@@ -480,22 +487,22 @@ stuffkeeper_data_backend_remove_item (StuffKeeperDataBackend * self, gint id)
         }
         self_item_removed(self, id);
     }}
-#line 484 "stuffkeeper-data-backend.c"
+#line 491 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
-#line 82 "stuffkeeper-data-backend.gob"
+#line 87 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_load (StuffKeeperDataBackend * self)
-#line 490 "stuffkeeper-data-backend.c"
-{
-#define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::load"
-#line 82 "stuffkeeper-data-backend.gob"
-	g_return_if_fail (self != NULL);
-#line 82 "stuffkeeper-data-backend.gob"
-	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
 #line 497 "stuffkeeper-data-backend.c"
 {
-#line 85 "stuffkeeper-data-backend.gob"
+#define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::load"
+#line 87 "stuffkeeper-data-backend.gob"
+	g_return_if_fail (self != NULL);
+#line 87 "stuffkeeper-data-backend.gob"
+	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
+#line 504 "stuffkeeper-data-backend.c"
+{
+#line 90 "stuffkeeper-data-backend.gob"
 	
         StuffKeeperDataItem *item;
         printf("Loading content\n");
@@ -509,26 +516,41 @@ stuffkeeper_data_backend_load (StuffKeeperDataBackend * self)
 
         /* Load items */
     }}
-#line 513 "stuffkeeper-data-backend.c"
+#line 520 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
-#line 99 "stuffkeeper-data-backend.gob"
+#line 104 "stuffkeeper-data-backend.gob"
 static void 
-___8_stuffkeeper_data_backend_finalize (GObject * obj G_GNUC_UNUSED)
-#line 519 "stuffkeeper-data-backend.c"
+stuffkeeper_data_backend_finalize_item (gint * key, StuffKeeperDataItem * item, gpointer user_data)
+#line 526 "stuffkeeper-data-backend.c"
+{
+#define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::finalize_item"
+{
+#line 107 "stuffkeeper-data-backend.gob"
+	
+        stuffkeeper_data_item_save_yourself(item);
+    }}
+#line 534 "stuffkeeper-data-backend.c"
+#undef __GOB_FUNCTION__
+
+#line 112 "stuffkeeper-data-backend.gob"
+static void 
+___9_stuffkeeper_data_backend_finalize (GObject * obj G_GNUC_UNUSED)
+#line 540 "stuffkeeper-data-backend.c"
 #define PARENT_HANDLER(___obj) \
 	{ if(G_OBJECT_CLASS(parent_class)->finalize) \
 		(* G_OBJECT_CLASS(parent_class)->finalize)(___obj); }
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::finalize"
 {
-#line 102 "stuffkeeper-data-backend.gob"
+#line 115 "stuffkeeper-data-backend.gob"
 	
         Self *self = SELF(obj);
         printf("destroying\n");
 
         if(self->_priv->items)
         {
+            g_hash_table_foreach(self->_priv->items, (GHFunc)self_finalize_item, NULL);
             g_hash_table_destroy(self->_priv->items);
 
             self->_priv->items = NULL;
@@ -536,21 +558,21 @@ ___8_stuffkeeper_data_backend_finalize (GObject * obj G_GNUC_UNUSED)
 
             PARENT_HANDLER(obj);
     }}
-#line 540 "stuffkeeper-data-backend.c"
+#line 562 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 #undef PARENT_HANDLER
 
-#line 118 "stuffkeeper-data-backend.gob"
+#line 132 "stuffkeeper-data-backend.gob"
 StuffKeeperDataBackend * 
 stuffkeeper_data_backend_new (void)
-#line 547 "stuffkeeper-data-backend.c"
+#line 569 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::new"
 {
-#line 121 "stuffkeeper-data-backend.gob"
+#line 135 "stuffkeeper-data-backend.gob"
 	
             printf("Creating backend\n");
             return GET_NEW;
         }}
-#line 556 "stuffkeeper-data-backend.c"
+#line 578 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__

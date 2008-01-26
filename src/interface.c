@@ -125,12 +125,13 @@ gboolean interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, gpointer
 /**
  * Initialize the main gui
  */
-void initialize_interface(const StuffKeeperDataBackend *skdb)
+void initialize_interface(StuffKeeperDataBackend *skdb)
 {
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkWidget *tree;
-    GtkListStore *store2,*store;
+    GtkListStore *store2;
+    GtkTreeModel *store;
 
     GtkListStore *original;
     /* This is a hack for testing now */
@@ -150,7 +151,7 @@ void initialize_interface(const StuffKeeperDataBackend *skdb)
     g_signal_connect(G_OBJECT(skdb), "item-removed", G_CALLBACK(item_removed), original);
     g_signal_connect(G_OBJECT(skdb), "item-changed", G_CALLBACK(item_changed), original);
 
-    store = gtk_tree_model_filter_new(GTK_TREE_MODEL(original), NULL);
+    store = (GtkTreeModel *)gtk_tree_model_filter_new(GTK_TREE_MODEL(original), NULL);
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(store), interface_visible_func, NULL, NULL);
     gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(store));
     /* testing */

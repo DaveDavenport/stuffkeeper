@@ -56,6 +56,8 @@ struct _StuffKeeperDataItemClass {
  */
 GType	stuffkeeper_data_item_get_type	(void);
 void 	stuffkeeper_data_item_item_changed	(StuffKeeperDataItem * self);
+void 	stuffkeeper_data_item_save_yourself	(StuffKeeperDataItem * self);
+void 	stuffkeeper_data_item_delete_yourself	(StuffKeeperDataItem * self);
 StuffKeeperDataItem * 	stuffkeeper_data_item_new	(void);
 StuffKeeperDataItem * 	stuffkeeper_data_item_new_with_id	(gint id);
 gint 	stuffkeeper_data_item_get_id	(StuffKeeperDataItem * self);
