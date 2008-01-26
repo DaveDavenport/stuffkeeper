@@ -1,0 +1,86 @@
+requires 2.0.10
+
+%ph{
+    #include "stuffkeeper-data-backend.h"
+%}
+
+%header{
+    #include <stdio.h>
+%}
+
+
+
+class StuffKeeper:Data:Item from G:Object 
+{
+    private gint id = {0};
+    private gchar *title = {g_strdup("N/A")} destroywith g_free;
+
+    signal last NONE (NONE)
+    void
+    item_changed(self)
+    {
+        printf("Signal my change: %i\n", self->_priv->id);
+    }
+
+    /* Finalize functions */
+    override (G:Object)
+    void
+    finalize (G:Object *obj)
+    {
+        printf("destroying item\n");
+        PARENT_HANDLER(obj);
+    }
+
+    /* Create new StuffKeeperDataBackend */
+    public 
+        StuffKeeperDataItem *
+        new (void)
+        {
+            
+            Self *obj = GET_NEW;
+            obj->_priv->id = g_random_int();
+            printf("Creating item: %i\n", obj->_priv->id);
+            return obj;
+        }
+
+    public
+    StuffKeeperDataItem *
+    new_with_id (gint id)
+    {
+        Self *obj = GET_NEW;
+        obj->_priv->id = id;
+        printf("Creating item: %i\n", obj->_priv->id);
+        return obj;
+    }
+
+    /* setting fields */
+    public
+    gint
+    get_id(self)
+    {
+        return self->_priv->id;
+    }
+
+    public 
+    const gchar *
+    get_title(self)
+    {
+        return self->_priv->title;
+    }
+    public 
+    const gchar *
+    set_title(self, const gchar *title)
+    {
+        if(self->_priv->title)
+        {
+            g_free(self->_priv->title);
+            self->_priv->title = NULL;
+        }
+        if(title)
+        {
+            self->_priv->title = g_strdup(title);
+        }
+        printf("new title: %s\n", title);
+        self_item_changed(self);
+    }
+}

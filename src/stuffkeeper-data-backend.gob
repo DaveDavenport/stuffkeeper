@@ -1,0 +1,125 @@
+requires 2.0.10
+
+%h{
+    #include "stuffkeeper-data-item.h"
+%}
+%header{
+    #include <stdio.h>
+%}
+
+
+class StuffKeeper:Data:Backend from G:Object 
+{
+    private GHashTable *items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} ;
+
+    /**
+     * Signal 
+     */
+    signal last NONE (POINTER)
+    void
+    item_changed(self, StuffKeeperDataItem *item)
+    {
+        printf("Item changed\n");
+    }
+
+    signal last NONE (POINTER)
+    void
+    item_added(self, StuffKeeperDataItem *item)
+    {
+        printf("Item added signal: '%i'\n", stuffkeeper_data_item_get_id(item));
+        g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), self);
+
+    }
+    signal last NONE (INT)
+        void
+    item_removed(self, gint id)
+    {
+        printf("Item removed signal: '%i'\n",id); 
+    }
+
+    /**
+     * Public functions 
+     */
+    public 
+    StuffKeeperDataItem *
+    get_item(self, gint id)
+    {
+        StuffKeeperDataItem *item;
+        item = g_hash_table_lookup(self->_priv->items, &id);
+        return item;
+    }
+
+    public 
+    StuffKeeperDataItem *
+    new_item(self)
+    {
+        gint *id;
+        StuffKeeperDataItem *item;
+        /* create a new item */
+        item = stuffkeeper_data_item_new();
+        /* want to copy the key, even if it is an integer */
+        id = g_malloc0(sizeof(gint));
+        *id = stuffkeeper_data_item_get_id(item);
+        /* insert it into my hash-list */
+        g_hash_table_insert(self->_priv->items,id, item);
+        self_item_added(self, item);
+        return item;
+    }
+
+    public 
+    void
+    remove_item(self, gint id)
+    {
+        if(g_hash_table_remove(self->_priv->items, &id) == FALSE)
+        {
+            printf("failed to remove: %i\n", id);
+            return;
+        }
+        self_item_removed(self, id);
+    }
+
+    /* Load the data */
+    public
+    void
+    load(self)
+    {
+        StuffKeeperDataItem *item;
+        printf("Loading content\n");
+
+        /* Load schema's */
+        int i;
+        for(i=0;i<1;i++)
+        {
+            item = self_new_item(self);
+        }
+
+        /* Load items */
+    }
+
+    override (G:Object)
+    void
+    finalize (G:Object *obj)
+    {
+        Self *self = SELF(obj);
+        printf("destroying\n");
+
+        if(self->_priv->items)
+        {
+            g_hash_table_destroy(self->_priv->items);
+
+            self->_priv->items = NULL;
+        }
+
+            PARENT_HANDLER(obj);
+    }
+
+
+    /* Create new StuffKeeperDataBackend */
+    public 
+        StuffKeeperDataBackend *
+        new (void)
+        {
+            printf("Creating backend\n");
+            return GET_NEW;
+        }
+}
