@@ -13,14 +13,16 @@ extern "C" {
 #line 3 "stuffkeeper-data-item.gob"
 
     #include "stuffkeeper-data-backend.h"
+#define KEYFILE_GENERAL "general"
+#define KEYFILE_CUSTOM "custom"
 
-#line 18 "stuffkeeper-data-item-private.h"
+#line 20 "stuffkeeper-data-item-private.h"
 struct _StuffKeeperDataItemPrivate {
-#line 15 "stuffkeeper-data-item.gob"
-	gint id;
-#line 16 "stuffkeeper-data-item.gob"
-	gchar * title;
-#line 24 "stuffkeeper-data-item-private.h"
+#line 17 "stuffkeeper-data-item.gob"
+	GKeyFile * data;
+#line 18 "stuffkeeper-data-item.gob"
+	char * path;
+#line 26 "stuffkeeper-data-item-private.h"
 };
 
 #ifdef __cplusplus

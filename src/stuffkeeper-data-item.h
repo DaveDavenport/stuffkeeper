@@ -58,8 +58,8 @@ GType	stuffkeeper_data_item_get_type	(void);
 void 	stuffkeeper_data_item_item_changed	(StuffKeeperDataItem * self);
 void 	stuffkeeper_data_item_save_yourself	(StuffKeeperDataItem * self);
 void 	stuffkeeper_data_item_delete_yourself	(StuffKeeperDataItem * self);
-StuffKeeperDataItem * 	stuffkeeper_data_item_new	(void);
-StuffKeeperDataItem * 	stuffkeeper_data_item_new_with_id	(gint id);
+StuffKeeperDataItem * 	stuffkeeper_data_item_new	(const gchar * path);
+StuffKeeperDataItem * 	stuffkeeper_data_item_new_from_file	(const gchar * file);
 gint 	stuffkeeper_data_item_get_id	(StuffKeeperDataItem * self);
 const gchar * 	stuffkeeper_data_item_get_title	(StuffKeeperDataItem * self);
 const gchar * 	stuffkeeper_data_item_set_title	(StuffKeeperDataItem * self,

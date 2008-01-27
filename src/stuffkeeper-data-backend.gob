@@ -56,13 +56,14 @@ class StuffKeeper:Data:Backend from G:Object
         gint *id;
         StuffKeeperDataItem *item;
         /* create a new item */
-        item = stuffkeeper_data_item_new();
+        item = stuffkeeper_data_item_new("/home/qball/.stuffkeeper/items/");
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
         *id = stuffkeeper_data_item_get_id(item);
         /* insert it into my hash-list */
         g_hash_table_insert(self->_priv->items,id, item);
         self_item_added(self, item);
+
         return item;
     }
 
@@ -92,12 +93,28 @@ class StuffKeeper:Data:Backend from G:Object
         printf("Loading content\n");
 
         /* Load schema's */
-        int i;
-        for(i=0;i<1;i++)
+        GDir *dir = g_dir_open("/home/qball/.stuffkeeper/items", 0, NULL);
+        if(dir)
         {
-            item = self_new_item(self);
-        }
+            gchar *filename;
+            while((filename = g_dir_read_name(dir))!= NULL)
+            {
+                gchar *full_path = g_strdup_printf("/home/qball/.stuffkeeper/items/%s", filename);
+                StuffKeeperDataItem *item;
+                gint *id;
+                /* create a new item */
+                item = stuffkeeper_data_item_new_from_file(full_path);
+                /* want to copy the key, even if it is an integer */
+                id = g_malloc0(sizeof(gint));
+                *id = stuffkeeper_data_item_get_id(item);
+                /* insert it into my hash-list */
+                g_hash_table_insert(self->_priv->items,id, item);
+                self_item_added(self, item);
 
+                g_free(full_path);
+            }
+            g_dir_close(dir);
+        }
         /* Load items */
     }
 

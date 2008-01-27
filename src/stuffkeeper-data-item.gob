@@ -2,6 +2,8 @@ requires 2.0.10
 
 %ph{
     #include "stuffkeeper-data-backend.h"
+#define KEYFILE_GENERAL "general"
+#define KEYFILE_CUSTOM "custom"
 %}
 
 %header{
@@ -12,14 +14,15 @@ requires 2.0.10
 
 class StuffKeeper:Data:Item from G:Object 
 {
-    private gint id = {0};
-    private gchar *title = {g_strdup("N/A")} destroywith g_free;
+    private GKeyFile *data = {NULL};
+    private char * path = {NULL} destroywith g_free;
 
     signal last NONE (NONE)
     void
     item_changed(self)
     {
-        printf("Signal my change: %i\n", self->_priv->id);
+        gint id = self_get_id(self);
+        printf("Signal my change: %i\n", id); 
     }
 
     /* Finalize functions */
@@ -27,7 +30,13 @@ class StuffKeeper:Data:Item from G:Object
     void
     finalize (G:Object *obj)
     {
+        Self *self = SELF(obj);
         printf("destroying item\n");
+        if(self->_priv->data)
+        {
+            g_key_file_free(self->_priv->data);
+            self->_priv->data = NULL;
+        }
         PARENT_HANDLER(obj);
     }
     /**
@@ -37,44 +46,55 @@ class StuffKeeper:Data:Item from G:Object
     void
     save_yourself(self)
     {
-
-        if(self->_priv->id == -1)
+        gint id = self_get_id(self);
+        printf("saving myself: %i\n",id);
+        if(self->_priv->data)
         {
-            printf("Cannot save a deleted item\n");
-            return;
+            char *content;
+            gsize size;
+            content = g_key_file_to_data(self->_priv->data,&size, NULL);
+            g_file_set_contents(self->_priv->path, content, size, NULL);
+            g_free(content);
         }
-        printf("Saving myself: %i\n", self->_priv->id);
-        /* ToDo */
-
     }
 
     public
     void
     delete_yourself(self)
     {
-        printf("Deleting myself: %i\n", self->_priv->id);
-        self->_priv->id = -1;
+        gint id = self_get_id(self);
+        printf("Deleting myself: %i\n", id);
+        g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
+        g_unlink(self->_priv->path);
+        g_free(self->_priv->path);
+        self->_priv->path = NULL;
     }
 
     /* Create new StuffKeeperDataBackend */
     public 
         StuffKeeperDataItem *
-        new (void)
+        new (const gchar *path)
         {
             
             Self *obj = GET_NEW;
-            obj->_priv->id = g_random_int();
-            printf("Creating item: %i\n", obj->_priv->id);
+            gint id = g_random_int();
+            obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
+            obj->_priv->data = g_key_file_new();
+            g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
+            printf("Creating item: %i\n", id);
+            self_save_yourself(obj);
             return obj;
         }
 
     public
     StuffKeeperDataItem *
-    new_with_id (gint id)
+    new_from_file (const gchar *file)
     {
         Self *obj = GET_NEW;
-        obj->_priv->id = id;
-        printf("Creating item: %i\n", obj->_priv->id);
+        obj->_priv->data = g_key_file_new();
+        obj->_priv->path = g_strdup(file);
+        g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
+
         return obj;
     }
 
@@ -83,28 +103,21 @@ class StuffKeeper:Data:Item from G:Object
     gint
     get_id(self)
     {
-        return self->_priv->id;
+        gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "id",NULL);
+        return id;
     }
 
     public 
     const gchar *
     get_title(self)
     {
-        return self->_priv->title;
+        return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, "title", NULL); 
     }
     public 
     const gchar *
     set_title(self, const gchar *title)
     {
-        if(self->_priv->title)
-        {
-            g_free(self->_priv->title);
-            self->_priv->title = NULL;
-        }
-        if(title)
-        {
-            self->_priv->title = g_strdup(title);
-        }
+        g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         printf("new title: %s\n", title);
         self_item_changed(self);
     }

@@ -191,7 +191,7 @@ ___finalize(GObject *obj_self)
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::finalize"
 	StuffKeeperDataBackend *self G_GNUC_UNUSED = STUFFKEEPER_DATA_BACKEND (obj_self);
 	gpointer priv G_GNUC_UNUSED = self->_priv;
-#line 112 "stuffkeeper-data-backend.gob"
+#line 129 "stuffkeeper-data-backend.gob"
 	___9_stuffkeeper_data_backend_finalize(obj_self);
 #line 197 "stuffkeeper-data-backend.c"
 }
@@ -260,7 +260,7 @@ stuffkeeper_data_backend_class_init (StuffKeeperDataBackendClass * c G_GNUC_UNUS
 	c->item_added = ___real_stuffkeeper_data_backend_item_added;
 #line 33 "stuffkeeper-data-backend.gob"
 	c->item_removed = ___real_stuffkeeper_data_backend_item_removed;
-#line 112 "stuffkeeper-data-backend.gob"
+#line 129 "stuffkeeper-data-backend.gob"
 	g_object_class->finalize = ___finalize;
 #line 266 "stuffkeeper-data-backend.c"
 }
@@ -449,31 +449,32 @@ stuffkeeper_data_backend_new_item (StuffKeeperDataBackend * self)
         gint *id;
         StuffKeeperDataItem *item;
         /* create a new item */
-        item = stuffkeeper_data_item_new();
+        item = stuffkeeper_data_item_new("/home/qball/.stuffkeeper/items/");
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
         *id = stuffkeeper_data_item_get_id(item);
         /* insert it into my hash-list */
         g_hash_table_insert(self->_priv->items,id, item);
         self_item_added(self, item);
+
         return item;
     }}
-#line 462 "stuffkeeper-data-backend.c"
+#line 463 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
-#line 69 "stuffkeeper-data-backend.gob"
+#line 70 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_remove_item (StuffKeeperDataBackend * self, gint id)
-#line 468 "stuffkeeper-data-backend.c"
+#line 469 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::remove_item"
-#line 69 "stuffkeeper-data-backend.gob"
+#line 70 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (self != NULL);
-#line 69 "stuffkeeper-data-backend.gob"
+#line 70 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
-#line 475 "stuffkeeper-data-backend.c"
+#line 476 "stuffkeeper-data-backend.c"
 {
-#line 72 "stuffkeeper-data-backend.gob"
+#line 73 "stuffkeeper-data-backend.gob"
 	
         StuffKeeperDataItem *item = g_hash_table_lookup(self->_priv->items, &id);
         if(item)
@@ -487,63 +488,79 @@ stuffkeeper_data_backend_remove_item (StuffKeeperDataBackend * self, gint id)
         }
         self_item_removed(self, id);
     }}
-#line 491 "stuffkeeper-data-backend.c"
+#line 492 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
-#line 87 "stuffkeeper-data-backend.gob"
+#line 88 "stuffkeeper-data-backend.gob"
 void 
 stuffkeeper_data_backend_load (StuffKeeperDataBackend * self)
-#line 497 "stuffkeeper-data-backend.c"
+#line 498 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::load"
-#line 87 "stuffkeeper-data-backend.gob"
+#line 88 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (self != NULL);
-#line 87 "stuffkeeper-data-backend.gob"
+#line 88 "stuffkeeper-data-backend.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_BACKEND (self));
-#line 504 "stuffkeeper-data-backend.c"
+#line 505 "stuffkeeper-data-backend.c"
 {
-#line 90 "stuffkeeper-data-backend.gob"
+#line 91 "stuffkeeper-data-backend.gob"
 	
         StuffKeeperDataItem *item;
         printf("Loading content\n");
 
         /* Load schema's */
-        int i;
-        for(i=0;i<1;i++)
+        GDir *dir = g_dir_open("/home/qball/.stuffkeeper/items", 0, NULL);
+        if(dir)
         {
-            item = self_new_item(self);
-        }
+            gchar *filename;
+            while((filename = g_dir_read_name(dir))!= NULL)
+            {
+                gchar *full_path = g_strdup_printf("/home/qball/.stuffkeeper/items/%s", filename);
+                StuffKeeperDataItem *item;
+                gint *id;
+                /* create a new item */
+                item = stuffkeeper_data_item_new_from_file(full_path);
+                /* want to copy the key, even if it is an integer */
+                id = g_malloc0(sizeof(gint));
+                *id = stuffkeeper_data_item_get_id(item);
+                /* insert it into my hash-list */
+                g_hash_table_insert(self->_priv->items,id, item);
+                self_item_added(self, item);
 
+                g_free(full_path);
+            }
+            g_dir_close(dir);
+        }
         /* Load items */
     }}
-#line 520 "stuffkeeper-data-backend.c"
+#line 537 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
-#line 104 "stuffkeeper-data-backend.gob"
+#line 121 "stuffkeeper-data-backend.gob"
 static void 
 stuffkeeper_data_backend_finalize_item (gint * key, StuffKeeperDataItem * item, gpointer user_data)
-#line 526 "stuffkeeper-data-backend.c"
+#line 543 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::finalize_item"
 {
-#line 107 "stuffkeeper-data-backend.gob"
+#line 124 "stuffkeeper-data-backend.gob"
 	
         stuffkeeper_data_item_save_yourself(item);
     }}
-#line 534 "stuffkeeper-data-backend.c"
+#line 551 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 
-#line 112 "stuffkeeper-data-backend.gob"
+#line 129 "stuffkeeper-data-backend.gob"
 static void 
 ___9_stuffkeeper_data_backend_finalize (GObject * obj G_GNUC_UNUSED)
-#line 540 "stuffkeeper-data-backend.c"
+#line 557 "stuffkeeper-data-backend.c"
 #define PARENT_HANDLER(___obj) \
 	{ if(G_OBJECT_CLASS(parent_class)->finalize) \
 		(* G_OBJECT_CLASS(parent_class)->finalize)(___obj); }
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::finalize"
 {
-#line 115 "stuffkeeper-data-backend.gob"
+#line 132 "stuffkeeper-data-backend.gob"
 	
         Self *self = SELF(obj);
         printf("destroying\n");
@@ -558,21 +575,21 @@ ___9_stuffkeeper_data_backend_finalize (GObject * obj G_GNUC_UNUSED)
 
             PARENT_HANDLER(obj);
     }}
-#line 562 "stuffkeeper-data-backend.c"
+#line 579 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
 #undef PARENT_HANDLER
 
-#line 132 "stuffkeeper-data-backend.gob"
+#line 149 "stuffkeeper-data-backend.gob"
 StuffKeeperDataBackend * 
 stuffkeeper_data_backend_new (void)
-#line 569 "stuffkeeper-data-backend.c"
+#line 586 "stuffkeeper-data-backend.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Backend::new"
 {
-#line 135 "stuffkeeper-data-backend.gob"
+#line 152 "stuffkeeper-data-backend.gob"
 	
             printf("Creating backend\n");
             return GET_NEW;
         }}
-#line 578 "stuffkeeper-data-backend.c"
+#line 595 "stuffkeeper-data-backend.c"
 #undef __GOB_FUNCTION__
