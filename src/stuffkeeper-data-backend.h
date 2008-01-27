@@ -12,6 +12,7 @@ extern "C" {
 
 
     #include "stuffkeeper-data-item.h"
+    #include "stuffkeeper-data-tag.h"
 
 
 
@@ -54,6 +55,8 @@ struct _StuffKeeperDataBackendClass {
 	/*signal*/void (* item_changed) (StuffKeeperDataBackend * self, StuffKeeperDataItem * item);
 	/*signal*/void (* item_added) (StuffKeeperDataBackend * self, StuffKeeperDataItem * item);
 	/*signal*/void (* item_removed) (StuffKeeperDataBackend * self, gint id);
+	/*signal*/void (* tag_changed) (StuffKeeperDataBackend * self, StuffKeeperDataTag * tag);
+	/*signal*/void (* tag_added) (StuffKeeperDataBackend * self, StuffKeeperDataTag * tag);
 };
 
 
@@ -72,8 +75,18 @@ StuffKeeperDataItem * 	stuffkeeper_data_backend_get_item	(StuffKeeperDataBackend
 StuffKeeperDataItem * 	stuffkeeper_data_backend_new_item	(StuffKeeperDataBackend * self);
 void 	stuffkeeper_data_backend_remove_item	(StuffKeeperDataBackend * self,
 					gint id);
-void 	stuffkeeper_data_backend_load	(StuffKeeperDataBackend * self);
+void 	stuffkeeper_data_backend_load	(StuffKeeperDataBackend * self,
+					const gchar * db_path);
 StuffKeeperDataBackend * 	stuffkeeper_data_backend_new	(void);
+void 	stuffkeeper_data_backend_tag_changed	(StuffKeeperDataBackend * self,
+					StuffKeeperDataTag * tag);
+void 	stuffkeeper_data_backend_tag_added	(StuffKeeperDataBackend * self,
+					StuffKeeperDataTag * tag);
+StuffKeeperDataTag * 	stuffkeeper_data_backend_add_tag	(StuffKeeperDataBackend * self,
+					StuffKeeperDataItem * item,
+					const int id);
+StuffKeeperDataTag * 	stuffkeeper_data_backend_get_tag	(StuffKeeperDataBackend * self,
+					const int id);
 
 /*
  * Signal connection wrapper macros
@@ -88,6 +101,12 @@ StuffKeeperDataBackend * 	stuffkeeper_data_backend_new	(void);
 #define stuffkeeper_data_backend_connect__item_removed(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"item_removed",(GCallback) __extension__ ({void (* ___item_removed) (StuffKeeperDataBackend * ___fake___self, gint ___fake___id, gpointer ___data ) = (func); ___item_removed; }), (data))
 #define stuffkeeper_data_backend_connect_after__item_removed(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"item_removed",(GCallback) __extension__ ({void (* ___item_removed) (StuffKeeperDataBackend * ___fake___self, gint ___fake___id, gpointer ___data ) = (func); ___item_removed; }), (data))
 #define stuffkeeper_data_backend_connect_data__item_removed(object,func,data,destroy_data,flags)	g_signal_connect_data(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"item_removed",(GCallback) __extension__ ({void (* ___item_removed) (StuffKeeperDataBackend * ___fake___self, gint ___fake___id, gpointer ___data ) = (func); ___item_removed; }), (data), (destroy_data), (GConnectFlags)(flags))
+#define stuffkeeper_data_backend_connect__tag_changed(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"tag_changed",(GCallback) __extension__ ({void (* ___tag_changed) (StuffKeeperDataBackend * ___fake___self, StuffKeeperDataTag * ___fake___tag, gpointer ___data ) = (func); ___tag_changed; }), (data))
+#define stuffkeeper_data_backend_connect_after__tag_changed(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"tag_changed",(GCallback) __extension__ ({void (* ___tag_changed) (StuffKeeperDataBackend * ___fake___self, StuffKeeperDataTag * ___fake___tag, gpointer ___data ) = (func); ___tag_changed; }), (data))
+#define stuffkeeper_data_backend_connect_data__tag_changed(object,func,data,destroy_data,flags)	g_signal_connect_data(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"tag_changed",(GCallback) __extension__ ({void (* ___tag_changed) (StuffKeeperDataBackend * ___fake___self, StuffKeeperDataTag * ___fake___tag, gpointer ___data ) = (func); ___tag_changed; }), (data), (destroy_data), (GConnectFlags)(flags))
+#define stuffkeeper_data_backend_connect__tag_added(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"tag_added",(GCallback) __extension__ ({void (* ___tag_added) (StuffKeeperDataBackend * ___fake___self, StuffKeeperDataTag * ___fake___tag, gpointer ___data ) = (func); ___tag_added; }), (data))
+#define stuffkeeper_data_backend_connect_after__tag_added(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"tag_added",(GCallback) __extension__ ({void (* ___tag_added) (StuffKeeperDataBackend * ___fake___self, StuffKeeperDataTag * ___fake___tag, gpointer ___data ) = (func); ___tag_added; }), (data))
+#define stuffkeeper_data_backend_connect_data__tag_added(object,func,data,destroy_data,flags)	g_signal_connect_data(STUFFKEEPER_DATA_BACKEND(__extension__ ({StuffKeeperDataBackend *___object = (object); ___object; })),"tag_added",(GCallback) __extension__ ({void (* ___tag_added) (StuffKeeperDataBackend * ___fake___self, StuffKeeperDataTag * ___fake___tag, gpointer ___data ) = (func); ___tag_added; }), (data), (destroy_data), (GConnectFlags)(flags))
 #else /* __GNUC__ && !__STRICT_ANSI__ */
 #define stuffkeeper_data_backend_connect__item_changed(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(object),"item_changed",(GCallback)(func),(data))
 #define stuffkeeper_data_backend_connect_after__item_changed(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(object),"item_changed",(GCallback)(func),(data))
@@ -98,6 +117,12 @@ StuffKeeperDataBackend * 	stuffkeeper_data_backend_new	(void);
 #define stuffkeeper_data_backend_connect__item_removed(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(object),"item_removed",(GCallback)(func),(data))
 #define stuffkeeper_data_backend_connect_after__item_removed(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(object),"item_removed",(GCallback)(func),(data))
 #define stuffkeeper_data_backend_connect_data__item_removed(object,func,data,destroy_data,flags)	g_signal_connect_data(STUFFKEEPER_DATA_BACKEND(object),"item_removed",(GCallback)(func),(data),(destroy_data),(GConnectFlags)(flags))
+#define stuffkeeper_data_backend_connect__tag_changed(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(object),"tag_changed",(GCallback)(func),(data))
+#define stuffkeeper_data_backend_connect_after__tag_changed(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(object),"tag_changed",(GCallback)(func),(data))
+#define stuffkeeper_data_backend_connect_data__tag_changed(object,func,data,destroy_data,flags)	g_signal_connect_data(STUFFKEEPER_DATA_BACKEND(object),"tag_changed",(GCallback)(func),(data),(destroy_data),(GConnectFlags)(flags))
+#define stuffkeeper_data_backend_connect__tag_added(object,func,data)	g_signal_connect(STUFFKEEPER_DATA_BACKEND(object),"tag_added",(GCallback)(func),(data))
+#define stuffkeeper_data_backend_connect_after__tag_added(object,func,data)	g_signal_connect_after(STUFFKEEPER_DATA_BACKEND(object),"tag_added",(GCallback)(func),(data))
+#define stuffkeeper_data_backend_connect_data__tag_added(object,func,data,destroy_data,flags)	g_signal_connect_data(STUFFKEEPER_DATA_BACKEND(object),"tag_added",(GCallback)(func),(data),(destroy_data),(GConnectFlags)(flags))
 #endif /* __GNUC__ && !__STRICT_ANSI__ */
 
 

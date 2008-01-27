@@ -6,7 +6,8 @@ SOURCE=\
 	main.c\
 	interface.c\
 	stuffkeeper-data-backend.c\
-	stuffkeeper-data-item.c
+	stuffkeeper-data-item.c\
+	stuffkeeper-data-tag.c
 	
 %.c %.h %-private.h: %.gob
 	gob2 --no-touch-headers --always-private-header $<
@@ -14,7 +15,7 @@ SOURCE=\
 
 
 all: $(SOURCE)
-	$(CC) -o stuffkeeper $(SOURCE) $(GTK_LIBS) $(GTK_CFLAGS)
+	$(CC) -g -O2 -o stuffkeeper $(SOURCE) $(GTK_LIBS) $(GTK_CFLAGS)
 
 clean:
 	@rm stuffkeeper

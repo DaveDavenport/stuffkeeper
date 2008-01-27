@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
     #include "stuffkeeper-data-item.h"
+    #include "stuffkeeper-data-tag.h"
 %}
 %header{
     #include <stdio.h>
@@ -10,7 +11,17 @@ requires 2.0.10
 
 class StuffKeeper:Data:Backend from G:Object 
 {
+    /**
+     * Private values 
+     */
+    /* A hash list used to store the tags, the tags id is the hash key */
+    private GHashTable *tags = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} ;
+
+    /* A hash list used to store the items, the item id is the hash key */
     private GHashTable *items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} ;
+
+    /* The path this "db" resides */
+    private gchar *path = {NULL} destroywith g_free;
 
     /**
      * Signal 
@@ -56,7 +67,7 @@ class StuffKeeper:Data:Backend from G:Object
         gint *id;
         StuffKeeperDataItem *item;
         /* create a new item */
-        item = stuffkeeper_data_item_new("/home/qball/.stuffkeeper/items/");
+        item = stuffkeeper_data_item_new(G_OBJECT(self),"/home/qball/.stuffkeeper/items/");
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
         *id = stuffkeeper_data_item_get_id(item);
@@ -87,23 +98,82 @@ class StuffKeeper:Data:Backend from G:Object
     /* Load the data */
     public
     void
-    load(self)
+    load(self, const gchar *db_path)
     {
+        /* item */
         StuffKeeperDataItem *item;
-        printf("Loading content\n");
+        gchar *path;
+        GDir *dir;
 
-        /* Load schema's */
-        GDir *dir = g_dir_open("/home/qball/.stuffkeeper/items", 0, NULL);
+        printf("Loading content from db path: '%s'\n",db_path);
+
+        /**
+         * Store the path in the backend.
+         */
+        self->_priv->path = g_strdup(db_path);
+
+        /* Read tags */
+        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"tags",NULL);
+        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
+        {
+            g_mkdir(path, 0755);
+            printf("directory created, returning\n");
+            return;
+        }
+
+        printf("Loading items from: %s\n", path);
+        /* Load item's */
+        dir = g_dir_open(path, 0, NULL);
+
+        /* cleanup path pointer */
+        g_free(path);
         if(dir)
         {
-            gchar *filename;
+            const gchar *filename;
             while((filename = g_dir_read_name(dir))!= NULL)
             {
-                gchar *full_path = g_strdup_printf("/home/qball/.stuffkeeper/items/%s", filename);
+                gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"tags", filename,NULL);
+                StuffKeeperDataTag *tag;
+                gint *id;
+                /* create a new item */
+                tag = stuffkeeper_data_tag_new_from_file(full_path);
+                /* want to copy the key, even if it is an integer */
+                id = g_malloc0(sizeof(gint));
+                *id = stuffkeeper_data_tag_get_id(tag);
+                /* insert it into my hash-list */
+                g_hash_table_insert(self->_priv->tags,id, tag);
+                self_tag_added(self, tag);
+                printf("added tag: %i\n", *id); 
+                g_free(full_path);
+            }
+            g_dir_close(dir);
+        }
+
+        /* test the items directory */
+        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"items",NULL);
+        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
+        {
+            g_mkdir(path, 0755);
+            printf("directory created, returning\n");
+            return;
+        }
+
+        printf("Loading items from: %s\n", path);
+        /* Load item's */
+        dir = g_dir_open(path, 0, NULL);
+
+        /* cleanup path pointer */
+        g_free(path);
+        if(dir)
+        {
+            const gchar *filename;
+            while((filename = g_dir_read_name(dir))!= NULL)
+            {
+                gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"items", filename,NULL);
                 StuffKeeperDataItem *item;
                 gint *id;
                 /* create a new item */
-                item = stuffkeeper_data_item_new_from_file(full_path);
+                item = stuffkeeper_data_item_new_from_file(G_OBJECT(self),full_path);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = stuffkeeper_data_item_get_id(item);
@@ -115,15 +185,24 @@ class StuffKeeper:Data:Backend from G:Object
             }
             g_dir_close(dir);
         }
-        /* Load items */
     }
-
+    
+    /**
+     * Handle destroying of the object
+     */
     private
     void
     finalize_item(gint *key, StuffKeeperDataItem *item, gpointer user_data)
     {
         stuffkeeper_data_item_save_yourself(item);
     }
+    private
+    void
+    finalize_tag(gint *key, StuffKeeperDataTag *tag, gpointer user_data)
+    {
+        stuffkeeper_data_tag_save_yourself(tag);
+    }
+
 
 
     override (G:Object)
@@ -140,17 +219,83 @@ class StuffKeeper:Data:Backend from G:Object
 
             self->_priv->items = NULL;
         }
+        if(self->_priv->tags)
+        {
+            g_hash_table_foreach(self->_priv->tags, (GHFunc)self_finalize_tag, NULL);
+            g_hash_table_destroy(self->_priv->tags);
 
-            PARENT_HANDLER(obj);
+            self->_priv->tags = NULL;
+        }
+
+
+        PARENT_HANDLER(obj);
     }
 
 
-    /* Create new StuffKeeperDataBackend */
+    /**
+     * Create new StuffKeeperDataBackend 
+     * destroy with g_object_unref();
+     */
     public 
-        StuffKeeperDataBackend *
-        new (void)
+    StuffKeeperDataBackend *
+    new (void)
+    {
+        Self *self = GET_NEW;
+        printf("Creating backend\n");
+        return self;
+    }
+
+
+    /**
+     * Tags
+     */
+    /* signals  */
+    signal last NONE (POINTER)
+    void
+    tag_changed(self, StuffKeeperDataTag *tag)
+    {
+        printf("Item changed\n");
+    }
+
+    signal last NONE (POINTER)
+        void
+        tag_added(self, StuffKeeperDataTag *tag)
         {
-            printf("Creating backend\n");
-            return GET_NEW;
+            printf("Tag added signal: '%i'\n", stuffkeeper_data_tag_get_id(tag));
+
+            g_signal_connect_swapped(G_OBJECT(tag), "tag-changed", G_CALLBACK(self_tag_changed), self);
         }
+
+    /**
+     * Add tag
+     * Call this from the item when adding a tag, it will return the tag.
+     * Existing tag if it allready exists
+     */
+    public
+    StuffKeeperDataTag *
+    add_tag(self, StuffKeeperDataItem *item, const int id)
+    {
+        StuffKeeperDataTag *tag;
+        printf("looking for tag: %i\n", id);
+        /* Look for existing tag */
+        tag = g_hash_table_lookup(self->_priv->tags, &id);
+        if(tag)
+        {
+            printf("return found tag: %i\n", stuffkeeper_data_tag_get_id(tag));
+            return tag;
+        }
+        /* No tag, lets make one. */
+        tag = stuffkeeper_data_tag_new_with_id("/home/qball/.stuffkeeper/tags/",id);
+        printf("addded tag: %i\n", stuffkeeper_data_tag_get_id(tag));
+        return tag;
+    }
+    public
+        StuffKeeperDataTag *
+    get_tag(self, const int id)
+    {
+        StuffKeeperDataTag *tag;
+        /* Look for existing tag */
+        tag = g_hash_table_lookup(self->_priv->tags, &id);
+        return tag;
+    }
 }

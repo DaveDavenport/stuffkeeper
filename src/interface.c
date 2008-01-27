@@ -8,6 +8,38 @@
 
 GladeXML *xml = NULL;
 StuffKeeperDataBackend *skdbg = NULL;
+
+
+void tag_added(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkListStore *store)
+{
+    GtkTreeIter iter;
+    gtk_list_store_append(store, &iter);
+    gchar *title = stuffkeeper_data_tag_get_title(tag);
+    gtk_list_store_set(store, &iter, 0, stuffkeeper_data_tag_get_id(tag),1,title, -1);
+    g_free(title);
+}
+
+void tag_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkListStore *store)
+{
+    GtkTreeIter iter;
+    GtkTreeModel *model = GTK_TREE_MODEL(store);
+    gint id = stuffkeeper_data_tag_get_id(tag);
+    if(gtk_tree_model_get_iter_first(model, &iter))
+    {
+        do{
+            gint oid;
+            gtk_tree_model_get(model, &iter, 0, &oid, -1);
+            if(oid == id)
+            {
+                gchar *title = stuffkeeper_data_tag_get_title(tag);
+                gtk_list_store_set(store, &iter, 1,title, -1);
+                g_free(title);
+                return;
+            }
+        }while(gtk_tree_model_iter_next(model, &iter));
+    }
+}
+
 /**
  * Update the gtk-list-store with signals from the backend
  */
@@ -108,6 +140,29 @@ void interface_edited
 
     }
 }
+void interface_tag_edited 
+    (
+        GtkCellRendererText *renderer,
+        gchar               *path,
+        gchar               *new_text,
+        GtkTreeModel        *model)
+{
+    GtkTreeIter iter;
+    printf("edited: %s\n", new_text);
+    if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+    {
+        gint id;
+        StuffKeeperDataTag *item;
+        gtk_tree_model_get(model, &iter ,0,&id, -1);
+        printf("get tag: %i\n",id);
+        item = stuffkeeper_data_backend_get_tag(skdbg, id);
+        if(item)
+        {
+            stuffkeeper_data_tag_set_title(item, new_text);
+        }
+
+    }
+}
 /**
  * Quit the program
  */
@@ -158,6 +213,24 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     store = (GtkTreeModel *)gtk_tree_model_filter_new(GTK_TREE_MODEL(original), NULL);
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(store), interface_visible_func, NULL, NULL);
     gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(store));
+
+    /* Tag list */
+
+    store = (GtkTreeModel *)gtk_list_store_new(2, G_TYPE_INT,G_TYPE_STRING);
+
+    tree = glade_xml_get_widget(xml, "treeview1");
+    renderer = gtk_cell_renderer_text_new();
+    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
+    g_object_set(renderer, "editable", TRUE);
+    g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_tag_edited), store);
+
+
+
+    g_signal_connect(G_OBJECT(skdb), "tag-added", G_CALLBACK(tag_added), store);
+
+    g_signal_connect(G_OBJECT(skdb), "tag-changed", G_CALLBACK(tag_changed), store);
+    gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(store));
+
 
 
 

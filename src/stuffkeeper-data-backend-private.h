@@ -10,9 +10,13 @@ extern "C" {
 #endif /* __cplusplus */
 
 struct _StuffKeeperDataBackendPrivate {
-#line 13 "stuffkeeper-data-backend.gob"
+#line 18 "stuffkeeper-data-backend.gob"
+	GHashTable * tags;
+#line 21 "stuffkeeper-data-backend.gob"
 	GHashTable * items;
-#line 16 "stuffkeeper-data-backend-private.h"
+#line 24 "stuffkeeper-data-backend.gob"
+	gchar * path;
+#line 20 "stuffkeeper-data-backend-private.h"
 };
 
 #ifdef __cplusplus

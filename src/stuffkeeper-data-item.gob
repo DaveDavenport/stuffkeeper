@@ -1,12 +1,15 @@
 requires 2.0.10
 
 %ph{
-    #include "stuffkeeper-data-backend.h"
+
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_CUSTOM "custom"
 %}
 
-%header{
+%ph{
+    #include "stuffkeeper-data-backend.h"
+%}
+%{
     #include <stdio.h>
 %}
 
@@ -14,8 +17,10 @@ requires 2.0.10
 
 class StuffKeeper:Data:Item from G:Object 
 {
+    private StuffKeeperDataBackend *skdb = {NULL};
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
+    private GList *tags = {NULL} destroywith g_list_free;
 
     /**
      * Signals 
@@ -76,11 +81,12 @@ class StuffKeeper:Data:Item from G:Object
     /* Create new StuffKeeperDataBackend */
     public 
         StuffKeeperDataItem *
-        new (const gchar *path)
+        new (G:Object *skdb, const gchar *path)
         {
-            
+
             Self *obj = GET_NEW;
             gint id = g_random_int();
+            obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
@@ -91,13 +97,26 @@ class StuffKeeper:Data:Item from G:Object
 
     public
     StuffKeeperDataItem *
-    new_from_file (const gchar *file)
+    new_from_file (G:Object *skdb, const gchar *file)
     {
         Self *obj = GET_NEW;
+        obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
         obj->_priv->data = g_key_file_new();
         obj->_priv->path = g_strdup(file);
         g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
-
+        /* Load the tags */
+        gsize items;
+        int *tags = g_key_file_get_integer_list(obj->_priv->data, KEYFILE_GENERAL, "tags", &items, NULL);
+        if(tags)
+        {
+           int i;
+           for(i=0;i<items;i++)
+           {
+               StuffKeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,obj, tags[i]);
+               obj->_priv->tags = g_list_append(obj->_priv->tags, tag);
+           }
+           g_free(tags);
+        }
         return obj;
     }
 
@@ -140,7 +159,7 @@ class StuffKeeper:Data:Item from G:Object
     gboolean
     has_tag(self, const gchar *tag_id)
     {
-
+        return TRUE;
     }
     
 }

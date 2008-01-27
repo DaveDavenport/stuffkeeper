@@ -10,10 +10,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 
-
-    #include <stdio.h>
-
-
 /*
  * Type checking and casting macros
  */
@@ -58,8 +54,10 @@ GType	stuffkeeper_data_item_get_type	(void);
 void 	stuffkeeper_data_item_item_changed	(StuffKeeperDataItem * self);
 void 	stuffkeeper_data_item_save_yourself	(StuffKeeperDataItem * self);
 void 	stuffkeeper_data_item_delete_yourself	(StuffKeeperDataItem * self);
-StuffKeeperDataItem * 	stuffkeeper_data_item_new	(const gchar * path);
-StuffKeeperDataItem * 	stuffkeeper_data_item_new_from_file	(const gchar * file);
+StuffKeeperDataItem * 	stuffkeeper_data_item_new	(GObject * skdb,
+					const gchar * path);
+StuffKeeperDataItem * 	stuffkeeper_data_item_new_from_file	(GObject * skdb,
+					const gchar * file);
 gint 	stuffkeeper_data_item_get_id	(StuffKeeperDataItem * self);
 gchar * 	stuffkeeper_data_item_get_title	(StuffKeeperDataItem * self);
 void 	stuffkeeper_data_item_set_title	(StuffKeeperDataItem * self,

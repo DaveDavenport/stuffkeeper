@@ -12,17 +12,27 @@ extern "C" {
 
 #line 3 "stuffkeeper-data-item.gob"
 
-    #include "stuffkeeper-data-backend.h"
+
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_CUSTOM "custom"
 
 #line 20 "stuffkeeper-data-item-private.h"
-struct _StuffKeeperDataItemPrivate {
-#line 17 "stuffkeeper-data-item.gob"
-	GKeyFile * data;
-#line 18 "stuffkeeper-data-item.gob"
-	char * path;
+
+#line 9 "stuffkeeper-data-item.gob"
+
+    #include "stuffkeeper-data-backend.h"
+
 #line 26 "stuffkeeper-data-item-private.h"
+struct _StuffKeeperDataItemPrivate {
+#line 20 "stuffkeeper-data-item.gob"
+	StuffKeeperDataBackend * skdb;
+#line 21 "stuffkeeper-data-item.gob"
+	GKeyFile * data;
+#line 22 "stuffkeeper-data-item.gob"
+	char * path;
+#line 23 "stuffkeeper-data-item.gob"
+	GList * tags;
+#line 36 "stuffkeeper-data-item-private.h"
 };
 
 #ifdef __cplusplus
