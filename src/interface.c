@@ -203,7 +203,7 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
    
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
-    g_object_set(renderer, "editable", TRUE);
+    g_object_set(renderer, "editable", TRUE,NULL);
     g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_edited), original);
 
     g_signal_connect(G_OBJECT(skdb), "item-added", G_CALLBACK(item_added), original);
@@ -221,7 +221,7 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     tree = glade_xml_get_widget(xml, "treeview1");
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
-    g_object_set(renderer, "editable", TRUE);
+    g_object_set(renderer, "editable", TRUE,NULL);
     g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_tag_edited), store);
 
 
