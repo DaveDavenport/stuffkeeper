@@ -17,6 +17,9 @@ class StuffKeeper:Data:Item from G:Object
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
 
+    /**
+     * Signals 
+     */
     signal last NONE (NONE)
     void
     item_changed(self)
@@ -99,6 +102,10 @@ class StuffKeeper:Data:Item from G:Object
     }
 
     /* setting fields */
+
+    /**
+     * ID (ro)
+     */
     public
     gint
     get_id(self)
@@ -106,19 +113,34 @@ class StuffKeeper:Data:Item from G:Object
         gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "id",NULL);
         return id;
     }
-
+    
+    /**
+     * Title (rw)
+     */
     public 
-    const gchar *
+    gchar *
     get_title(self)
     {
         return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, "title", NULL); 
     }
+
+
     public 
-    const gchar *
+    void
     set_title(self, const gchar *title)
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         printf("new title: %s\n", title);
         self_item_changed(self);
     }
+    /**
+     * Tags
+     */
+    public
+    gboolean
+    has_tag(self, const gchar *tag_id)
+    {
+
+    }
+    
 }

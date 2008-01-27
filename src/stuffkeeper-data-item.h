@@ -61,9 +61,11 @@ void 	stuffkeeper_data_item_delete_yourself	(StuffKeeperDataItem * self);
 StuffKeeperDataItem * 	stuffkeeper_data_item_new	(const gchar * path);
 StuffKeeperDataItem * 	stuffkeeper_data_item_new_from_file	(const gchar * file);
 gint 	stuffkeeper_data_item_get_id	(StuffKeeperDataItem * self);
-const gchar * 	stuffkeeper_data_item_get_title	(StuffKeeperDataItem * self);
-const gchar * 	stuffkeeper_data_item_set_title	(StuffKeeperDataItem * self,
+gchar * 	stuffkeeper_data_item_get_title	(StuffKeeperDataItem * self);
+void 	stuffkeeper_data_item_set_title	(StuffKeeperDataItem * self,
 					const gchar * title);
+gboolean 	stuffkeeper_data_item_has_tag	(StuffKeeperDataItem * self,
+					const gchar * tag_id);
 
 /*
  * Signal connection wrapper macros

@@ -66,6 +66,7 @@ static GObjectClass *parent_class = NULL;
 #define self_get_id stuffkeeper_data_item_get_id
 #define self_get_title stuffkeeper_data_item_get_title
 #define self_set_title stuffkeeper_data_item_set_title
+#define self_has_tag stuffkeeper_data_item_has_tag
 GType
 stuffkeeper_data_item_get_type (void)
 {
@@ -115,12 +116,12 @@ ___finalize(GObject *obj_self)
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::finalize"
 	StuffKeeperDataItem *self G_GNUC_UNUSED = STUFFKEEPER_DATA_ITEM (obj_self);
 	gpointer priv G_GNUC_UNUSED = self->_priv;
-#line 29 "stuffkeeper-data-item.gob"
+#line 32 "stuffkeeper-data-item.gob"
 	___2_stuffkeeper_data_item_finalize(obj_self);
-#line 121 "stuffkeeper-data-item.c"
+#line 122 "stuffkeeper-data-item.c"
 #line 18 "stuffkeeper-data-item.gob"
 	if(self->_priv->path) { g_free ((gpointer) self->_priv->path); self->_priv->path = NULL; }
-#line 124 "stuffkeeper-data-item.c"
+#line 125 "stuffkeeper-data-item.c"
 }
 #undef __GOB_FUNCTION__
 
@@ -131,10 +132,10 @@ stuffkeeper_data_item_init (StuffKeeperDataItem * o G_GNUC_UNUSED)
 	o->_priv = G_TYPE_INSTANCE_GET_PRIVATE(o,STUFFKEEPER_TYPE_DATA_ITEM,StuffKeeperDataItemPrivate);
 #line 17 "stuffkeeper-data-item.gob"
 	o->_priv->data = NULL;
-#line 135 "stuffkeeper-data-item.c"
+#line 136 "stuffkeeper-data-item.c"
 #line 18 "stuffkeeper-data-item.gob"
 	o->_priv->path = NULL;
-#line 138 "stuffkeeper-data-item.c"
+#line 139 "stuffkeeper-data-item.c"
 }
 #undef __GOB_FUNCTION__
 static void 
@@ -156,20 +157,20 @@ stuffkeeper_data_item_class_init (StuffKeeperDataItemClass * c G_GNUC_UNUSED)
 			g_cclosure_marshal_VOID__VOID,
 			G_TYPE_NONE, 0);
 
-#line 20 "stuffkeeper-data-item.gob"
+#line 23 "stuffkeeper-data-item.gob"
 	c->item_changed = ___real_stuffkeeper_data_item_item_changed;
-#line 29 "stuffkeeper-data-item.gob"
+#line 32 "stuffkeeper-data-item.gob"
 	g_object_class->finalize = ___finalize;
-#line 164 "stuffkeeper-data-item.c"
+#line 165 "stuffkeeper-data-item.c"
 }
 #undef __GOB_FUNCTION__
 
 
 
-#line 20 "stuffkeeper-data-item.gob"
+#line 23 "stuffkeeper-data-item.gob"
 void 
 stuffkeeper_data_item_item_changed (StuffKeeperDataItem * self)
-#line 173 "stuffkeeper-data-item.c"
+#line 174 "stuffkeeper-data-item.c"
 {
 	GValue ___param_values[1];
 	GValue ___return_val;
@@ -177,11 +178,11 @@ stuffkeeper_data_item_item_changed (StuffKeeperDataItem * self)
 memset (&___return_val, 0, sizeof (___return_val));
 memset (&___param_values, 0, sizeof (___param_values));
 
-#line 20 "stuffkeeper-data-item.gob"
+#line 23 "stuffkeeper-data-item.gob"
 	g_return_if_fail (self != NULL);
-#line 20 "stuffkeeper-data-item.gob"
+#line 23 "stuffkeeper-data-item.gob"
 	g_return_if_fail (STUFFKEEPER_IS_DATA_ITEM (self));
-#line 185 "stuffkeeper-data-item.c"
+#line 186 "stuffkeeper-data-item.c"
 
 	___param_values[0].g_type = 0;
 	g_value_init (&___param_values[0], G_TYPE_FROM_INSTANCE (self));
@@ -194,32 +195,32 @@ memset (&___param_values, 0, sizeof (___param_values));
 
 	g_value_unset (&___param_values[0]);
 }
-#line 20 "stuffkeeper-data-item.gob"
+#line 23 "stuffkeeper-data-item.gob"
 static void 
 ___real_stuffkeeper_data_item_item_changed (StuffKeeperDataItem * self G_GNUC_UNUSED)
-#line 201 "stuffkeeper-data-item.c"
+#line 202 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::item_changed"
 {
-#line 23 "stuffkeeper-data-item.gob"
+#line 26 "stuffkeeper-data-item.gob"
 	
         gint id = self_get_id(self);
         printf("Signal my change: %i\n", id); 
     }}
-#line 210 "stuffkeeper-data-item.c"
+#line 211 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 29 "stuffkeeper-data-item.gob"
+#line 32 "stuffkeeper-data-item.gob"
 static void 
 ___2_stuffkeeper_data_item_finalize (GObject * obj G_GNUC_UNUSED)
-#line 216 "stuffkeeper-data-item.c"
+#line 217 "stuffkeeper-data-item.c"
 #define PARENT_HANDLER(___obj) \
 	{ if(G_OBJECT_CLASS(parent_class)->finalize) \
 		(* G_OBJECT_CLASS(parent_class)->finalize)(___obj); }
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::finalize"
 {
-#line 32 "stuffkeeper-data-item.gob"
+#line 35 "stuffkeeper-data-item.gob"
 	
         Self *self = SELF(obj);
         printf("destroying item\n");
@@ -230,23 +231,23 @@ ___2_stuffkeeper_data_item_finalize (GObject * obj G_GNUC_UNUSED)
         }
         PARENT_HANDLER(obj);
     }}
-#line 234 "stuffkeeper-data-item.c"
+#line 235 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 #undef PARENT_HANDLER
 
-#line 45 "stuffkeeper-data-item.gob"
+#line 48 "stuffkeeper-data-item.gob"
 void 
 stuffkeeper_data_item_save_yourself (StuffKeeperDataItem * self)
-#line 241 "stuffkeeper-data-item.c"
+#line 242 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::save_yourself"
-#line 45 "stuffkeeper-data-item.gob"
-	g_return_if_fail (self != NULL);
-#line 45 "stuffkeeper-data-item.gob"
-	g_return_if_fail (STUFFKEEPER_IS_DATA_ITEM (self));
-#line 248 "stuffkeeper-data-item.c"
-{
 #line 48 "stuffkeeper-data-item.gob"
+	g_return_if_fail (self != NULL);
+#line 48 "stuffkeeper-data-item.gob"
+	g_return_if_fail (STUFFKEEPER_IS_DATA_ITEM (self));
+#line 249 "stuffkeeper-data-item.c"
+{
+#line 51 "stuffkeeper-data-item.gob"
 	
         gint id = self_get_id(self);
         printf("saving myself: %i\n",id);
@@ -259,22 +260,22 @@ stuffkeeper_data_item_save_yourself (StuffKeeperDataItem * self)
             g_free(content);
         }
     }}
-#line 263 "stuffkeeper-data-item.c"
+#line 264 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 61 "stuffkeeper-data-item.gob"
+#line 64 "stuffkeeper-data-item.gob"
 void 
 stuffkeeper_data_item_delete_yourself (StuffKeeperDataItem * self)
-#line 269 "stuffkeeper-data-item.c"
+#line 270 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::delete_yourself"
-#line 61 "stuffkeeper-data-item.gob"
-	g_return_if_fail (self != NULL);
-#line 61 "stuffkeeper-data-item.gob"
-	g_return_if_fail (STUFFKEEPER_IS_DATA_ITEM (self));
-#line 276 "stuffkeeper-data-item.c"
-{
 #line 64 "stuffkeeper-data-item.gob"
+	g_return_if_fail (self != NULL);
+#line 64 "stuffkeeper-data-item.gob"
+	g_return_if_fail (STUFFKEEPER_IS_DATA_ITEM (self));
+#line 277 "stuffkeeper-data-item.c"
+{
+#line 67 "stuffkeeper-data-item.gob"
 	
         gint id = self_get_id(self);
         printf("Deleting myself: %i\n", id);
@@ -283,17 +284,17 @@ stuffkeeper_data_item_delete_yourself (StuffKeeperDataItem * self)
         g_free(self->_priv->path);
         self->_priv->path = NULL;
     }}
-#line 287 "stuffkeeper-data-item.c"
+#line 288 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 74 "stuffkeeper-data-item.gob"
+#line 77 "stuffkeeper-data-item.gob"
 StuffKeeperDataItem * 
 stuffkeeper_data_item_new (const gchar * path)
-#line 293 "stuffkeeper-data-item.c"
+#line 294 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::new"
 {
-#line 77 "stuffkeeper-data-item.gob"
+#line 80 "stuffkeeper-data-item.gob"
 	
             
             Self *obj = GET_NEW;
@@ -305,17 +306,17 @@ stuffkeeper_data_item_new (const gchar * path)
             self_save_yourself(obj);
             return obj;
         }}
-#line 309 "stuffkeeper-data-item.c"
+#line 310 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 89 "stuffkeeper-data-item.gob"
+#line 92 "stuffkeeper-data-item.gob"
 StuffKeeperDataItem * 
 stuffkeeper_data_item_new_from_file (const gchar * file)
-#line 315 "stuffkeeper-data-item.c"
+#line 316 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::new_from_file"
 {
-#line 92 "stuffkeeper-data-item.gob"
+#line 95 "stuffkeeper-data-item.gob"
 	
         Self *obj = GET_NEW;
         obj->_priv->data = g_key_file_new();
@@ -324,65 +325,82 @@ stuffkeeper_data_item_new_from_file (const gchar * file)
 
         return obj;
     }}
-#line 328 "stuffkeeper-data-item.c"
+#line 329 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 102 "stuffkeeper-data-item.gob"
+#line 109 "stuffkeeper-data-item.gob"
 gint 
 stuffkeeper_data_item_get_id (StuffKeeperDataItem * self)
-#line 334 "stuffkeeper-data-item.c"
+#line 335 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::get_id"
-#line 102 "stuffkeeper-data-item.gob"
+#line 109 "stuffkeeper-data-item.gob"
 	g_return_val_if_fail (self != NULL, (gint )0);
-#line 102 "stuffkeeper-data-item.gob"
+#line 109 "stuffkeeper-data-item.gob"
 	g_return_val_if_fail (STUFFKEEPER_IS_DATA_ITEM (self), (gint )0);
-#line 341 "stuffkeeper-data-item.c"
+#line 342 "stuffkeeper-data-item.c"
 {
-#line 105 "stuffkeeper-data-item.gob"
+#line 112 "stuffkeeper-data-item.gob"
 	
         gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "id",NULL);
         return id;
     }}
-#line 348 "stuffkeeper-data-item.c"
+#line 349 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 110 "stuffkeeper-data-item.gob"
-const gchar * 
+#line 120 "stuffkeeper-data-item.gob"
+gchar * 
 stuffkeeper_data_item_get_title (StuffKeeperDataItem * self)
-#line 354 "stuffkeeper-data-item.c"
+#line 355 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::get_title"
-#line 110 "stuffkeeper-data-item.gob"
-	g_return_val_if_fail (self != NULL, (const gchar * )0);
-#line 110 "stuffkeeper-data-item.gob"
-	g_return_val_if_fail (STUFFKEEPER_IS_DATA_ITEM (self), (const gchar * )0);
-#line 361 "stuffkeeper-data-item.c"
+#line 120 "stuffkeeper-data-item.gob"
+	g_return_val_if_fail (self != NULL, (gchar * )0);
+#line 120 "stuffkeeper-data-item.gob"
+	g_return_val_if_fail (STUFFKEEPER_IS_DATA_ITEM (self), (gchar * )0);
+#line 362 "stuffkeeper-data-item.c"
 {
-#line 113 "stuffkeeper-data-item.gob"
+#line 123 "stuffkeeper-data-item.gob"
 	
         return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, "title", NULL); 
     }}
-#line 367 "stuffkeeper-data-item.c"
+#line 368 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__
 
-#line 116 "stuffkeeper-data-item.gob"
-const gchar * 
+#line 128 "stuffkeeper-data-item.gob"
+void 
 stuffkeeper_data_item_set_title (StuffKeeperDataItem * self, const gchar * title)
-#line 373 "stuffkeeper-data-item.c"
+#line 374 "stuffkeeper-data-item.c"
 {
 #define __GOB_FUNCTION__ "StuffKeeper:Data:Item::set_title"
-#line 116 "stuffkeeper-data-item.gob"
-	g_return_val_if_fail (self != NULL, (const gchar * )0);
-#line 116 "stuffkeeper-data-item.gob"
-	g_return_val_if_fail (STUFFKEEPER_IS_DATA_ITEM (self), (const gchar * )0);
-#line 380 "stuffkeeper-data-item.c"
+#line 128 "stuffkeeper-data-item.gob"
+	g_return_if_fail (self != NULL);
+#line 128 "stuffkeeper-data-item.gob"
+	g_return_if_fail (STUFFKEEPER_IS_DATA_ITEM (self));
+#line 381 "stuffkeeper-data-item.c"
 {
-#line 119 "stuffkeeper-data-item.gob"
+#line 131 "stuffkeeper-data-item.gob"
 	
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         printf("new title: %s\n", title);
         self_item_changed(self);
     }}
-#line 388 "stuffkeeper-data-item.c"
+#line 389 "stuffkeeper-data-item.c"
+#undef __GOB_FUNCTION__
+
+#line 139 "stuffkeeper-data-item.gob"
+gboolean 
+stuffkeeper_data_item_has_tag (StuffKeeperDataItem * self, const gchar * tag_id)
+#line 395 "stuffkeeper-data-item.c"
+{
+#define __GOB_FUNCTION__ "StuffKeeper:Data:Item::has_tag"
+#line 139 "stuffkeeper-data-item.gob"
+	g_return_val_if_fail (self != NULL, (gboolean )0);
+#line 139 "stuffkeeper-data-item.gob"
+	g_return_val_if_fail (STUFFKEEPER_IS_DATA_ITEM (self), (gboolean )0);
+#line 402 "stuffkeeper-data-item.c"
+{
+#line 139 "stuffkeeper-data-item.gob"
+	/*empty*/}}
+#line 406 "stuffkeeper-data-item.c"
 #undef __GOB_FUNCTION__

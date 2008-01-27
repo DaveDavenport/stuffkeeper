@@ -32,7 +32,9 @@ void item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkList
 {
     GtkTreeIter iter;
     gtk_list_store_append(store, &iter);
-    gtk_list_store_set(store, &iter, 0, stuffkeeper_data_item_get_id(item),1,stuffkeeper_data_item_get_title(item), -1);
+    gchar *title = stuffkeeper_data_item_get_title(item);
+    gtk_list_store_set(store, &iter, 0, stuffkeeper_data_item_get_id(item),1,title, -1);
+    g_free(title);
 
 
 }
@@ -48,7 +50,9 @@ void item_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkLi
             gtk_tree_model_get(model, &iter, 0, &oid, -1);
             if(oid == id)
             {
-                gtk_list_store_set(store, &iter, 1,stuffkeeper_data_item_get_title(item), -1);
+                gchar *title = stuffkeeper_data_item_get_title(item);
+                gtk_list_store_set(store, &iter, 1,title, -1);
+                g_free(title);
                 return;
             }
         }while(gtk_tree_model_iter_next(model, &iter));
@@ -120,7 +124,7 @@ gboolean interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, gpointer
     if(test && strcmp(test, "test") == 0)
         retv = 0;
 
-    return retv;
+    return 1;//retv;
 }
 /**
  * Initialize the main gui
@@ -154,18 +158,7 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     store = (GtkTreeModel *)gtk_tree_model_filter_new(GTK_TREE_MODEL(original), NULL);
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(store), interface_visible_func, NULL, NULL);
     gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(store));
-    /* testing */
-    store2 = gtk_list_store_new(2, G_TYPE_INT,G_TYPE_STRING);
-    tree = glade_xml_get_widget(xml, "treeview1");
-    gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(store2));
-    renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
-    g_object_set(renderer, "editable", TRUE);
-    g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_edited), store2);
 
-    g_signal_connect(G_OBJECT(skdb), "item-added", G_CALLBACK(item_added), store2);
-    g_signal_connect(G_OBJECT(skdb), "item-removed", G_CALLBACK(item_removed), store2);
-    g_signal_connect(G_OBJECT(skdb), "item-changed", G_CALLBACK(item_changed), store2);
 
 
     glade_xml_signal_autoconnect(xml);
