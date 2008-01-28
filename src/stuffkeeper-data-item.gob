@@ -5,9 +5,13 @@ requires 2.0.10
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_CUSTOM "custom"
 %}
+%h{
+    #include "stuffkeeper-data-tag.h"
+%}
 
 %ph{
     #include "stuffkeeper-data-backend.h"
+
 %}
 %{
     #include <stdio.h>
@@ -157,9 +161,10 @@ class StuffKeeper:Data:Item from G:Object
      */
     public
     gboolean
-    has_tag(self, const gchar *tag_id)
+    has_tag(self, const StuffKeeperDataTag *tag)
     {
-        return TRUE;
+        GList *node = g_list_find(self->_priv->tags, tag);
+
+        return (node != NULL)?TRUE:FALSE;
     }
-    
 }
