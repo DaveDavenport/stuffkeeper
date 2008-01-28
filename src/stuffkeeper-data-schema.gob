@@ -1,0 +1,6 @@
+requires 2.0.10
+
+
+class StuffKeeper:Data:Schema from G:Object 
+{
+}

@@ -7,11 +7,15 @@ GTK_CFLAGS=`pkg-config --cflags gtk+-2.0 libglade-2.0 gmodule-2.0`
 
 SOURCE=\
 	stuffkeeper-data-backend.h\
+	stuffkeeper-data-schema.h\
 	stuffkeeper-data-item.h\
 	stuffkeeper-data-tag.h\
+	stuffkeeper-data-entry.h\
 	stuffkeeper-data-backend.c\
+	stuffkeeper-data-schema.c\
 	stuffkeeper-data-item.c\
 	stuffkeeper-data-tag.c\
+	stuffkeeper-data-entry.c\
 	main.c\
 	interface.c
 

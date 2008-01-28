@@ -3,10 +3,10 @@ requires 2.0.10
 %ph{
 
 #define KEYFILE_GENERAL "general"
-#define KEYFILE_CUSTOM "custom"
 %}
 %h{
     #include "stuffkeeper-data-tag.h"
+    #include "stuffkeeper-data-schema.h"
 %}
 
 %ph{
@@ -25,6 +25,8 @@ class StuffKeeper:Data:Item from G:Object
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
     private GList *tags = {NULL} destroywith g_list_free;
+
+    //private StuffKeeperDataSchema *schema = {NULL};
 
     /**
      * Signals 
@@ -179,6 +181,25 @@ class StuffKeeper:Data:Item from G:Object
         printf("new title: %s\n", title);
         self_item_changed(self);
     }
+    /**
+     * Generic getting/setting items
+     */
+    public
+    gchar *
+    get_string(self, const gchar *field)
+    {
+        return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, field, NULL); 
+    }
+
+    public 
+    void
+    set_string(self, const gchar *field, const gchar *value)
+    {
+        g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, field, value);
+        self_item_changed(self);
+    }
+
+
     /**
      * Tags
      */

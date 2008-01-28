@@ -3,6 +3,8 @@
 #include <glade/glade.h>
 /* Include the database */
 #include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-entry.h"
+
 /* Include interface header file */
 #include "interface.h"
 
@@ -245,6 +247,7 @@ void interface_entry_add(GtkWidget *button, gpointer data)
     if(title && strlen(title) > 0)
         stuffkeeper_data_tag_set_title(tag, title);
 }
+
 void interface_add_tag_to_item(GtkWidget *box, gpointer data)
 {
     StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(box), "tag");
@@ -278,8 +281,8 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
     }
     /**/
     tree = glade_xml_get_widget(xml, "treeview2");
-    GtkWidget *hbox = gtk_hbox_new(FALSE, 6);
-    gtk_box_pack_start(GTK_BOX(container), hbox, FALSE, TRUE, 0);
+
+
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
     GtkTreeIter iter;
@@ -289,9 +292,35 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
         gtk_tree_model_get(model, &iter, 2, &item, -1);
         if(item)
         {
-            /* Fill in the */
+            /* The title */
+            gchar *title;
+            GtkWidget *vbox;
+            GtkWidget *label1,*label2;
+
+            vbox = gtk_hbox_new(FALSE, 6);
+            /* Title */
+            label1 = gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label1), "<b>Title:</b>");
+            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+            gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+
+            label1 = stuffkeeper_data_entry_new(item,"title");
+            gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
+
+            gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+
+
+
+            /**
+             * Fill in the Tag list 
+             */
+
+            /* now I need list */
             GList *node,*list =  stuffkeeper_data_backend_get_tags(skdbg);
-            GtkWidget *label = gtk_label_new("Tags:");
+            GtkWidget *label = gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label), "<b>Tags:</b>");
+            GtkWidget *hbox = gtk_hbox_new(FALSE, 6);
+            
             gtk_box_pack_start(GTK_BOX(hbox),label, FALSE,TRUE, 0);
 
             for(node = list;node;node = g_list_next(node))
@@ -312,6 +341,7 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                 gtk_box_pack_start(GTK_BOX(hbox),but, FALSE,TRUE, 0);
             }
             g_list_free(list);
+            gtk_box_pack_end(GTK_BOX(container), hbox, FALSE, TRUE, 0);
         }
     }
     gtk_widget_show_all(container);
