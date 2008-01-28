@@ -47,6 +47,9 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
+
+        gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
+
         /* store item */
         obj->_priv->item = item; 
         /* field */

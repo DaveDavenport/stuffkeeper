@@ -265,10 +265,14 @@ void interface_add_tag_to_item(GtkWidget *box, gpointer data)
 void interface_item_selection_changed (GtkTreeSelection *selection, gpointer data)
 {
     GtkTreeModel *model;
-    GtkWidget *container,*tree;
+    GtkWidget *container,*tree,*event;
     GList *list;
     /** Remove all old widgets */
     container = glade_xml_get_widget(xml, "item_vbox");
+
+    event =  glade_xml_get_widget(xml, "item_event_box");
+    gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->white));
+
     list = gtk_container_get_children(GTK_CONTAINER(container));
     if(list)
     {
