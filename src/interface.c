@@ -103,6 +103,7 @@ void item_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkLi
             if(oid == id)
             {
                 gchar *title = stuffkeeper_data_item_get_title(item);
+                printf("Item items: %i\n", id);
                 gtk_list_store_set(store, &iter, 1,title, -1);
                 g_free(title);
                 return;
@@ -116,7 +117,9 @@ void item_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkLi
  */
 void interface_item_add(void)
 {
-    stuffkeeper_data_backend_new_item(skdbg);
+    StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(skdbg);
+    stuffkeeper_data_item_set_title(item,"New Item");
+
 }
 /**
  * Remove selected item
@@ -236,9 +239,11 @@ void interface_entry_add(GtkWidget *button, gpointer data)
     GtkWidget *entry= glade_xml_get_widget(xml, "add_tag_entry");
     const gchar *title = gtk_entry_get_text(GTK_ENTRY(entry));
     StuffKeeperDataTag *tag;
-    
+    if(title == NULL || strlen(title) == 0)
+        return;
     tag = stuffkeeper_data_backend_add_tag(skdbg,NULL,g_random_int());
-    stuffkeeper_data_tag_set_title(tag, title);
+    if(title && strlen(title) > 0)
+        stuffkeeper_data_tag_set_title(tag, title);
 }
 void interface_add_tag_to_item(GtkWidget *box, gpointer data)
 {
@@ -284,7 +289,11 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
         gtk_tree_model_get(model, &iter, 2, &item, -1);
         if(item)
         {
+            /* Fill in the */
             GList *node,*list =  stuffkeeper_data_backend_get_tags(skdbg);
+            GtkWidget *label = gtk_label_new("Tags:");
+            gtk_box_pack_start(GTK_BOX(hbox),label, FALSE,TRUE, 0);
+
             for(node = list;node;node = g_list_next(node))
             {
                 StuffKeeperDataTag *tag = node->data;
@@ -360,14 +369,14 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
     g_object_set(renderer, "editable", TRUE,NULL);
-    g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_edited), original);
+
 
     g_signal_connect(G_OBJECT(skdb), "item-added", G_CALLBACK(item_added), original);
     g_signal_connect(G_OBJECT(skdb), "item-removed", G_CALLBACK(item_removed), original);
     g_signal_connect(G_OBJECT(skdb), "item-changed", G_CALLBACK(item_changed), original);
 
     filter = (GtkTreeModel *)gtk_tree_model_filter_new(GTK_TREE_MODEL(original), NULL);
-
+    g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_edited), filter);
     gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(filter));
 
     sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));

@@ -6,6 +6,7 @@ requires 2.0.10
 %}
 %header{
     #include <stdio.h>
+    #include <string.h>
 %}
 
 
@@ -304,12 +305,14 @@ class StuffKeeper:Data:Backend from G:Object
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
+        *ide = id;
         g_hash_table_insert(self->_priv->tags,ide, tag);
 
         printf("addded tag: %i\n", stuffkeeper_data_tag_get_id(tag));
         self_tag_added(self, tag);
         return tag;
     }
+
     public
         StuffKeeperDataTag *
     get_tag(self, const int id)
