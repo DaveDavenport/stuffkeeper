@@ -301,7 +301,9 @@ class StuffKeeper:Data:Backend from G:Object
             return tag;
         }
         /* No tag, lets make one. */
-        tag = stuffkeeper_data_tag_new_with_id("/home/qball/.stuffkeeper/tags/",id);
+        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "tags", NULL);
+        tag = stuffkeeper_data_tag_new_with_id(path,id);
+        g_free(path);
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
