@@ -1,7 +1,12 @@
 requires 2.0.10
 
+%{
+    #include "stuffkeeper-data-item.h"
+%}
+
 %ph{
 #include <stdio.h>
+
 #define KEYFILE_GENERAL "general"
 
 %}
@@ -10,6 +15,8 @@ class StuffKeeper:Data:Tag from G:Object
 {
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
+
+    private GList *items = {NULL} destroywith g_list_free;
 
 
     /**
@@ -143,4 +150,24 @@ class StuffKeeper:Data:Tag from G:Object
             self->_priv->path = NULL;
         }
 
+    public
+    int
+    num_items(self)
+    {
+        return g_list_length(self->_priv->items);
+    }
+    public
+    void
+    add_item(self, GObject *item)
+    {
+        self->_priv->items = g_list_append(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
+        self_tag_changed(self);
+    }
+    public 
+    void
+    remove_item(self, GObject *item)
+    {
+        self->_priv->items = g_list_remove(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
+        self_tag_changed(self);
+    }
 }

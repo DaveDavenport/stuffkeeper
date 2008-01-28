@@ -58,12 +58,34 @@ class StuffKeeper:Data:Item from G:Object
     void
     save_yourself(self)
     {
-        gint id = self_get_id(self);
-        printf("saving myself: %i\n",id);
         if(self->_priv->data)
         {
+            gint id = self_get_id(self);
             char *content;
+
             gsize size;
+
+            printf("saving myself: %i\n",id);
+
+            /* save tags */
+            /* clear previous values */
+            g_key_file_remove_key(self->_priv->data, KEYFILE_GENERAL, "tags", NULL);
+            gsize numtags = g_list_length(self->_priv->tags);
+            printf("numtags: %i\n", numtags);
+            if(numtags != 0)
+            {
+                int *items = g_malloc0(sizeof(int)*numtags); 
+                GList *node = g_list_first(self->_priv->tags);
+                int i=0;
+                for(;node;node = g_list_next(node))
+                {
+                   items[i] = stuffkeeper_data_tag_get_id(STUFFKEEPER_DATA_TAG(node->data));
+                   printf("%i\n", items[i]);
+                   i++;
+                }
+                g_key_file_set_integer_list(self->_priv->data, KEYFILE_GENERAL, "tags", items, numtags);
+                g_free(items);
+            }
             content = g_key_file_to_data(self->_priv->data,&size, NULL);
             g_file_set_contents(self->_priv->path, content, size, NULL);
             g_free(content);
@@ -118,6 +140,7 @@ class StuffKeeper:Data:Item from G:Object
            {
                StuffKeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,obj, tags[i]);
                obj->_priv->tags = g_list_append(obj->_priv->tags, tag);
+               stuffkeeper_data_tag_add_item(tag, G_OBJECT(obj));
            }
            g_free(tags);
         }
@@ -166,5 +189,21 @@ class StuffKeeper:Data:Item from G:Object
         GList *node = g_list_find(self->_priv->tags, tag);
 
         return (node != NULL)?TRUE:FALSE;
+    }
+    public
+    void
+    add_tag(self, StuffKeeperDataTag *tag)
+    {
+        self->_priv->tags = g_list_append(self->_priv->tags, tag);
+        self_item_changed(self);
+        stuffkeeper_data_tag_add_item(tag,G_OBJECT(self));
+    }
+    public
+    void
+    remove_tag(self, StuffKeeperDataTag *tag)
+    {
+        self->_priv->tags = g_list_remove(self->_priv->tags, tag);
+        self_item_changed(self);
+        stuffkeeper_data_tag_remove_item(tag, G_OBJECT(self));
     }
 }

@@ -66,8 +66,10 @@ class StuffKeeper:Data:Backend from G:Object
     {
         gint *id;
         StuffKeeperDataItem *item;
+        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "items", NULL);
         /* create a new item */
-        item = stuffkeeper_data_item_new(G_OBJECT(self),"/home/qball/.stuffkeeper/items/");
+        item = stuffkeeper_data_item_new(G_OBJECT(self),path);
+        g_free(path);
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
         *id = stuffkeeper_data_item_get_id(item);
@@ -121,7 +123,7 @@ class StuffKeeper:Data:Backend from G:Object
             return;
         }
 
-        printf("Loading items from: %s\n", path);
+        printf("Loading tags from: %s\n", path);
         /* Load item's */
         dir = g_dir_open(path, 0, NULL);
 
@@ -266,6 +268,18 @@ class StuffKeeper:Data:Backend from G:Object
             g_signal_connect_swapped(G_OBJECT(tag), "tag-changed", G_CALLBACK(self_tag_changed), self);
         }
 
+    signal last NONE (INT)
+    void
+    tag_removed(self,const int id)
+    {
+        printf("Item changed: %i\n",id);
+    }
+
+
+
+
+
+
     /**
      * Add tag
      * Call this from the item when adding a tag, it will return the tag.
@@ -275,6 +289,7 @@ class StuffKeeper:Data:Backend from G:Object
     StuffKeeperDataTag *
     add_tag(self, StuffKeeperDataItem *item, const int id)
     {
+        gint *ide;
         StuffKeeperDataTag *tag;
         printf("looking for tag: %i\n", id);
         /* Look for existing tag */
@@ -286,7 +301,13 @@ class StuffKeeper:Data:Backend from G:Object
         }
         /* No tag, lets make one. */
         tag = stuffkeeper_data_tag_new_with_id("/home/qball/.stuffkeeper/tags/",id);
+
+        /* Add to the list */
+        ide = g_malloc0(sizeof(gint));
+        g_hash_table_insert(self->_priv->tags,ide, tag);
+
         printf("addded tag: %i\n", stuffkeeper_data_tag_get_id(tag));
+        self_tag_added(self, tag);
         return tag;
     }
     public
@@ -297,5 +318,36 @@ class StuffKeeper:Data:Backend from G:Object
         /* Look for existing tag */
         tag = g_hash_table_lookup(self->_priv->tags, &id);
         return tag;
+    }
+
+    public
+    GList *
+    get_tags(self)
+    {
+        return g_hash_table_get_values(self->_priv->tags);
+    }
+
+    public
+    void
+    remove_tag(self, gint id)
+    {
+        StuffKeeperDataTag *tag = self_get_tag(self, id);
+        if(!tag) return;
+        if(stuffkeeper_data_tag_num_items(tag) >0)
+        {
+            printf("failed: Still items tagged by this\n");
+            return;
+        }
+        if(tag)
+        {
+            printf("deleting tag\n");
+            stuffkeeper_data_tag_delete_yourself(tag); 
+        }
+
+        if(g_hash_table_remove(self->_priv->tags, &id) == FALSE)
+        {
+            return;
+        }
+        self_tag_removed(self,id);
     }
 }
