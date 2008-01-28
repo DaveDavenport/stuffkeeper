@@ -86,6 +86,7 @@ class StuffKeeper:Data:Backend from G:Object
     remove_item(self, gint id)
     {
         StuffKeeperDataItem *item = g_hash_table_lookup(self->_priv->items, &id);
+        self_item_removed(self, id);
         if(item)
         {
             stuffkeeper_data_item_delete_yourself(item); 
@@ -95,7 +96,7 @@ class StuffKeeper:Data:Backend from G:Object
             printf("failed to remove: %i\n", id);
             return;
         }
-        self_item_removed(self, id);
+
     }
 
     /* Load the data */
