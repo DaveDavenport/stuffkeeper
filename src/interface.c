@@ -309,6 +309,9 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
 
             gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
 
+            /**
+             * Get the attached schema and fill in the rest from there
+             */
 
 
             /**
