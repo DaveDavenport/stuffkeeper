@@ -1,9 +1,17 @@
+#load previous found deps
+-include Makefile.config 
 
-OUTPUT=stuffkeeper
-Q=@
+OUTPUT			= stuffkeeper
+EMPTY 			= 
+EXTRA_CFLAGS	= -g -Os -Wall -D_GNU_SOURCE 
+Q				= @
 
-GTK_LIBS=`pkg-config --libs gtk+-2.0 libglade-2.0 gmodule-2.0`
-GTK_CFLAGS=`pkg-config --cflags gtk+-2.0 libglade-2.0 gmodule-2.0`
+HEADERS=\
+	interface.h\
+	stuffkeeper-data-backend.h\
+	stuffkeeper-data-schema.h\
+	stuffkeeper-data-item.h\
+	stuffkeeper-data-tag.h
 
 SOURCE=\
 	stuffkeeper-data-backend.h\
@@ -21,17 +29,70 @@ SOURCE=\
 
 OBJECTS=$(patsubst %.c, %.o, $(SOURCE))
 
+##
+# Checking dependencies
+###
+
+# Check for gtk
+ifeq ($(GTK_LIBS), $(EMPTY))
+$(info *** Checking gtk dependency)
+GTK_LIBS=$(shell pkg-config --silence-errors --libs gtk+-2.0)
+GTK_CFLAGS=	$(shell pkg-config --silence-errors --cflags gtk+-2.0)
+ifeq ($(GTK_LIBS), $(EMPTY))
+$(error **ERROR** gtk not found)
+else
+$(info ==> Gtk found)
+$(shell echo "GTK_LIBS=$(GTK_LIBS)" >> Makefile.config)
+$(shell echo "GTK_CFLAGS=$(GTK_CFLAGS)" >> Makefile.config)
+endif
+endif
+# Check for glib
+ifeq ($(GLIB_LIBS), $(EMPTY))
+$(info *** Checking glib dependency)
+GLIB_LIBS=$(shell pkg-config --silence-errors --libs glib-2.0)
+GLIB_CFLAGS=	$(shell pkg-config --silence-errors --cflags glib-2.0)
+ifeq ($(GLIB_LIBS), $(EMPTY))
+$(error **ERROR** glib not found)
+else
+$(info ==> glib found)
+$(shell echo "GLIB_LIBS=$(GLIB_LIBS)" >> Makefile.config)
+$(shell echo "GLIB_CFLAGS=$(GLIB_CFLAGS)" >> Makefile.config)
+endif
+endif
+
+# Check for glade
+ifeq ($(GLADE_LIBS), $(EMPTY))
+$(info *** Checking libglade dependency)
+GLADE_LIBS=$(shell pkg-config --silence-errors --libs libglade-2.0)
+GLADE_CFLAGS=	$(shell pkg-config --silence-errors --cflags libglade-2.0)
+ifeq ($(GLADE_LIBS), $(EMPTY))
+$(error **ERROR** libglade not found)
+else
+$(info ==> libglade found)
+$(shell echo "GLADE_LIBS=$(GLADE_LIBS)" >> Makefile.config)
+$(shell echo "GLADE_CFLAGS=$(GLADE_CFLAGS)" >> Makefile.config)
+endif
+endif
+
+
+
+
+
+
+SK_LIBS=$(GTK_LIBS) $(GLIB_LIBS) $(GLADE_LIBS)
+SK_CFLAGS=$(GTK_CFLAGS) $(GLIB_CFLAGS) $(GLADE_CFLAGS) $(EXTRA_CFLAGS)
+
 %.c %.h %-private.h: %.gob
 	$(info ==> Processing: $<)
 	$(Q)gob2 --no-touch-headers --always-private-header $<
 
-%.o: %.c
+%.o: %.c $(HEADERS)
 	$(info ==> Building:   $@)
-	$(Q)$(CC) -c $< -o $@ $(GTK_CFLAGS)
+	$(Q)$(CC) -c $< -o $@ $(SK_CFLAGS)
 
 $(OUTPUT): $(OBJECTS)
 	$(info ==> Linking:    $@)
-	$(Q)$(CC) $(OBJECTS) -o $@ $(GTK_LIBS) $(GTK_CFLAGS)
+	$(Q)$(CC) $(OBJECTS) -o $@ $(SK_LIBS) $(SK_CFLAGS)
 
 
 clean:

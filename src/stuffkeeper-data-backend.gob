@@ -95,13 +95,13 @@ class StuffKeeper:Data:Backend from G:Object
 
     public 
     StuffKeeperDataItem *
-    new_item(self)
+    new_item(self,StuffKeeperDataSchema *schema)
     {
         gint *id;
         StuffKeeperDataItem *item;
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "items", NULL);
         /* create a new item */
-        item = stuffkeeper_data_item_new(G_OBJECT(self),path);
+        item = stuffkeeper_data_item_new(G_OBJECT(self),path,schema);
         g_free(path);
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
@@ -364,7 +364,7 @@ class StuffKeeper:Data:Backend from G:Object
      */
     public
     StuffKeeperDataSchema*
-    add_schema(self, const int id)
+    get_schema(self, const int id)
     {
         gint *ide;
         StuffKeeperDataSchema *schema;

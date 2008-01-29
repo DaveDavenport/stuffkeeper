@@ -26,7 +26,7 @@ class StuffKeeper:Data:Item from G:Object
     private char * path = {NULL} destroywith g_free;
     private GList *tags = {NULL} destroywith g_list_free;
 
-    //private StuffKeeperDataSchema *schema = {NULL};
+    private StuffKeeperDataSchema *schema = {NULL};
 
     /**
      * Signals 
@@ -109,7 +109,7 @@ class StuffKeeper:Data:Item from G:Object
     /* Create new StuffKeeperDataBackend */
     public 
         StuffKeeperDataItem *
-        new (G:Object *skdb, const gchar *path)
+        new (G:Object *skdb, const gchar *path,StuffKeeperDataSchema *schema)
         {
 
             Self *obj = GET_NEW;
@@ -119,6 +119,9 @@ class StuffKeeper:Data:Item from G:Object
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
             printf("Creating item: %i\n", id);
+
+            obj->_priv->schema = schema; 
+
             self_save_yourself(obj);
             return obj;
         }
@@ -145,6 +148,12 @@ class StuffKeeper:Data:Item from G:Object
                stuffkeeper_data_tag_add_item(tag, G_OBJECT(obj));
            }
            g_free(tags);
+        }
+        GError *error=NULL;
+        int schemaid = g_key_file_get_integer(obj->_priv->data, KEYFILE_GENERAL, "schema", &error);
+        if(error == NULL)
+        {
+            obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
         }
         return obj;
     }

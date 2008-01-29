@@ -119,7 +119,8 @@ void item_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkLi
  */
 void interface_item_add(void)
 {
-    StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(skdbg);
+    /** TODO, set schema */
+    StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(skdbg,NULL);
     stuffkeeper_data_item_set_title(item,"New Item");
 
 }
