@@ -101,6 +101,16 @@ class StuffKeeper:Data:Item from G:Object
         gint id = self_get_id(self);
         printf("Deleting myself: %i\n", id);
         g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
+
+
+
+        GList *node = g_list_first(self->_priv->tags);
+        for(;node;node = g_list_next(node))
+        {
+            stuffkeeper_data_tag_remove_item(STUFFKEEPER_DATA_TAG(node->data), G_OBJECT(self));
+        }
+        g_list_free(self->_priv->tags);
+        self->_priv->tags = NULL;
         g_unlink(self->_priv->path);
         g_free(self->_priv->path);
         self->_priv->path = NULL;
@@ -235,5 +245,13 @@ class StuffKeeper:Data:Item from G:Object
         self->_priv->tags = g_list_remove(self->_priv->tags, tag);
         self_item_changed(self);
         stuffkeeper_data_tag_remove_item(tag, G_OBJECT(self));
+    }
+    
+    /* Schema */
+    public
+    StuffKeeperDataSchema *
+    get_schema(self)
+    {
+        return self->_priv->schema;
     }
 }

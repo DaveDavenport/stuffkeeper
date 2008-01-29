@@ -4,6 +4,11 @@ requires 2.0.10
 #include <stdio.h>
 #define KEYFILE_GENERAL "general"
 %}
+%h{
+    typedef enum _FieldType{
+        FIELD_TYPE_STRING = 0
+    } FieldType;
+%}
 
 class StuffKeeper:Data:Schema from G:Object 
 {
@@ -121,5 +126,28 @@ class StuffKeeper:Data:Schema from G:Object
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         printf("new title: %s\n", title);
         self_schema_changed(self);
+    }
+    /**
+     */
+    public
+    gchar **
+    get_fields(self, gsize *size)
+    {
+        gchar **retv = NULL;
+        retv = g_key_file_get_keys(self->_priv->data, "field-types",size, NULL);
+        return retv;
+    }
+    public 
+    FieldType 
+    get_field_type(self, gchar *id)
+    {
+        return g_key_file_get_integer(self->_priv->data, "field-types",id, NULL);
+    }
+
+    public
+    gchar *
+    get_field_name(self, gchar *id)
+    {
+        return g_key_file_get_string(self->_priv->data, "field-names",id, NULL);
     }
 }

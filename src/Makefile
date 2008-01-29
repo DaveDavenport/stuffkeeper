@@ -73,14 +73,24 @@ $(shell echo "GLADE_LIBS=$(GLADE_LIBS)" >> Makefile.config)
 $(shell echo "GLADE_CFLAGS=$(GLADE_CFLAGS)" >> Makefile.config)
 endif
 endif
+# Check for gmodule
+ifeq ($(GMODULE_LIBS), $(EMPTY))
+$(info *** Checking gmodule dependency)
+GMODULE_LIBS=$(shell pkg-config --silence-errors --libs gmodule-2.0)
+GMODULE_CFLAGS=	$(shell pkg-config --silence-errors --cflags gmodule-2.0)
+ifeq ($(GMODULE_LIBS), $(EMPTY))
+$(error **ERROR** gmodule not found)
+else
+$(info ==> gmodule found)
+$(shell echo "GMODULE_LIBS=$(GMODULE_LIBS)" >> Makefile.config)
+$(shell echo "GMODULE_CFLAGS=$(GMODULE_CFLAGS)" >> Makefile.config)
+endif
+endif
 
 
 
-
-
-
-SK_LIBS=$(GTK_LIBS) $(GLIB_LIBS) $(GLADE_LIBS)
-SK_CFLAGS=$(GTK_CFLAGS) $(GLIB_CFLAGS) $(GLADE_CFLAGS) $(EXTRA_CFLAGS)
+SK_LIBS=$(GTK_LIBS) $(GLIB_LIBS) $(GLADE_LIBS) $(GMODULE_LIBS)
+SK_CFLAGS=$(GTK_CFLAGS) $(GLIB_CFLAGS) $(GLADE_CFLAGS) $(EXTRA_CFLAGS) $(GMODULE_CFLAGS)
 
 %.c %.h %-private.h: %.gob
 	$(info ==> Processing: $<)

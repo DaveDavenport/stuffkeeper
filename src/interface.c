@@ -2,7 +2,9 @@
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 /* Include the database */
+
 #include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-entry.h"
 
 /* Include interface header file */
@@ -312,12 +314,55 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
             label1 = stuffkeeper_data_entry_new(item,"title");
             gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
 
+            /* type */
+            StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
+            label1 =gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label1), "<b>Type:</b>");
+            gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+
+            if(schema) {
+                gchar *title = stuffkeeper_data_schema_get_title(schema);
+                label1 = gtk_label_new(title);
+                g_free(title);
+            } else {
+                label1 = gtk_label_new("N/A");
+            }
+            
+
+            gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
             gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
 
             /**
              * Get the attached schema and fill in the rest from there
              */
+            if(schema)
+            {
+                gsize length;
+                int i;
+                gchar **retv = stuffkeeper_data_schema_get_fields(schema, &length);
+                for(i=0;i<length;i++)
+                {
+                    FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]);
+                    gchar *field_name = stuffkeeper_data_schema_get_field_name(schema, retv[i]);
 
+                    vbox = gtk_hbox_new(FALSE, 6);
+                    /* Title */
+                    label1 = gtk_label_new("");
+                    gchar *val = g_markup_printf_escaped("<b>%s</b>", field_name);
+                    gtk_label_set_markup(GTK_LABEL(label1), val);
+                    g_free(val);
+                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+
+                    label1 = stuffkeeper_data_entry_new(item,retv[i]);
+                    gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
+
+                    gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+
+                    g_free(field_name);
+                }
+                g_strfreev(retv);
+            }
 
             /**
              * Fill in the Tag list 
@@ -328,7 +373,7 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
             GtkWidget *label = gtk_label_new("");
             gtk_label_set_markup(GTK_LABEL(label), "<b>Tags:</b>");
             GtkWidget *hbox = gtk_hbox_new(FALSE, 6);
-            
+
             gtk_box_pack_start(GTK_BOX(hbox),label, FALSE,TRUE, 0);
 
             for(node = list;node;node = g_list_next(node))
@@ -399,11 +444,11 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     /* This is a hack for testing now */
     skdbg = skdb;
 
-	xml = glade_xml_new ("stuffkeeper.glade", "win", NULL);
+    xml = glade_xml_new ("stuffkeeper.glade", "win", NULL);
     original = gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
 
     tree = glade_xml_get_widget(xml, "treeview2");
-   
+
     renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
     g_object_set(renderer, "editable", TRUE,NULL);
