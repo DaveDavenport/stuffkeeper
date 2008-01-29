@@ -17,7 +17,13 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     changed(self, gpointer data)
     {
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
-        stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
+        if(self->_priv->field)
+        {
+           stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
+        }else{
+            stuffkeeper_data_item_set_title(self->_priv->item, text);
+        }
+        
         printf("8ee: %s\n", text);
 
     }
@@ -27,7 +33,13 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     item_changed(self, StuffKeeperDataItem *item)
     {
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
-        gchar *value = stuffkeeper_data_item_get_string(item, self->_priv->field);
+        gchar *value;
+        if(self->_priv->field)
+        {
+            value = stuffkeeper_data_item_get_string(item, self->_priv->field);
+        }else{
+            value = stuffkeeper_data_item_get_title(item); 
+        }
         if(value)
         {
             if(strcmp(text,value))
@@ -58,7 +70,12 @@ class StuffKeeper:Data:Entry from Gtk:Entry
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
         /* update the entry */
-        value = stuffkeeper_data_item_get_string(item, obj->_priv->field);
+        if(obj->_priv->field)
+        {
+            value = stuffkeeper_data_item_get_string(item, obj->_priv->field);
+        }else{
+            value = stuffkeeper_data_item_get_title(item); 
+        }
         if(value)
         {
             gtk_entry_set_text(GTK_ENTRY(obj), value);

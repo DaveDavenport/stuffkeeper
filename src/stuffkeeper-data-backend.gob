@@ -6,6 +6,7 @@ requires 2.0.10
     #include "stuffkeeper-data-tag.h"
 %}
 %header{
+    #include <glib/gstdio.h>
     #include <stdio.h>
     #include <string.h>
 %}
@@ -137,7 +138,6 @@ class StuffKeeper:Data:Backend from G:Object
     load(self, const gchar *db_path)
     {
         /* item */
-        StuffKeeperDataItem *item;
         gchar *path;
         GDir *dir;
 
@@ -390,7 +390,12 @@ class StuffKeeper:Data:Backend from G:Object
         self_schema_added(self, schema);
         return schema;
     }
-
+    public
+        GList *
+        get_schemas(self)
+        {
+            return g_hash_table_get_values(self->_priv->schemas);
+        }
     /**
      * TAGS
      */

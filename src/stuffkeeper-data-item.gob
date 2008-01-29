@@ -1,8 +1,8 @@
 requires 2.0.10
 
 %ph{
-
 #define KEYFILE_GENERAL "general"
+#define KEYFILE_CUSTOM "custom"
 %}
 %h{
     #include "stuffkeeper-data-tag.h"
@@ -73,7 +73,6 @@ class StuffKeeper:Data:Item from G:Object
             /* clear previous values */
             g_key_file_remove_key(self->_priv->data, KEYFILE_GENERAL, "tags", NULL);
             gsize numtags = g_list_length(self->_priv->tags);
-            printf("numtags: %i\n", numtags);
             if(numtags != 0)
             {
                 int *items = g_malloc0(sizeof(int)*numtags); 
@@ -131,6 +130,8 @@ class StuffKeeper:Data:Item from G:Object
             printf("Creating item: %i\n", id);
 
             obj->_priv->schema = schema; 
+            id = stuffkeeper_data_schema_get_id(schema);
+            g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL, "schema", id);
 
             self_save_yourself(obj);
             return obj;
@@ -143,7 +144,7 @@ class StuffKeeper:Data:Item from G:Object
         Self *obj = GET_NEW;
         obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
         obj->_priv->data = g_key_file_new();
-        obj->_priv->path = g_strdup(file);
+        obj->_priv->path = (file != NULL)?g_strdup(file):NULL;
         g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
         /* Load the tags */
         gsize items;
@@ -207,14 +208,14 @@ class StuffKeeper:Data:Item from G:Object
     gchar *
     get_string(self, const gchar *field)
     {
-        return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, field, NULL); 
+        return g_key_file_get_string(self->_priv->data, KEYFILE_CUSTOM, field, NULL); 
     }
 
     public 
     void
     set_string(self, const gchar *field, const gchar *value)
     {
-        g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, field, value);
+        g_key_file_set_string(self->_priv->data, KEYFILE_CUSTOM, field, value);
         self_item_changed(self);
     }
 

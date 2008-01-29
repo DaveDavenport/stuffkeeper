@@ -122,8 +122,13 @@ void item_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkLi
 void interface_item_add(void)
 {
     /** TODO, set schema */
-    StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(skdbg,NULL);
-    stuffkeeper_data_item_set_title(item,"New Item");
+    GList *list = stuffkeeper_data_backend_get_schemas(skdbg);
+    if(list)
+    {
+        StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(skdbg,list->data);
+        stuffkeeper_data_item_set_title(item,"New Item");
+        g_list_free(list);
+    }
 
 }
 /**
@@ -214,7 +219,6 @@ void quit_program(void)
 gboolean interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, GtkTreeModel *tagmodel)
 {
     gchar *test;
-    int retv =     1;
     int has_selected = 0;
     StuffKeeperDataItem *item;
     gtk_tree_model_get(model, iter, 1, &test,2,&item, -1);
@@ -300,9 +304,8 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
         if(item)
         {
             /* The title */
-            gchar *title;
             GtkWidget *vbox;
-            GtkWidget *label1,*label2;
+            GtkWidget *label1;
 
             vbox = gtk_hbox_new(FALSE, 6);
             /* Title */
@@ -311,7 +314,7 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
             gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
             gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
 
-            label1 = stuffkeeper_data_entry_new(item,"title");
+            label1 = stuffkeeper_data_entry_new(item,NULL);
             gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
 
             /* type */
@@ -354,9 +357,11 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
 
-                    label1 = stuffkeeper_data_entry_new(item,retv[i]);
-                    gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
-
+                    if(type == FIELD_TYPE_STRING)
+                    {
+                        label1 = stuffkeeper_data_entry_new(item,retv[i]);
+                        gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
+                    }
                     gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
 
                     g_free(field_name);
@@ -434,9 +439,7 @@ void interface_remove_tag()
 void initialize_interface(StuffKeeperDataBackend *skdb)
 {
     GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
     GtkWidget *tree;
-    GtkListStore *store2;
     GtkTreeModel *store,*filter;
     GtkTreeSelection *sel;
 

@@ -1,6 +1,7 @@
 requires 2.0.10
 
 %ph{
+#include <glib/gstdio.h>
 #include <stdio.h>
 #define KEYFILE_GENERAL "general"
 %}
