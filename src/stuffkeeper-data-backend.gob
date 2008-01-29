@@ -1,6 +1,7 @@
 requires 2.0.10
 
 %h{
+    #include "stuffkeeper-data-schema.h"
     #include "stuffkeeper-data-item.h"
     #include "stuffkeeper-data-tag.h"
 %}
@@ -15,6 +16,9 @@ class StuffKeeper:Data:Backend from G:Object
     /**
      * Private values 
      */
+    /* A hash list used to store the items, the item id is the hash key */
+    private GHashTable *schemas = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} ;
+
     /* A hash list used to store the tags, the tags id is the hash key */
     private GHashTable *tags = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} ;
 
@@ -27,6 +31,7 @@ class StuffKeeper:Data:Backend from G:Object
     /**
      * Signal 
      */
+    /* item */
     signal last NONE (POINTER)
     void
     item_changed(self, StuffKeeperDataItem *item)
@@ -48,6 +53,33 @@ class StuffKeeper:Data:Backend from G:Object
     {
         printf("Item removed signal: '%i'\n",id); 
     }
+    /* schema */
+    signal last NONE (POINTER)
+    void
+    schema_changed(self, StuffKeeperDataSchema *schema)
+    {
+        printf("Item changed\n");
+    }
+
+    signal last NONE (POINTER)
+    void
+    schema_added(self, StuffKeeperDataSchema *schema)
+    {
+        printf("Item added signal: '%i'\n", stuffkeeper_data_schema_get_id(schema));
+        g_signal_connect_swapped(G_OBJECT(schema), "schema-changed", G_CALLBACK(self_schema_changed), self);
+    }
+    signal last NONE (INT)
+        void
+    schema_removed(self, gint id)
+    {
+        printf("Schema removed signal: '%i'\n",id); 
+    }
+
+
+
+
+
+
 
     /**
      * Public functions 
@@ -115,14 +147,53 @@ class StuffKeeper:Data:Backend from G:Object
          * Store the path in the backend.
          */
         self->_priv->path = g_strdup(db_path);
+        /**
+         * Read Schemas 
+         */
 
-        /* Read tags */
+        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas",NULL);
+        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
+        {
+            g_mkdir(path, 0755);
+            printf("directory created, returning\n");
+        }
+
+        printf("Loading schemas from: %s\n", path);
+        /* Load item's */
+        dir = g_dir_open(path, 0, NULL);
+
+        /* cleanup path pointer */
+        g_free(path);
+        if(dir)
+        {
+            const gchar *filename;
+            while((filename = g_dir_read_name(dir))!= NULL)
+            {
+                gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas", filename,NULL);
+                StuffKeeperDataSchema *schema;
+                gint *id;
+                /* create a new item */
+                schema = stuffkeeper_data_schema_new_from_file(full_path);
+                /* want to copy the key, even if it is an integer */
+                id = g_malloc0(sizeof(gint));
+                *id = stuffkeeper_data_schema_get_id(schema);
+                /* insert it into my hash-list */
+                g_hash_table_insert(self->_priv->schemas,id, schema);
+                self_schema_added(self, schema);
+                printf("added schema: %i\n", *id); 
+                g_free(full_path);
+            }
+            g_dir_close(dir);
+        }
+
+        /**
+         * Read tags 
+         */
         path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"tags",NULL);
         if(!g_file_test(path, G_FILE_TEST_IS_DIR))
         {
             g_mkdir(path, 0755);
             printf("directory created, returning\n");
-            return;
         }
 
         printf("Loading tags from: %s\n", path);
@@ -159,7 +230,6 @@ class StuffKeeper:Data:Backend from G:Object
         {
             g_mkdir(path, 0755);
             printf("directory created, returning\n");
-            return;
         }
 
         printf("Loading items from: %s\n", path);
@@ -196,6 +266,12 @@ class StuffKeeper:Data:Backend from G:Object
      */
     private
     void
+    finalize_schema(gint *key, StuffKeeperDataSchema *schema, gpointer user_data)
+    {
+        stuffkeeper_data_schema_save_yourself(schema);
+    }
+    private
+    void
     finalize_item(gint *key, StuffKeeperDataItem *item, gpointer user_data)
     {
         stuffkeeper_data_item_save_yourself(item);
@@ -230,7 +306,13 @@ class StuffKeeper:Data:Backend from G:Object
 
             self->_priv->tags = NULL;
         }
+        if(self->_priv->schemas)
+        {
+            g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_finalize_schema, NULL);
+            g_hash_table_destroy(self->_priv->schemas);
 
+            self->_priv->schemas = NULL;
+        }
 
         PARENT_HANDLER(obj);
     }
@@ -276,13 +358,44 @@ class StuffKeeper:Data:Backend from G:Object
     {
         printf("Item changed: %i\n",id);
     }
+    
+    /**
+     * Schema's
+     */
+    public
+    StuffKeeperDataSchema*
+    add_schema(self, const int id)
+    {
+        gint *ide;
+        StuffKeeperDataSchema *schema;
+        printf("looking for schema: %i\n", id);
+        /* Look for existing tag */
+        schema = g_hash_table_lookup(self->_priv->schemas, &id);
+        if(schema)
+        {
+            printf("return found schema: %i\n", stuffkeeper_data_schema_get_id(schema));
+            return schema;
+        }
+        /* No tag, lets make one. */
+        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
+        schema = stuffkeeper_data_schema_new_with_id(path,id);
+        g_free(path);
 
+        /* Add to the list */
+        ide = g_malloc0(sizeof(gint));
+        *ide = id;
+        g_hash_table_insert(self->_priv->schemas,ide, schema);
 
-
-
-
+        printf("addded schema: %i\n", stuffkeeper_data_schema_get_id(schema));
+        self_schema_added(self, schema);
+        return schema;
+    }
 
     /**
+     * TAGS
+     */
+
+   /**
      * Add tag
      * Call this from the item when adding a tag, it will return the tag.
      * Existing tag if it allready exists

@@ -29,6 +29,9 @@ class StuffKeeper:Data:Tag from G:Object
             gint id = self_get_id(self);
             printf("Signal my tag change : %i\n", id); 
         }
+    /**
+     * Constructors
+     */
 
     public
         StuffKeeperDataTag*
@@ -55,7 +58,6 @@ class StuffKeeper:Data:Tag from G:Object
             return obj;
         }
 
-    /* Create new StuffKeeperDataBackend */
     public 
         StuffKeeperDataTag *
         new (const gchar *path)
