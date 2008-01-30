@@ -233,12 +233,12 @@ gboolean interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, GtkTreeM
         do{
             StuffKeeperDataTag *tag;
             gboolean sel;
+            has_selected = 0;
             gtk_tree_model_get(tagmodel, &piter,2,&sel, 3,&tag, -1);
             if(sel)
             {
-                has_selected = 1;
-                if(item && tag && stuffkeeper_data_item_has_tag(item, tag))
-                    return 1;
+                if(item && tag && !stuffkeeper_data_item_has_tag(item, tag))
+                    return 0;
             }
 
         }while(gtk_tree_model_iter_next(tagmodel, &piter));
