@@ -107,7 +107,7 @@ class StuffKeeper:Data:Item from G:Object
         printf("Deleting myself: %i\n", id);
         g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
 
-
+        stuffkeeper_data_schema_remove_item(self->_priv->schema, G_OBJECT(self));
 
         GList *node = g_list_first(self->_priv->tags);
         for(;node;node = g_list_next(node))
@@ -138,6 +138,7 @@ class StuffKeeper:Data:Item from G:Object
             obj->_priv->schema = schema; 
             id = stuffkeeper_data_schema_get_id(schema);
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL, "schema", id);
+            stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
 
             self_save_yourself(obj);
             return obj;
@@ -171,6 +172,7 @@ class StuffKeeper:Data:Item from G:Object
         if(error == NULL)
         {
             obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
+            stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
         }
         /* When loading the items it is marked as changed. reset this*/
         obj->_priv->changed = FALSE;

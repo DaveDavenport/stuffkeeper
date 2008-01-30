@@ -28,13 +28,67 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
     /**
      * Treeview 1 & 2
      */
+    private GtkWidget *LeftPaneCB GladeXML;
     private GtkWidget *treeview1 GladeXML;
     private GtkWidget *treeview2 GladeXML;
     private GtkWidget *add_tag_entry GladeXML;
     private GtkWidget *item_vbox GladeXML;
     private GtkWidget *item_event_box GladeXML;
     private StuffKeeperDataBackend *skdbg = {NULL};
-
+    /**
+     * Keep Schema's GtkListStore up2date
+     */
+    public
+    void 
+    schema_added(StuffKeeperDataBackend *skdb, StuffKeeperDataSchema *schema, GtkListStore *store)
+    {
+        GtkTreeIter iter;
+        gtk_list_store_append(store, &iter);
+        gchar *title = stuffkeeper_data_schema_get_title(schema);
+        gtk_list_store_set(store, &iter, 0, stuffkeeper_data_schema_get_id(schema),1,title,3,schema, 4, stuffkeeper_data_schema_num_items(schema),-1);
+        g_free(title);
+    }
+    public
+    void 
+    schema_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataSchema *schema, GtkListStore *store)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(store);
+        gint id = stuffkeeper_data_schema_get_id(schema);
+        if(gtk_tree_model_get_iter_first(model, &iter))
+        {
+            do{
+                gint oid;
+                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                if(oid == id)
+                {
+                    gchar *title = stuffkeeper_data_schema_get_title(schema);
+                    gtk_list_store_set(store, &iter, 1,title, 4, stuffkeeper_data_schema_num_items(schema),-1);
+                    g_free(title);
+                    return;
+                }
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
+    }
+    public
+    void 
+    schema_removed(StuffKeeperDataBackend *skdb, gint id, GtkListStore *store)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(store);
+        if(gtk_tree_model_get_iter_first(model, &iter))
+        {
+            do{
+                gint oid;
+                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                if(oid == id)
+                {
+                    gtk_list_store_remove(store, &iter);
+                    return;
+                }
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
+    }
 
     /**
      * Keep Tag's GtkListStore up2date
@@ -286,13 +340,14 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
      */
     public
         void 
-        interface_tag_toggled(self, gchar *path, GtkCellRendererToggle *renderer)
+        interface_left_pane_toggled(self, gchar *path, GtkCellRendererToggle *renderer)
         {
             GtkTreeIter iter;
-            if(gtk_tree_model_get_iter_from_string(self->_priv->model_tags, &iter, path))
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
                 gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
-                gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_tags), &iter, 2,value,-1);
+                gtk_list_store_set(GTK_LIST_STORE(model), &iter, 2,value,-1);
 
                 /* refilter the items list */
                 gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
@@ -327,7 +382,7 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
         }
 
     public
-        void interface_tag_edited 
+        void interface_left_pane_edited 
         (
          self,
          gchar               *path,
@@ -337,18 +392,20 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
 
         {
             GtkTreeIter iter;
-            printf("edited: %s\n", new_text);
-            if(gtk_tree_model_get_iter_from_string(self->_priv->model_tags, &iter, path))
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
-                gint id;
-                StuffKeeperDataTag *item;
-                gtk_tree_model_get(self->_priv->model_tags, &iter ,0,&id, -1);
-                printf("get tag: %i\n",id);
-                item = stuffkeeper_data_backend_get_tag(self->_priv->skdbg, id);
-                if(item)
+                GObject *item;
+
+                gtk_tree_model_get(model, &iter ,3,&item, -1);
+
+                if(STUFFKEEPER_IS_DATA_TAG(item))
                 {
-                    stuffkeeper_data_tag_set_title(item, new_text);
+                    stuffkeeper_data_tag_set_title(STUFFKEEPER_DATA_TAG(item), new_text);
+                }else if (STUFFKEEPER_IS_DATA_SCHEMA(item)){
+                    stuffkeeper_data_schema_set_title(STUFFKEEPER_DATA_SCHEMA(item), new_text);
                 }
+                
 
             }
         }
@@ -368,7 +425,9 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
         gboolean 
         interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, StuffKeeperInterface *self) 
         {
+            GtkTreeModel *model2 = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
             StuffKeeperDataItem *item;
+            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
 
             /* Get the item */
             gtk_tree_model_get(model, iter, 2,&item, -1);
@@ -378,22 +437,28 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
             }
 
             GtkTreeIter piter;
-            if(gtk_tree_model_get_iter_first(self->_priv->model_tags, &piter))
+            if(gtk_tree_model_get_iter_first(model2, &piter))
             {
                 do{
-                    StuffKeeperDataTag *tag;
+                    GObject *tag;
                     gboolean sel;
                     /* get the tag, and if it is selected */
-                    gtk_tree_model_get(self->_priv->model_tags, &piter,2,&sel, 3,&tag, -1);
-                    if(sel)
+                    gtk_tree_model_get(model2, &piter,2,&sel, 3,&tag, -1);
+
+                    if(sel && tag)
                     {
-                        if(tag && !stuffkeeper_data_item_has_tag(item, tag))
+                        if(type == 0 && !stuffkeeper_data_item_has_tag(item, STUFFKEEPER_DATA_TAG(tag)))
+                        {
+                            return FALSE;
+                        }
+                        else if (type == 1 && 
+                        stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) != stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
                         {
                             return FALSE;
                         }
                     }
 
-                }while(gtk_tree_model_iter_next(self->_priv->model_tags, &piter));
+                }while(gtk_tree_model_iter_next(model2, &piter));
             }
 
             return TRUE; 
@@ -588,6 +653,19 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
             return GET_NEW;
         }
 
+    public
+    void
+    left_pane_changed(self, GtkComboBox *box)
+    {
+        int i = gtk_combo_box_get_active(box);
+        if(i==0){
+            gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
+        }else{
+            gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
+        }
+        /* refilter the items list */
+        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+    }
     /**
      * Initialize the main gui
      */
@@ -597,7 +675,6 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
         {
             GtkTreeViewColumn *column;
             GtkCellRenderer *renderer;
-            GtkWidget *tree;
             GtkTreeSelection *sel;
             /**
              * StuffKeeperDataBackend
@@ -608,27 +685,19 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
             /* Tags */
             self->_priv->model_tags = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
             /* handle an added tag */
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), 
-                    "tag-added",
-                    G_CALLBACK(self_tag_added), 
-                    self->_priv->model_tags);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg),
-                    "tag-changed", 
-                    G_CALLBACK(self_tag_changed), 
-                    self->_priv->model_tags);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg),
-                    "tag-removed",
-                    G_CALLBACK(self_tag_removed),
-                    self->_priv->model_tags);
-
-
+            g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-added",G_CALLBACK(self_tag_added),self->_priv->model_tags);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-changed",G_CALLBACK(self_tag_changed),self->_priv->model_tags);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-removed",G_CALLBACK(self_tag_removed),self->_priv->model_tags);
 
             self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
             g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added), self->_priv->model_items);
             g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-removed", G_CALLBACK(self_item_removed),self->_priv->model_items);
             g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-changed", G_CALLBACK(self_item_changed),self->_priv->model_items);
 
-
+            self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-added",   G_CALLBACK(self_schema_added), self->_priv->model_schemas);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-removed", G_CALLBACK(self_schema_removed),self->_priv->model_schemas);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-changed", G_CALLBACK(self_schema_changed),self->_priv->model_schemas);
             /**
              * Items
              */
@@ -652,8 +721,6 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
                     (GtkTreeModelFilterVisibleFunc)self_interface_visible_func, self, NULL);
 
 
-            tree = self->_priv->treeview1;
-
 
             /* TAGS */
             column = gtk_tree_view_column_new();
@@ -664,14 +731,14 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
             gtk_tree_view_column_set_attributes(column, renderer, "active", 2, NULL);
             /* handle toggled */
-            g_signal_connect_swapped(G_OBJECT(renderer), "toggled", G_CALLBACK(self_interface_tag_toggled), self);
+            g_signal_connect_swapped(G_OBJECT(renderer), "toggled", G_CALLBACK(self_interface_left_pane_toggled), self);
 
             /* Tag name */
             renderer = gtk_cell_renderer_text_new();
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, TRUE);
             gtk_tree_view_column_set_attributes(column, renderer, "text", 1, NULL);
             g_object_set(renderer, "editable", TRUE,NULL);
-            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_tag_edited), self);
+            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_left_pane_edited), self);
 
             /* Number of items */
             renderer = gtk_cell_renderer_text_new();
@@ -679,14 +746,14 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
             gtk_tree_view_column_set_attributes(column, renderer, "text", 4, NULL);
 
-            gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
+            gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
+
+            gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB), 0);
 
 
 
 
 
-
-            gtk_tree_view_set_model(GTK_TREE_VIEW(tree), GTK_TREE_MODEL(self->_priv->model_tags));
 
 
 

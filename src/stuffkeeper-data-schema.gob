@@ -4,6 +4,10 @@ requires 2.0.10
 #include <glib/gstdio.h>
 #include <stdio.h>
 #define KEYFILE_GENERAL "general"
+#define KEYFILE_FIELD_TYPES "field-types" 
+#define KEYFILE_FIELD_NAMES "field-names" 
+#include "stuffkeeper-data-item.h"
+
 %}
 %h{
     typedef enum _FieldType{
@@ -19,6 +23,9 @@ class StuffKeeper:Data:Schema from G:Object
     private gboolean changed = {FALSE};
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
+
+    private GList *items = {NULL} destroywith g_list_free;
+
     /**
      * Signals 
      */
@@ -143,20 +150,41 @@ class StuffKeeper:Data:Schema from G:Object
     get_fields(self, gsize *size)
     {
         gchar **retv = NULL;
-        retv = g_key_file_get_keys(self->_priv->data, "field-types",size, NULL);
+        retv = g_key_file_get_keys(self->_priv->data, KEYFILE_FIELD_TYPES,size, NULL);
         return retv;
     }
     public 
     FieldType 
     get_field_type(self, gchar *id)
     {
-        return g_key_file_get_integer(self->_priv->data, "field-types",id, NULL);
+        return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, NULL);
     }
 
     public
     gchar *
     get_field_name(self, gchar *id)
     {
-        return g_key_file_get_string(self->_priv->data, "field-names",id, NULL);
+        return g_key_file_get_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, NULL);
     }
+
+    public
+        int
+        num_items(self)
+        {
+            return g_list_length(self->_priv->items);
+        }
+    public
+        void
+        add_item(self, GObject *item)
+        {
+            self->_priv->items = g_list_append(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
+            self_schema_changed(self);
+        }
+    public 
+        void
+        remove_item(self, GObject *item)
+        {
+            self->_priv->items = g_list_remove(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
+            self_schema_changed(self);
+        }
 }
