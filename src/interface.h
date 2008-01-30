@@ -4,7 +4,7 @@
 #include "stuffkeeper-data-backend.h"
 
 /* Create the main interface */
-void initialize_interface(StuffKeeperDataBackend *skdb);
+void initialize_interface(StuffKeeperDataBackend *skdb, GtkListStore *tag_store, GtkListStore *items_store);
 
 
 #endif

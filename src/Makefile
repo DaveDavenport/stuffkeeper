@@ -7,7 +7,7 @@ EXTRA_CFLAGS	= -g -Os -Wall -D_GNU_SOURCE
 Q				= @
 
 HEADERS=\
-	interface.h\
+	stuffkeeper-interface.h\
 	stuffkeeper-data-backend.h\
 	stuffkeeper-data-schema.h\
 	stuffkeeper-data-item.h\
@@ -20,6 +20,7 @@ HEADERS=\
 	stuffkeeper-data-spinbutton.h
 
 SOURCE=\
+	stuffkeeper-interface.h\
 	stuffkeeper-data-backend.h\
 	stuffkeeper-data-schema.h\
 	stuffkeeper-data-item.h\
@@ -30,6 +31,7 @@ SOURCE=\
 	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-data-rating.h\
+	stuffkeeper-interface.c\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-item.c\
@@ -41,7 +43,6 @@ SOURCE=\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-rating.c\
 	main.c\
-	interface.c
 
 OBJECTS=$(patsubst %.c, %.o, $(SOURCE))
 

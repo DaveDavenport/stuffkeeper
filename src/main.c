@@ -3,13 +3,17 @@
 
 /* Include the database */
 #include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-interface.h"
 
-/* Include interface header file */
-#include "interface.h"
 
+/**
+ * The main programs
+ */
 
 int main ( int argc, char **argv )
 {
+    StuffKeeperInterface  *ski;
+
     /* string used the path*/
     gchar *path;
     /* pointer holding the backend */
@@ -38,8 +42,9 @@ int main ( int argc, char **argv )
         return EXIT_FAILURE;
     }
 
-    /* Initialize the Main interface */
-    initialize_interface(skdb);
+ 
+    ski= stuffkeeper_interface_new();
+    stuffkeeper_interface_initialize_interface(ski,skdb);
 
     /**
      * Do filesystem checking 
