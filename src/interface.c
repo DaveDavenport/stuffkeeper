@@ -8,6 +8,7 @@
 #include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
 #include "stuffkeeper-data-spinbutton.h"
+#include "stuffkeeper-data-taglist.h"
 
 /* Include interface header file */
 #include "interface.h"
@@ -256,7 +257,7 @@ void interface_entry_add(GtkWidget *button, gpointer data)
     if(title && strlen(title) > 0)
         stuffkeeper_data_tag_set_title(tag, title);
 }
-
+/*
 void interface_add_tag_to_item(GtkWidget *box, gpointer data)
 {
     StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(box), "tag");
@@ -269,7 +270,7 @@ void interface_add_tag_to_item(GtkWidget *box, gpointer data)
     }
 
 }
-
+*/
 
 void interface_item_selection_changed (GtkTreeSelection *selection, gpointer data)
 {
@@ -348,7 +349,8 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                 gsize length;
                 int i;
                 gchar **retv = stuffkeeper_data_schema_get_fields(schema, &length);
-                vbox = gtk_table_new(length, 2, FALSE);
+                /* num fields + one for the tags */
+                vbox = gtk_table_new(length+1, 2, FALSE);
                 gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
                 gtk_table_set_col_spacings(GTK_TABLE(vbox), 6);
                 for(i=0;i<length;i++)
@@ -363,17 +365,13 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                     g_free(val);
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                     gtk_table_attach(GTK_TABLE(vbox), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
-//                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-
                     if(type == FIELD_TYPE_STRING)
                     {
                         label1 = stuffkeeper_data_entry_new(item,retv[i]);
-  //                      gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
                     }
                     else if (type == FIELD_TYPE_INTEGER)
                     {
                         label1 = stuffkeeper_data_spinbutton_new(item,retv[i]);
-    //                    gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
                     }else {
                         label1 = gtk_label_new("not supported\n");
                     }
@@ -382,42 +380,25 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
 
                     g_free(field_name);
                 }
+                /**
+                 * Fill in the Tag list 
+                 */
+                /* Title */
+                label1 = gtk_label_new("");
+                gchar *val = g_markup_printf_escaped("<b>%s</b>", "Tags");
+                gtk_label_set_markup(GTK_LABEL(label1), val);
+                g_free(val);
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+                gtk_table_attach(GTK_TABLE(vbox), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+
+                label1 = stuffkeeper_data_taglist_new(skdbg,item);
+                gtk_table_attach(GTK_TABLE(vbox), label1, 1,2,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+
                 gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
                 g_strfreev(retv);
             }
 
-            /**
-             * Fill in the Tag list 
-             */
-
-            /* now I need list */
-            GList *node,*list =  stuffkeeper_data_backend_get_tags(skdbg);
-            GtkWidget *label = gtk_label_new("");
-            gtk_label_set_markup(GTK_LABEL(label), "<b>Tags:</b>");
-            GtkWidget *hbox = gtk_hbox_new(FALSE, 6);
-
-            gtk_box_pack_start(GTK_BOX(hbox),label, FALSE,TRUE, 0);
-
-            for(node = list;node;node = g_list_next(node))
-            {
-                StuffKeeperDataTag *tag = node->data;
-                gchar *title = stuffkeeper_data_tag_get_title(tag);
-                GtkWidget *but= gtk_check_button_new_with_label(title); 
-                g_object_set_data(G_OBJECT(but), "tag", tag);
-                g_object_set_data(G_OBJECT(but), "item", item);
-
-
-                if(stuffkeeper_data_item_has_tag(item, tag))
-                    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(but), TRUE);
-                g_free(title);
-
-
-                g_signal_connect(G_OBJECT(but), "toggled", G_CALLBACK(interface_add_tag_to_item), NULL);
-                gtk_box_pack_start(GTK_BOX(hbox),but, FALSE,TRUE, 0);
-            }
-            g_list_free(list);
-            gtk_box_pack_end(GTK_BOX(container), hbox, FALSE, TRUE, 0);
-        }
+                   }
     }
     gtk_widget_show_all(container);
 

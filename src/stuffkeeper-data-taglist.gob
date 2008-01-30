@@ -1,0 +1,161 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-item.h"
+#include "stuffkeeper-data-tag.h"
+#include "stuffkeeper-data-label.h"
+%}
+
+class StuffKeeper:Data:TagList from Gtk:HBox
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+    private StuffKeeperDataBackend *skdb = {NULL};
+
+    private gulong uid_tag_changed = {0};
+    private gulong uid_tag_added = {0};
+    private gulong uid_tag_removed = {0};
+
+
+    public
+    void
+    tag_changed(self, StuffKeeperDataTag *tag)
+    {
+        int id = stuffkeeper_data_tag_get_id(tag);
+        /* unused */
+        GList *node ,*list = gtk_container_get_children(GTK_CONTAINER(self));
+        for(node = list;node;node= g_list_next(node))
+        {
+            gpointer data = g_object_get_data(G_OBJECT(node->data), "tag-id");
+            if(data && GPOINTER_TO_INT(data) == id)
+            {
+                GtkWidget *label = gtk_bin_get_child(GTK_BIN(node->data));
+                if(!stuffkeeper_data_item_has_tag(self->_priv->item,tag))
+                {
+                    gtk_widget_set_sensitive(label, FALSE);
+                }
+                else {
+                    gtk_widget_set_sensitive(label, TRUE);
+                }
+
+                g_list_free(list);
+                return;
+            }
+        }
+        if(list)
+            g_list_free(list);
+    }
+    public
+    void
+    event_button_press_event(self, GdkEventButton *button, GtkEventBox *event)
+    {
+        if(button->button == 1)
+        {
+            gpointer data = g_object_get_data(G_OBJECT(event), "tag-id");
+            if(data)
+            {       
+                StuffKeeperDataTag *tag = stuffkeeper_data_backend_get_tag(self->_priv->skdb, GPOINTER_TO_INT(data));
+                if(tag)
+                {
+                    if(!stuffkeeper_data_item_has_tag(self->_priv->item,tag))
+                    {
+                        stuffkeeper_data_item_add_tag(self->_priv->item, tag);
+                    }else{
+                        stuffkeeper_data_item_remove_tag(self->_priv->item, tag);
+                    }
+                }
+            }
+        }
+
+    }
+    public
+    void
+    tag_added(self, StuffKeeperDataTag *tag)
+    {
+        GtkWidget *label = stuffkeeper_data_label_new_tag(STUFFKEEPER_DATA_TAG(tag)); 
+        GtkWidget *event = gtk_event_box_new();
+        gtk_event_box_set_visible_window(event, FALSE);
+        g_signal_connect_swapped(G_OBJECT(event), "button-press-event", G_CALLBACK(self_event_button_press_event), self);
+        g_object_set_data(G_OBJECT(event), "tag-id", GINT_TO_POINTER(stuffkeeper_data_tag_get_id(tag)));
+        gtk_container_add(GTK_CONTAINER(event), label);
+        gtk_box_pack_start(GTK_BOX(self), event, FALSE, TRUE, 0);
+        if(!stuffkeeper_data_item_has_tag(self->_priv->item,tag))
+        {
+            gtk_widget_set_sensitive(label, FALSE);
+        }
+        gtk_widget_show_all(event);
+    }
+    public
+    void
+    tag_removed(self, const int id)
+    {
+        GList *node ,*list = gtk_container_get_children(GTK_CONTAINER(self));
+        printf("Tag removed\n");
+        for(node = list;node;node= g_list_next(node))
+        {
+            gpointer data = g_object_get_data(G_OBJECT(node->data), "tag-id");
+            if(data && GPOINTER_TO_INT(data) == id)
+            {
+                gtk_widget_destroy(node->data);
+                g_list_free(list);
+                return;
+            }
+        }
+        if(list)
+            g_list_free(list);
+    }
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item)
+    {
+        Self *obj = GET_NEW;
+
+        gtk_box_set_spacing(GTK_BOX(obj), 6);
+
+        /* store item */
+        obj->_priv->skdb = skdb;
+        obj->_priv->item = item; 
+        obj->_priv->uid_tag_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->skdb), "tag-changed",G_CALLBACK(self_tag_changed), obj);
+        obj->_priv->uid_tag_added = g_signal_connect_swapped(G_OBJECT(obj->_priv->skdb), "tag-added",G_CALLBACK(self_tag_added), obj);
+        obj->_priv->uid_tag_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->skdb), "tag-removed",G_CALLBACK(self_tag_removed), obj);
+
+
+        GList *node,*list =  stuffkeeper_data_backend_get_tags(skdb);
+        for(node=g_list_first(list);node;node = g_list_next(node))
+        {
+            self_tag_added(obj, node->data);
+        }
+        return GTK_WIDGET(obj);
+    }
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            printf("finalizing vbox\n");
+            if(self->_priv->uid_tag_changed)
+            {
+                g_signal_handler_disconnect(self->_priv->skdb,self->_priv->uid_tag_changed);
+                self->_priv->uid_tag_changed= 0;
+            }
+            if(self->_priv->uid_tag_added)
+            {
+                g_signal_handler_disconnect(self->_priv->skdb,self->_priv->uid_tag_added);
+                self->_priv->uid_tag_added= 0;
+            }
+            if(self->_priv->uid_tag_removed)
+            {
+                g_signal_handler_disconnect(self->_priv->skdb,self->_priv->uid_tag_removed);
+                self->_priv->uid_tag_removed= 0;
+            }
+
+
+
+            PARENT_HANDLER(obj);
+        }
+
+}

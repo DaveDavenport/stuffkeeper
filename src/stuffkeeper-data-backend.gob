@@ -462,6 +462,7 @@ class StuffKeeper:Data:Backend from G:Object
             printf("failed: Still items tagged by this\n");
             return;
         }
+        self_tag_removed(self,id);
         if(tag)
         {
             printf("deleting tag\n");
@@ -472,6 +473,6 @@ class StuffKeeper:Data:Backend from G:Object
         {
             return;
         }
-        self_tag_removed(self,id);
+
     }
 }

@@ -13,6 +13,7 @@ HEADERS=\
 	stuffkeeper-data-item.h\
 	stuffkeeper-data-tag.h\
 	stuffkeeper-data-label.h\
+	stuffkeeper-data-taglist.h\
 	stuffkeeper-data-entry.h\
 	stuffkeeper-data-spinbutton.h
 
@@ -22,6 +23,7 @@ SOURCE=\
 	stuffkeeper-data-item.h\
 	stuffkeeper-data-tag.h\
 	stuffkeeper-data-label.h\
+	stuffkeeper-data-taglist.h\
 	stuffkeeper-data-entry.h\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-data-backend.c\
@@ -29,6 +31,7 @@ SOURCE=\
 	stuffkeeper-data-item.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-label.c\
+	stuffkeeper-data-taglist.c\
 	stuffkeeper-data-entry.c\
 	stuffkeeper-data-spinbutton.c\
 	main.c\

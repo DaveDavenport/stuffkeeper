@@ -83,24 +83,6 @@ class StuffKeeper:Data:Label from Gtk:Label
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     override (G:Object)
         void
         finalize (G:Object *obj)
