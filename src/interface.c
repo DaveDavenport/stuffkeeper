@@ -5,6 +5,7 @@
 
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-schema.h"
+#include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
 #include "stuffkeeper-data-spinbutton.h"
 
@@ -325,9 +326,7 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
             gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
 
             if(schema) {
-                gchar *title = stuffkeeper_data_schema_get_title(schema);
-                label1 = gtk_label_new(title);
-                g_free(title);
+                label1 = stuffkeeper_data_label_new_schema(schema);
             } else {
                 label1 = gtk_label_new("N/A");
             }

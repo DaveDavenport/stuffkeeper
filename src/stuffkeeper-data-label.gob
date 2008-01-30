@@ -1,0 +1,118 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-tag.h"
+#include "stuffkeeper-data-schema.h"
+%}
+
+class StuffKeeper:Data:Label from Gtk:Label
+{
+    private GObject *item = {NULL};
+    private gulong changed_item_entry = {0};
+
+    public
+    void
+    item_changed(self,GObject *item, gpointer data)
+    {
+        gchar *value;
+        if(STUFFKEEPER_IS_DATA_SCHEMA(self->_priv->item))
+        {
+            value = stuffkeeper_data_schema_get_title(STUFFKEEPER_DATA_SCHEMA(self->_priv->item));
+            if(value)
+            {
+                gtk_label_set_text(GTK_LABEL(self), value);
+                g_free(value);
+            }
+        }else if (STUFFKEEPER_IS_DATA_TAG(self->_priv->item))
+        {
+            value = stuffkeeper_data_tag_get_title(STUFFKEEPER_DATA_TAG(self->_priv->item));
+            if(value)
+            {
+                gtk_label_set_text(GTK_LABEL(self), value);
+                g_free(value);
+            }
+        }
+    }
+
+
+    public
+    GtkWidget *
+    new_tag(StuffKeeperDataTag *tag)
+    {
+        Self *obj = GET_NEW;
+        gchar *value =NULL;
+
+        gtk_misc_set_alignment(GTK_MISC(obj), 0, 0.5);
+        
+        /* store item */
+        obj->_priv->item = G_OBJECT(tag); 
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "tag-changed", G_CALLBACK(self_item_changed), obj);
+
+        value = stuffkeeper_data_tag_get_title(STUFFKEEPER_DATA_TAG(obj->_priv->item));
+        if(value)
+        {
+            gtk_label_set_text(GTK_LABEL(obj), value);
+            g_free(value);
+        }
+        return GTK_WIDGET(obj);
+    }
+    public
+    GtkWidget *
+    new_schema(StuffKeeperDataSchema *schema)
+    {
+        Self *obj = GET_NEW;
+        gchar *value =NULL;
+
+        gtk_misc_set_alignment(GTK_MISC(obj), 0, 0.5);
+        
+        /* store item */
+        obj->_priv->item = G_OBJECT(schema); 
+
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "schema-changed", G_CALLBACK(self_item_changed), obj);
+
+        value = stuffkeeper_data_schema_get_title(STUFFKEEPER_DATA_SCHEMA(obj->_priv->item));
+        if(value)
+        {
+            gtk_label_set_text(GTK_LABEL(obj), value);
+            g_free(value);
+        }
+        return GTK_WIDGET(obj);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            printf("finalizing label\n");
+            if(self->_priv->changed_item_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+                self->_priv->changed_item_entry = 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}
