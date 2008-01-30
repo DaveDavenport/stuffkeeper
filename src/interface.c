@@ -9,6 +9,7 @@
 #include "stuffkeeper-data-entry.h"
 #include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
+#include "stuffkeeper-data-rating.h"
 #include "stuffkeeper-data-taglist.h"
 
 /* Include interface header file */
@@ -258,20 +259,7 @@ void interface_entry_add(GtkWidget *button, gpointer data)
     if(title && strlen(title) > 0)
         stuffkeeper_data_tag_set_title(tag, title);
 }
-/*
-void interface_add_tag_to_item(GtkWidget *box, gpointer data)
-{
-    StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(box), "tag");
-    StuffKeeperDataItem *item = g_object_get_data(G_OBJECT(box), "item");
-    gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(box));
-    if(value) {
-        stuffkeeper_data_item_add_tag(item, tag);
-    } else {
-        stuffkeeper_data_item_remove_tag(item, tag);
-    }
 
-}
-*/
 
 void interface_item_selection_changed (GtkTreeSelection *selection, gpointer data)
 {
@@ -375,6 +363,8 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                         label1 = stuffkeeper_data_spinbutton_new(item,retv[i]);
                     }else if (type == FIELD_TYPE_BOOLEAN) {
                         label1 = stuffkeeper_data_boolean_new(item,retv[i]);
+                    }else if (type == FIELD_TYPE_RATING) {
+                        label1 = stuffkeeper_data_rating_new(item,retv[i]);
                     }else {
                         label1 = gtk_label_new("not supported\n");
                     }
@@ -471,9 +461,6 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(interface_item_selection_changed), NULL);
 
     /* Tag list */
-
-
-
     store = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filter), (GtkTreeModelFilterVisibleFunc)interface_visible_func, store, NULL);
 
