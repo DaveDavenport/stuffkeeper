@@ -1,0 +1,80 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-item.h"
+%}
+
+class StuffKeeper:Data:SpinButton from Gtk:Spin:Button
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+    private gulong changed_item_entry = {0};
+    private gulong changed_spin_value = {0};
+
+    public
+    void
+    value_changed(self, gpointer data)
+    {
+        const int value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self));
+        stuffkeeper_data_item_set_integer(self->_priv->item, self->_priv->field, value);
+
+    }
+
+    public
+    void
+    item_changed(self, StuffKeeperDataItem *item)
+    {
+        const int value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self));
+        const int new_value = stuffkeeper_data_item_get_integer(item, self->_priv->field);
+
+        if(new_value != value)
+        {
+            g_signal_handler_block(self,self->_priv->changed_spin_value);
+            gtk_spin_button_set_value(GTK_SPIN_BUTTON(self), (gdouble)new_value);
+            printf("changen\n");
+            g_signal_handler_unblock(self,self->_priv->changed_spin_value);
+        }
+    }
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataItem *item, const gchar *field)
+    {
+        Self *obj = GET_NEW;/*_VARG(gtk_adjustment_new(0,G_MININT,G_MAXINT,1,1,1),8);*/
+        int value; 
+
+        /* setup */
+        gtk_spin_button_set_range(GTK_SPIN_BUTTON(obj), G_MININT, G_MAXINT);
+        gtk_spin_button_set_increments(GTK_SPIN_BUTTON(obj),1,5);
+
+        /* store item */
+        obj->_priv->item = item; 
+        /* field */
+        obj->_priv->field = g_strdup(field);
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
+
+        /* update the entry */
+        value = stuffkeeper_data_item_get_integer(item, obj->_priv->field);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj), (gdouble)value);
+
+        obj->_priv->changed_spin_value = g_signal_connect(G_OBJECT(obj), "value_changed", G_CALLBACK(self_value_changed), NULL);
+        return GTK_WIDGET(obj);
+    }
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            printf("finalizing spinbutton\n");
+            if(self->_priv->changed_item_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+                self->_priv->changed_item_entry = 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}

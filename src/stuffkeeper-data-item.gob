@@ -218,6 +218,20 @@ class StuffKeeper:Data:Item from G:Object
         g_key_file_set_string(self->_priv->data, KEYFILE_CUSTOM, field, value);
         self_item_changed(self);
     }
+    public
+    gint 
+    get_integer(self, const gchar *field)
+    {
+        return g_key_file_get_integer(self->_priv->data, KEYFILE_CUSTOM, field, NULL); 
+    }
+
+    public 
+    void
+    set_integer(self, const gchar *field, const gint value)
+    {
+        g_key_file_set_integer(self->_priv->data, KEYFILE_CUSTOM, field, value);
+        self_item_changed(self);
+    }
 
 
     /**

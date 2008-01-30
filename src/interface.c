@@ -6,6 +6,7 @@
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-entry.h"
+#include "stuffkeeper-data-spinbutton.h"
 
 /* Include interface header file */
 #include "interface.h"
@@ -334,6 +335,11 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
 
             gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
             gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+            label1 = gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label1),"<span weight='bold' size='x-large'>Fields:</span>");
+            gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
+            gtk_misc_set_padding(GTK_MISC(label1), 0,8);
+            gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
 
             /**
              * Get the attached schema and fill in the rest from there
@@ -343,29 +349,41 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                 gsize length;
                 int i;
                 gchar **retv = stuffkeeper_data_schema_get_fields(schema, &length);
+                vbox = gtk_table_new(length, 2, FALSE);
+                gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
+                gtk_table_set_col_spacings(GTK_TABLE(vbox), 6);
                 for(i=0;i<length;i++)
                 {
                     FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]);
                     gchar *field_name = stuffkeeper_data_schema_get_field_name(schema, retv[i]);
 
-                    vbox = gtk_hbox_new(FALSE, 6);
                     /* Title */
                     label1 = gtk_label_new("");
                     gchar *val = g_markup_printf_escaped("<b>%s</b>", field_name);
                     gtk_label_set_markup(GTK_LABEL(label1), val);
                     g_free(val);
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
-                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    gtk_table_attach(GTK_TABLE(vbox), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+//                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
 
                     if(type == FIELD_TYPE_STRING)
                     {
                         label1 = stuffkeeper_data_entry_new(item,retv[i]);
-                        gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
+  //                      gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
                     }
-                    gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+                    else if (type == FIELD_TYPE_INTEGER)
+                    {
+                        label1 = stuffkeeper_data_spinbutton_new(item,retv[i]);
+    //                    gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
+                    }else {
+                        label1 = gtk_label_new("not supported\n");
+                    }
+                    gtk_table_attach(GTK_TABLE(vbox), label1, 1,2,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+                    
 
                     g_free(field_name);
                 }
+                gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
                 g_strfreev(retv);
             }
 
