@@ -21,6 +21,7 @@ requires 2.0.10
 
 class StuffKeeper:Data:Item from G:Object 
 {
+    private gboolean changed = {FALSE};
     private StuffKeeperDataBackend *skdb = {NULL};
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
@@ -37,6 +38,8 @@ class StuffKeeper:Data:Item from G:Object
     {
         gint id = self_get_id(self);
         printf("Signal my change: %i\n", id); 
+        /* Mark the item changed */
+        self->_priv->changed = TRUE;
     }
 
     /* Finalize functions */
@@ -60,14 +63,14 @@ class StuffKeeper:Data:Item from G:Object
     void
     save_yourself(self)
     {
-        if(self->_priv->data)
+        if(self->_priv->data && self->_priv->changed == TRUE)
         {
             gint id = self_get_id(self);
             char *content;
 
             gsize size;
 
-            printf("saving myself: %i\n",id);
+            printf("saving myself item: %i\n",id);
 
             /* save tags */
             /* clear previous values */
@@ -90,6 +93,9 @@ class StuffKeeper:Data:Item from G:Object
             content = g_key_file_to_data(self->_priv->data,&size, NULL);
             g_file_set_contents(self->_priv->path, content, size, NULL);
             g_free(content);
+
+            /* Mark as unchanged */
+            self->_priv->changed = FALSE;
         }
     }
 
@@ -145,7 +151,7 @@ class StuffKeeper:Data:Item from G:Object
         obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
         obj->_priv->data = g_key_file_new();
         obj->_priv->path = (file != NULL)?g_strdup(file):NULL;
-        g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
+        g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_NONE, NULL);
         /* Load the tags */
         gsize items;
         int *tags = g_key_file_get_integer_list(obj->_priv->data, KEYFILE_GENERAL, "tags", &items, NULL);
@@ -166,6 +172,8 @@ class StuffKeeper:Data:Item from G:Object
         {
             obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
         }
+        /* When loading the items it is marked as changed. reset this*/
+        obj->_priv->changed = FALSE;
         return obj;
     }
 

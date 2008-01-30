@@ -14,6 +14,7 @@ requires 2.0.10
 
 class StuffKeeper:Data:Tag from G:Object 
 {
+    private gboolean changed = {FALSE};
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
 
@@ -42,6 +43,8 @@ class StuffKeeper:Data:Tag from G:Object
             obj->_priv->data = g_key_file_new();
             obj->_priv->path = g_strdup(file);
             g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
+            /* Mark changed */
+            obj->_priv->changed = FALSE;
 
             return obj;
         }
@@ -103,23 +106,9 @@ class StuffKeeper:Data:Tag from G:Object
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         printf("new title: %s\n", title);
         self_tag_changed(self);
+        /* Mark changed */
+        self->_priv->changed = TRUE;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -130,14 +119,19 @@ class StuffKeeper:Data:Tag from G:Object
         save_yourself(self)
         {
             gint id = self_get_id(self);
-            printf("saving myself: %i\n",id);
-            if(self->_priv->data)
+
+            if(self->_priv->data && self->_priv->changed == TRUE)
             {
                 char *content;
                 gsize size;
+                printf("saving myself tag: %i\n",id);
+
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
+
                 g_free(content);
+                /* Mark changed */
+                self->_priv->changed = FALSE;
             }
         }
 

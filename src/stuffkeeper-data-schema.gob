@@ -16,6 +16,7 @@ requires 2.0.10
 
 class StuffKeeper:Data:Schema from G:Object 
 {
+    private gboolean changed = {FALSE};
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
     /**
@@ -65,10 +66,10 @@ class StuffKeeper:Data:Schema from G:Object
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-                    printf("Creating tag: %i\n", id);
-                    self_save_yourself(obj);
-                    return obj;
-                }                                                                          
+            printf("Creating tag: %i\n", id);
+            self_save_yourself(obj);
+            return obj;
+        }                                                                          
                 
     /**
      * Functions to manage 
@@ -79,13 +80,15 @@ class StuffKeeper:Data:Schema from G:Object
         {
             gint id = self_get_id(self);
             printf("saving myself: %i\n",id);
-            if(self->_priv->data)
+            if(self->_priv->data && self->_priv->changed == TRUE)
             {
                 char *content;
                 gsize size;
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
                 g_free(content);
+                /* reset changed */
+                self->_priv->changed = FALSE;
             }
         }
 
@@ -130,6 +133,8 @@ class StuffKeeper:Data:Schema from G:Object
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         printf("new title: %s\n", title);
         self_schema_changed(self);
+        /* mark changed */
+        self->_priv->changed =TRUE;
     }
     /**
      */
