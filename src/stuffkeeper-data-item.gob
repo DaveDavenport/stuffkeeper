@@ -234,6 +234,22 @@ class StuffKeeper:Data:Item from G:Object
     }
 
 
+    public
+        gint 
+    get_boolean(self, const gchar *field)
+    {
+        return g_key_file_get_boolean(self->_priv->data, KEYFILE_CUSTOM, field, NULL); 
+    }
+
+    public 
+    void
+    set_boolean(self, const gchar *field, const gint value)
+    {
+        g_key_file_set_boolean(self->_priv->data, KEYFILE_CUSTOM, field, value);
+        self_item_changed(self);
+    }
+
+
     /**
      * Tags
      */

@@ -76,7 +76,7 @@ class StuffKeeper:Data:TagList from Gtk:HBox
     {
         GtkWidget *label = stuffkeeper_data_label_new_tag(STUFFKEEPER_DATA_TAG(tag)); 
         GtkWidget *event = gtk_event_box_new();
-        gtk_event_box_set_visible_window(event, FALSE);
+        gtk_event_box_set_visible_window(GTK_EVENT_BOX(event), FALSE);
         g_signal_connect_swapped(G_OBJECT(event), "button-press-event", G_CALLBACK(self_event_button_press_event), self);
         g_object_set_data(G_OBJECT(event), "tag-id", GINT_TO_POINTER(stuffkeeper_data_tag_get_id(tag)));
         gtk_container_add(GTK_CONTAINER(event), label);

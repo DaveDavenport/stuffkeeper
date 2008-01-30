@@ -7,6 +7,7 @@
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
+#include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-taglist.h"
 
@@ -372,6 +373,8 @@ void interface_item_selection_changed (GtkTreeSelection *selection, gpointer dat
                     else if (type == FIELD_TYPE_INTEGER)
                     {
                         label1 = stuffkeeper_data_spinbutton_new(item,retv[i]);
+                    }else if (type == FIELD_TYPE_BOOLEAN) {
+                        label1 = stuffkeeper_data_boolean_new(item,retv[i]);
                     }else {
                         label1 = gtk_label_new("not supported\n");
                     }
@@ -436,6 +439,7 @@ void interface_remove_tag()
  */
 void initialize_interface(StuffKeeperDataBackend *skdb)
 {
+    GtkTreeViewColumn *column;
     GtkCellRenderer *renderer;
     GtkWidget *tree;
     GtkTreeModel *store,*filter;
@@ -469,21 +473,35 @@ void initialize_interface(StuffKeeperDataBackend *skdb)
     /* Tag list */
 
 
+
     store = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
     gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filter), (GtkTreeModelFilterVisibleFunc)interface_visible_func, store, NULL);
 
     tree = glade_xml_get_widget(xml, "treeview1");
-    renderer = gtk_cell_renderer_toggle_new();
-    g_object_set_data(G_OBJECT(renderer),"model1", filter); 
 
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "active", 2, NULL);
+    column = gtk_tree_view_column_new();
+
+    /* Toggle button  */
+    renderer = gtk_cell_renderer_toggle_new();
+    gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
+    g_object_set_data(G_OBJECT(renderer),"model1", filter); 
+    gtk_tree_view_column_set_attributes(column, renderer, "active", 2, NULL);
     g_signal_connect(G_OBJECT(renderer), "toggled", G_CALLBACK(interface_tag_toggled), store);
+
+    /* Tag name */
     renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "test", renderer, "text", 1, NULL);
+    gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, TRUE);
+    gtk_tree_view_column_set_attributes(column, renderer, "text", 1, NULL);
     g_object_set(renderer, "editable", TRUE,NULL);
     g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(interface_tag_edited), store);
+
+    /* Number of items */
     renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tree), -1, "#", renderer, "text", 4, NULL);
+    g_object_set(G_OBJECT(renderer), "background-set", TRUE, "background", "black", "foreground-set", TRUE, "foreground", "white",NULL);
+    gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
+    gtk_tree_view_column_set_attributes(column, renderer, "text", 4, NULL);
+
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
     g_signal_connect(G_OBJECT(skdb), "tag-added", G_CALLBACK(tag_added), store);
     g_signal_connect(G_OBJECT(skdb), "tag-changed", G_CALLBACK(tag_changed), store);

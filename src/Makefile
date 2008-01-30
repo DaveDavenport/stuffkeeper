@@ -15,6 +15,7 @@ HEADERS=\
 	stuffkeeper-data-label.h\
 	stuffkeeper-data-taglist.h\
 	stuffkeeper-data-entry.h\
+	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-spinbutton.h
 
 SOURCE=\
@@ -25,6 +26,7 @@ SOURCE=\
 	stuffkeeper-data-label.h\
 	stuffkeeper-data-taglist.h\
 	stuffkeeper-data-entry.h\
+	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
@@ -33,6 +35,7 @@ SOURCE=\
 	stuffkeeper-data-label.c\
 	stuffkeeper-data-taglist.c\
 	stuffkeeper-data-entry.c\
+	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
 	main.c\
 	interface.c
