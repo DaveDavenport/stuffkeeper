@@ -329,19 +329,20 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
     public
         void interface_tag_edited 
         (
-         GtkCellRendererText *renderer,
+         self,
          gchar               *path,
          gchar               *new_text,
-         StuffKeeperInterface *self)
+         GtkCellRendererText *renderer
+        )
+
         {
-            GtkTreeModel *model =  gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
             GtkTreeIter iter;
             printf("edited: %s\n", new_text);
-            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            if(gtk_tree_model_get_iter_from_string(self->_priv->model_tags, &iter, path))
             {
                 gint id;
                 StuffKeeperDataTag *item;
-                gtk_tree_model_get(model, &iter ,0,&id, -1);
+                gtk_tree_model_get(self->_priv->model_tags, &iter ,0,&id, -1);
                 printf("get tag: %i\n",id);
                 item = stuffkeeper_data_backend_get_tag(self->_priv->skdbg, id);
                 if(item)
@@ -670,7 +671,7 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, TRUE);
             gtk_tree_view_column_set_attributes(column, renderer, "text", 1, NULL);
             g_object_set(renderer, "editable", TRUE,NULL);
-            g_signal_connect(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_tag_edited), self->_priv->model_tags);
+            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_tag_edited), self);
 
             /* Number of items */
             renderer = gtk_cell_renderer_text_new();
