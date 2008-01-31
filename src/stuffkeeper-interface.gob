@@ -14,7 +14,7 @@ requires 2.0.10
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
 #include "stuffkeeper-data-taglist.h"
-
+extern GList *interface_list;
 %}
 
 
@@ -40,12 +40,12 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
      */
     public
     void 
-    schema_added(StuffKeeperDataBackend *skdb, StuffKeeperDataSchema *schema, GtkListStore *store)
+    schema_added(StuffKeeperDataBackend *skdb, StuffKeeperDataSchema *schema, GtkTreeModel *store)
     {
         GtkTreeIter iter;
-        gtk_list_store_append(store, &iter);
+        gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_schema_get_title(schema);
-        gtk_list_store_set(store, &iter, 0, stuffkeeper_data_schema_get_id(schema),1,title,3,schema, 4, stuffkeeper_data_schema_num_items(schema),-1);
+        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_schema_get_id(schema),1,title,3,schema, 4, stuffkeeper_data_schema_num_items(schema),-1);
         g_free(title);
     }
     public
@@ -63,7 +63,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_schema_get_title(schema);
-                    gtk_list_store_set(store, &iter, 1,title, 4, stuffkeeper_data_schema_num_items(schema),-1);
+                    gtk_list_store_set(GTK_LIST_STORE(store), &iter, 1,title, 4, stuffkeeper_data_schema_num_items(schema),-1);
                     g_free(title);
                     return;
                 }
@@ -95,17 +95,17 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
      */
     public
     void 
-    tag_added(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkListStore *store)
+    tag_added(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
     {
         GtkTreeIter iter;
-        gtk_list_store_append(store, &iter);
+        gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_tag_get_title(tag);
-        gtk_list_store_set(store, &iter, 0, stuffkeeper_data_tag_get_id(tag),1,title,3,tag, 4, stuffkeeper_data_tag_num_items(tag),-1);
+        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_tag_get_id(tag),1,title,3,tag, 4, stuffkeeper_data_tag_num_items(tag),-1);
         g_free(title);
     }
     public
     void 
-    tag_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkListStore *store)
+    tag_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(store);
@@ -118,7 +118,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_tag_get_title(tag);
-                    gtk_list_store_set(store, &iter, 1,title, 4, stuffkeeper_data_tag_num_items(tag),-1);
+                    gtk_list_store_set(GTK_LIST_STORE(store), &iter, 1,title, 4, stuffkeeper_data_tag_num_items(tag),-1);
                     g_free(title);
                     return;
                 }
@@ -170,12 +170,12 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     }
     public
     void
-    item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkListStore *store)
+    item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkTreeModel *store)
     {
         GtkTreeIter iter;
-        gtk_list_store_append(store, &iter);
+        gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_item_get_title(item);
-        gtk_list_store_set(store, &iter, 0, stuffkeeper_data_item_get_id(item),1,title, 2,item,-1);
+        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_item_get_id(item),1,title, 2,item,-1);
         g_free(title);
 
 
@@ -417,6 +417,30 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         {
             gtk_main_quit();
         }
+
+    public 
+    void
+    close_window(self)
+    {
+        int n;
+        interface_list = g_list_remove(interface_list, self);
+        n = g_list_length(interface_list);
+        printf("%i interfaces left\n", n);
+        gtk_widget_destroy(GTK_WIDGET(self));
+        if(n == 0)
+        {
+            gtk_main_quit();
+        }
+    }
+    public
+    void
+    new_window(self)
+    {
+        Self *ski;
+        ski= stuffkeeper_interface_new();
+        interface_list = g_list_append(interface_list, ski);
+        stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg);
+    }
 
     /**
      * Filtering the item list
@@ -683,6 +707,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         void 
         initialize_interface(self, StuffKeeperDataBackend *skdb)
         {
+            GList *iter, *node;
             GtkTreeViewColumn *column;
             GtkCellRenderer *renderer;
             GtkTreeSelection *sel;
@@ -692,22 +717,53 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             self->_priv->skdbg = skdb;
 
             /* Setting up backends */
+            self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
+            /** Load the schemas*/
+            node = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
+            for(iter = node;iter;iter = g_list_next(iter))
+            {
+                self_schema_added(self->_priv->skdbg, iter->data,self->_priv->model_schemas);
+            }
+            if(node) g_list_free(node);
+
+            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-added",   G_CALLBACK(self_schema_added), self->_priv->model_schemas);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-removed", G_CALLBACK(self_schema_removed),self->_priv->model_schemas);
+            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-changed", G_CALLBACK(self_schema_changed),self->_priv->model_schemas);
+
+
+
+
+
             /* Tags */
             self->_priv->model_tags = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
+            /** Load the tags */
+            node = stuffkeeper_data_backend_get_tags(self->_priv->skdbg);
+            for(iter = node;iter;iter = g_list_next(iter))
+            {
+                self_tag_added(self->_priv->skdbg, iter->data,self->_priv->model_tags);
+            }
+            if(node) g_list_free(node);
             /* handle an added tag */
             g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-added",G_CALLBACK(self_tag_added),self->_priv->model_tags);
             g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-changed",G_CALLBACK(self_tag_changed),self->_priv->model_tags);
             g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-removed",G_CALLBACK(self_tag_removed),self->_priv->model_tags);
 
             self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
+            /** Load the items*/
+            node = stuffkeeper_data_backend_get_items(self->_priv->skdbg);
+            for(iter = node;iter;iter = g_list_next(iter))
+            {
+                self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self->_priv->model_items);
+            }
+            if(node) g_list_free(node);
             g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added), self->_priv->model_items);
             g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-removed", G_CALLBACK(self_item_removed),self->_priv->model_items);
             g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-changed", G_CALLBACK(self_item_changed),self->_priv->model_items);
 
-            self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-added",   G_CALLBACK(self_schema_added), self->_priv->model_schemas);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-removed", G_CALLBACK(self_schema_removed),self->_priv->model_schemas);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-changed", G_CALLBACK(self_schema_changed),self->_priv->model_schemas);
+
+
+
+
             /**
              * Items
              */

@@ -7,7 +7,7 @@
     <property name="title" translatable="yes">window1</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
-    <signal name="delete_event" handler="quit_program"/>
+    <signal name="delete_event" handler="close_window"/>
     <child>
       <widget class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -21,6 +21,30 @@
                 <property name="use_underline">True</property>
                 <child>
                   <widget class="GtkMenu" id="menu1">
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem3">
+                        <property name="visible">True</property>
+                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">New Window</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="new_window"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image1">
+                            <property name="stock">gtk-new</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem2">
+                        <property name="visible">True</property>
+                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">gtk-close</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="close_window"/>
+                      </widget>
+                    </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="quit1">
                         <property name="visible">True</property>

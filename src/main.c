@@ -5,7 +5,13 @@
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-interface.h"
 
+GList *interface_list = NULL;
 
+/* Iter function from g_list_foreach */
+static void destroy_interface(gpointer data, gpointer user_data)
+{
+    gtk_widget_destroy(GTK_WIDGET(data));
+}
 /**
  * The main programs
  */
@@ -44,6 +50,7 @@ int main ( int argc, char **argv )
 
  
     ski= stuffkeeper_interface_new();
+    interface_list = g_list_append(interface_list, ski);
     stuffkeeper_interface_initialize_interface(ski,skdb);
 
     /**
@@ -72,6 +79,8 @@ int main ( int argc, char **argv )
     /* Start the main loop */
     gtk_main();
 
+//    g_list_foreach(interface_list, destroy_interface, NULL);
+    g_list_free(interface_list);
 
     /* cleanup  */
     g_object_unref(skdb);

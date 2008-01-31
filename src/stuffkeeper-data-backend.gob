@@ -85,6 +85,12 @@ class StuffKeeper:Data:Backend from G:Object
     /**
      * Public functions 
      */
+    public
+        GList *
+        get_items(self)
+        {
+            return g_hash_table_get_values(self->_priv->items);
+        }
     public 
     StuffKeeperDataItem *
     get_item(self, gint id)
