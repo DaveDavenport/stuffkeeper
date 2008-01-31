@@ -18,7 +18,7 @@ requires 2.0.10
 %}
 
 
-class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
+class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 {
     private GtkTreeModel *model_tags = {NULL};
     private GtkTreeModel *model_items= {NULL};
@@ -666,6 +666,16 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
+    public
+    void
+    style_changed(GtkWidget *tree,GtkStyle *old, GtkCellRenderer *renderer)
+    {
+            printf("style changed\n");
+            g_object_set(G_OBJECT(renderer), 
+                    "background-set", TRUE, "background-gdk",&(GTK_WIDGET(tree)->style->bg[GTK_STATE_SELECTED]), 
+                    "foreground-set", TRUE, "foreground-gdk",&(GTK_WIDGET(tree)->style->fg[GTK_STATE_SELECTED]), 
+                    NULL);
+    }
     /**
      * Initialize the main gui
      */
@@ -742,19 +752,19 @@ class StuffKeeper:Interface from Gtk:Widget (GladeXML "stuffkeeper.glade" "win")
 
             /* Number of items */
             renderer = gtk_cell_renderer_text_new();
-            g_object_set(G_OBJECT(renderer), "background-set", TRUE, "background", "black", "foreground-set", TRUE, "foreground", "white",NULL);
+            g_object_set(G_OBJECT(renderer), 
+                    "background-set", TRUE, "background-gdk",&(GTK_WIDGET(self->_priv->treeview1)->style->bg[GTK_STATE_SELECTED]), 
+                    "foreground-set", TRUE, "foreground-gdk",&(GTK_WIDGET(self->_priv->treeview1)->style->fg[GTK_STATE_SELECTED]), 
+                    NULL);
+            g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_style_changed), renderer);            
+
+
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
             gtk_tree_view_column_set_attributes(column, renderer, "text", 4, NULL);
 
             gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
 
             gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB), 0);
-
-
-
-
-
-
 
 
 
