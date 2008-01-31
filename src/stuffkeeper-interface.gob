@@ -205,99 +205,6 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Add item button clicked 
      */
@@ -502,6 +409,15 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             if(title && strlen(title) > 0)
                 stuffkeeper_data_tag_set_title(tag, title);
         }
+    public
+    void
+    interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
+    {
+        printf("style changed\n");
+        gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
+    }
 
     public
         void 
@@ -510,6 +426,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             GtkTreeModel *model;
             GtkWidget *container,*tree,*event;
             GList *list;
+            GtkWidget *event2 = NULL;
             /** Remove all old widgets */
             container = self->_priv->item_vbox; ///glade_xml_get_widget(xml, "item_vbox");
 
@@ -542,7 +459,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                     /* The title */
                     GtkWidget *vbox;
                     GtkWidget *label1;
-
+                    event2 = gtk_event_box_new();
                     vbox = gtk_hbox_new(FALSE, 6);
                     /* Title */
                     label1 = gtk_label_new("");
@@ -567,7 +484,13 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 
 
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-                    gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+                   
+                    gtk_container_set_border_width(GTK_CONTAINER(vbox), 8);
+                    self_interface_header_changed(self->_priv->treeview1, NULL, event2);
+                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),event2);            
+
+                    gtk_container_add(GTK_CONTAINER(event2), vbox);
+                    gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
                     label1 = gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1),"<span weight='bold' size='x-large'>Fields:</span>");
                     gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);

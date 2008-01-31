@@ -16,7 +16,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
     void
     value_changed(self, gpointer data)
     {
-        const gint value = (gint)gtk_range_get_value(GTK_RANGE(self));
+        const gint value = (gint)(gtk_range_get_value(GTK_RANGE(self))*10);
         stuffkeeper_data_item_set_integer(self->_priv->item, self->_priv->field, value);
     }
 
@@ -24,13 +24,13 @@ class StuffKeeper:Data:Rating from Gtk:HScale
     void
     item_changed(self, StuffKeeperDataItem *item)
     {
-        const int value = (gint)gtk_range_get_value(GTK_RANGE(self));
+        const int value = (gint)(gtk_range_get_value(GTK_RANGE(self))*10);
         const int new_value = stuffkeeper_data_item_get_integer(item, self->_priv->field);
 
         if(new_value != value)
         {
             g_signal_handler_block(self,self->_priv->changed_spin_value);
-            gtk_range_set_value(GTK_RANGE(self), (gdouble)new_value);
+            gtk_range_set_value(GTK_RANGE(self), (gdouble)(new_value/10.0));
             printf("changen\n");
             g_signal_handler_unblock(self,self->_priv->changed_spin_value);
         }
@@ -46,7 +46,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
         /* setup */
         gtk_scale_set_value_pos(GTK_SCALE(obj), GTK_POS_RIGHT);
         gtk_range_set_range(GTK_RANGE(obj), 0, 10);
-        gtk_range_set_increments(GTK_RANGE(obj),1,5);
+        gtk_range_set_increments(GTK_RANGE(obj),0.1,1);
 
         /* store item */
         obj->_priv->item = item; 
@@ -57,7 +57,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
 
         /* update the entry */
         value = stuffkeeper_data_item_get_integer(item, obj->_priv->field);
-        gtk_range_set_value(GTK_RANGE(obj), (gdouble)value);
+        gtk_range_set_value(GTK_RANGE(obj), (gdouble)(value/10.0));
 
         obj->_priv->changed_spin_value = g_signal_connect(G_OBJECT(obj), "value_changed", G_CALLBACK(self_value_changed), NULL);
         return GTK_WIDGET(obj);
