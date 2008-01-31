@@ -466,6 +466,8 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Title:</b>");
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     label1 = stuffkeeper_data_entry_new(item,NULL);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
@@ -475,6 +477,8 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                     label1 =gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Type:</b>");
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     if(schema) {
                         label1 = stuffkeeper_data_label_new_schema(schema);
@@ -486,8 +490,11 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                    
                     gtk_container_set_border_width(GTK_CONTAINER(vbox), 8);
+
                     self_interface_header_changed(self->_priv->treeview1, NULL, event2);
                     g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),event2);            
+                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     gtk_container_add(GTK_CONTAINER(event2), vbox);
                     gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
