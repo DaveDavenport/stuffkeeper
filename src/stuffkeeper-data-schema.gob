@@ -90,7 +90,7 @@ class StuffKeeper:Data:Schema from G:Object
             if(self->_priv->data && self->_priv->changed == TRUE)
             {
                 char *content;
-                gsize size;
+                gsize size=0;
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
                 g_free(content);
@@ -150,6 +150,7 @@ class StuffKeeper:Data:Schema from G:Object
     get_fields(self, gsize *size)
     {
         gchar **retv = NULL;
+        *size = 0;
         retv = g_key_file_get_keys(self->_priv->data, KEYFILE_FIELD_TYPES,size, NULL);
         return retv;
     }

@@ -123,7 +123,7 @@ class StuffKeeper:Data:Tag from G:Object
             if(self->_priv->data && self->_priv->changed == TRUE)
             {
                 char *content;
-                gsize size;
+                gsize size=0;
                 printf("saving myself tag: %i\n",id);
 
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);

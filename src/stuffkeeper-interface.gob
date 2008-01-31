@@ -212,6 +212,8 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         void 
         interface_item_add(self)
         {
+
+
             /** TODO, set schema */
             GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
             if(list)
@@ -399,15 +401,19 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         void 
         interface_entry_add(self,GtkWidget *button)
         {
-
-            GtkWidget *entry= self->_priv->add_tag_entry;
-            const gchar *title = gtk_entry_get_text(GTK_ENTRY(entry));
-            StuffKeeperDataTag *tag;
-            if(title == NULL || strlen(title) == 0)
-                return;
-            tag = stuffkeeper_data_backend_add_tag(self->_priv->skdbg,NULL,g_random_int());
-            if(title && strlen(title) > 0)
-                stuffkeeper_data_tag_set_title(tag, title);
+            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+            if(type == 0) /* Add an tag */
+            {
+                StuffKeeperDataTag *tag;
+                tag = stuffkeeper_data_backend_add_tag(self->_priv->skdbg,NULL,g_random_int());
+                stuffkeeper_data_tag_set_title(tag, "New Tag");
+            }
+            else if(type == 1) /* Add new schema */
+            {
+                StuffKeeperDataSchema *schema;
+                schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
+                stuffkeeper_data_schema_set_title(schema, "New Schema");
+            }
         }
     public
     void

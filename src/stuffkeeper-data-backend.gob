@@ -402,6 +402,54 @@ class StuffKeeper:Data:Backend from G:Object
         {
             return g_hash_table_get_values(self->_priv->schemas);
         }
+
+    public
+        StuffKeeperDataSchema *
+        new_schema(self)
+    {
+        gint *ide;
+        gint id = g_random_int();
+        StuffKeeperDataSchema *schema;
+        printf("looking for schema: %i\n", id);
+        /* No schema, lets make one. */
+        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
+        schema = stuffkeeper_data_schema_new_with_id(path,id);
+        g_free(path);
+
+        /* Add to the list */
+        ide = g_malloc0(sizeof(gint));
+        *ide = id;
+        g_hash_table_insert(self->_priv->schemas,ide, schema);
+
+        printf("addded schema: %i\n", stuffkeeper_data_schema_get_id(schema));
+        self_schema_added(self, schema);
+        return schema;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * TAGS
      */
