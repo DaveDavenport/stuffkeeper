@@ -105,10 +105,6 @@ class StuffKeeper:Show:Item from Gtk:Table
             /* update */
             self_field_changed(self, NULL, self->_priv->schema);
 
-            return GTK_TABLE(self);
+            return GTK_WIDGET(self);
         }
-
-
-
-
 }
