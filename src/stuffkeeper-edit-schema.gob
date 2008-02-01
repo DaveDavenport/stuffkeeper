@@ -30,7 +30,10 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
 {
     private StuffKeeper:Data:Schema *schema = {NULL};
     private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING)}  destroywith g_object_unref;
+
+
     private GtkWidget *tree GladeXML;
+
     private guint field_changed_signal = 0;
     private guint field_added_signal = 0;
     private guint field_removed_signal = 0;

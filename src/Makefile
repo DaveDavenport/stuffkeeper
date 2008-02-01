@@ -18,6 +18,7 @@ HEADERS=\
 	stuffkeeper-data-rating.h\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-interface.h\
+	stuffkeeper-show-item.h\
 	stuffkeeper-edit-schema.h
 SOURCE=\
 	stuffkeeper-data-backend.h\
@@ -31,6 +32,7 @@ SOURCE=\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-data-rating.h\
 	stuffkeeper-interface.h\
+	stuffkeeper-show-item.h\
 	stuffkeeper-edit-schema.h\
 	stuffkeeper-interface.c\
 	stuffkeeper-edit-schema.c\
@@ -44,6 +46,7 @@ SOURCE=\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-rating.c\
+	stuffkeeper-show-item.c\
 	main.c\
 
 OBJECTS=$(patsubst %.c, %.o, $(SOURCE))

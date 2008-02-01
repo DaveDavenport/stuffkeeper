@@ -15,6 +15,7 @@ requires 2.0.10
 #include "stuffkeeper-data-rating.h"
 #include "stuffkeeper-data-taglist.h"
 #include "stuffkeeper-edit-schema.h"
+#include "stuffkeeper-show-item.h"
 
 extern GList *interface_list;
 %}
@@ -36,6 +37,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     private GtkWidget *item_vbox GladeXML;
     private GtkWidget *item_event_box GladeXML;
     private StuffKeeperDataBackend *skdbg = {NULL};
+    private GtkWidget *LeftPane_edit GladeXML;
     /**
      * Keep Schema's GtkListStore up2date
      */
@@ -517,59 +519,28 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                     if(schema)
                     {
                         gsize length;
-                        int i;
                         gchar **retv = stuffkeeper_data_schema_get_fields(schema, &length);
                         /* num fields + one for the tags */
-                        vbox = gtk_table_new(length+1, 2, FALSE);
+                        vbox = stuffkeeper_show_item_new(item);
                         gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
                         gtk_table_set_col_spacings(GTK_TABLE(vbox), 6);
-                        for(i=0;i<length;i++)
-                        {
-                            FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]);
-//                            gchar *field_name = stuffkeeper_data_schema_get_field_name(schema, retv[i]);
-
-                            /* Title */
-/*                            label1 = gtk_label_new("");
-                            gchar *val = g_markup_printf_escaped("<b>%s</b>", field_name);
-                            gtk_label_set_markup(GTK_LABEL(label1), val);
-                            g_free(val);
-                            */
-                            label1 = stuffkeeper_data_label_new_schema_field(schema, retv[i]);
-
-                            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
-                            gtk_table_attach(GTK_TABLE(vbox), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
-                            if(type == FIELD_TYPE_STRING)
-                            {
-                                label1 = stuffkeeper_data_entry_new(item,retv[i]);
-                            }
-                            else if (type == FIELD_TYPE_INTEGER)
-                            {
-                                label1 = stuffkeeper_data_spinbutton_new(item,retv[i]);
-                            }else if (type == FIELD_TYPE_BOOLEAN) {
-                                label1 = stuffkeeper_data_boolean_new(item,retv[i]);
-                            }else if (type == FIELD_TYPE_RATING) {
-                                label1 = stuffkeeper_data_rating_new(item,retv[i]);
-                            }else {
-                                label1 = gtk_label_new("not supported\n");
-                            }
-                            gtk_table_attach(GTK_TABLE(vbox), label1, 1,2,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
 
 
-  //                          g_free(field_name);
-                        }
+                        gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
                         /**
                          * Fill in the Tag list 
                          */
                         /* Title */
+                        vbox = gtk_hbox_new(FALSE,6);
                         label1 = gtk_label_new("");
                         gchar *val = g_markup_printf_escaped("<b>%s</b>", "Tags");
                         gtk_label_set_markup(GTK_LABEL(label1), val);
                         g_free(val);
                         gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
-                        gtk_table_attach(GTK_TABLE(vbox), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+                        gtk_box_pack_start(GTK_BOX(vbox), label1, FALSE, TRUE, 0);
 
                         label1 = stuffkeeper_data_taglist_new(self->_priv->skdbg,item);
-                        gtk_table_attach(GTK_TABLE(vbox), label1, 1,2,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+                        gtk_box_pack_start(GTK_BOX(vbox), label1, TRUE, TRUE, 0);
 
                         gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
                         g_strfreev(retv);
@@ -646,8 +617,10 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     {
         int i = gtk_combo_box_get_active(box);
         if(i==0){
+            gtk_widget_set_sensitive(self->_priv->LeftPane_edit, FALSE);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
         }else{
+            gtk_widget_set_sensitive(self->_priv->LeftPane_edit,TRUE);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
         }
         /* refilter the items list */

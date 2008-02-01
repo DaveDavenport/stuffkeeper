@@ -1,0 +1,114 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-item.h"
+#include "stuffkeeper-data-label.h"
+#include "stuffkeeper-data-entry.h"
+#include "stuffkeeper-data-boolean.h"
+#include "stuffkeeper-data-spinbutton.h"
+#include "stuffkeeper-data-rating.h"
+
+%}
+
+class StuffKeeper:Show:Item from Gtk:Table
+{
+    private StuffKeeperDataSchema *schema = {NULL};
+    private StuffKeeperDataItem *item = {NULL};
+    /* list */
+    private gchar **retv = NULL;
+    private gsize length = 0;
+    /* signals */
+    private guint schema_field_added = 0;
+    private guint schema_field_removed = 0;
+
+    public
+        void
+        reload_data(self)
+        {
+            int i;
+            GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
+            for(node =list; node; node = g_list_next(node))
+            {
+                gtk_widget_destroy(GTK_WIDGET(node->data));
+            }
+            g_list_free(list);
+            /** now fill it again */
+            gtk_table_resize(GTK_TABLE(self),self->_priv->length,2); 
+
+            for(i=0;i<self->_priv->length;i++)                                                                             
+            {
+                GtkWidget *label1;
+                FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
+                /* Title */
+                label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
+
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+
+                gtk_table_attach(GTK_TABLE(self), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+
+                if(type == FIELD_TYPE_STRING)
+                {
+                    label1 = stuffkeeper_data_entry_new(self->_priv->item,self->_priv->retv[i]);
+                }
+                else if (type == FIELD_TYPE_INTEGER)
+                {
+                    label1 = stuffkeeper_data_spinbutton_new(self->_priv->item,self->_priv->retv[i]);
+                }else if (type == FIELD_TYPE_BOOLEAN) {
+                    label1 = stuffkeeper_data_boolean_new(self->_priv->item,self->_priv->retv[i]);
+                }else if (type == FIELD_TYPE_RATING) {
+                    label1 = stuffkeeper_data_rating_new(self->_priv->item,self->_priv->retv[i]);
+                }else {
+                    label1 = gtk_label_new("not supported\n");
+                }
+                gtk_table_attach(GTK_TABLE(self), label1, 1,2,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+            }
+            gtk_widget_show_all(GTK_WIDGET(self));
+        }
+
+    public
+        void
+        field_changed(self, const gchar *id, StuffKeeperDataSchema *schema)
+        {
+            /* free old values */
+            if(self->_priv->retv)
+                g_strfreev(self->_priv->retv);
+            self->_priv->length = 0;
+
+            /* get new fields */
+            self->_priv->retv = stuffkeeper_data_schema_get_fields(schema, &(self->_priv->length));
+            /* reload */
+            self_reload_data(self);
+        }
+    /**
+     * Get the widget 
+     */
+    public
+        Gtk:Widget * 
+        new(StuffKeeper:Data:Item *item)
+        {
+            Self *self = GET_NEW;
+
+            /* Get the schema  */
+            self->_priv->schema = stuffkeeper_data_item_get_schema(item);
+            /* Get the item */
+            self->_priv->item = item;
+            /* Signals */
+            self->_priv->schema_field_added =   g_signal_connect_swapped(G_OBJECT(self->_priv->schema),  
+                    "schema-field-added",
+                    G_CALLBACK(self_field_changed),
+                    self);
+            self->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(self->_priv->schema),
+                    "schema-field-removed",
+                    G_CALLBACK(self_field_changed),
+                    self);
+            /* update */
+            self_field_changed(self, NULL, self->_priv->schema);
+
+            return GTK_TABLE(self);
+        }
+
+
+
+
+}
