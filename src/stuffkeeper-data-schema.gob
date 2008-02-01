@@ -36,6 +36,43 @@ class StuffKeeper:Data:Schema from G:Object
             gint id = self_get_id(self);               
             printf("Signal my schema change : %i\n", id); 
         }
+    signal last NONE (STRING)
+        void
+        schema_field_changed(self,const gchar *field)
+        {
+            gint id = self_get_id(self);               
+            printf("Signal my schema change : %i:%s\n", id,field); 
+        }
+   signal last NONE (STRING)
+        void
+        schema_field_added(self,const gchar *field)
+        {
+            gint id = self_get_id(self);               
+            printf("Signal my schema added : %i:%s\n", id,field); 
+        }
+
+   signal last NONE (STRING)
+        void
+        schema_field_removed(self,const gchar *field)
+        {
+            gint id = self_get_id(self);               
+            printf("Signal my schema removed: %i:%s\n", id,field); 
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Constructors
@@ -167,6 +204,18 @@ class StuffKeeper:Data:Schema from G:Object
     {
         return g_key_file_get_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, NULL);
     }
+
+    public
+    void
+    set_field_name(self, const gchar *id, const gchar *name)
+    {
+        g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name);
+        self_schema_field_changed(self,id);
+        self->_priv->changed = TRUE;
+
+    }
+
+
 
     public
         int

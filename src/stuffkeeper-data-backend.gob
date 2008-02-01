@@ -425,30 +425,29 @@ class StuffKeeper:Data:Backend from G:Object
         self_schema_added(self, schema);
         return schema;
     }
+    public
+        void
+        remove_schema(self, gint id)
+        {
+            StuffKeeperDataSchema *schema = self_get_schema(self, id);
+            if(!schema) return;
+            if(stuffkeeper_data_schema_num_items(schema) >0)
+            {
+                printf("failed: Still items depending on this schema\n");
+                return;
+            }
+            self_schema_removed(self,id);
+            if(schema)
+            {
+                printf("deleting schema\n");
+                stuffkeeper_data_schema_delete_yourself(schema); 
+            }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            if(g_hash_table_remove(self->_priv->schemas, &id) == FALSE)
+            {
+                return;
+            }
+        }
 
     /**
      * TAGS
