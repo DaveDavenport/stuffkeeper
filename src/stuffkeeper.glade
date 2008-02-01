@@ -413,7 +413,7 @@ Types</property>
                     <property name="label" translatable="yes">gtk-remove</property>
                     <property name="use_stock">True</property>
                     <property name="response_id">0</property>
-                    <signal name="clicked" handler="remove"/>
+                    <signal name="clicked" handler="remove_field"/>
                   </widget>
                   <packing>
                     <property name="position">4</property>

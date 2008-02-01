@@ -178,14 +178,14 @@ class StuffKeeper:Data:Schema from G:Object
     }
     public 
     FieldType 
-    get_field_type(self, gchar *id)
+    get_field_type(self, const gchar *id)
     {
         return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, NULL);
     }
 
     public
     gchar *
-    get_field_name(self, gchar *id)
+    get_field_name(self, const gchar *id)
     {
         return g_key_file_get_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, NULL);
     }
@@ -199,9 +199,20 @@ class StuffKeeper:Data:Schema from G:Object
         self->_priv->changed = TRUE;
 
     }
+    /* Field editing */
+    public
+    void
+    add_field(self, FieldType field, const gchar *name)
+    {
+        gchar *id = g_strdup_printf("%u", (guint)g_random_int());
+        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, field); 
+        g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name); 
 
+        self_schema_field_added(self, id);
+        g_free(id);
+    }
 
-
+    /* Item handling */
     public
         int
         num_items(self)
