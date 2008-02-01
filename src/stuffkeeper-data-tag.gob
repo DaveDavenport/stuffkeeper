@@ -28,8 +28,6 @@ class StuffKeeper:Data:Tag from G:Object
         void
         tag_changed(self)
         {
-            gint id = self_get_id(self);
-            printf("Signal my tag change : %i\n", id); 
         }
     /**
      * Constructors
@@ -57,7 +55,6 @@ class StuffKeeper:Data:Tag from G:Object
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            printf("Creating tag: %i\n", id);
             self_save_yourself(obj);
             return obj;
         }
@@ -72,7 +69,6 @@ class StuffKeeper:Data:Tag from G:Object
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            printf("Creating tag: %i\n", id);
             self_save_yourself(obj);
             return obj;
         }
@@ -104,7 +100,6 @@ class StuffKeeper:Data:Tag from G:Object
     set_title(self, const gchar *title)
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
-        printf("new title: %s\n", title);
         self_tag_changed(self);
         /* Mark changed */
         self->_priv->changed = TRUE;
@@ -118,13 +113,11 @@ class StuffKeeper:Data:Tag from G:Object
         void
         save_yourself(self)
         {
-            gint id = self_get_id(self);
 
             if(self->_priv->data && self->_priv->changed == TRUE)
             {
                 char *content;
                 gsize size=0;
-                printf("saving myself tag: %i\n",id);
 
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
@@ -139,8 +132,6 @@ class StuffKeeper:Data:Tag from G:Object
         void
         delete_yourself(self)
         {
-            gint id = self_get_id(self);
-            printf("Deleting myself: %i\n", id);
             g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
             g_unlink(self->_priv->path);
             g_free(self->_priv->path);

@@ -33,30 +33,22 @@ class StuffKeeper:Data:Schema from G:Object
         void
         schema_changed(self)
         {
-            gint id = self_get_id(self);               
-            printf("Signal my schema change : %i\n", id); 
         }
     signal last NONE (STRING)
         void
         schema_field_changed(self,const gchar *field)
         {
-            gint id = self_get_id(self);               
-            printf("Signal my schema field change : %i:%s\n", id,field); 
         }
    signal last NONE (STRING)
         void
         schema_field_added(self,const gchar *field)
         {
-            gint id = self_get_id(self);               
-            printf("Signal my schema field added : %i:%s\n", id,field); 
         }
 
    signal last NONE (STRING)
         void
         schema_field_removed(self,const gchar *field)
         {
-            gint id = self_get_id(self);               
-            printf("Signal my schema field removed: %i:%s\n", id,field); 
         }
 
     /**
@@ -81,7 +73,6 @@ class StuffKeeper:Data:Schema from G:Object
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            printf("Creating self: %i\n", id);
             self_save_yourself(obj);
             return obj;
         }
@@ -95,7 +86,6 @@ class StuffKeeper:Data:Schema from G:Object
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            printf("Creating tag: %i\n", id);
             self_save_yourself(obj);
             return obj;
         }                                                                          
@@ -107,8 +97,6 @@ class StuffKeeper:Data:Schema from G:Object
         void
         save_yourself(self)
         {
-            gint id = self_get_id(self);
-            printf("saving myself: %i\n",id);
             if(self->_priv->data && self->_priv->changed == TRUE)
             {
                 char *content;
@@ -125,8 +113,6 @@ class StuffKeeper:Data:Schema from G:Object
         void
         delete_yourself(self)
         {
-            gint id = self_get_id(self);
-            printf("Deleting myself: %i\n", id);
             g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
             g_unlink(self->_priv->path);
             g_free(self->_priv->path);
@@ -160,7 +146,6 @@ class StuffKeeper:Data:Schema from G:Object
     set_title(self, const gchar *title)
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
-        printf("new title: %s\n", title);
         self_schema_changed(self);
         /* mark changed */
         self->_priv->changed =TRUE;

@@ -137,7 +137,6 @@ class StuffKeeper:Data:Label from Gtk:Label
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
-            printf("finalizing label\n");
             if(self->_priv->changed_item_entry)
             {
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);

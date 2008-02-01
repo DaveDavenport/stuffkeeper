@@ -31,7 +31,6 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
         {
             g_signal_handler_block(self,self->_priv->changed_entry);
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self), value);
-            printf("changen\n");
             g_signal_handler_unblock(self,self->_priv->changed_entry);
         }
     }
@@ -63,7 +62,6 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
-            printf("finalizing boolean\n");
             if(self->_priv->changed_item_entry)
             {
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);

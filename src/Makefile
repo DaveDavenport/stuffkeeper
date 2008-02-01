@@ -4,6 +4,7 @@
 OUTPUT			= stuffkeeper
 EMPTY 			= 
 EXTRA_CFLAGS	= -g -Os -Wall -D_GNU_SOURCE 
+EXTRA_LIBS		= -lm
 Q				= @
 
 HEADERS=\
@@ -111,7 +112,7 @@ endif
 
 
 
-SK_LIBS=$(GTK_LIBS) $(GLIB_LIBS) $(GLADE_LIBS) $(GMODULE_LIBS)
+SK_LIBS=$(GTK_LIBS) $(GLIB_LIBS) $(GLADE_LIBS) $(GMODULE_LIBS) $(EXTRA_LIBS)
 SK_CFLAGS=$(GTK_CFLAGS) $(GLIB_CFLAGS) $(GLADE_CFLAGS) $(EXTRA_CFLAGS) $(GMODULE_CFLAGS)
 
 %.c %.h %-private.h: %.gob

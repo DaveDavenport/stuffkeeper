@@ -38,8 +38,6 @@ class StuffKeeper:Data:Item from G:Object
     void
     item_changed(self)
     {
-        gint id = self_get_id(self);
-        printf("Signal my change: %i\n", id); 
         /* Mark the item changed */
         self->_priv->changed = TRUE;
     }
@@ -50,7 +48,6 @@ class StuffKeeper:Data:Item from G:Object
     finalize (G:Object *obj)
     {
         Self *self = SELF(obj);
-        printf("destroying item\n");
         if(self->_priv->data)
         {
             g_key_file_free(self->_priv->data);
@@ -72,12 +69,9 @@ class StuffKeeper:Data:Item from G:Object
     {
         if(self->_priv->data && self->_priv->changed == TRUE)
         {
-            gint id = self_get_id(self);
             char *content;
 
             gsize size=0;
-
-            printf("saving myself item: %i\n",id);
 
             /* save tags */
             /* clear previous values */
@@ -91,7 +85,6 @@ class StuffKeeper:Data:Item from G:Object
                 for(;node;node = g_list_next(node))
                 {
                    items[i] = stuffkeeper_data_tag_get_id(STUFFKEEPER_DATA_TAG(node->data));
-                   printf("%i\n", items[i]);
                    i++;
                 }
                 g_key_file_set_integer_list(self->_priv->data, KEYFILE_GENERAL, "tags", items, numtags);
@@ -110,8 +103,6 @@ class StuffKeeper:Data:Item from G:Object
     void
     delete_yourself(self)
     {
-        gint id = self_get_id(self);
-        printf("Deleting myself: %i\n", id);
         g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
 
         stuffkeeper_data_schema_remove_item(self->_priv->schema, G_OBJECT(self));
@@ -140,7 +131,6 @@ class StuffKeeper:Data:Item from G:Object
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            printf("Creating item: %i\n", id);
 
             obj->_priv->schema = schema; 
             obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", G_CALLBACK(self_item_schema_field_removed), obj);
@@ -197,7 +187,6 @@ class StuffKeeper:Data:Item from G:Object
     void
     item_schema_field_removed(self, const char *id, StuffKeeperDataSchema *schema)
     {
-        printf("Removing field: '%s'\n",id);
         g_key_file_remove_key(self->_priv->data, KEYFILE_CUSTOM, id, NULL);
         /* Mark for change */
         self->_priv->changed = TRUE;
@@ -231,7 +220,6 @@ class StuffKeeper:Data:Item from G:Object
     set_title(self, const gchar *title)
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
-        printf("new title: %s\n", title);
         self_item_changed(self);
     }
     /**

@@ -37,14 +37,12 @@ class StuffKeeper:Data:Backend from G:Object
     void
     item_changed(self, StuffKeeperDataItem *item)
     {
-        printf("Item changed\n");
     }
 
     signal last NONE (POINTER)
     void
     item_added(self, StuffKeeperDataItem *item)
     {
-        printf("Item added signal: '%i'\n", stuffkeeper_data_item_get_id(item));
         g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), self);
 
     }
@@ -52,28 +50,24 @@ class StuffKeeper:Data:Backend from G:Object
         void
     item_removed(self, gint id)
     {
-        printf("Item removed signal: '%i'\n",id); 
     }
     /* schema */
     signal last NONE (POINTER)
     void
     schema_changed(self, StuffKeeperDataSchema *schema)
     {
-        printf("Item changed\n");
     }
 
     signal last NONE (POINTER)
     void
     schema_added(self, StuffKeeperDataSchema *schema)
     {
-        printf("Item added signal: '%i'\n", stuffkeeper_data_schema_get_id(schema));
         g_signal_connect_swapped(G_OBJECT(schema), "schema-changed", G_CALLBACK(self_schema_changed), self);
     }
     signal last NONE (INT)
         void
     schema_removed(self, gint id)
     {
-        printf("Schema removed signal: '%i'\n",id); 
     }
 
 
@@ -132,7 +126,6 @@ class StuffKeeper:Data:Backend from G:Object
         }
         if(g_hash_table_remove(self->_priv->items, &id) == FALSE)
         {
-            printf("failed to remove: %i\n", id);
             return;
         }
 
@@ -147,7 +140,6 @@ class StuffKeeper:Data:Backend from G:Object
         gchar *path;
         GDir *dir;
 
-        printf("Loading content from db path: '%s'\n",db_path);
 
         /**
          * Store the path in the backend.
@@ -161,10 +153,8 @@ class StuffKeeper:Data:Backend from G:Object
         if(!g_file_test(path, G_FILE_TEST_IS_DIR))
         {
             g_mkdir(path, 0755);
-            printf("directory created, returning\n");
         }
 
-        printf("Loading schemas from: %s\n", path);
         /* Load item's */
         dir = g_dir_open(path, 0, NULL);
 
@@ -186,7 +176,6 @@ class StuffKeeper:Data:Backend from G:Object
                 /* insert it into my hash-list */
                 g_hash_table_insert(self->_priv->schemas,id, schema);
                 self_schema_added(self, schema);
-                printf("added schema: %i\n", *id); 
                 g_free(full_path);
             }
             g_dir_close(dir);
@@ -199,10 +188,8 @@ class StuffKeeper:Data:Backend from G:Object
         if(!g_file_test(path, G_FILE_TEST_IS_DIR))
         {
             g_mkdir(path, 0755);
-            printf("directory created, returning\n");
         }
 
-        printf("Loading tags from: %s\n", path);
         /* Load item's */
         dir = g_dir_open(path, 0, NULL);
 
@@ -224,7 +211,6 @@ class StuffKeeper:Data:Backend from G:Object
                 /* insert it into my hash-list */
                 g_hash_table_insert(self->_priv->tags,id, tag);
                 self_tag_added(self, tag);
-                printf("added tag: %i\n", *id); 
                 g_free(full_path);
             }
             g_dir_close(dir);
@@ -235,10 +221,8 @@ class StuffKeeper:Data:Backend from G:Object
         if(!g_file_test(path, G_FILE_TEST_IS_DIR))
         {
             g_mkdir(path, 0755);
-            printf("directory created, returning\n");
         }
 
-        printf("Loading items from: %s\n", path);
         /* Load item's */
         dir = g_dir_open(path, 0, NULL);
 
@@ -296,7 +280,6 @@ class StuffKeeper:Data:Backend from G:Object
     finalize (G:Object *obj)
     {
         Self *self = SELF(obj);
-        printf("destroying\n");
 
         if(self->_priv->items)
         {
@@ -333,7 +316,6 @@ class StuffKeeper:Data:Backend from G:Object
     new (void)
     {
         Self *self = GET_NEW;
-        printf("Creating backend\n");
         return self;
     }
 
@@ -346,14 +328,12 @@ class StuffKeeper:Data:Backend from G:Object
     void
     tag_changed(self, StuffKeeperDataTag *tag)
     {
-        printf("Item changed\n");
     }
 
     signal last NONE (POINTER)
         void
         tag_added(self, StuffKeeperDataTag *tag)
         {
-            printf("Tag added signal: '%i'\n", stuffkeeper_data_tag_get_id(tag));
 
             g_signal_connect_swapped(G_OBJECT(tag), "tag-changed", G_CALLBACK(self_tag_changed), self);
         }
@@ -362,7 +342,6 @@ class StuffKeeper:Data:Backend from G:Object
     void
     tag_removed(self,const int id)
     {
-        printf("Item changed: %i\n",id);
     }
     
     /**
@@ -374,12 +353,10 @@ class StuffKeeper:Data:Backend from G:Object
     {
         gint *ide;
         StuffKeeperDataSchema *schema;
-        printf("looking for schema: %i\n", id);
         /* Look for existing tag */
         schema = g_hash_table_lookup(self->_priv->schemas, &id);
         if(schema)
         {
-            printf("return found schema: %i\n", stuffkeeper_data_schema_get_id(schema));
             return schema;
         }
         /* No tag, lets make one. */
@@ -392,7 +369,6 @@ class StuffKeeper:Data:Backend from G:Object
         *ide = id;
         g_hash_table_insert(self->_priv->schemas,ide, schema);
 
-        printf("addded schema: %i\n", stuffkeeper_data_schema_get_id(schema));
         self_schema_added(self, schema);
         return schema;
     }
@@ -410,7 +386,6 @@ class StuffKeeper:Data:Backend from G:Object
         gint *ide;
         gint id = g_random_int();
         StuffKeeperDataSchema *schema;
-        printf("looking for schema: %i\n", id);
         /* No schema, lets make one. */
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
         schema = stuffkeeper_data_schema_new_with_id(path,id);
@@ -421,7 +396,6 @@ class StuffKeeper:Data:Backend from G:Object
         *ide = id;
         g_hash_table_insert(self->_priv->schemas,ide, schema);
 
-        printf("addded schema: %i\n", stuffkeeper_data_schema_get_id(schema));
         self_schema_added(self, schema);
         return schema;
     }
@@ -433,13 +407,11 @@ class StuffKeeper:Data:Backend from G:Object
             if(!schema) return;
             if(stuffkeeper_data_schema_num_items(schema) >0)
             {
-                printf("failed: Still items depending on this schema\n");
                 return;
             }
             self_schema_removed(self,id);
             if(schema)
             {
-                printf("deleting schema\n");
                 stuffkeeper_data_schema_delete_yourself(schema); 
             }
 
@@ -464,12 +436,10 @@ class StuffKeeper:Data:Backend from G:Object
     {
         gint *ide;
         StuffKeeperDataTag *tag;
-        printf("looking for tag: %i\n", id);
         /* Look for existing tag */
         tag = g_hash_table_lookup(self->_priv->tags, &id);
         if(tag)
         {
-            printf("return found tag: %i\n", stuffkeeper_data_tag_get_id(tag));
             return tag;
         }
         /* No tag, lets make one. */
@@ -482,7 +452,6 @@ class StuffKeeper:Data:Backend from G:Object
         *ide = id;
         g_hash_table_insert(self->_priv->tags,ide, tag);
 
-        printf("addded tag: %i\n", stuffkeeper_data_tag_get_id(tag));
         self_tag_added(self, tag);
         return tag;
     }
@@ -512,13 +481,11 @@ class StuffKeeper:Data:Backend from G:Object
         if(!tag) return;
         if(stuffkeeper_data_tag_num_items(tag) >0)
         {
-            printf("failed: Still items tagged by this\n");
             return;
         }
         self_tag_removed(self,id);
         if(tag)
         {
-            printf("deleting tag\n");
             stuffkeeper_data_tag_delete_yourself(tag); 
         }
 

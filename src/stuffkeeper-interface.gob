@@ -198,7 +198,6 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_item_get_title(item);
-                    printf("Item items: %i\n", id);
                     gtk_list_store_set(store, &iter, 1,title, -1);
                     g_free(title);
                     return;
@@ -241,7 +240,6 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             {
                 gint id;
                 gtk_tree_model_get(model, &iter ,0,&id, -1);
-                printf("requesting removal of: %i\n", id);
                 stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
 
             }
@@ -277,13 +275,11 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         {
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkTreeIter iter;
-            printf("edited: %s\n", new_text);
             if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
                 gint id;
                 StuffKeeperDataItem *item;
                 gtk_tree_model_get(model, &iter ,0,&id, -1);
-                printf("get item: %i\n",id);
                 item = stuffkeeper_data_backend_get_item(self->_priv->skdbg, id);
                 if(item)
                 {
@@ -337,7 +333,6 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         int n;
         interface_list = g_list_remove(interface_list, self);
         n = g_list_length(interface_list);
-        printf("%i interfaces left\n", n);
         gtk_widget_destroy(GTK_WIDGET(self));
         if(n == 0)
         {
@@ -422,7 +417,6 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     void
     interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
     {
-        printf("style changed\n");
         gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
         gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
         gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
@@ -526,7 +520,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                         gtk_table_set_col_spacings(GTK_TABLE(vbox), 6);
 
 
-                        gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+                        gtk_box_pack_start(GTK_BOX(container),vbox, TRUE,TRUE, 0);
                         /**
                          * Fill in the Tag list 
                          */
@@ -536,13 +530,18 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                         gchar *val = g_markup_printf_escaped("<b>%s</b>", "Tags");
                         gtk_label_set_markup(GTK_LABEL(label1), val);
                         g_free(val);
-                        gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+                        gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
                         gtk_box_pack_start(GTK_BOX(vbox), label1, FALSE, TRUE, 0);
 
                         label1 = stuffkeeper_data_taglist_new(self->_priv->skdbg,item);
-                        gtk_box_pack_start(GTK_BOX(vbox), label1, TRUE, TRUE, 0);
 
-                        gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 0);
+                        gtk_table_set_row_spacings(GTK_TABLE(label1), 6);
+                        gtk_table_set_col_spacings(GTK_TABLE(label1), 18);
+
+                        gtk_box_pack_start(GTK_BOX(vbox), label1, FALSE, FALSE, 0);
+                        
+
+                        gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 6);
                         g_strfreev(retv);
                     }
 
