@@ -130,5 +130,5 @@ $(OUTPUT): $(OBJECTS)
 
 clean:
 	@rm *.o
-	@rm stuffkeeper-data-*.c stuffkeeper-data-*.h
+	@rm stuffkeeper-*.c stuffkeeper-*.h
 	@rm stuffkeeper
