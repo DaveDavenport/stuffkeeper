@@ -59,21 +59,6 @@ class StuffKeeper:Data:Schema from G:Object
             printf("Signal my schema removed: %i:%s\n", id,field); 
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Constructors
      */
