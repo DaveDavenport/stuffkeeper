@@ -1,0 +1,158 @@
+requires 2.0.10
+
+%h{
+/* Include gtk */
+#include <gtk/gtk.h>
+#include <glade/glade.h>
+/* Include the database */
+
+#include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-schema.h"
+#include "stuffkeeper-data-label.h"
+#include "stuffkeeper-data-entry.h"
+#include "stuffkeeper-data-boolean.h"
+#include "stuffkeeper-data-spinbutton.h"
+#include "stuffkeeper-data-rating.h"
+#include "stuffkeeper-data-taglist.h"
+extern GList *interface_list;
+%}
+%ph{
+    typedef enum _StoreFields
+    {  
+        COL_ID,
+        COL_TYPE,
+        COL_NAME,
+        NUM_ROWS
+    }StoreFields;
+%}
+
+class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edit_schema_dialog")
+{
+    private StuffKeeper:Data:Schema *schema = {NULL};
+    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING)}  destroywith g_object_unref;
+    private GtkWidget *tree GladeXML;
+    private guint field_changed_signal = 0;
+
+    public
+    void
+    field_changed(self, const gchar *field, StuffKeeperDataSchema *schema)
+    {
+        GtkTreeIter iter;
+
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
+        {
+            do{
+                gchar *id;
+                gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                if(strcmp(id, field) ==0)
+                {
+                    gchar *name = stuffkeeper_data_schema_get_field_name(self->_priv->schema, field);
+                    gtk_list_store_set(self->_priv->store, &iter, COL_NAME, name, -1);
+                    g_free(name);
+                    return;
+                }
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
+    }
+
+    public
+    void interface_field_edited
+        (
+         self,
+         gchar               *path,
+         gchar               *new_text,
+         GtkCellRendererText *renderer
+        )
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        printf("new: %s\n", new_text);
+        if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+        {
+            gchar *id;
+            gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+            stuffkeeper_data_schema_set_field_name(self->_priv->schema, id,new_text);
+            g_free(id);
+
+
+        }
+    }
+
+    /** Create the interface */
+    public
+        StuffKeeper:Edit:Schema * 
+        new(void)
+        {
+            GtkCellRenderer *renderer;
+            Self *self = GET_NEW;
+            /* fill tree with columns */
+            renderer = gtk_cell_renderer_text_new();
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE, NULL);
+            renderer = gtk_cell_renderer_text_new();
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_NAME, NULL);
+            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
+
+            gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->tree), GTK_TREE_MODEL(self->_priv->store));
+            return self;
+        }
+
+    public
+    void
+    close(self)
+    {
+        gtk_widget_destroy(GTK_WIDGET(self));
+    }
+
+    public
+    void
+    add_string(self)
+    {
+
+
+    }
+
+    public
+    void
+    set_schema(self, StuffKeeper:Data:Schema *schema)
+    {
+        if(self->_priv->schema != NULL)
+        {
+            printf("Allready have a schema attaches\n");
+            return;
+        }
+        self->_priv->schema = schema;
+       
+        gsize length;
+        int i =0;
+        char **ids  = stuffkeeper_data_schema_get_fields(schema, &length);
+        for(i=0;i<length;i++)
+        {
+            GtkTreeIter iter;
+            gchar *name;
+            gtk_list_store_append(self->_priv->store, &iter);
+            name = stuffkeeper_data_schema_get_field_name(schema, ids[i]);
+            gtk_list_store_set(self->_priv->store, &iter, 
+                        COL_ID, ids[i], 
+                        COL_TYPE, stuffkeeper_data_schema_get_field_type(schema, ids[i]),
+                        COL_NAME, name,
+                        -1);
+            g_free(name);
+
+        }
+        self->_priv->field_changed_signal = g_signal_connect_swapped(G_OBJECT(schema), "schema-field-changed", G_CALLBACK(self_field_changed), self);
+
+    }
+    override (G:Object)
+    void
+    finalize(self)
+    {
+        if(self->_priv->field_changed_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_changed_signal);
+            self->_priv->field_changed_signal =0;
+        }
+
+    }
+}
