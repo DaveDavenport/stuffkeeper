@@ -9,7 +9,26 @@ requires 2.0.10
 class StuffKeeper:Data:Label from Gtk:Label
 {
     private GObject *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
+
+
+    public
+    void
+    field_item_changed(self,const gchar *id, StuffKeeper:Data:Schema *schema)
+    {
+        gchar *value;
+        value = stuffkeeper_data_schema_get_field_name(STUFFKEEPER_DATA_SCHEMA(self->_priv->item),self->_priv->field);
+        if(value)
+        {
+            gchar *markup = g_markup_printf_escaped("<b>%s</b>", value);
+            gtk_label_set_text(GTK_LABEL(self), value);
+            gtk_label_set_markup(GTK_LABEL(self), markup);
+            g_free(markup);
+            g_free(value);
+        }
+    }
+
 
     public
     void
@@ -82,6 +101,36 @@ class StuffKeeper:Data:Label from Gtk:Label
         return GTK_WIDGET(obj);
     }
 
+
+    public
+    GtkWidget *
+    new_schema_field(StuffKeeperDataSchema *schema,const gchar *field)
+    {
+        Self *obj = GET_NEW;
+        gchar *value =NULL;
+
+        gtk_misc_set_alignment(GTK_MISC(obj), 0, 0.5);
+        
+        /* store item */
+        obj->_priv->item = G_OBJECT(schema); 
+
+        obj->_priv->field = g_strdup(field); 
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), 
+                        "schema-field-changed", 
+                        G_CALLBACK(self_field_item_changed),
+                        obj);
+
+        value = stuffkeeper_data_schema_get_field_name(STUFFKEEPER_DATA_SCHEMA(obj->_priv->item),obj->_priv->field);
+        if(value)
+        {
+            gchar *markup = g_markup_printf_escaped("<b>%s</b>", value);
+            gtk_label_set_text(GTK_LABEL(obj), value);
+            gtk_label_set_markup(GTK_LABEL(obj), markup);
+            g_free(markup);
+            g_free(value);
+        }
+        return GTK_WIDGET(obj);
+    }
 
     override (G:Object)
         void

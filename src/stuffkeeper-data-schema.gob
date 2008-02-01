@@ -41,14 +41,14 @@ class StuffKeeper:Data:Schema from G:Object
         schema_field_changed(self,const gchar *field)
         {
             gint id = self_get_id(self);               
-            printf("Signal my schema change : %i:%s\n", id,field); 
+            printf("Signal my schema field change : %i:%s\n", id,field); 
         }
    signal last NONE (STRING)
         void
         schema_field_added(self,const gchar *field)
         {
             gint id = self_get_id(self);               
-            printf("Signal my schema added : %i:%s\n", id,field); 
+            printf("Signal my schema field added : %i:%s\n", id,field); 
         }
 
    signal last NONE (STRING)
@@ -56,7 +56,7 @@ class StuffKeeper:Data:Schema from G:Object
         schema_field_removed(self,const gchar *field)
         {
             gint id = self_get_id(self);               
-            printf("Signal my schema removed: %i:%s\n", id,field); 
+            printf("Signal my schema field removed: %i:%s\n", id,field); 
         }
 
     /**
@@ -208,8 +208,23 @@ class StuffKeeper:Data:Schema from G:Object
         g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, field); 
         g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name); 
 
+        /* Mark it for saving */
+        self->_priv->changed = TRUE;
+
         self_schema_field_added(self, id);
         g_free(id);
+    }
+    public
+    void
+    remove_field(self, const gchar *id)
+    {
+        /* Remove the type field */
+        g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_TYPES, id, NULL);
+        /* Remove the Name field */
+        g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_NAMES, id, NULL);
+        /* Mark it for saving */
+        self->_priv->changed = TRUE;
+        self_schema_field_removed(self, id);
     }
 
     /* Item handling */

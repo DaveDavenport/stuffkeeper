@@ -8,10 +8,12 @@
 GList *interface_list = NULL;
 
 /* Iter function from g_list_foreach */
+/*
 static void destroy_interface(gpointer data, gpointer user_data)
 {
     gtk_widget_destroy(GTK_WIDGET(data));
 }
+*/
 /**
  * The main programs
  */

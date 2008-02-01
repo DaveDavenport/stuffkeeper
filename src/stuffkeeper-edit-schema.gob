@@ -33,10 +33,11 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
     private GtkWidget *tree GladeXML;
     private guint field_changed_signal = 0;
     private guint field_added_signal = 0;
+    private guint field_removed_signal = 0;
 
     public
     void
-    field_changed(self, const gchar *field, StuffKeeperDataSchema *schema)
+    schema_field_changed(self, const gchar *field, StuffKeeperDataSchema *schema)
     {
         GtkTreeIter iter;
 
@@ -56,29 +57,68 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
             }while(gtk_tree_model_iter_next(model, &iter));
         }
     }
+    public
+    void
+    schema_field_removed(self, const gchar *removed_id, StuffKeeper:Data:Schema *schema)
+    {
+        GtkTreeIter iter;
+        
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        printf("removing field from list\n");
+        if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
+        {
+            do{
+                gchar *id;
+                gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                if(strcmp(id, removed_id) ==0)
+                {
+                    gtk_list_store_remove(self->_priv->store, &iter);
+                    return;
+                }
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
+    }
 
     public
-    void interface_field_edited
+        void
+        schema_field_added(self, const gchar *id, StuffKeeperDataSchema *schema)
+        {
+
+            GtkTreeIter iter;
+            gchar *name;
+            gtk_list_store_append(self->_priv->store, &iter);
+            name = stuffkeeper_data_schema_get_field_name(schema, id);
+            gtk_list_store_set(self->_priv->store, &iter, 
+                    COL_ID, id, 
+                    COL_TYPE, stuffkeeper_data_schema_get_field_type(schema, id),
+                    COL_NAME, name,
+                    -1);
+            g_free(name);
+        }
+
+
+    public
+        void interface_field_edited
         (
          self,
          gchar               *path,
          gchar               *new_text,
          GtkCellRendererText *renderer
         )
-    {
-        GtkTreeIter iter;
-        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-        printf("new: %s\n", new_text);
-        if(gtk_tree_model_get_iter_from_string(model, &iter, path))
         {
-            gchar *id;
-            gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
-            stuffkeeper_data_schema_set_field_name(self->_priv->schema, id,new_text);
-            g_free(id);
+            GtkTreeIter iter;
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+            printf("new: %s\n", new_text);
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            {
+                gchar *id;
+                gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                stuffkeeper_data_schema_set_field_name(self->_priv->schema, id,new_text);
+                g_free(id);
 
 
+            }
         }
-    }
 
     /** Create the interface */
     public
@@ -100,18 +140,18 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
         }
 
     public
-    void
-    close(self)
-    {
-        gtk_widget_destroy(GTK_WIDGET(self));
-    }
+        void
+        close(self)
+        {
+            gtk_widget_destroy(GTK_WIDGET(self));
+        }
 
     public
-    void
-    add_string(self)
-    {
-        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field");
-    }
+        void
+        add_string(self)
+        {
+            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field");
+        }
     public
         void
         add_integer(self)
@@ -119,38 +159,49 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
             stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_INTEGER, "New Field");
         }
     public 
-    void
-    add_boolean(self)
-    {
-        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_BOOLEAN, "New Field");
-    }
+        void
+        add_boolean(self)
+        {
+            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_BOOLEAN, "New Field");
+        }
     public
-    void
-    add_slider(self)
-    {
-        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_RATING, "New Field");
+        void
+        add_slider(self)
+        {
+            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_RATING, "New Field");
     }
 
-    public
-    void
-    field_added(self, const gchar *id, StuffKeeperDataSchema *schema)
-    {
-
+    
+    
+   public
+   void
+   remove_field(self)
+   {
+       GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(self),
+                        GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_MODAL,
+                        GTK_MESSAGE_WARNING,GTK_BUTTONS_YES_NO,
+                        "This will delete the field, and all data it contains in the related items.\nAre you sure you want to continue?"); 
+       switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+       {
+            case GTK_RESPONSE_YES:
+                gtk_widget_destroy(dialog);
+                break;
+            default:
+                gtk_widget_destroy(dialog);
+                return;
+       }
+       GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+       GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
         GtkTreeIter iter;
-        gchar *name;
-        gtk_list_store_append(self->_priv->store, &iter);
-        name = stuffkeeper_data_schema_get_field_name(schema, id);
-        gtk_list_store_set(self->_priv->store, &iter, 
-                COL_ID, id, 
-                COL_TYPE, stuffkeeper_data_schema_get_field_type(schema, id),
-                COL_NAME, name,
-                -1);
-        g_free(name);
-    }
-
-
-
-
+        if(gtk_tree_selection_get_selected(sel, &model, &iter))
+        {
+            gchar *id;
+            gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+            stuffkeeper_data_schema_remove_field(self->_priv->schema, id);
+            g_free(id);
+        }
+   }
+    
     public
     void
     set_schema(self, StuffKeeper:Data:Schema *schema)
@@ -167,18 +218,28 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
         char **ids  = stuffkeeper_data_schema_get_fields(schema, &length);
         for(i=0;i<length;i++)
         {
-            self_field_added(self, ids[i], schema); 
+            self_schema_field_added(self, ids[i], schema); 
 
         }
-        self->_priv->field_changed_signal = g_signal_connect_swapped(G_OBJECT(schema), "schema-field-changed", G_CALLBACK(self_field_changed), self);
-        self->_priv->field_added_signal = g_signal_connect_swapped(G_OBJECT(schema), "schema-field-added", G_CALLBACK(self_field_added), self);
+        self->_priv->field_changed_signal = g_signal_connect_swapped(G_OBJECT(schema),  
+                            "schema-field-changed",
+                            G_CALLBACK(self_schema_field_changed),
+                            self);
+        self->_priv->field_added_signal =   g_signal_connect_swapped(G_OBJECT(schema),  
+                            "schema-field-added",
+                            G_CALLBACK(self_schema_field_added),
+                            self);
+        self->_priv->field_removed_signal = g_signal_connect_swapped(G_OBJECT(schema),
+                            "schema-field-removed",
+                            G_CALLBACK(self_schema_field_removed),
+                            self);
 
     }
     override (G:Object)
     void
     finalize(G:Object *obj)
     {
-        Self *self = obj;
+        Self *self = SELF(obj);
         if(self->_priv->field_changed_signal)
         {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_changed_signal);
@@ -189,9 +250,10 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_added_signal);
             self->_priv->field_added_signal =0;
         }
-
-
-
-
+        if(self->_priv->field_removed_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_removed_signal);
+            self->_priv->field_removed_signal =0;
+        }
     }
 }

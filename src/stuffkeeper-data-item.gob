@@ -29,6 +29,8 @@ class StuffKeeper:Data:Item from G:Object
 
     private StuffKeeperDataSchema *schema = {NULL};
 
+    private guint schema_field_removed = {0};
+
     /**
      * Signals 
      */
@@ -53,6 +55,11 @@ class StuffKeeper:Data:Item from G:Object
         {
             g_key_file_free(self->_priv->data);
             self->_priv->data = NULL;
+        }
+        if(self->_priv->schema_field_removed )
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema),self->_priv->schema_field_removed );
+            self->_priv->schema_field_removed = 0; 
         }
         PARENT_HANDLER(obj);
     }
@@ -136,6 +143,8 @@ class StuffKeeper:Data:Item from G:Object
             printf("Creating item: %i\n", id);
 
             obj->_priv->schema = schema; 
+            obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", G_CALLBACK(self_item_schema_field_removed), obj);
+
             id = stuffkeeper_data_schema_get_id(schema);
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL, "schema", id);
             stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
@@ -172,6 +181,7 @@ class StuffKeeper:Data:Item from G:Object
         if(error == NULL)
         {
             obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
+            obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", G_CALLBACK(self_item_schema_field_removed), obj);
             stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
         }
         /* When loading the items it is marked as changed. reset this*/
@@ -179,7 +189,20 @@ class StuffKeeper:Data:Item from G:Object
         return obj;
     }
 
-    /* setting fields */
+    /**
+     * When a field in the schema is removed, removed the entry from the item.
+     * Don't signal a change, (for now) This should be handled by the parent holding it.
+     */
+    private 
+    void
+    item_schema_field_removed(self, const char *id, StuffKeeperDataSchema *schema)
+    {
+        printf("Removing field: '%s'\n",id);
+        g_key_file_remove_key(self->_priv->data, KEYFILE_CUSTOM, id, NULL);
+        /* Mark for change */
+        self->_priv->changed = TRUE;
+    }
+
 
     /**
      * ID (ro)
