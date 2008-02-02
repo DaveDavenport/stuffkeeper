@@ -15,10 +15,23 @@ requires 2.0.10
         FIELD_TYPE_INTEGER = 1,
         FIELD_TYPE_BOOLEAN = 2,
         FIELD_TYPE_RATING = 3,
-        FIELD_TYPE_LIST = 4
+        FIELD_TYPE_LIST = 4,
+        NUM_FIELDS
     } FieldType;
+    extern char *FieldNames[NUM_FIELDS];
 %}
+%ph{
+        char *FieldNames[NUM_FIELDS] = {
+        "String", // FIELD_TYPE_STRING
+        "Integer", // FIELD_TYPE_INTEGER
+        "Boolean", // FIELD_TYPE_BOOLEAN
+        "Slider", // FIELD_TYPE_RATING
+        "List" //FIELD_TYPE_LIST
+    };
 
+
+
+%}
 class StuffKeeper:Data:Schema from G:Object 
 {
     private gboolean changed = {FALSE};
@@ -171,6 +184,20 @@ class StuffKeeper:Data:Schema from G:Object
     {
         return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, NULL);
     }
+    /* Be carefull with this */
+    public 
+    void 
+    set_field_type(self, const gchar *id, FieldType type)
+    {
+        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id,type);
+        self_schema_field_changed(self,id);
+        self->_priv->changed = TRUE;
+    }
+
+
+
+
+
 
     public
     gchar *

@@ -22,6 +22,7 @@ extern GList *interface_list;
         COL_ID,
         COL_TYPE,
         COL_NAME,
+        COL_TYPE_NAME,
         NUM_ROWS
     }StoreFields;
 %}
@@ -29,7 +30,7 @@ extern GList *interface_list;
 class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edit_schema_dialog")
 {
     private StuffKeeper:Data:Schema *schema = {NULL};
-    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING)}  destroywith g_object_unref;
+    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING)}  destroywith g_object_unref;
 
 
     private GtkWidget *tree GladeXML;
@@ -52,8 +53,13 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
                 gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
                 if(strcmp(id, field) ==0)
                 {
+
+                    int type = stuffkeeper_data_schema_get_field_type(schema, id);
                     gchar *name = stuffkeeper_data_schema_get_field_name(self->_priv->schema, field);
-                    gtk_list_store_set(self->_priv->store, &iter, COL_NAME, name, -1);
+                    gtk_list_store_set(self->_priv->store, &iter, COL_NAME, name,
+                            COL_TYPE, type,
+                            COL_TYPE_NAME, FieldNames[type],
+                            -1);
                     g_free(name);
                     return;
                 }
@@ -89,12 +95,14 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
 
             GtkTreeIter iter;
             gchar *name;
+            int type = stuffkeeper_data_schema_get_field_type(schema, id);
             gtk_list_store_append(self->_priv->store, &iter);
             name = stuffkeeper_data_schema_get_field_name(schema, id);
             gtk_list_store_set(self->_priv->store, &iter, 
                     COL_ID, id, 
-                    COL_TYPE, stuffkeeper_data_schema_get_field_type(schema, id),
+                    COL_TYPE, type ,
                     COL_NAME, name,
+                    COL_TYPE_NAME, FieldNames[type],
                     -1);
             g_free(name);
         }
@@ -122,6 +130,31 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
 
             }
         }
+    public
+        void interface_type_edited
+        (
+         self,
+         gchar               *path,
+         gchar               *new_text,
+         GtkCellRendererText *renderer
+        )
+        {
+            GtkTreeIter iter;
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+            printf("new: %s\n", new_text);
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            {
+                int type;
+                gchar *id = NULL;
+                gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                for(type=0;strcmp(new_text,FieldNames[type]) && type < NUM_FIELDS;type++);
+                /* somehow type is not found default to string */
+                if(type == NUM_FIELDS) type = FIELD_TYPE_STRING; 
+                stuffkeeper_data_schema_set_field_type(self->_priv->schema,id, type);
+                g_free(id);
+            }
+        }
+
 
     /** Create the interface */
     public
@@ -130,9 +163,25 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
         {
             GtkCellRenderer *renderer;
             Self *self = GET_NEW;
+            GtkListStore *store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
+            int i;
+            for(i=0; i <NUM_FIELDS;i++)
+            {
+                GtkTreeIter iter;
+                gtk_list_store_append(store,&iter);
+                gtk_list_store_set(store, &iter, 0, i, 1,FieldNames[i], -1); 
+            }
             /* fill tree with columns */
-            renderer = gtk_cell_renderer_text_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE, NULL);
+            renderer = gtk_cell_renderer_combo_new();
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, NULL);
+            g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(store), NULL);
+            g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
+            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_type_edited), self);
+
+
+
+
             renderer = gtk_cell_renderer_text_new();
             gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_NAME, NULL);
             g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);

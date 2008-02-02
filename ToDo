@@ -1,1 +1,2 @@
 * Make the StuffKeeperDataSchema, StuffKeeperDataItem and StuffKeeperDataTag childs of one class, they share alot of sub functions.
+* Remove all signals when stuffkeeperinterface get destroyed.
