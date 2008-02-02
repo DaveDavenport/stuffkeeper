@@ -51,7 +51,6 @@ class StuffKeeper:Item:Window from Gtk:Dialog
 
     /**
      * Popup an item list
-     * TODO: Check it item is destroyed, and if it is remove the window
      */
     public
         void 
@@ -180,6 +179,4 @@ class StuffKeeper:Item:Window from Gtk:Dialog
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
             gtk_widget_show_all(dialog);
         }
-
-
 }
