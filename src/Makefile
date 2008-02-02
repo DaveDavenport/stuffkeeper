@@ -21,6 +21,7 @@ HEADERS=\
 	stuffkeeper-data-list.h\
 	stuffkeeper-interface.h\
 	stuffkeeper-show-item.h\
+	stuffkeeper-item-window.h\
 	stuffkeeper-edit-schema.h
 SOURCE=\
 	stuffkeeper-data-backend.h\
@@ -37,6 +38,7 @@ SOURCE=\
 	stuffkeeper-interface.h\
 	stuffkeeper-show-item.h\
 	stuffkeeper-edit-schema.h\
+	stuffkeeper-item-window.h\
 	stuffkeeper-interface.c\
 	stuffkeeper-edit-schema.c\
 	stuffkeeper-data-backend.c\
@@ -51,6 +53,7 @@ SOURCE=\
 	stuffkeeper-data-rating.c\
 	stuffkeeper-data-list.c\
 	stuffkeeper-show-item.c\
+	stuffkeeper-item-window.c\
 	main.c\
 
 OBJECTS=$(patsubst %.c, %.o, $(SOURCE))

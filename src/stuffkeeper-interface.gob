@@ -16,6 +16,7 @@ requires 2.0.10
 #include "stuffkeeper-data-taglist.h"
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
+#include "stuffkeeper-item-window.h"
 
 extern GList *interface_list;
 %}
@@ -499,7 +500,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             container = self->_priv->item_vbox; ///glade_xml_get_widget(xml, "item_vbox");
 
             event =  self->_priv->item_event_box;//glade_xml_get_widget(xml, "item_event_box");
-            gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->white));
+            gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->base[GTK_STATE_NORMAL]));
 
             list = gtk_container_get_children(GTK_CONTAINER(container));
             if(list)
@@ -815,9 +816,11 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
              */
             /* A filtered items */
             self->_priv->model_items_filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(self->_priv->model_items), NULL);
-
+            renderer = gtk_cell_renderer_pixbuf_new();
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->treeview2), -1, "test", renderer, NULL);
+            g_object_set(renderer, "icon-name", "gtk-new", NULL);
             renderer = gtk_cell_renderer_text_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->treeview2), -1, "test", renderer, "text", 1, NULL);
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->treeview2), -1, "items", renderer, "text", 1, NULL);
             g_object_set(renderer, "editable", TRUE,NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_item_title_edited), self);
 
@@ -891,5 +894,38 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_removed);
                 self->_priv->signal_schema_removed = 0;
             }
+        }
+        /**
+         * Item popup
+         */
+        public 
+        void
+        item_row_activated(self, GtkTreePath *path, GtkTreeViewColumn *column, GtkTreeView *view)
+        {
+
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkTreeIter iter;
+            printf("item row activated\n");
+            if(gtk_tree_model_get_iter(model,&iter, path)) 
+            {
+                StuffKeeperDataItem *item;
+                gtk_tree_model_get(model, &iter, 2, &item, -1);
+                if(item)
+                {
+                    self_popup_item(self, item);
+                }
+            }
+        }
+
+        /**
+         * Popup an item list
+         * TODO: Check it item is destroyed, and if it is remove the window
+         */
+        public
+        void 
+        popup_item(self, StuffKeeper:Data:Item *item)
+        {
+            stuffkeeper_item_window_new(self->_priv->skdbg, item);
+
         }
 }

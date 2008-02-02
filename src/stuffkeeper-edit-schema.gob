@@ -200,29 +200,10 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
 
     public
         void
-        add_string(self)
+        add_field(self)
         {
             stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field");
         }
-    public
-        void
-        add_integer(self)
-        {
-            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_INTEGER, "New Field");
-        }
-    public 
-        void
-        add_boolean(self)
-        {
-            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_BOOLEAN, "New Field");
-        }
-    public
-        void
-        add_slider(self)
-        {
-            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_RATING, "New Field");
-    }
-
     
     
    public
