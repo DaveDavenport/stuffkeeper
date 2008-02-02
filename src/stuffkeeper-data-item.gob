@@ -284,21 +284,6 @@ class StuffKeeper:Data:Item from G:Object
         self_item_changed(self);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Tags
      */
@@ -333,5 +318,38 @@ class StuffKeeper:Data:Item from G:Object
     get_schema(self)
     {
         return self->_priv->schema;
+    }
+    /**  Get values */
+    /* usefull for searching */
+    public
+    gchar **
+    get_values(self, gsize *length)
+    {
+        gchar **ids = NULL;
+        *length = 0;
+        ids = stuffkeeper_data_schema_get_fields(self->_priv->schema, length); 
+        if(ids)
+        {
+            gchar **retv = g_malloc0(((*length)+2)*sizeof(gchar *));
+            int i;
+            int entry =0;
+            retv[0] = self_get_title(self);
+            if(retv)
+                entry++;
+
+            for(i=0;i<*length;i++)
+            {
+                gchar *data = self_get_string(self, ids[i]);  
+                if(data)
+                {
+                    retv[entry] = data;
+                    entry++;
+                }
+            }
+            g_strfreev(ids);
+            *length = entry;
+            return retv;
+        }
+        return NULL; 
     }
 }

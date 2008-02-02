@@ -45,6 +45,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     private StuffKeeperDataBackend *skdbg = {NULL};
     private GtkWidget *LeftPane_edit GladeXML;
     private GtkWidget *AddMenuButton GladeXML;
+    private GtkWidget *search_entry GladeXML;
 
     /**
      * Fix so the signals are correctly destroy
@@ -425,7 +426,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             GtkTreeModel *model2 = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
             StuffKeeperDataItem *item;
             int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
-
+            const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->search_entry));
             /* Get the item */
             gtk_tree_model_get(model, iter, 2,&item, -1);
 
@@ -458,8 +459,32 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 }while(gtk_tree_model_iter_next(model2, &piter));
             }
 
+            if(strlen(text))
+            {
+                int found = 0;
+                gsize length = 0;
+                gchar **values = stuffkeeper_data_item_get_values(item, &length);
+                int i;
+                if(values)
+                {
+                    for(i=0;i<length && !found;i++)
+                    {
+                        if(values[i])
+                            if(strstr(values[i], text)) found = TRUE;
+                    }
+                    g_strfreev(values);
+                }
+                return found;
+            }
+
             return TRUE; 
         }
+    public
+    void
+    search_entry_changed(self)
+    {
+        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+    }
 
     public
         void 
