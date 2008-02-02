@@ -28,6 +28,11 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     private GtkTreeModel *model_schemas = {NULL};
 
     private GtkTreeModel *model_items_filter = {NULL};
+
+    /* Menu */
+    /* A hash list used to store the items, the item id is the hash key */
+    private GHashTable *schemas_items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, gtk_widget_destroy)} destroywith g_hash_table_destroy ;
+    private GtkWidget *menu = {NULL};
     /**
      * Treeview 1 & 2
      */
@@ -38,25 +43,58 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     private GtkWidget *item_event_box GladeXML;
     private StuffKeeperDataBackend *skdbg = {NULL};
     private GtkWidget *LeftPane_edit GladeXML;
+    private GtkWidget *AddMenuButton GladeXML;
+
+    /**
+     * Fix so the signals are correctly destroy
+     */
+    private gulong signal_schema_added = {0};
+    private gulong signal_schema_changed = {0};
+    private gulong signal_schema_removed = {0};
+
+
+
     /**
      * Keep Schema's GtkListStore up2date
      */
     public
     void 
-    schema_added(StuffKeeperDataBackend *skdb, StuffKeeperDataSchema *schema, GtkTreeModel *store)
+    schema_added(self, StuffKeeperDataSchema *schema,StuffKeeperDataBackend *skdb )
     {
         GtkTreeIter iter;
-        gtk_list_store_append(GTK_LIST_STORE(store), &iter);
+        gint id;
+        gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_schemas), &iter);
         gchar *title = stuffkeeper_data_schema_get_title(schema);
-        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_schema_get_id(schema),1,title,3,schema, 4, stuffkeeper_data_schema_num_items(schema),-1);
+        gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_schemas), &iter, 
+                    0, stuffkeeper_data_schema_get_id(schema),
+                    1, title,
+                    3, schema,
+                    4, stuffkeeper_data_schema_num_items(schema),-1);
+
+
+
+        id = stuffkeeper_data_schema_get_id(schema);
+        if(schema)
+        {
+            GtkWidget *m = gtk_menu_item_new_with_label((title==NULL)?"n/a":title);
+            gint *ide;
+            ide = g_malloc0(sizeof(gint));
+            *ide = id;
+            g_hash_table_insert(self->_priv->schemas_items, ide, m); 
+            /* menu */
+            gtk_menu_shell_insert(GTK_MENU_SHELL(self->_priv->menu), m,-1);
+            g_object_set_data(G_OBJECT(m), "schema", schema);
+            g_signal_connect_swapped(G_OBJECT(m), "activate", G_CALLBACK(self_interface_item_add_menu_button), self);
+            gtk_widget_show_all(self->_priv->menu);
+        }
         g_free(title);
     }
     public
     void 
-    schema_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataSchema *schema, GtkListStore *store)
+    schema_changed(self, StuffKeeperDataSchema *schema, StuffKeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
-        GtkTreeModel *model = GTK_TREE_MODEL(store);
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_schemas);
         gint id = stuffkeeper_data_schema_get_id(schema);
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
@@ -66,19 +104,30 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_schema_get_title(schema);
-                    gtk_list_store_set(GTK_LIST_STORE(store), &iter, 1,title, 4, stuffkeeper_data_schema_num_items(schema),-1);
+                    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1,title, 4, stuffkeeper_data_schema_num_items(schema),-1);
                     g_free(title);
-                    return;
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
+        }
+        printf("schema changed\n");
+        GtkWidget *item = g_hash_table_lookup(self->_priv->schemas_items, &id);
+        if(item) {
+            gchar *name = stuffkeeper_data_schema_get_title(schema);
+            GtkWidget *label = gtk_bin_get_child(GTK_BIN(item));
+            gtk_label_set_text(GTK_LABEL(label), name);
+            g_free(name);
+
         }
     }
     public
     void 
-    schema_removed(StuffKeeperDataBackend *skdb, gint id, GtkListStore *store)
+    schema_removed(self, gint id, StuffKeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
-        GtkTreeModel *model = GTK_TREE_MODEL(store);
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_schemas);
+
+        g_hash_table_remove(self->_priv->schemas_items,&id);
+
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
             do{
@@ -86,7 +135,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 gtk_tree_model_get(model, &iter, 0, &oid, -1);
                 if(oid == id)
                 {
-                    gtk_list_store_remove(store, &iter);
+                    gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
                     return;
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
@@ -214,8 +263,6 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         void 
         interface_item_add(self)
         {
-
-
             /** TODO, set schema */
             GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
             if(list)
@@ -226,6 +273,24 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             }
 
         }
+
+    public
+        void 
+        interface_item_add_menu_button(self, GtkWidget *button)
+        {
+            StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+            if(schema)
+            {
+                StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
+                stuffkeeper_data_item_set_title(item,"New Item");
+            }
+
+        }
+
+
+
+
+
     /**
      * Remove selected item
      */
@@ -653,6 +718,15 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 
         }
     }
+    /* Add item menu */
+
+    public
+    void
+    interface_item_add_menu(self, GtkWidget *but)
+    {
+        printf("show menu\n");
+
+    }
 
     public
     void
@@ -680,19 +754,27 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
              */
             self->_priv->skdbg = skdb;
 
+
+
+            self->_priv->menu = gtk_menu_new();
+            gtk_menu_tool_button_set_menu(GTK_MENU_TOOL_BUTTON(self->_priv->AddMenuButton), (self->_priv->menu));
+
+
+
+
             /* Setting up backends */
             self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
             /** Load the schemas*/
             node = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
             {
-                self_schema_added(self->_priv->skdbg, iter->data,self->_priv->model_schemas);
+                self_schema_added(self, STUFFKEEPER_DATA_SCHEMA(iter->data), self->_priv->skdbg);
             }
             if(node) g_list_free(node);
 
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-added",   G_CALLBACK(self_schema_added), self->_priv->model_schemas);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-removed", G_CALLBACK(self_schema_removed),self->_priv->model_schemas);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "schema-changed", G_CALLBACK(self_schema_changed),self->_priv->model_schemas);
+            self->_priv->signal_schema_added = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "schema-added",   G_CALLBACK(self_schema_added),self); 
+            self->_priv->signal_schema_removed =g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "schema-removed", G_CALLBACK(self_schema_removed),self);
+            self->_priv->signal_schema_changed=g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "schema-changed", G_CALLBACK(self_schema_changed),self);
 
 
 
@@ -788,6 +870,26 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 
 
 
+
             //glade_xml_signal_autoconnect(xml);
+        }
+
+        override (G:Object)
+        void
+        finalize(G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            if(self->_priv->signal_schema_added) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_added);
+                self->_priv->signal_schema_added = 0;
+            }
+            if(self->_priv->signal_schema_changed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_changed);
+                self->_priv->signal_schema_changed = 0;
+            }
+            if(self->_priv->signal_schema_removed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_removed);
+                self->_priv->signal_schema_removed = 0;
+            }
         }
 }
