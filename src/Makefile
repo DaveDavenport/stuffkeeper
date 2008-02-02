@@ -6,6 +6,11 @@ EMPTY 			=
 EXTRA_CFLAGS	= -g -Os -Wall -D_GNU_SOURCE 
 EXTRA_LIBS		= -lm
 Q				= @
+GOB2			= $(shell which gob2)
+
+ifeq ($(GOB2), $(EMPTY))
+$(error **ERROR** Gob2 not found)
+endif
 
 HEADERS=\
 	stuffkeeper-data-backend.h\
