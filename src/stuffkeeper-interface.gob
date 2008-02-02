@@ -31,7 +31,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 
     /* Menu */
     /* A hash list used to store the items, the item id is the hash key */
-    private GHashTable *schemas_items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, gtk_widget_destroy)} destroywith g_hash_table_destroy ;
+    private GHashTable *schemas_items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} destroywith g_hash_table_destroy ;
     private GtkWidget *menu = {NULL};
     /**
      * Treeview 1 & 2

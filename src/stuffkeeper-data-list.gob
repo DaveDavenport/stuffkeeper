@@ -81,7 +81,7 @@ class StuffKeeper:Data:List from Gtk:VBox
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-        GtkTreeSelection *sel = gtk_tree_view_get_selection(self->_priv->tree);
+        GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
         if(gtk_tree_selection_get_selected(sel, &model, &iter))
         {
             gtk_list_store_remove(self->_priv->store, &iter);
@@ -115,7 +115,6 @@ class StuffKeeper:Data:List from Gtk:VBox
     new(StuffKeeperDataItem *item,const gchar *field)
     {
         Self *obj = GET_NEW;
-        gchar *value =NULL;
         GtkCellRenderer *renderer;
         GtkWidget *hbox = gtk_hbox_new(FALSE,6);
 
