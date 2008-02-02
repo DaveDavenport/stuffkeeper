@@ -110,7 +110,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
-        printf("schema changed\n");
+        printf("schema changed: %i\n",id);
         GtkWidget *item = g_hash_table_lookup(self->_priv->schemas_items, &id);
         if(item) {
             gchar *name = stuffkeeper_data_schema_get_title(schema);
