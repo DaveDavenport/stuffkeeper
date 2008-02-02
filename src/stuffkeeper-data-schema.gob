@@ -14,7 +14,8 @@ requires 2.0.10
         FIELD_TYPE_STRING = 0,
         FIELD_TYPE_INTEGER = 1,
         FIELD_TYPE_BOOLEAN = 2,
-        FIELD_TYPE_RATING = 3
+        FIELD_TYPE_RATING = 3,
+        FIELD_TYPE_LIST = 4
     } FieldType;
 %}
 

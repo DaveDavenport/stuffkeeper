@@ -269,6 +269,34 @@ class StuffKeeper:Data:Item from G:Object
         g_key_file_set_boolean(self->_priv->data, KEYFILE_CUSTOM, field, value);
         self_item_changed(self);
     }
+    public
+        gchar **
+    get_list(self, const gchar *field,gsize *length)
+    {
+        return g_key_file_get_string_list(self->_priv->data, KEYFILE_CUSTOM, field,length, NULL); 
+    }
+
+    public 
+    void
+    set_list(self, const gchar *field, const gchar *value[], gsize length)
+    {
+        g_key_file_set_string_list(self->_priv->data, KEYFILE_CUSTOM, field, value,length);
+        self_item_changed(self);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /**

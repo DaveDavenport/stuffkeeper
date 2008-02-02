@@ -18,6 +18,7 @@ HEADERS=\
 	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-rating.h\
 	stuffkeeper-data-spinbutton.h\
+	stuffkeeper-data-list.h\
 	stuffkeeper-interface.h\
 	stuffkeeper-show-item.h\
 	stuffkeeper-edit-schema.h
@@ -32,6 +33,7 @@ SOURCE=\
 	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-data-rating.h\
+	stuffkeeper-data-list.h\
 	stuffkeeper-interface.h\
 	stuffkeeper-show-item.h\
 	stuffkeeper-edit-schema.h\
@@ -47,6 +49,7 @@ SOURCE=\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-rating.c\
+	stuffkeeper-data-list.c\
 	stuffkeeper-show-item.c\
 	main.c\
 

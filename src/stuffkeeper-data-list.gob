@@ -1,0 +1,176 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-tag.h"
+#include "stuffkeeper-data-item.h"
+%}
+
+class StuffKeeper:Data:List from Gtk:VBox
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+    private gulong changed_item_entry = {0};
+    private GtkWidget *sw;
+    private GtkWidget *tree;
+    private GtkListStore *store = {gtk_list_store_new(1, GTK_TYPE_STRING)} destroywith g_object_unref;
+
+
+    public
+    void
+    item_changed(self, StuffKeeper:Data:Item *item)
+    {
+        gsize length =0;
+        gchar **value;
+        gtk_list_store_clear(self->_priv->store);
+        value = stuffkeeper_data_item_get_list(item, self->_priv->field, &length);
+        if(value)
+        {
+            int i;
+            GtkTreeIter iter;
+            for(i=0;i<length;i++)
+            {
+                gtk_list_store_append(GTK_LIST_STORE(self->_priv->store), &iter);
+                gtk_list_store_set(GTK_LIST_STORE(self->_priv->store), &iter,0,value[i],-1);
+
+            }
+            g_strfreev(value);
+        }
+    }
+    public
+    void
+    save_changes(self)
+    {
+        gsize rows=0;
+        gchar **retv=NULL;
+        int i=0;
+        GtkTreeIter iter;
+        g_signal_handler_block(self->_priv->item,self->_priv->changed_item_entry);
+        rows = gtk_tree_model_iter_n_children(GTK_TREE_MODEL(self->_priv->store), NULL);
+        retv = g_malloc0((rows+1)*sizeof(gchar *));
+        if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
+        {
+            do{
+                gchar *name;
+                gtk_tree_model_get(GTK_TREE_MODEL(self->_priv->store), &iter, 0, &name, -1);
+                retv[i] = name;
+                i++;
+            }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->store), &iter));
+        }
+        stuffkeeper_data_item_set_list(self->_priv->item, self->_priv->field, retv, rows);
+        for(;i>=0;i--)
+        {
+            g_free(retv[i]);
+        }
+        g_free(retv);
+
+        g_signal_handler_unblock(self->_priv->item,self->_priv->changed_item_entry);
+    }
+    public
+    void
+    add_row(self)
+    {
+        GtkTreeIter iter;
+        gtk_list_store_append(self->_priv->store, &iter);
+        gtk_list_store_set(self->_priv->store, &iter,0,"New Row",-1);
+        self_save_changes(self);
+    }
+    public
+    void
+    remove_row(self)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        GtkTreeSelection *sel = gtk_tree_view_get_selection(self->_priv->tree);
+        if(gtk_tree_selection_get_selected(sel, &model, &iter))
+        {
+            gtk_list_store_remove(self->_priv->store, &iter);
+            self_save_changes(self);
+        }
+    }
+    /* handle rows getting edited */
+    public
+        void row_edited 
+        (
+         self,
+         gchar               *path,
+         gchar               *new_text,
+         GtkCellRendererText *renderer
+        )
+        {
+            GtkTreeIter iter;
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);            
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            {
+                gtk_list_store_set(self->_priv->store, &iter, 0, new_text, -1);
+                self_save_changes(self);
+            }
+        }
+
+
+
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataItem *item,const gchar *field)
+    {
+        Self *obj = GET_NEW;
+        gchar *value =NULL;
+        GtkCellRenderer *renderer;
+        GtkWidget *hbox = gtk_hbox_new(FALSE,6);
+
+        GtkWidget *button;
+        
+        /* store item */
+        obj->_priv->item = item; 
+        obj->_priv->field = g_strdup(field);
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "item-changed", G_CALLBACK(self_item_changed), obj);
+        /* Scrolled window */
+        obj->_priv->sw = gtk_scrolled_window_new(NULL, NULL);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(obj->_priv->sw), GTK_POLICY_AUTOMATIC,GTK_POLICY_NEVER);
+        gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(obj->_priv->sw), GTK_SHADOW_ETCHED_IN);
+        /* tree */
+        obj->_priv->tree = gtk_tree_view_new();
+        gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(obj->_priv->tree), FALSE);
+        gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(obj->_priv->tree), TRUE);
+        gtk_container_add(GTK_CONTAINER(obj->_priv->sw), obj->_priv->tree);
+        /* add it */
+        gtk_box_pack_start(GTK_BOX(obj),obj->_priv->sw, TRUE, TRUE,0);
+        renderer = gtk_cell_renderer_text_new();
+        gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(obj->_priv->tree),-1,"Item", renderer, "text", 0, NULL);
+        g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+        g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_row_edited), obj);        
+
+        /* Add model */
+        gtk_tree_view_set_model(GTK_TREE_VIEW(obj->_priv->tree), GTK_TREE_MODEL(obj->_priv->store));
+        self_item_changed(obj, obj->_priv->item);
+
+        /**/
+        button = gtk_button_new_from_stock(GTK_STOCK_REMOVE);
+        gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+        g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_remove_row), obj);
+        button = gtk_button_new_from_stock(GTK_STOCK_ADD);          
+        gtk_box_pack_end(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+        g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_add_row), obj);
+
+
+        gtk_box_pack_end(GTK_BOX(obj),hbox, FALSE, TRUE,0);
+
+        return GTK_WIDGET(obj);
+    }
+  
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            if(self->_priv->changed_item_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+                self->_priv->changed_item_entry = 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}
