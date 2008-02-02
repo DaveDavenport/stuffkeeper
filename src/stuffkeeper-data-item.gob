@@ -333,10 +333,11 @@ class StuffKeeper:Data:Item from G:Object
             gchar **retv = g_malloc0(((*length)+2)*sizeof(gchar *));
             int i;
             int entry =0;
+            /** Add title to the value list */
             retv[0] = self_get_title(self);
             if(retv)
                 entry++;
-
+            /** iterate and add every available list */
             for(i=0;i<*length;i++)
             {
                 gchar *data = self_get_string(self, ids[i]);  
