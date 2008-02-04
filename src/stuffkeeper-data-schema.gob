@@ -266,4 +266,11 @@ class StuffKeeper:Data:Schema from G:Object
             self->_priv->items = g_list_remove(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
             self_schema_changed(self);
         }
+
+        override (G:Object)
+        void
+        finalize(G:Object *obj)
+        {
+            printf("destroying schema\n");
+        }
 }

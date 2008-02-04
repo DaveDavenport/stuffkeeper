@@ -32,7 +32,8 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 
     /* Menu */
     /* A hash list used to store the items, the item id is the hash key */
-    private GHashTable *schemas_items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, g_object_unref)} destroywith g_hash_table_destroy ;
+    /* Don't free the list */
+    private GHashTable *schemas_items = {g_hash_table_new_full(g_int_hash, g_int_equal,g_free, NULL)} destroywith g_hash_table_destroy ;
     private GtkWidget *menu = {NULL};
     /**
      * Treeview 1 & 2
@@ -53,6 +54,19 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     private gulong signal_schema_added = {0};
     private gulong signal_schema_changed = {0};
     private gulong signal_schema_removed = {0};
+
+    private gulong signal_tag_added = {0};
+    private gulong signal_tag_changed = {0};
+    private gulong signal_tag_removed = {0};
+
+    private gulong signal_item_added = {0};
+    private gulong signal_item_changed = {0};
+    private gulong signal_item_removed = {0};
+
+
+
+
+
 
 
 
@@ -833,9 +847,9 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             }
             if(node) g_list_free(node);
             /* handle an added tag */
-            g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-added",G_CALLBACK(self_tag_added),self->_priv->model_tags);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-changed",G_CALLBACK(self_tag_changed),self->_priv->model_tags);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-removed",G_CALLBACK(self_tag_removed),self->_priv->model_tags);
+            self->_priv->signal_tag_added = g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-added",G_CALLBACK(self_tag_added),self->_priv->model_tags);
+             self->_priv->signal_tag_changed = g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-changed",G_CALLBACK(self_tag_changed),self->_priv->model_tags);
+              self->_priv->signal_tag_removed = g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-removed",G_CALLBACK(self_tag_removed),self->_priv->model_tags);
 
             self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
             /** Load the items*/
@@ -845,9 +859,9 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
                 self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self->_priv->model_items);
             }
             if(node) g_list_free(node);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added), self->_priv->model_items);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-removed", G_CALLBACK(self_item_removed),self->_priv->model_items);
-            g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-changed", G_CALLBACK(self_item_changed),self->_priv->model_items);
+            self->_priv->signal_item_added = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added), self->_priv->model_items);
+            self->_priv->signal_item_removed = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-removed", G_CALLBACK(self_item_removed),self->_priv->model_items);
+            self->_priv->signal_item_changed = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-changed", G_CALLBACK(self_item_changed),self->_priv->model_items);
 
 
 
@@ -917,6 +931,9 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
 
 
             //glade_xml_signal_autoconnect(xml);
+            /*gtk_window_resize(GTK_WINDOW(self), 800,600);
+            gtk_widget_show(GTK_WIDGET(self));
+            */
         }
 
         override (G:Object)
@@ -935,6 +952,32 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             if(self->_priv->signal_schema_removed) { 
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_removed);
                 self->_priv->signal_schema_removed = 0;
+            }
+
+            if(self->_priv->signal_item_added) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_item_added);
+                self->_priv->signal_item_added = 0;
+            }
+            if(self->_priv->signal_item_changed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_item_changed);
+                self->_priv->signal_item_changed = 0;
+            }
+            if(self->_priv->signal_item_removed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_item_removed);
+                self->_priv->signal_item_removed = 0;
+            }
+
+            if(self->_priv->signal_tag_added) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_tag_added);
+                self->_priv->signal_tag_added = 0;
+            }
+            if(self->_priv->signal_tag_changed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_tag_changed);
+                self->_priv->signal_tag_changed = 0;
+            }
+            if(self->_priv->signal_tag_removed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_tag_removed);
+                self->_priv->signal_tag_removed = 0;
             }
         }
         /**
