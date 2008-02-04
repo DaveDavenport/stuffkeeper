@@ -5,9 +5,10 @@ requires 2.0.10
 #include "stuffkeeper-data-item.h"
 %}
 
-class StuffKeeper:Data:Entry from Gtk:Entry
+class StuffKeeper:Data:Text from Gtk:Text:View
 {
     private StuffKeeperDataItem *item = {NULL};
+    private GtkTextBuffer *buffer = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_entry = {0};
@@ -16,20 +17,29 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     void
     changed(self, gpointer data)
     {
-        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        GtkTextIter start, stop;
+        gchar *text = NULL;
+        gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);        
+        gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop); 
+        text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
         if(self->_priv->field)
         {
            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
         }else{
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
+        g_free(text);
     }
 
     public
     void
     item_changed(self, StuffKeeperDataItem *item)
     {
-        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        GtkTextIter start, stop;
+        gchar *text = NULL;
+        gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);        
+        gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop); 
+        text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
         gchar *value;
         if(self->_priv->field)
         {
@@ -42,11 +52,12 @@ class StuffKeeper:Data:Entry from Gtk:Entry
             if(strcmp(text,value))
             {
                 g_signal_handler_block(self,self->_priv->changed_entry);
-                gtk_entry_set_text(GTK_ENTRY(self), value);
+                gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
                 g_signal_handler_unblock(self,self->_priv->changed_entry);
             }
             g_free(value);
         }
+        g_free(text);
     }
 
     public
@@ -55,14 +66,14 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
-
-        gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
-
+        /* Get buffer */
+        obj->_priv->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj));
         /* store item */
         obj->_priv->item = item; 
         /* field */
         obj->_priv->field = g_strdup(field);
             
+        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj), GTK_WRAP_WORD);
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
         /* update the entry */
@@ -74,11 +85,10 @@ class StuffKeeper:Data:Entry from Gtk:Entry
         }
         if(value)
         {
-            gtk_entry_set_text(GTK_ENTRY(obj), value);
+            gtk_text_buffer_set_text(obj->_priv->buffer, value, -1);
             g_free(value);
         }
-        /* this is destroyed when self is destroyed, so no need to disconnect myself */
-        obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);
+        obj->_priv->changed_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->buffer), "changed", G_CALLBACK(self_changed), obj);
         return GTK_WIDGET(obj);
     }
 
@@ -92,6 +102,13 @@ class StuffKeeper:Data:Entry from Gtk:Entry
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
                 self->_priv->changed_item_entry = 0;
             }
+            /* Destroyed when the view get destroyed
+            if(self->_priv->changed_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->buffer,self->_priv->changed_entry);
+                self->_priv->changed_entry = 0;
+            }
+            */
             PARENT_HANDLER(obj);
         }
 

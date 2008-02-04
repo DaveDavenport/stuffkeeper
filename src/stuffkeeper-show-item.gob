@@ -9,6 +9,7 @@ requires 2.0.10
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
 #include "stuffkeeper-data-list.h"
+#include "stuffkeeper-data-text.h"
 
 
 %}
@@ -64,6 +65,8 @@ class StuffKeeper:Show:Item from Gtk:Table
                     label1 = stuffkeeper_data_rating_new(self->_priv->item,self->_priv->retv[i]);
                 }else if (type == FIELD_TYPE_LIST) {
                     label1 = stuffkeeper_data_list_new(self->_priv->item,self->_priv->retv[i]);
+                }else if (type == FIELD_TYPE_TEXT) {
+                    label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
                 }else {
                     label1 = gtk_label_new("not supported\n");
                 }

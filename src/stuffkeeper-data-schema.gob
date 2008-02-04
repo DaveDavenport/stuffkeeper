@@ -16,6 +16,7 @@ requires 2.0.10
         FIELD_TYPE_BOOLEAN = 2,
         FIELD_TYPE_RATING = 3,
         FIELD_TYPE_LIST = 4,
+        FIELD_TYPE_TEXT = 5,
         NUM_FIELDS
     } FieldType;
     extern char *FieldNames[NUM_FIELDS];
@@ -26,7 +27,8 @@ requires 2.0.10
         "Integer", // FIELD_TYPE_INTEGER
         "Boolean", // FIELD_TYPE_BOOLEAN
         "Slider", // FIELD_TYPE_RATING
-        "List" //FIELD_TYPE_LIST
+        "List", //FIELD_TYPE_LIST
+        "Text"
     };
 
 

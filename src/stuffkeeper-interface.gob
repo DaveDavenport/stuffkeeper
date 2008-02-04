@@ -299,16 +299,33 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     public
         void interface_item_remove(self)
         {
-            GtkWidget *tree = self->_priv->treeview2;//glade_xml_get_widget(xml, "treeview2");
-            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-            GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
-            GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(selection, &model, &iter))
-            {
-                gint id;
-                gtk_tree_model_get(model, &iter ,0,&id, -1);
-                stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
+            /** Setup a dialog that ask the user if he is sure */
+            GtkWidget *dialog;
 
+            dialog = gtk_message_dialog_new(GTK_WINDOW(self), 
+                        GTK_DIALOG_DESTROY_WITH_PARENT|// This belongs to the parent, so if the user closes the parent, close it
+                        GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
+                        GTK_MESSAGE_WARNING, // It is a warning message.
+                        GTK_BUTTONS_YES_NO, // yes/no question
+                    "Deleting an entry cannot be undone.\nAre you sure you want to continue?");
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_YES:
+                    {
+                        GtkWidget *tree = self->_priv->treeview2;//glade_xml_get_widget(xml, "treeview2");
+                        GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+                        GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
+                        GtkTreeIter iter;
+                        if(gtk_tree_selection_get_selected(selection, &model, &iter))
+                        {
+                            gint id;
+                            gtk_tree_model_get(model, &iter ,0,&id, -1);
+                            stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
+
+                        }
+                    }
+                default:
+                    gtk_widget_destroy(dialog);
             }
         }
 

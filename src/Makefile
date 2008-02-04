@@ -20,6 +20,7 @@ HEADERS=\
 	stuffkeeper-data-label.h\
 	stuffkeeper-data-taglist.h\
 	stuffkeeper-data-entry.h\
+	stuffkeeper-data-text.h\
 	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-rating.h\
 	stuffkeeper-data-spinbutton.h\
@@ -36,6 +37,7 @@ SOURCE=\
 	stuffkeeper-data-label.h\
 	stuffkeeper-data-taglist.h\
 	stuffkeeper-data-entry.h\
+	stuffkeeper-data-text.h\
 	stuffkeeper-data-boolean.h\
 	stuffkeeper-data-spinbutton.h\
 	stuffkeeper-data-rating.h\
@@ -53,6 +55,7 @@ SOURCE=\
 	stuffkeeper-data-label.c\
 	stuffkeeper-data-taglist.c\
 	stuffkeeper-data-entry.c\
+	stuffkeeper-data-text.c\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-rating.c\
