@@ -147,9 +147,9 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
                 int type;
                 gchar *id = NULL;
                 gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
-                for(type=0;strcmp(new_text,FieldNames[type]) && type < NUM_FIELDS;type++);
+                for(type=0;strcmp(new_text,FieldNames[type]) && type < FIELD_TYPE_NUM_FIELDS;type++);
                 /* somehow type is not found default to string */
-                if(type == NUM_FIELDS) type = FIELD_TYPE_STRING; 
+                if(type == FIELD_TYPE_NUM_FIELDS) type = FIELD_TYPE_STRING; 
                 stuffkeeper_data_schema_set_field_type(self->_priv->schema,id, type);
                 g_free(id);
             }
@@ -165,7 +165,7 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
             Self *self = GET_NEW;
             GtkListStore *store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
             int i;
-            for(i=0; i <NUM_FIELDS;i++)
+            for(i=0; i <FIELD_TYPE_NUM_FIELDS;i++)
             {
                 GtkTreeIter iter;
                 gtk_list_store_append(store,&iter);

@@ -17,12 +17,12 @@ requires 2.0.10
         FIELD_TYPE_RATING = 3,
         FIELD_TYPE_LIST = 4,
         FIELD_TYPE_TEXT = 5,
-        NUM_FIELDS
+        FIELD_TYPE_NUM_FIELDS
     } FieldType;
-    extern char *FieldNames[NUM_FIELDS];
+    extern char *FieldNames[FIELD_TYPE_NUM_FIELDS];
 %}
 %ph{
-        char *FieldNames[NUM_FIELDS] = {
+        char *FieldNames[FIELD_TYPE_NUM_FIELDS] = {
         "String", // FIELD_TYPE_STRING
         "Integer", // FIELD_TYPE_INTEGER
         "Boolean", // FIELD_TYPE_BOOLEAN
