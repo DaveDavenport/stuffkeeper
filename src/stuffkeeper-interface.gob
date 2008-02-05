@@ -22,7 +22,7 @@ extern GList *interface_list;
 %}
 
 
-class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
+class StuffKeeper:Interface from G:Object 
 {
     private GtkTreeModel *model_tags = {NULL};
     private GtkTreeModel *model_items= {NULL};
@@ -38,16 +38,19 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
     /**
      * Treeview 1 & 2
      */
-    private GtkWidget *LeftPaneCB GladeXML;
-    private GtkWidget *treeview1 GladeXML;
-    private GtkWidget *treeview2 GladeXML;
-    private GtkWidget *item_vbox GladeXML;
-    private GtkWidget *item_event_box GladeXML;
-    private StuffKeeperDataBackend *skdbg = {NULL};
-    private GtkWidget *LeftPane_edit GladeXML;
-    private GtkWidget *AddMenuButton GladeXML;
-    private GtkWidget *search_entry GladeXML;
+     private GladeXML *xml;
+     private GtkWidget *win;
+    private GtkWidget *LeftPaneCB ;
+    private GtkWidget *treeview1 ;
+    private GtkWidget *treeview2 ;
+    private GtkWidget *item_vbox ;
+    private GtkWidget *item_event_box ;
+    
+    private GtkWidget *LeftPane_edit ;
+    private GtkWidget *AddMenuButton ;
+    private GtkWidget *search_entry ;
 
+    private StuffKeeperDataBackend *skdbg = {NULL};
     /**
      * Fix so the signals are correctly destroy
      */
@@ -316,7 +319,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             /** Setup a dialog that ask the user if he is sure */
             GtkWidget *dialog;
 
-            dialog = gtk_message_dialog_new(GTK_WINDOW(self), 
+            dialog = gtk_message_dialog_new(GTK_WINDOW(self->_priv->win), 
                         GTK_DIALOG_DESTROY_WITH_PARENT|// This belongs to the parent, so if the user closes the parent, close it
                         GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
                         GTK_MESSAGE_WARNING, // It is a warning message.
@@ -431,7 +434,9 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         int n;
         interface_list = g_list_remove(interface_list, self);
         n = g_list_length(interface_list);
-        gtk_widget_destroy(GTK_WIDGET(self));
+        gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
+        g_object_unref(self);
+
         if(n == 0)
         {
             gtk_main_quit();
@@ -729,7 +734,29 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         StuffKeeperInterface * 
         new(void)
         {
-            return GET_NEW;
+            Self *self = GET_NEW;
+
+            self->_priv->xml = glade_xml_new("stuffkeeper.glade","win",NULL);
+            if(self->_priv->xml == NULL)
+            {
+                g_object_unref(self);
+                printf("Failed top open xml file\n");
+                return NULL;
+            }
+            self->_priv->LeftPaneCB  = glade_xml_get_widget(self->_priv->xml, "LeftPaneCB");
+            self->_priv->treeview1 = glade_xml_get_widget(self->_priv->xml, "treeview1");
+            self->_priv->treeview2 = glade_xml_get_widget(self->_priv->xml, "treeview2");
+            self->_priv->item_vbox = glade_xml_get_widget(self->_priv->xml, "item_vbox");
+            self->_priv->item_event_box = glade_xml_get_widget(self->_priv->xml, "item_event_box");
+
+            self->_priv->LeftPane_edit = glade_xml_get_widget(self->_priv->xml, "LeftPane_edit");
+            self->_priv->AddMenuButton = glade_xml_get_widget(self->_priv->xml, "AddMenuButton");
+            self->_priv->search_entry = glade_xml_get_widget(self->_priv->xml, "search_entry");
+            
+            self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
+
+            glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            return self;
         }
 
     public
@@ -934,6 +961,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
             /*gtk_window_resize(GTK_WINDOW(self), 800,600);
             gtk_widget_show(GTK_WIDGET(self));
             */
+            gtk_widget_show(self->_priv->win);
         }
 
         override (G:Object)
@@ -941,6 +969,7 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         finalize(G:Object *obj)
         {
             Self *self = SELF(obj);
+            printf("** Finalize stuffkeeper interface\n");
             if(self->_priv->signal_schema_added) { 
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_added);
                 self->_priv->signal_schema_added = 0;
@@ -1012,5 +1041,37 @@ class StuffKeeper:Interface from Gtk:Window (GladeXML "stuffkeeper.glade" "win")
         {
             stuffkeeper_item_window_new(self->_priv->skdbg, item);
 
+        }
+
+    private
+    void
+        ___glade_xml_connect_foreach(const gchar *handler_name,
+                GObject *object,
+                const gchar *signal_name,
+                const gchar *signal_data,
+                GObject *connect_object,
+                gboolean after,
+                gpointer user_data)
+        {
+            static GModule * allsymbols = NULL;
+
+            if (!allsymbols) allsymbols = g_module_open(NULL, 0);
+            if (allsymbols) {
+                gchar * func_name = g_strdup_printf("stuffkeeper_interface_%s", handler_name);
+                GCallback func;
+
+                if (!g_module_symbol(allsymbols, func_name, (gpointer)&func)){
+                    if (!g_module_symbol(allsymbols, handler_name, (gpointer)&func)) {
+                        g_warning("could not find signal handler '%s'.", func_name);
+                        g_free(func_name);
+                        return;
+                    }
+                }
+                if (after)
+                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
+                else
+                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED);
+                g_free(func_name);
+            }
         }
 }

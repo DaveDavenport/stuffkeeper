@@ -27,13 +27,14 @@ extern GList *interface_list;
     }StoreFields;
 %}
 
-class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edit_schema_dialog")
+class StuffKeeper:Edit:Schema from G:Object 
 {
     private StuffKeeper:Data:Schema *schema = {NULL};
     private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING)}  destroywith g_object_unref;
 
-
-    private GtkWidget *tree GladeXML;
+    private GladeXML *xml;
+    private GtkWidget *tree;
+    private GtkWidget *win;
 
     private guint field_changed_signal = 0;
     private guint field_added_signal = 0;
@@ -161,10 +162,21 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
         StuffKeeper:Edit:Schema * 
         new(void)
         {
+            int i;
             GtkCellRenderer *renderer;
             Self *self = GET_NEW;
             GtkListStore *store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
-            int i;
+            self->_priv->xml = glade_xml_new("stuffkeeper.glade","edit_schema_dialog",NULL);
+            if(self->_priv->xml == NULL)
+            {
+                g_object_unref(self);
+                printf("Failed top open xml file\n");
+                return NULL;
+            }
+
+            self->_priv->tree = glade_xml_get_widget(self->_priv->xml, "tree");
+            self->_priv->win = glade_xml_get_widget(self->_priv->xml, "edit_schema_dialog");
+
             for(i=0; i <FIELD_TYPE_NUM_FIELDS;i++)
             {
                 GtkTreeIter iter;
@@ -188,14 +200,51 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
 
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->tree), GTK_TREE_MODEL(self->_priv->store));
+
+            glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            gtk_widget_show_all(GTK_WIDGET(self->_priv->win));
             return self;
+        }
+
+    private
+    void
+        ___glade_xml_connect_foreach(const gchar *handler_name,
+                GObject *object,
+                const gchar *signal_name,
+                const gchar *signal_data,
+                GObject *connect_object,
+                gboolean after,
+                gpointer user_data)
+        {
+            static GModule * allsymbols = NULL;
+
+            if (!allsymbols) allsymbols = g_module_open(NULL, 0);
+            if (allsymbols) {
+                gchar * func_name = g_strdup_printf("stuffkeeper_edit_schema_%s", handler_name);
+                GCallback func;
+
+                if (!g_module_symbol(allsymbols, func_name, (gpointer)&func)){
+                    if (!g_module_symbol(allsymbols, handler_name, (gpointer)&func)) {
+                        g_warning("could not find signal handler '%s'.", func_name);
+                        g_free(func_name);
+                        return;
+                    }
+                }
+                if (after)
+                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
+                else
+                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED);
+                g_free(func_name);
+            }
         }
 
     public
         void
         close(self)
         {
-            gtk_widget_destroy(GTK_WIDGET(self));
+            gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
+            g_object_unref(self->_priv->xml);
+            g_object_unref(self);
         }
 
     public
@@ -273,6 +322,7 @@ class StuffKeeper:Edit:Schema from Gtk:Window (GladeXML "stuffkeeper.glade" "edi
     finalize(G:Object *obj)
     {
         Self *self = SELF(obj);
+        printf("** Finalize edit schema\n");
         if(self->_priv->field_changed_signal)
         {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_changed_signal);
