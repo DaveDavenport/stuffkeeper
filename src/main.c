@@ -41,6 +41,7 @@ int main ( int argc, char **argv )
             /* There is an instant allready running */
 
             /* Returning */
+            printf("There is allready an instance running. quitting\n");
             exit(EXIT_SUCCESS);
         }
         /* setup signal handler */
