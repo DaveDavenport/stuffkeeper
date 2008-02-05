@@ -131,7 +131,7 @@ SK_CFLAGS=$(GTK_CFLAGS) $(GLIB_CFLAGS) $(GLADE_CFLAGS) $(EXTRA_CFLAGS) $(GMODULE
 
 %.c %.h %-private.h: %.gob
 	$(info ==> Processing: $<)
-	$(Q)gob2 --no-touch-headers --always-private-header $<
+	$(Q)gob2 --no-touch --always-private-header $<
 
 %.o: %.c $(HEADERS)
 	$(info ==> Building:   $@)
