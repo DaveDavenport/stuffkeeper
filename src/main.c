@@ -4,16 +4,11 @@
 /* Include the database */
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-interface.h"
+#include "bacon-message-connection.h"
 
 GList *interface_list = NULL;
 
-/* Iter function from g_list_foreach */
-/*
-static void destroy_interface(gpointer data, gpointer user_data)
-{
-    gtk_widget_destroy(GTK_WIDGET(data));
-}
-*/
+BaconMessageConnection *bacon_connection = NULL;
 /**
  * The main programs
  */
@@ -36,7 +31,21 @@ int main ( int argc, char **argv )
         /* return a failure */
         return EXIT_FAILURE;
     }
+    
+    /* bacon here we come */
+    bacon_connection = bacon_message_connection_new("stuffkeeper");
+    if(bacon_connection) 
+    {
+        if (!bacon_message_connection_get_is_server (bacon_connection)) 
+        {
+            /* There is an instant allready running */
 
+            /* Returning */
+            exit(EXIT_SUCCESS);
+        }
+        /* setup signal handler */
+
+    }
 
     /* Initialize the backend */
     skdb = stuffkeeper_data_backend_new();
@@ -86,6 +95,13 @@ int main ( int argc, char **argv )
 
     /* cleanup  */
     g_object_unref(skdb);
+
+    /* Close the IPC bus */
+	if(bacon_connection)
+	{
+		bacon_message_connection_free (bacon_connection);
+	}
+
 
     /* exit */
     return EXIT_SUCCESS;

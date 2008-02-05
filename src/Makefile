@@ -62,6 +62,7 @@ SOURCE=\
 	stuffkeeper-data-list.c\
 	stuffkeeper-show-item.c\
 	stuffkeeper-item-window.c\
+	bacon-message-connection.c\
 	main.c\
 
 OBJECTS=$(patsubst %.c, %.o, $(SOURCE))
