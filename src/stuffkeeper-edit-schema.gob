@@ -259,7 +259,7 @@ class StuffKeeper:Edit:Schema from G:Object
    void
    remove_field(self)
    {
-       GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(self),
+       GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(self->_priv->win),
                         GTK_DIALOG_DESTROY_WITH_PARENT|GTK_DIALOG_MODAL,
                         GTK_MESSAGE_WARNING,GTK_BUTTONS_YES_NO,
                         "This will delete the field, and all data it contains in the related items.\nAre you sure you want to continue?"); 

@@ -7,7 +7,7 @@ requires 2.0.10
 #define KEYFILE_FIELD_TYPES "field-types" 
 #define KEYFILE_FIELD_NAMES "field-names" 
 #include "stuffkeeper-data-item.h"
-
+#define SAVE_TIMEOUT 30000 
 %}
 %h{
     typedef enum _FieldType{
@@ -44,6 +44,9 @@ class StuffKeeper:Data:Schema from G:Object
 
     private GList *items = {NULL} destroywith g_list_free;
 
+
+
+    private guint save_timeout = {0};
     /**
      * Signals 
      */
@@ -69,6 +72,19 @@ class StuffKeeper:Data:Schema from G:Object
         schema_field_removed(self,const gchar *field)
         {
         }
+   private
+       void
+    mark_changed(self)
+    {
+        if(self->_priv->save_timeout)
+        {
+            g_source_remove(self->_priv->save_timeout);
+            self->_priv->save_timeout = 0;
+        }
+        self->_priv->changed = TRUE;
+
+        self->_priv->save_timeout = g_timeout_add(SAVE_TIMEOUT, (GSourceFunc)self_save_yourself, self);
+    }
 
     /**
      * Constructors
@@ -120,12 +136,24 @@ class StuffKeeper:Data:Schema from G:Object
             {
                 char *content;
                 gsize size=0;
+                printf("Saving my schema self\n");
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
                 g_free(content);
                 /* reset changed */
                 self->_priv->changed = FALSE;
             }
+            if(self->_priv->save_timeout)
+            {
+                g_source_remove(self->_priv->save_timeout);
+                self->_priv->save_timeout = 0;
+            }
+
+
+
+
+
+
         }
 
     public
@@ -167,7 +195,7 @@ class StuffKeeper:Data:Schema from G:Object
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
         self_schema_changed(self);
         /* mark changed */
-        self->_priv->changed =TRUE;
+        self_mark_changed(self);
     }
     /**
      */
@@ -193,7 +221,7 @@ class StuffKeeper:Data:Schema from G:Object
     {
         g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id,type);
         self_schema_field_changed(self,id);
-        self->_priv->changed = TRUE;
+        self_mark_changed(self);
     }
 
 
@@ -214,8 +242,7 @@ class StuffKeeper:Data:Schema from G:Object
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name);
         self_schema_field_changed(self,id);
-        self->_priv->changed = TRUE;
-
+        self_mark_changed(self);
     }
     /* Field editing */
     public
@@ -227,7 +254,7 @@ class StuffKeeper:Data:Schema from G:Object
         g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name); 
 
         /* Mark it for saving */
-        self->_priv->changed = TRUE;
+        self_mark_changed(self);
 
         self_schema_field_added(self, id);
         g_free(id);
@@ -241,7 +268,7 @@ class StuffKeeper:Data:Schema from G:Object
         /* Remove the Name field */
         g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_NAMES, id, NULL);
         /* Mark it for saving */
-        self->_priv->changed = TRUE;
+        self_mark_changed(self);
         self_schema_field_removed(self, id);
     }
 
@@ -271,6 +298,12 @@ class StuffKeeper:Data:Schema from G:Object
         void
         finalize(G:Object *obj)
         {
+            Self *self = SELF(obj);
             printf("destroying schema\n");
+            if(self->_priv->save_timeout)
+            {
+                g_source_remove(self->_priv->save_timeout);
+                self->_priv->save_timeout = 0;
+            }
         }
 }

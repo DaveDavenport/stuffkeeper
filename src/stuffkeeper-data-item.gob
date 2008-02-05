@@ -3,6 +3,8 @@ requires 2.0.10
 %ph{
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_CUSTOM "custom"
+/* Save a changed item after 30 seconds */
+#define SAVE_TIMEOUT 30000 
 %}
 %h{
     #include "stuffkeeper-data-tag.h"
@@ -31,6 +33,7 @@ class StuffKeeper:Data:Item from G:Object
 
     private guint schema_field_removed = {0};
 
+    private guint save_timeout = {0};
     /**
      * Signals 
      */
@@ -39,7 +42,7 @@ class StuffKeeper:Data:Item from G:Object
     item_changed(self)
     {
         /* Mark the item changed */
-        self->_priv->changed = TRUE;
+        self_mark_changed(self);
     }
 
     /* Finalize functions */
@@ -58,7 +61,25 @@ class StuffKeeper:Data:Item from G:Object
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema),self->_priv->schema_field_removed );
             self->_priv->schema_field_removed = 0; 
         }
+        if(self->_priv->save_timeout)
+        {
+            g_source_remove(self->_priv->save_timeout);
+            self->_priv->save_timeout = 0;
+        }
         PARENT_HANDLER(obj);
+    }
+    private
+    void
+    mark_changed(self)
+    {
+        if(self->_priv->save_timeout)
+        {
+            g_source_remove(self->_priv->save_timeout);
+            self->_priv->save_timeout = 0;
+        }
+        self->_priv->changed = TRUE;
+
+        self->_priv->save_timeout = g_timeout_add(SAVE_TIMEOUT, (GSourceFunc)self_save_yourself, self);
     }
     /**
      * Functions to manage 
@@ -73,6 +94,7 @@ class StuffKeeper:Data:Item from G:Object
 
             gsize size=0;
 
+            printf("Item Saving myself\n");
             /* save tags */
             /* clear previous values */
             g_key_file_remove_key(self->_priv->data, KEYFILE_GENERAL, "tags", NULL);
@@ -84,8 +106,8 @@ class StuffKeeper:Data:Item from G:Object
                 int i=0;
                 for(;node;node = g_list_next(node))
                 {
-                   items[i] = stuffkeeper_data_tag_get_id(STUFFKEEPER_DATA_TAG(node->data));
-                   i++;
+                    items[i] = stuffkeeper_data_tag_get_id(STUFFKEEPER_DATA_TAG(node->data));
+                    i++;
                 }
                 g_key_file_set_integer_list(self->_priv->data, KEYFILE_GENERAL, "tags", items, numtags);
                 g_free(items);
@@ -93,10 +115,15 @@ class StuffKeeper:Data:Item from G:Object
             content = g_key_file_to_data(self->_priv->data,&size, NULL);
             g_file_set_contents(self->_priv->path, content, size, NULL);
             g_free(content);
-
-            /* Mark as unchanged */
-            self->_priv->changed = FALSE;
         }
+        /* Mark as unchanged */
+        self->_priv->changed = FALSE;
+        if(self->_priv->save_timeout)
+        {
+            g_source_remove(self->_priv->save_timeout);
+            self->_priv->save_timeout = 0;
+        }
+
     }
 
     public
@@ -176,6 +203,11 @@ class StuffKeeper:Data:Item from G:Object
         }
         /* When loading the items it is marked as changed. reset this*/
         obj->_priv->changed = FALSE;
+        if(obj->_priv->save_timeout)
+        {
+            g_source_remove(obj->_priv->save_timeout);
+            obj->_priv->save_timeout = 0;
+        }
         return obj;
     }
 
@@ -189,7 +221,7 @@ class StuffKeeper:Data:Item from G:Object
     {
         g_key_file_remove_key(self->_priv->data, KEYFILE_CUSTOM, id, NULL);
         /* Mark for change */
-        self->_priv->changed = TRUE;
+        self_mark_changed(self);
     }
 
 
