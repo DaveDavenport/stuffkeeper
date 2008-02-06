@@ -18,23 +18,26 @@ class StuffKeeper:Data:List from Gtk:VBox
 
     public
     void
-    item_changed(self, StuffKeeper:Data:Item *item)
+    item_changed(self,const gchar *field, StuffKeeper:Data:Item *item)
     {
         gsize length =0;
         gchar **value;
-        gtk_list_store_clear(self->_priv->store);
-        value = stuffkeeper_data_item_get_list(item, self->_priv->field, &length);
-        if(value)
+        if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
         {
-            int i;
-            GtkTreeIter iter;
-            for(i=0;i<length;i++)
+            gtk_list_store_clear(self->_priv->store);
+            value = stuffkeeper_data_item_get_list(item, self->_priv->field, &length);
+            if(value)
             {
-                gtk_list_store_append(GTK_LIST_STORE(self->_priv->store), &iter);
-                gtk_list_store_set(GTK_LIST_STORE(self->_priv->store), &iter,0,value[i],-1);
+                int i;
+                GtkTreeIter iter;
+                for(i=0;i<length;i++)
+                {
+                    gtk_list_store_append(GTK_LIST_STORE(self->_priv->store), &iter);
+                    gtk_list_store_set(GTK_LIST_STORE(self->_priv->store), &iter,0,value[i],-1);
 
+                }
+                g_strfreev(value);
             }
-            g_strfreev(value);
         }
     }
     public
@@ -143,7 +146,7 @@ class StuffKeeper:Data:List from Gtk:VBox
 
         /* Add model */
         gtk_tree_view_set_model(GTK_TREE_VIEW(obj->_priv->tree), GTK_TREE_MODEL(obj->_priv->store));
-        self_item_changed(obj, obj->_priv->item);
+        self_item_changed(obj,obj->_priv->field, obj->_priv->item);
 
         /**/
         button = gtk_button_new_from_stock(GTK_STOCK_REMOVE);

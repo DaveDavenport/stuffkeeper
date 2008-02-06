@@ -22,16 +22,19 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
 
     public
     void
-    item_changed(self, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
     {
         const gboolean old_value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self));
         gboolean value;
-        value = stuffkeeper_data_item_get_boolean(item, self->_priv->field);
-        if(value != old_value)
+        if(field && self->_priv->field && strcmp(self->_priv->field, field) == 0)
         {
-            g_signal_handler_block(self,self->_priv->changed_entry);
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self), value);
-            g_signal_handler_unblock(self,self->_priv->changed_entry);
+            value = stuffkeeper_data_item_get_boolean(item, self->_priv->field);
+            if(value != old_value)
+            {
+                g_signal_handler_block(self,self->_priv->changed_entry);
+                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(self), value);
+                g_signal_handler_unblock(self,self->_priv->changed_entry);
+            }
         }
     }
 

@@ -23,16 +23,19 @@ class StuffKeeper:Data:SpinButton from Gtk:Spin:Button
 
     public
     void
-    item_changed(self, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
     {
-        const int value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self));
-        const int new_value = stuffkeeper_data_item_get_integer(item, self->_priv->field);
-
-        if(new_value != value)
+        if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
         {
-            g_signal_handler_block(self,self->_priv->changed_spin_value);
-            gtk_spin_button_set_value(GTK_SPIN_BUTTON(self), (gdouble)new_value);
-            g_signal_handler_unblock(self,self->_priv->changed_spin_value);
+            const int value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self));
+            const int new_value = stuffkeeper_data_item_get_integer(item, self->_priv->field);
+
+            if(new_value != value)
+            {
+                g_signal_handler_block(self,self->_priv->changed_spin_value);
+                gtk_spin_button_set_value(GTK_SPIN_BUTTON(self), (gdouble)new_value);
+                g_signal_handler_unblock(self,self->_priv->changed_spin_value);
+            }
         }
     }
 

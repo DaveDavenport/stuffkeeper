@@ -32,7 +32,7 @@ class StuffKeeper:Data:Label from Gtk:Label
 
     public
     void
-    item_changed(self,GObject *item, gpointer data)
+    schema_item_changed(self,GObject *item, gpointer data)
     {
         gchar *value;
         if(STUFFKEEPER_IS_DATA_SCHEMA(self->_priv->item))
@@ -43,7 +43,15 @@ class StuffKeeper:Data:Label from Gtk:Label
                 gtk_label_set_text(GTK_LABEL(self), value);
                 g_free(value);
             }
-        }else if (STUFFKEEPER_IS_DATA_TAG(self->_priv->item))
+        }
+    }
+
+    public
+    void
+    tag_item_changed(self, GObject *item, gpointer data)
+    {
+        gchar *value;
+        if (STUFFKEEPER_IS_DATA_TAG(self->_priv->item))
         {
             value = stuffkeeper_data_tag_get_title(STUFFKEEPER_DATA_TAG(self->_priv->item));
             if(value)
@@ -67,7 +75,7 @@ class StuffKeeper:Data:Label from Gtk:Label
         /* store item */
         obj->_priv->item = G_OBJECT(tag); 
             
-        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "tag-changed", G_CALLBACK(self_item_changed), obj);
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "tag-changed", G_CALLBACK(self_tag_item_changed), obj);
 
         value = stuffkeeper_data_tag_get_title(STUFFKEEPER_DATA_TAG(obj->_priv->item));
         if(value)
@@ -90,7 +98,7 @@ class StuffKeeper:Data:Label from Gtk:Label
         obj->_priv->item = G_OBJECT(schema); 
 
             
-        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "schema-changed", G_CALLBACK(self_item_changed), obj);
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "schema-changed", G_CALLBACK(self_schema_item_changed), obj);
 
         value = stuffkeeper_data_schema_get_title(STUFFKEEPER_DATA_SCHEMA(obj->_priv->item));
         if(value)

@@ -253,7 +253,7 @@ class StuffKeeper:Interface from G:Object
     }
     public
     void
-    item_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkListStore *store)
+    item_changed(StuffKeeperDataBackend *skdb, const gchar *field, StuffKeeperDataItem *item, GtkListStore *store)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(store);

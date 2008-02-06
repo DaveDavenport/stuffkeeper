@@ -33,31 +33,34 @@ class StuffKeeper:Data:Text from Gtk:Text:View
 
     public
     void
-    item_changed(self, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
     {
-        GtkTextIter start, stop;
-        gchar *text = NULL;
-        gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);        
-        gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop); 
-        text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
-        gchar *value;
-        if(self->_priv->field)
+        if(self->_priv->field && field && strcmp(field, self->_priv->field) == 0)
         {
-            value = stuffkeeper_data_item_get_string(item, self->_priv->field);
-        }else{
-            value = stuffkeeper_data_item_get_title(item); 
-        }
-        if(value)
-        {
-            if(strcmp(text,value))
+            GtkTextIter start, stop;
+            gchar *text = NULL;
+            gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);        
+            gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop); 
+            text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
+            gchar *value;
+            if(self->_priv->field)
             {
-                g_signal_handler_block(self,self->_priv->changed_entry);
-                gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
-                g_signal_handler_unblock(self,self->_priv->changed_entry);
+                value = stuffkeeper_data_item_get_string(item, self->_priv->field);
+            }else{
+                value = stuffkeeper_data_item_get_title(item); 
             }
-            g_free(value);
+            if(value)
+            {
+                if(strcmp(text,value))
+                {
+                    g_signal_handler_block(self,self->_priv->changed_entry);
+                    gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
+                    g_signal_handler_unblock(self,self->_priv->changed_entry);
+                }
+                g_free(value);
+            }
+            g_free(text);
         }
-        g_free(text);
     }
 
     public

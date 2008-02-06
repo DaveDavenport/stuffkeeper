@@ -37,9 +37,9 @@ class StuffKeeper:Data:Item from G:Object
     /**
      * Signals 
      */
-    signal last NONE (NONE)
+    signal last NONE (STRING)
     void
-    item_changed(self)
+    item_changed(self, const gchar *field)
     {
         /* Mark the item changed */
         self_mark_changed(self);
@@ -252,7 +252,7 @@ class StuffKeeper:Data:Item from G:Object
     set_title(self, const gchar *title)
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
-        self_item_changed(self);
+        self_item_changed(self,NULL);
     }
     /**
      * Generic getting/setting items
@@ -269,7 +269,7 @@ class StuffKeeper:Data:Item from G:Object
     set_string(self, const gchar *field, const gchar *value)
     {
         g_key_file_set_string(self->_priv->data, KEYFILE_CUSTOM, field, value);
-        self_item_changed(self);
+        self_item_changed(self,field);
     }
     public
     gint 
@@ -283,7 +283,7 @@ class StuffKeeper:Data:Item from G:Object
     set_integer(self, const gchar *field, const gint value)
     {
         g_key_file_set_integer(self->_priv->data, KEYFILE_CUSTOM, field, value);
-        self_item_changed(self);
+        self_item_changed(self,field);
     }
 
 
@@ -299,7 +299,7 @@ class StuffKeeper:Data:Item from G:Object
     set_boolean(self, const gchar *field, const gint value)
     {
         g_key_file_set_boolean(self->_priv->data, KEYFILE_CUSTOM, field, value);
-        self_item_changed(self);
+        self_item_changed(self,field);
     }
     public
         gchar **
@@ -313,7 +313,7 @@ class StuffKeeper:Data:Item from G:Object
     set_list(self, const gchar *field, const gchar *value[], gsize length)
     {
         g_key_file_set_string_list(self->_priv->data, KEYFILE_CUSTOM, field, value,length);
-        self_item_changed(self);
+        self_item_changed(self,field);
     }
 
     /**
@@ -332,7 +332,7 @@ class StuffKeeper:Data:Item from G:Object
     add_tag(self, StuffKeeperDataTag *tag)
     {
         self->_priv->tags = g_list_append(self->_priv->tags, tag);
-        self_item_changed(self);
+        self_item_changed(self,NULL);
         stuffkeeper_data_tag_add_item(tag,G_OBJECT(self));
     }
     public
@@ -340,7 +340,7 @@ class StuffKeeper:Data:Item from G:Object
     remove_tag(self, StuffKeeperDataTag *tag)
     {
         self->_priv->tags = g_list_remove(self->_priv->tags, tag);
-        self_item_changed(self);
+        self_item_changed(self,NULL);
         stuffkeeper_data_tag_remove_item(tag, G_OBJECT(self));
     }
     
