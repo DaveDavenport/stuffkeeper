@@ -4,6 +4,7 @@ requires 2.0.10
 /* Include gtk */
 #include <gtk/gtk.h>
 #include <glade/glade.h>
+#include <config.h>
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -736,7 +737,7 @@ class StuffKeeper:Interface from G:Object
         {
             Self *self = GET_NEW;
 
-            self->_priv->xml = glade_xml_new("stuffkeeper.glade","win",NULL);
+            self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","win",NULL);
             if(self->_priv->xml == NULL)
             {
                 g_object_unref(self);

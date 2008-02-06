@@ -4,6 +4,7 @@ requires 2.0.10
 /* Include gtk */
 #include <gtk/gtk.h>
 #include <glade/glade.h>
+#include <config.h>
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -166,7 +167,7 @@ class StuffKeeper:Edit:Schema from G:Object
             GtkCellRenderer *renderer;
             Self *self = GET_NEW;
             GtkListStore *store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
-            self->_priv->xml = glade_xml_new("stuffkeeper.glade","edit_schema_dialog",NULL);
+            self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"stuffkeeper.glade","edit_schema_dialog",NULL);
             if(self->_priv->xml == NULL)
             {
                 g_object_unref(self);
