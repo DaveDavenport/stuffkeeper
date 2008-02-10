@@ -17,18 +17,20 @@ requires 2.0.10
         FIELD_TYPE_RATING = 3,
         FIELD_TYPE_LIST = 4,
         FIELD_TYPE_TEXT = 5,
+        FIELD_TYPE_IMAGE = 6,
         FIELD_TYPE_NUM_FIELDS
     } FieldType;
     extern char *FieldNames[FIELD_TYPE_NUM_FIELDS];
 %}
 %ph{
         char *FieldNames[FIELD_TYPE_NUM_FIELDS] = {
-        "String", // FIELD_TYPE_STRING
-        "Integer", // FIELD_TYPE_INTEGER
-        "Boolean", // FIELD_TYPE_BOOLEAN
-        "Slider", // FIELD_TYPE_RATING
-        "List", //FIELD_TYPE_LIST
-        "Text"
+        "String",   // FIELD_TYPE_STRING
+        "Integer",  // FIELD_TYPE_INTEGER
+        "Boolean",  // FIELD_TYPE_BOOLEAN
+        "Slider",   // FIELD_TYPE_RATING
+        "List",     // FIELD_TYPE_LIST
+        "Text",     // FIELD_TYPE_TEXT
+        "Image"     // FIELD_TYPE_IMAGE
     };
 
 
@@ -148,12 +150,6 @@ class StuffKeeper:Data:Schema from G:Object
                 g_source_remove(self->_priv->save_timeout);
                 self->_priv->save_timeout = 0;
             }
-
-
-
-
-
-
         }
 
     public

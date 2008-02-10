@@ -91,7 +91,7 @@ checkWAF()
 #
 generateMakefile()
 {
-	cat > Makefile << EOF
+	cat > $1 << EOF
 #!/usr/bin/make -f
 # Waf Makefile wrapper
 WAF_HOME=$CUR_DIR
@@ -145,7 +145,14 @@ $WAF configure $* || exit $EXIT_ERROR
 if [ -f "Makefile" ] ; then
     echo ""
 else
-    generateMakefile
+    generateMakefile "Makefile"
 fi
+if [ -f "src/Makefile" ] ; then
+    echo ""
+else
+    generateMakefile "src/Makefile"
+fi
+
+
 
 exit $EXIT_SUCCESS

@@ -145,6 +145,21 @@ class StuffKeeper:Data:Backend from G:Object
          * Store the path in the backend.
          */
         self->_priv->path = g_strdup(db_path);
+
+
+
+
+        /** image dir */
+        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"images",NULL);
+        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
+        {
+            g_mkdir(path, 0755);
+        }
+        g_free(path);
+
+
+
+
         /**
          * Read Schemas 
          */

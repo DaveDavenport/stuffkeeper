@@ -10,6 +10,7 @@ requires 2.0.10
 #include "stuffkeeper-data-rating.h"
 #include "stuffkeeper-data-list.h"
 #include "stuffkeeper-data-text.h"
+#include "stuffkeeper-data-image.h"
 
 
 %}
@@ -67,6 +68,8 @@ class StuffKeeper:Show:Item from Gtk:Table
                     label1 = stuffkeeper_data_list_new(self->_priv->item,self->_priv->retv[i]);
                 }else if (type == FIELD_TYPE_TEXT) {
                     label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
+                }else if (type == FIELD_TYPE_IMAGE) {
+                    label1 = stuffkeeper_data_image_new(self->_priv->item,self->_priv->retv[i]);                    
                 }else {
                     label1 = gtk_label_new("not supported\n");
                 }

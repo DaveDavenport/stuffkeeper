@@ -153,7 +153,16 @@ class StuffKeeper:Data:Item from G:Object
         {
 
             Self *obj = GET_NEW;
+            Self *test= NULL;
             gint id = g_random_int();
+            /** check if it exists */
+            while((test = stuffkeeper_data_backend_get_item(STUFFKEEPER_DATA_BACKEND(skdb),id)) != NULL)
+            {
+                /* generate new id */
+                printf("%i allready exists, re-trying\n",id);
+                id = g_random_int();
+            }
+
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();

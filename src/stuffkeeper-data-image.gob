@@ -1,0 +1,140 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-item.h"
+%}
+
+class StuffKeeper:Data:Image from Gtk:Event:Box
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+    private gulong changed_item_entry = {0};
+    private gulong changed_entry = {0};
+    private GtkWidget *image = {NULL};
+
+    public
+    void
+    changed(self, gpointer data)
+    {
+    }
+
+    public
+    void
+    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    {
+        if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
+        {
+            /* update the image */
+            gchar *value = stuffkeeper_data_item_get_string(item, self->_priv->field);        
+            if(value && strlen(value))
+            {
+                GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(value, 150,150, TRUE, NULL);
+                if(pb)
+                {
+                    gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
+                    g_free(value);
+                    return;
+                }
+                g_free(value);
+            }
+            gtk_image_set_from_stock(GTK_IMAGE(self->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
+        }
+    }
+    private void 
+    button_press_event(self, GdkEventButton *event, gpointer user_data)
+    {
+        printf("button-press event\n");
+        if(event->button == 1)
+        {
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick and image", 
+                        NULL, 
+                        GTK_FILE_CHOOSER_ACTION_OPEN,
+                        GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
+                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                        GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
+                        NULL);
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_NO:
+                    stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
+                    break;
+                case GTK_RESPONSE_OK:
+                    {
+                        gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+                        if(file)
+                        {
+                            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,file);
+                            g_free(file);
+                        }
+                    }
+                default:
+                    break;
+            }
+            gtk_widget_destroy(dialog);
+        }
+        else
+        {
+            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
+        }
+    }
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataItem *item, const gchar *field)
+    {
+        Self *obj = GET_NEW;
+        GtkWidget *alignment = gtk_alignment_new(0, 0, 0,0);
+        gchar *value =NULL;
+
+        gtk_event_box_set_visible_window(GTK_EVENT_BOX(obj), FALSE);
+
+        obj->_priv->image = gtk_image_new();
+        gtk_image_set_from_stock(GTK_IMAGE(obj->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
+
+        
+        gtk_widget_set_size_request(obj, 150,150);
+        /* add it to myself */
+        gtk_container_add(GTK_CONTAINER(alignment), obj->_priv->image);
+        gtk_container_add(GTK_CONTAINER(obj),alignment);
+
+        /* store item */
+        obj->_priv->item = item; 
+        /* field */
+        obj->_priv->field = g_strdup(field);
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
+
+        /* update the image */
+        value = stuffkeeper_data_item_get_string(item, obj->_priv->field);        
+        if(value && strlen(value))
+        {
+            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(value, 150,150, TRUE, NULL);
+            if(pb)
+            {
+                gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
+            }
+            g_free(value);
+        }
+
+
+        /* this is destroyed when self is destroyed, so no need to disconnect myself */
+//        obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);
+        obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "button-press-event", G_CALLBACK(self_button_press_event), NULL);
+        return GTK_WIDGET(obj);
+    }
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            if(self->_priv->changed_item_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+                self->_priv->changed_item_entry = 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}

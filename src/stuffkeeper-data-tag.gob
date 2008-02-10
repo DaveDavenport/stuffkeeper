@@ -83,20 +83,6 @@ class StuffKeeper:Data:Tag from G:Object
             return obj;
         }
 
-    public 
-        StuffKeeperDataTag *
-        new (const gchar *path)
-        {
-
-            Self *obj = GET_NEW;
-            gint id = g_random_int();
-            obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
-            obj->_priv->data = g_key_file_new();
-            g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            self_save_yourself(obj);
-            return obj;
-        }
-
     /**
      * ID (ro)
      */
