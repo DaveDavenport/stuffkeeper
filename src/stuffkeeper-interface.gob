@@ -50,6 +50,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *LeftPane_edit ;
     private GtkWidget *AddMenuButton ;
     private GtkWidget *search_entry ;
+    private GtkWidget *item_label;
 
     private StuffKeeperDataBackend *skdbg = {NULL};
     /**
@@ -223,10 +224,18 @@ class StuffKeeper:Interface from G:Object
      */
     public
     void
-    item_removed(StuffKeeperDataBackend *skdb, gint id, GtkListStore *store)
+    item_removed(StuffKeeperDataBackend *skdb, gint id,StuffKeeperInterface *self) 
     {
         GtkTreeIter iter;
+        GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
         GtkTreeModel *model = GTK_TREE_MODEL(store);
+        gchar *data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb)-1);
+        gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
+        g_free(data);
+
+
+
+
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
             do{
@@ -242,21 +251,27 @@ class StuffKeeper:Interface from G:Object
     }
     public
     void
-    item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, GtkTreeModel *store)
+    item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
     {
         GtkTreeIter iter;
+        gchar *data;
+        GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
         gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_item_get_title(item);
         gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_item_get_id(item),1,title, 2,item,-1);
         g_free(title);
 
+        data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb));
+        gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
+        g_free(data);
 
     }
     public
     void
-    item_changed(StuffKeeperDataBackend *skdb, const gchar *field, StuffKeeperDataItem *item, GtkListStore *store)
+    item_changed(StuffKeeperDataBackend *skdb, const gchar *field, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
     {
         GtkTreeIter iter;
+        GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
         GtkTreeModel *model = GTK_TREE_MODEL(store);
         gint id = stuffkeeper_data_item_get_id(item);
         if(gtk_tree_model_get_iter_first(model, &iter))
@@ -753,6 +768,7 @@ class StuffKeeper:Interface from G:Object
             self->_priv->LeftPane_edit = glade_xml_get_widget(self->_priv->xml, "LeftPane_edit");
             self->_priv->AddMenuButton = glade_xml_get_widget(self->_priv->xml, "AddMenuButton");
             self->_priv->search_entry = glade_xml_get_widget(self->_priv->xml, "search_entry");
+            self->_priv->item_label = glade_xml_get_widget(self->_priv->xml, "item_label");
             
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
 
@@ -887,9 +903,9 @@ class StuffKeeper:Interface from G:Object
                 self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self->_priv->model_items);
             }
             if(node) g_list_free(node);
-            self->_priv->signal_item_added = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added), self->_priv->model_items);
-            self->_priv->signal_item_removed = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-removed", G_CALLBACK(self_item_removed),self->_priv->model_items);
-            self->_priv->signal_item_changed = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-changed", G_CALLBACK(self_item_changed),self->_priv->model_items);
+            self->_priv->signal_item_added = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added),self); 
+            self->_priv->signal_item_removed = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-removed", G_CALLBACK(self_item_removed),self);
+            self->_priv->signal_item_changed = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-changed", G_CALLBACK(self_item_changed),self);
 
 
 
@@ -954,6 +970,13 @@ class StuffKeeper:Interface from G:Object
             gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
 
             gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB), 0);
+
+
+            /** initial setup the list */
+            gchar *data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb));
+            gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
+            g_free(data);
+
 
 
 
