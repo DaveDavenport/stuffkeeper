@@ -510,4 +510,11 @@ class StuffKeeper:Data:Backend from G:Object
         }
 
     }
+
+    public
+    gchar *
+    get_path(self)
+    {
+        return self->_priv->path;
+    }
 }

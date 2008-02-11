@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 #include <gtk/gtk.h>
 #include "stuffkeeper-data-item.h"
+#include "stuffkeeper-data-backend.h"
 %}
 
 class StuffKeeper:Data:Image from Gtk:Event:Box
@@ -23,24 +24,60 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
     void
     item_changed(self,const gchar *field, StuffKeeperDataItem *item)
     {
+        int set = FALSE;
         if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
         {
-            /* update the image */
             gchar *value = stuffkeeper_data_item_get_string(item, self->_priv->field);        
             if(value && strlen(value))
             {
-                GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(value, 150,150, TRUE, NULL);
-                if(pb)
+                const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+                if(path)
                 {
-                    gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
-                    g_free(value);
-                    return;
+                    gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
+                    if(fpath)
+                    {
+                        GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, 150,150, TRUE, NULL);
+                        printf("Trying to load: %s %p\n", fpath,pb);
+                        if(pb)
+                        {
+                            gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
+                            set = TRUE;
+                        }
+                        g_free(fpath);
+                    }
                 }
                 g_free(value);
             }
-            gtk_image_set_from_stock(GTK_IMAGE(self->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
+            if(!set)
+                gtk_image_set_from_stock(GTK_IMAGE(self->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
         }
+    
     }
+    private
+    void
+    copy_path(self, const gchar *original_path)
+    {
+        const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+        if(path)
+        {
+            gchar *id = g_strdup_printf("%i-%s.jpg", stuffkeeper_data_item_get_id(self->_priv->item), self->_priv->field);
+            gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
+
+            printf("From '%s' --> '%s'\n", original_path, fpath);
+            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, 150,150, TRUE, NULL);
+            printf("%p\n",pb);
+            gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
+            g_object_unref(pb);
+
+            /* store it */
+            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,id);
+
+            g_free(fpath);
+            g_free(id);
+        }
+
+    }
+
     private void 
     button_press_event(self, GdkEventButton *event, gpointer user_data)
     {
@@ -64,7 +101,9 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                         gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
                         if(file)
                         {
-                            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,file);
+                            printf("Saving file: %s\n", file);
+//                            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,file);
+                                self_copy_path(self, file);
                             g_free(file);
                         }
                     }
@@ -109,10 +148,20 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
         value = stuffkeeper_data_item_get_string(item, obj->_priv->field);        
         if(value && strlen(value))
         {
-            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(value, 150,150, TRUE, NULL);
-            if(pb)
+            const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
+            if(path)
             {
-                gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
+
+                gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
+                if(fpath)
+                {
+                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, 150,150, TRUE, NULL);
+                    if(pb)
+                    {
+                        gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
+                    }
+                    g_free(fpath);
+                }
             }
             g_free(value);
         }

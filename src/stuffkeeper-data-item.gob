@@ -9,6 +9,7 @@ requires 2.0.10
 %h{
     #include "stuffkeeper-data-tag.h"
     #include "stuffkeeper-data-schema.h"
+
 %}
 
 %ph{
@@ -394,4 +395,12 @@ class StuffKeeper:Data:Item from G:Object
         }
         return NULL; 
     }
+
+    public
+    G:Object *
+    get_backend(self)
+    {
+        return G_OBJECT(self->_priv->skdb);
+    }
+
 }
