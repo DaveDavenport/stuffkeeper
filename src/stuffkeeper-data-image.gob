@@ -6,6 +6,10 @@ requires 2.0.10
 #include "stuffkeeper-data-backend.h"
 %}
 
+%ph{
+#define IMAGE_SIZE 250
+%}
+
 class StuffKeeper:Data:Image from Gtk:Event:Box
 {
     private StuffKeeperDataItem *item = {NULL};
@@ -36,7 +40,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                     gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
                     if(fpath)
                     {
-                        GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, 150,150, TRUE, NULL);
+                        GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
                         printf("Trying to load: %s %p\n", fpath,pb);
                         if(pb)
                         {
@@ -64,7 +68,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
             gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
 
             printf("From '%s' --> '%s'\n", original_path, fpath);
-            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, 150,150, TRUE, NULL);
+            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
             printf("%p\n",pb);
             gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
             g_object_unref(pb);
@@ -132,7 +136,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
         gtk_image_set_from_stock(GTK_IMAGE(obj->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
 
         
-        gtk_widget_set_size_request(obj, 150,150);
+        gtk_widget_set_size_request(obj, IMAGE_SIZE,IMAGE_SIZE);
         /* add it to myself */
         gtk_container_add(GTK_CONTAINER(alignment), obj->_priv->image);
         gtk_container_add(GTK_CONTAINER(obj),alignment);
@@ -155,7 +159,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                 gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
                 if(fpath)
                 {
-                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, 150,150, TRUE, NULL);
+                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
                     if(pb)
                     {
                         gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
