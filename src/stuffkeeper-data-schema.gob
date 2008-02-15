@@ -6,6 +6,7 @@ requires 2.0.10
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_FIELD_TYPES "field-types" 
 #define KEYFILE_FIELD_NAMES "field-names" 
+#define KEYFILE_FIELD_SORT  "field-sort"
 #include "stuffkeeper-data-item.h"
 #define SAVE_TIMEOUT 30000 
 %}
@@ -33,6 +34,7 @@ requires 2.0.10
         "Image"     // FIELD_TYPE_IMAGE
     };
 
+    typedef struct _a { char *id; int pos; }a;
 
 
 %}
@@ -66,6 +68,11 @@ class StuffKeeper:Data:Schema from G:Object
    signal last NONE (STRING)
         void
         schema_field_added(self,const gchar *field)
+        {
+        }
+   signal last NONE (STRING,STRING)
+        void
+        schema_field_swapped(self,const gchar *field, const gchar *field2)
         {
         }
 
@@ -194,16 +201,79 @@ class StuffKeeper:Data:Schema from G:Object
         self_mark_changed(self);
     }
     /**
+     * Some nasty hacking to return a ordered list.
      */
+     private 
+     int
+     sort_a_list(a *aa, a *ab)
+     {
+        return aa->pos - ab->pos;
+     }
     public
     gchar **
     get_fields(self, gsize *size)
     {
         gchar **retv = NULL;
+        a *l = NULL;
+        GList *iter,*list = NULL;
         *size = 0;
+        int i =0;
         retv = g_key_file_get_keys(self->_priv->data, KEYFILE_FIELD_TYPES,size, NULL);
+        if(!retv)
+            return retv;
+        /* fix "old" schema's */
+        if(!g_key_file_has_group(self->_priv->data, KEYFILE_FIELD_SORT))
+        {
+            for(i=0;i<*size;i++)
+            {
+                g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,retv[i],i);
+            }
+            self_mark_changed(self);
+        }
+
+        for( i=0;i<*size;i++)
+        {
+            l = g_malloc0(sizeof(*l));
+            l->id = retv[i];
+            l->pos = self_get_field_pos(self, retv[i]);
+            list = g_list_prepend(list, l);
+        }
+        list = g_list_sort(list, (GCompareFunc)self_sort_a_list);
+        i =0;
+        for(iter = g_list_first(list);iter;iter = g_list_next(iter))
+        {
+            l = iter->data;
+            retv[i] = l->id;
+            i++;
+        }
+
+        g_list_foreach(list, (GFunc)g_free, NULL);
+        g_list_free(list);
         return retv;
     }
+
+    public 
+    int 
+    get_field_pos(self, const gchar *id)
+    {
+        return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_SORT,id, NULL);
+    }
+    public 
+        void 
+    swap_field_pos(self, const gchar *id, const gchar *id2)
+    {
+        int pos = self_get_field_pos(self, id);
+        int pos2 = self_get_field_pos(self, id2);
+        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,id,pos2);
+        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,id2,pos);
+
+
+        self_schema_field_changed(self,id);
+        self_schema_field_changed(self,id2);
+        self_schema_field_swapped(self, id, id2);
+        self_mark_changed(self);
+    }
+
     public 
     FieldType 
     get_field_type(self, const gchar *id)
@@ -245,9 +315,28 @@ class StuffKeeper:Data:Schema from G:Object
     void
     add_field(self, FieldType field, const gchar *name)
     {
+        gchar **retv = NULL; 
+        gsize size=0;
+        int pos = 0;
         gchar *id = g_strdup_printf("%u", (guint)g_random_int());
+        while(g_key_file_has_key(self->_priv->data, KEYFILE_FIELD_TYPES, id, NULL))
+        {
+            g_free(id);
+            id = g_strdup_printf("%u", (guint)g_random_int());
+        }
+        /* find new position */
+        retv = self_get_fields(self,&size);
+        if(retv)
+        {
+            /* get the position of the last item and put it after that */
+            pos = self_get_field_pos(self,retv[size-1])+1;
+            g_strfreev(retv);
+        }
+
+        /* Add the field */
         g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, field); 
         g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name); 
+        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,id, pos); 
 
         /* Mark it for saving */
         self_mark_changed(self);
@@ -263,6 +352,9 @@ class StuffKeeper:Data:Schema from G:Object
         g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_TYPES, id, NULL);
         /* Remove the Name field */
         g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_NAMES, id, NULL);
+        /* Remove sort field */
+        g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_SORT, id, NULL);
+
         /* Mark it for saving */
         self_mark_changed(self);
         self_schema_field_removed(self, id);

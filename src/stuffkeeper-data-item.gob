@@ -211,6 +211,8 @@ class StuffKeeper:Data:Item from G:Object
             obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", G_CALLBACK(self_item_schema_field_removed), obj);
             stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
         }
+        else
+            g_error_free(error);
         /* When loading the items it is marked as changed. reset this*/
         obj->_priv->changed = FALSE;
         if(obj->_priv->save_timeout)

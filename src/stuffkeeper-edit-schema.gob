@@ -40,6 +40,7 @@ class StuffKeeper:Edit:Schema from G:Object
     private guint field_changed_signal = 0;
     private guint field_added_signal = 0;
     private guint field_removed_signal = 0;
+private guint field_swapped_signal = 0;
 
     public
     void
@@ -108,7 +109,40 @@ class StuffKeeper:Edit:Schema from G:Object
                     -1);
             g_free(name);
         }
+        public
+        void
+        schema_field_swapped(self, const gchar *id1, const gchar *id2, StuffKeeperDataSchema *schema)
+        {
+            GtkTreeIter iter1, iter2,iter;
+            int found1=0, found2 = 0;
+            /* lookup iters */
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+            printf("swapping field in list.\n");
+            if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
+            {
+                do{
+                    gchar *id;
+                    gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                    if(!found1  && strcmp(id, id1) ==0)
+                    {
+                        iter1 = iter;
+                        found1 = 1;
+                    }else if (!found2 && strcmp(id, id2) == 0)
+                    {
+                        iter2 = iter;
+                        found2 = 1;
+                    }
+                    g_free(id);
+                }while((!found1 || !found2) && gtk_tree_model_iter_next(model, &iter));
 
+                if(found1 && found2)
+                {
+                    gtk_list_store_swap(GTK_LIST_STORE(model), &iter1, &iter2);
+                }
+            }   
+
+
+        }
 
     public
         void interface_field_edited
@@ -255,7 +289,57 @@ class StuffKeeper:Edit:Schema from G:Object
             stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field");
         }
     
-    
+   public 
+   void
+   move_field_up(self)
+   {
+       GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+       GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
+        GtkTreeIter siter,piter;
+        if(gtk_tree_selection_get_selected(sel, &model, &siter))
+        {
+            GtkTreePath *path = gtk_tree_model_get_path(model, &siter);
+            if(path)
+            {
+                if(gtk_tree_path_prev(path))
+                {
+                    if(gtk_tree_model_get_iter(model, &piter, path))
+                    {
+                        gchar *sid = NULL, *pid = NULL;
+                        gtk_tree_model_get(model, &siter, COL_ID, &sid, -1);
+                        gtk_tree_model_get(model, &piter, COL_ID, &pid, -1);
+                        
+                        stuffkeeper_data_schema_swap_field_pos(self->_priv->schema, sid,pid); 
+
+                        g_free(sid); g_free(pid);
+                    }
+                }
+                gtk_tree_path_free(path);
+            }
+        }
+   }
+   public 
+   void
+   move_field_down(self)
+   {
+       GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+       GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
+       GtkTreeIter siter,piter;
+       if(gtk_tree_selection_get_selected(sel, &model, &siter))
+       {
+           piter = siter;
+           if(gtk_tree_model_iter_next(model, &piter))
+           {
+               gchar *sid = NULL, *pid = NULL;
+               gtk_tree_model_get(model, &siter, COL_ID, &sid, -1);
+               gtk_tree_model_get(model, &piter, COL_ID, &pid, -1);
+
+               stuffkeeper_data_schema_swap_field_pos(self->_priv->schema, sid,pid); 
+
+               g_free(sid); g_free(pid);
+           }
+       }
+   }
    public
    void
    remove_field(self)
@@ -316,6 +400,10 @@ class StuffKeeper:Edit:Schema from G:Object
                             "schema-field-removed",
                             G_CALLBACK(self_schema_field_removed),
                             self);
+        self->_priv->field_swapped_signal = g_signal_connect_swapped(G_OBJECT(schema),
+                            "schema-field-swapped",
+                            G_CALLBACK(self_schema_field_swapped),
+                            self);
 
     }
     override (G:Object)
@@ -339,5 +427,11 @@ class StuffKeeper:Edit:Schema from G:Object
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_removed_signal);
             self->_priv->field_removed_signal =0;
         }
+        if(self->_priv->field_swapped_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_swapped_signal);
+            self->_priv->field_swapped_signal =0;
+        }
+
     }
 }

@@ -865,6 +865,7 @@ class StuffKeeper:Interface from G:Object
 
             /* Setting up backends */
             self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_schemas), 4, GTK_SORT_DESCENDING);
             /** Load the schemas*/
             node = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
@@ -883,6 +884,7 @@ class StuffKeeper:Interface from G:Object
 
             /* Tags */
             self->_priv->model_tags = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_tags), 4, GTK_SORT_DESCENDING);
             /** Load the tags */
             node = stuffkeeper_data_backend_get_tags(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
