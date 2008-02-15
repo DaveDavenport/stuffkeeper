@@ -902,7 +902,7 @@ class StuffKeeper:Interface from G:Object
             node = stuffkeeper_data_backend_get_items(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
             {
-                self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self->_priv->model_items);
+                self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self);
             }
             if(node) g_list_free(node);
             self->_priv->signal_item_added = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added),self); 

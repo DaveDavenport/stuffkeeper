@@ -26,6 +26,7 @@ def configure(conf):
     conf.check_pkg('gmodule-2.0', destvar='GMODULE', vnum='2.10.0', mandatory=True)
 
     conf.define('PACKAGE_DATADIR', conf.env['DATADIR']+APPNAME)
+    
     # finally, write the configuration header
     conf.write_config_header('config.h')
 
