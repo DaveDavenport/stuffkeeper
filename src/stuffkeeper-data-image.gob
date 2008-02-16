@@ -136,7 +136,6 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
         gtk_image_set_from_stock(GTK_IMAGE(obj->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
 
         
-        gtk_widget_set_size_request(obj, IMAGE_SIZE,IMAGE_SIZE);
         /* add it to myself */
         gtk_container_add(GTK_CONTAINER(alignment), obj->_priv->image);
         gtk_container_add(GTK_CONTAINER(obj),alignment);
