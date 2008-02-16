@@ -32,6 +32,7 @@ def configure(conf):
 
 def build(bld):
     bld.add_subdirs('src')
+    bld.add_subdirs('glade')
 
 def shutdown():
     pass

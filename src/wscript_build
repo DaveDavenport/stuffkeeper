@@ -2,7 +2,7 @@
 # encoding: utf-8
 # Qball Cow, 2008
 
-install_files('PACKAGE_DATADIR', '', 'stuffkeeper.glade')
+#install_files('PACKAGE_DATADIR', '', 'stuffkeeper.glade')
 
 obj = bld.create_obj('cc', 'program')
 obj.find_sources_in_dirs('.') # take the sources in the current folder
