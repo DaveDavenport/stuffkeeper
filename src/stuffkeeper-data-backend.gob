@@ -255,7 +255,7 @@ class StuffKeeper:Data:Backend from G:Object
                 StuffKeeperDataItem *item;
                 gint *id;
                 /* create a new item */
-                item = stuffkeeper_data_item_new_from_file(G_OBJECT(self),full_path);
+                item = stuffkeeper_data_item_load_from_file(G_OBJECT(self),full_path);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = stuffkeeper_data_item_get_id(item);

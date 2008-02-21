@@ -258,7 +258,12 @@ class StuffKeeper:Interface from G:Object
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
         gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_item_get_title(item);
-        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_item_get_id(item),1,title, 2,item,-1);
+        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
+                    0, stuffkeeper_data_item_get_id(item),
+                    1, title, 
+                    2, item,
+                    3, stuffkeeper_data_item_get_creation_time(item),
+                    -1);
         g_free(title);
 
         data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb));
@@ -644,11 +649,35 @@ class StuffKeeper:Interface from G:Object
 
                     gtk_container_add(GTK_CONTAINER(event2), vbox);
                     gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
+                
+                    if(stuffkeeper_data_item_get_creation_time(item) > 0)
+                    {
+                        label1 = gtk_label_new("");
+                        time_t time = stuffkeeper_data_item_get_creation_time(item);
+                        struct tm *t  = localtime(&time);
+                        char buffer[256];
+                        strftime(buffer,256, "%c", t);
+                        gchar *markup = g_markup_printf_escaped("<b>Created:</b> %s", buffer); 
+                        gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
+                        gtk_label_set_markup(GTK_LABEL(label1), markup);
+                        g_free(markup);
+                        gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
+                    }
+
+
+
                     label1 = gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1),"<span weight='bold' size='x-large'>Fields:</span>");
                     gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
-                    gtk_misc_set_padding(GTK_MISC(label1), 0,8);
+                    gtk_misc_set_padding(GTK_MISC(label1), 0,4);
                     gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
+
+                    
+                    
+                    
+                    
+                    
+                    
 
                     /**
                      * Get the attached schema and fill in the rest from there
@@ -897,7 +926,8 @@ class StuffKeeper:Interface from G:Object
              self->_priv->signal_tag_changed = g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-changed",G_CALLBACK(self_tag_changed),self->_priv->model_tags);
               self->_priv->signal_tag_removed = g_signal_connect(G_OBJECT(self->_priv->skdbg),"tag-removed",G_CALLBACK(self_tag_removed),self->_priv->model_tags);
 
-            self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
+            self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(4, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER,G_TYPE_INT);
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, GTK_SORT_DESCENDING);
             /** Load the items*/
             node = stuffkeeper_data_backend_get_items(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))

@@ -169,6 +169,8 @@ class StuffKeeper:Data:Item from G:Object
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
 
+            g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"creation", time(NULL));
+
             obj->_priv->schema = schema; 
             obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", G_CALLBACK(self_item_schema_field_removed), obj);
 
@@ -182,7 +184,7 @@ class StuffKeeper:Data:Item from G:Object
 
     public
     StuffKeeperDataItem *
-    new_from_file (G:Object *skdb, const gchar *file)
+    load_from_file (G:Object *skdb, const gchar *file)
     {
         Self *obj = GET_NEW;
         obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
@@ -236,6 +238,16 @@ class StuffKeeper:Data:Item from G:Object
         self_mark_changed(self);
     }
 
+    /**
+     * Creation Time (ro)
+     */
+     public 
+     gint
+     get_creation_time(self)
+     {
+         gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "creation",NULL);
+         return id;
+     }
 
     /**
      * ID (ro)
