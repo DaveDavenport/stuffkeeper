@@ -132,7 +132,7 @@ int main ( int argc, char **argv )
     /* Start the main loop */
     gtk_main();
 
-//    g_list_foreach(interface_list, destroy_interface, NULL);
+    //g_list_foreach(interface_list, destroy_interface, NULL);
     g_list_free(interface_list);
 
     /* cleanup  */

@@ -295,20 +295,47 @@ class StuffKeeper:Interface from G:Object
         }
     }
 
+    private
+    void
+    add_item(self, StuffKeeperDataSchema *schema)
+    {
+        GtkTreeIter iter;
+        StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema/*list->data*/);
+        stuffkeeper_data_item_set_title(item,"New Item");
+        if(gtk_tree_model_get_iter_first(self->_priv->model_tags, &iter))
+        {
+            do{
+                StuffKeeperDataTag *tag = NULL;
+                gboolean enabled;
+                gtk_tree_model_get(GTK_TREE_MODEL(self->_priv->model_tags), &iter,2, &enabled, 3,&tag, -1); 
+                if(enabled)
+                {
+                    stuffkeeper_data_item_add_tag(item, tag);
+                }
 
+            }while(gtk_tree_model_iter_next(self->_priv->model_tags, &iter));
+        }
+
+    }
     /**
      * Add item button clicked 
      */
     public
         void 
-        interface_item_add(self)
+        interface_item_add(self,GtkWidget *button)
         {
-            /** TODO, set schema */
+
             GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
+            /* check if there are schema's */
             if(list)
             {
-                StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,list->data);
-                stuffkeeper_data_item_set_title(item,"New Item");
+                StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+                /* if there is no schema, get the first*/
+                if(schema  == NULL || !STUFFKEEPER_IS_DATA_SCHEMA(schema))
+                {
+                    schema = list->data;
+                }
+                self_add_item(self, schema);
                 g_list_free(list);
             }
 
@@ -321,8 +348,11 @@ class StuffKeeper:Interface from G:Object
             StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
             if(schema)
             {
-                StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
+/*                StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
                 stuffkeeper_data_item_set_title(item,"New Item");
+  */              self_add_item(self, schema);
+                /* Store last added item. */
+                g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", schema);
             }
 
         }
@@ -932,7 +962,7 @@ class StuffKeeper:Interface from G:Object
             node = stuffkeeper_data_backend_get_items(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
             {
-                self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self->_priv->model_items);
+                self_item_added(self->_priv->skdbg, STUFFKEEPER_DATA_ITEM(iter->data),self);
             }
             if(node) g_list_free(node);
             self->_priv->signal_item_added = g_signal_connect(G_OBJECT(self->_priv->skdbg), "item-added",   G_CALLBACK(self_item_added),self); 

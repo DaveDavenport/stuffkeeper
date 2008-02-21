@@ -77,7 +77,7 @@ class StuffKeeper:Item:Window from Gtk:Dialog
 
 
             /* set size */
-            gtk_window_set_default_size(GTK_WINDOW(dialog), 500,400);
+            gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
 
 
 

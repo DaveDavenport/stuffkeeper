@@ -53,9 +53,9 @@ class StuffKeeper:Data:Text from Gtk:Text:View
             {
                 if(strcmp(text,value))
                 {
-                    g_signal_handler_block(self,self->_priv->changed_entry);
+                    g_signal_handler_block(self->_priv->buffer,self->_priv->changed_entry);
                     gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
-                    g_signal_handler_unblock(self,self->_priv->changed_entry);
+                    g_signal_handler_unblock(self->_priv->buffer,self->_priv->changed_entry);
                 }
                 g_free(value);
             }
