@@ -139,6 +139,7 @@ class StuffKeeper:Data:Backend from G:Object
     void
     load(self, const gchar *db_path)
     {
+        int iter;
         /* item */
         gchar *path;
         GDir *dir;
@@ -181,6 +182,7 @@ class StuffKeeper:Data:Backend from G:Object
         if(dir)
         {
             const gchar *filename;
+            iter =0;
             while((filename = g_dir_read_name(dir))!= NULL)
             {
                 gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas", filename,NULL);
@@ -196,8 +198,9 @@ class StuffKeeper:Data:Backend from G:Object
                 self_schema_added(self, schema);
                 g_free(full_path);
 
-                while(gtk_events_pending())
+                while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
+                iter++;
             }
             g_dir_close(dir);
         }
@@ -219,6 +222,7 @@ class StuffKeeper:Data:Backend from G:Object
         if(dir)
         {
             const gchar *filename;
+            iter = 0;
             while((filename = g_dir_read_name(dir))!= NULL)
             {
                 gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"tags", filename,NULL);
@@ -234,8 +238,9 @@ class StuffKeeper:Data:Backend from G:Object
                 self_tag_added(self, tag);
                 g_free(full_path);
 
-                while(gtk_events_pending())
+                while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
+                iter++;
             }
             g_dir_close(dir);
         }
@@ -255,6 +260,7 @@ class StuffKeeper:Data:Backend from G:Object
         if(dir)
         {
             const gchar *filename;
+            iter = 0;
             while((filename = g_dir_read_name(dir))!= NULL)
             {
                 gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"items", filename,NULL);
@@ -271,8 +277,9 @@ class StuffKeeper:Data:Backend from G:Object
 
                 g_free(full_path);
 
-                while(gtk_events_pending())
+                while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
+                iter++;
             }
             g_dir_close(dir);
         }
