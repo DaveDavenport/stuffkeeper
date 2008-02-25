@@ -81,6 +81,8 @@ class StuffKeeper:Data:Item from G:Object
         self->_priv->changed = TRUE;
 
         self->_priv->save_timeout = g_timeout_add(SAVE_TIMEOUT, (GSourceFunc)self_save_yourself, self);
+        g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"modification", time(NULL));
+
     }
     /**
      * Functions to manage 
@@ -248,6 +250,14 @@ class StuffKeeper:Data:Item from G:Object
          gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "creation",NULL);
          return id;
      }
+     public 
+     gint
+     get_modification_time(self)
+     {
+         gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "modification",NULL);
+         return id;
+     }
+
 
     /**
      * ID (ro)
