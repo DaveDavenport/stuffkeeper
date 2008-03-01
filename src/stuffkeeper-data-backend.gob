@@ -420,6 +420,12 @@ class StuffKeeper:Data:Backend from G:Object
         gint *ide;
         gint id = g_random_int();
         StuffKeeperDataSchema *schema;
+
+        while((schema = g_hash_table_lookup(self->_priv->schemas, &id)) != NULL)
+        {
+            id = g_random_int();
+        }
+
         /* No schema, lets make one. */
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
         schema = stuffkeeper_data_schema_new_with_id(path,id);
@@ -466,7 +472,7 @@ class StuffKeeper:Data:Backend from G:Object
      */
     public
     StuffKeeperDataTag *
-    add_tag(self, StuffKeeperDataItem *item, const int id)
+    add_tag(self, const int id)
     {
         gint *ide;
         StuffKeeperDataTag *tag;
@@ -498,6 +504,19 @@ class StuffKeeper:Data:Backend from G:Object
         /* Look for existing tag */
         tag = g_hash_table_lookup(self->_priv->tags, &id);
         return tag;
+    }
+    public
+    StuffKeeperDataTag *
+    new_tag(self)
+    {
+         gint id = g_random_int();
+         /* Check if the random id is allready available */
+         while(self_get_tag(self, id) != NULL)
+         {
+             id = g_random_int();
+         }
+        /* We have a valid id now, so add it */
+        return self_add_tag(self, id);
     }
 
     public

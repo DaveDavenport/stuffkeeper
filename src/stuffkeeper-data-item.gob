@@ -201,7 +201,7 @@ class StuffKeeper:Data:Item from G:Object
            int i;
            for(i=0;i<items;i++)
            {
-               StuffKeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,obj, tags[i]);
+               StuffKeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tags[i]);
                obj->_priv->tags = g_list_append(obj->_priv->tags, tag);
                stuffkeeper_data_tag_add_item(tag, G_OBJECT(obj));
            }

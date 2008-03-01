@@ -120,6 +120,7 @@ class StuffKeeper:Data:Schema from G:Object
             self_save_yourself(obj);
             return obj;
         }
+        /*
     public 
         StuffKeeperDataSchema *
         new (const gchar *path)
@@ -132,7 +133,8 @@ class StuffKeeper:Data:Schema from G:Object
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
             self_save_yourself(obj);
             return obj;
-        }                                                                          
+        } 
+        */
                 
     /**
      * Functions to manage 

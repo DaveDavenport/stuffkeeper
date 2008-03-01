@@ -572,25 +572,8 @@ class StuffKeeper:Interface from G:Object
     {
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
+    
 
-    public
-        void 
-        interface_entry_add(self,GtkWidget *button)
-        {
-            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
-            if(type == 0) /* Add an tag */
-            {
-                StuffKeeperDataTag *tag;
-                tag = stuffkeeper_data_backend_add_tag(self->_priv->skdbg,NULL,g_random_int());
-                stuffkeeper_data_tag_set_title(tag, "New Tag");
-            }
-            else if(type == 1) /* Add new schema */
-            {
-                StuffKeeperDataSchema *schema;
-                schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
-                stuffkeeper_data_schema_set_title(schema, "New Schema");
-            }
-        }
     public
     void
     interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
@@ -609,9 +592,9 @@ class StuffKeeper:Interface from G:Object
             GList *list;
             GtkWidget *event2 = NULL;
             /** Remove all old widgets */
-            container = self->_priv->item_vbox; ///glade_xml_get_widget(xml, "item_vbox");
+            container = self->_priv->item_vbox;
 
-            event =  self->_priv->item_event_box;//glade_xml_get_widget(xml, "item_event_box");
+            event =  self->_priv->item_event_box;
             gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->base[GTK_STATE_NORMAL]));
 
             list = gtk_container_get_children(GTK_CONTAINER(container));
@@ -781,57 +764,91 @@ class StuffKeeper:Interface from G:Object
 
         }
 
-    public
-        void 
-        interface_remove_tag(self)
-        {
-            GtkWidget *tree = self->_priv->treeview1;
-            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+     /**
+     * Right mouse handling left treeview
+     */
+    /**
+     * Label signals
+     */
+     private
+     void
+     add_tag(self, GtkMenuItem *item)
+     {
+         StuffKeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdbg);
+         stuffkeeper_data_tag_set_title(tag, "New Tag");
+     }
+     private 
+     void
+     remove_tag(self, GtkMenuItem *item)
+     {
+         GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeIter iter;
+         if(gtk_tree_selection_get_selected(selection,&model, &iter))
+         {
+             gint items;
+             gint id;
+             /* Get id and items */
+             gtk_tree_model_get(model, &iter,0,&id,4,&items, -1);
+
+             if(items == 0)
+             {
+                 stuffkeeper_data_backend_remove_tag(self->_priv->skdbg,id);
+             }
+         }
+     }
+    /* Types */
+
+     private
+     void
+     add_type(self, GtkMenuItem *item)
+     {
+         StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
+         stuffkeeper_data_schema_set_title(schema, "New Schema");
+     }
+     private 
+     void
+     remove_type(self, GtkMenuItem *item)
+     {
+         GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeIter iter;
+         if(gtk_tree_selection_get_selected(selection,&model, &iter))
+         {
+             gint items;
+             gint id;
+             /* Get id and items */
+             gtk_tree_model_get(model, &iter,0,&id,4,&items, -1);
+
+             if(items == 0)
+             {
+                 stuffkeeper_data_backend_remove_schema(self->_priv->skdbg,id);
+             }
+         }
 
 
-            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
-            GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-            GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(sel, &model, &iter))
-            {
-                if(type == 0) // tag
-                {
-                    StuffKeeperDataTag *tag;
-                    gtk_tree_model_get(model, &iter, 3, &tag, -1);
-                    if(tag)
-                    {
-                        if(stuffkeeper_data_tag_num_items(tag) > 0)
-                        {
-                            printf("This tag is not empty\n");
-                        }
-                        else
-                        {
-                            gint id = stuffkeeper_data_tag_get_id(tag); 
-                            printf("removing item: %i\n", id);
-                            stuffkeeper_data_backend_remove_tag(self->_priv->skdbg,id);
-                        }
-                    }
-                }
-                else if(type == 1) // schema
-                {
-                    StuffKeeperDataSchema *schema;
-                    gtk_tree_model_get(model, &iter, 3, &schema, -1);
-                    if(schema)
-                    {
-                        if(stuffkeeper_data_schema_num_items(schema) > 0)
-                        {
-                            printf("This schema is not empty\n");
-                        }
-                        else
-                        {
-                            gint id = stuffkeeper_data_schema_get_id(schema); 
-                            printf("removing scema: %i\n", id);
-                            stuffkeeper_data_backend_remove_schema(self->_priv->skdbg,id);
-                        }
-                    }
-                }
-            }
-        }
+     }
+     private 
+     void
+     edit_type(self, GtkMenuItem *item)
+     {
+         GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeIter iter;
+         if(gtk_tree_selection_get_selected(selection,&model, &iter))
+         {
+             StuffKeeperDataSchema *schema;
+             gtk_tree_model_get(model, &iter, 3, &schema, -1);
+             if(schema)
+             {
+                 StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+                 stuffkeeper_edit_schema_set_schema(skes, schema);
+             }
+         }
+     }
+
+
+
 
     /* Right mouse button press */
     public 
@@ -843,6 +860,9 @@ class StuffKeeper:Interface from G:Object
         if(event->button == 3)
         {
             int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+            GtkTreeIter iter;
             GtkWidget *menu;
             GtkWidget *menu_item;
 
@@ -853,15 +873,61 @@ class StuffKeeper:Interface from G:Object
             if(type == 0)
             {
                 /* Add tag */
-                menu_item = gtk_image_menu_item_new_with_label("Add label");
+                menu_item = gtk_image_menu_item_new_with_label("New tag");
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                         gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
-
+                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_tag), self);
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                if(gtk_tree_selection_get_selected(selection,&model, &iter))
+                {
+                    int items;
+                    /* Get the number of items */
+                    gtk_tree_model_get(model, &iter, 4, &items, -1);
+            
+                    /* no items, then you can delete it*/
+                    if(items ==  0)
+                    {
+                        menu_item = gtk_image_menu_item_new_with_label("Remove tag");
+                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_tag),self);
+                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+
+                    }
+                }
 
             }
             else 
             {
+                /* Add item */
+                menu_item = gtk_image_menu_item_new_with_label("New type");
+                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                        gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_type), self);
+                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                if(gtk_tree_selection_get_selected(selection,&model, &iter))
+                {
+                    int items;
+                    /* Get the number of items */
+                    gtk_tree_model_get(model, &iter, 4, &items, -1);
+
+                    /* no items, then you can delete it*/
+                    if(items ==  0)
+                    {
+                        menu_item = gtk_image_menu_item_new_with_label("Remove tag");
+                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_type),self);
+                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                    }
+                    menu_item = gtk_image_menu_item_new_with_label("Edit type");
+                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                            gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
+                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_type),self);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+
+                }
+
 
 
 
@@ -913,45 +979,14 @@ class StuffKeeper:Interface from G:Object
     {
         int i = gtk_combo_box_get_active(box);
         if(i==0){
-            gtk_widget_set_sensitive(self->_priv->LeftPane_edit, FALSE);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
         }else{
-            gtk_widget_set_sensitive(self->_priv->LeftPane_edit,TRUE);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
         }
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
-
-    public
-    void
-    interface_edit(self,GtkWidget *button)
-    {
-        GtkWidget *tree = self->_priv->treeview1;
-        int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
-
-
-        GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
-        GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-        GtkTreeIter iter;
-
-        if(type == 1) // schema
-        {
-            if(gtk_tree_selection_get_selected(sel, &model, &iter))
-            {
-                StuffKeeperDataSchema *schema;
-                gtk_tree_model_get(model, &iter, 3, &schema, -1);
-                if(schema)
-                {
-                    StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
-                    stuffkeeper_edit_schema_set_schema(skes, schema);
-                }
-            }
-
-        }
-    }
     /* Add item menu */
-
     public
     void
     interface_item_add_menu(self, GtkWidget *but)
