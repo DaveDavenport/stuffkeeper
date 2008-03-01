@@ -1,3 +1,4 @@
+#include <glib.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
 
@@ -13,6 +14,26 @@ GList *interface_list = NULL;
  * only one instance is running
  */
 BaconMessageConnection *bacon_connection = NULL;
+
+/**
+ * Command line parsing stuff 
+ */
+
+static gchar *db_path = NULL;
+
+static GOptionEntry entries[] = 
+{
+  { "db-path", 'd', 0, G_OPTION_ARG_STRING, &db_path, "Path to the database", "Path" },
+  { NULL }
+};
+
+
+
+
+
+
+
+
 
 /**
  * Handle ipc messages
@@ -39,12 +60,22 @@ static void bacon_on_message_received(const char *message, gpointer data)
 
 int main ( int argc, char **argv )
 {
+    GError *error = NULL;
+    GOptionContext *context;
+
     StuffKeeperInterface  *ski;
 
     /* string used the path*/
     gchar *path;
     /* pointer holding the backend */
     StuffKeeperDataBackend *skdb = NULL;
+
+
+
+    context = g_option_context_new ("- StuffKeeper");
+    g_option_context_add_main_entries (context, entries, "stuffkeeper");
+    g_option_context_add_group (context, gtk_get_option_group (TRUE));
+    g_option_context_parse (context, &argc, &argv, &error);
 
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))
@@ -65,7 +96,7 @@ int main ( int argc, char **argv )
         return EXIT_FAILURE;
     }
 
-    
+
     /* Setup the interprocess communication. this does not work in win32! */ 
     bacon_connection = bacon_message_connection_new("stuffkeeper");
     if(bacon_connection) 
@@ -88,7 +119,7 @@ int main ( int argc, char **argv )
         /* Listen for incoming messages */
         bacon_message_connection_set_callback (bacon_connection,
                 bacon_on_message_received,
-                    skdb);
+                skdb);
     }
     else
     {
@@ -99,9 +130,9 @@ int main ( int argc, char **argv )
         exit(EXIT_FAILURE);
     }
 
-  
 
-    
+
+
     ski= stuffkeeper_interface_new();
     interface_list = g_list_append(interface_list, ski);
     stuffkeeper_interface_initialize_interface(ski,skdb);
@@ -111,7 +142,17 @@ int main ( int argc, char **argv )
      */
 
     /* build the directory where data is stored */
-    path = g_build_path(G_DIR_SEPARATOR_S, g_get_home_dir(), ".stuffkeeper", NULL);
+    if(db_path != NULL)
+    {
+        path = g_build_path(G_DIR_SEPARATOR_S, db_path, NULL);
+        printf("Testing path: %s\n", path);
+
+    }
+    else
+    {
+        path = g_build_path(G_DIR_SEPARATOR_S, g_get_home_dir(), ".stuffkeeper", NULL);
+    }
+
 
     /* Test if the directory exists */
     if(!g_file_test(path, G_FILE_TEST_IS_DIR))
@@ -132,17 +173,16 @@ int main ( int argc, char **argv )
     /* Start the main loop */
     gtk_main();
 
-    //g_list_foreach(interface_list, destroy_interface, NULL);
     g_list_free(interface_list);
 
     /* cleanup  */
     g_object_unref(skdb);
 
     /* Close the IPC bus */
-	if(bacon_connection)
-	{
-		bacon_message_connection_free (bacon_connection);
-	}
+    if(bacon_connection)
+    {
+        bacon_message_connection_free (bacon_connection);
+    }
 
 
     /* exit */
