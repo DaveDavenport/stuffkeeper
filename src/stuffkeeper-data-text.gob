@@ -4,6 +4,12 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include "stuffkeeper-data-item.h"
 %}
+%ph{
+#include <config.h>
+#if HAVE_GTKSPELL == 1
+    #include <gtkspell/gtkspell.h>
+#endif
+%}
 
 class StuffKeeper:Data:Text from Gtk:Text:View
 {
@@ -69,6 +75,7 @@ class StuffKeeper:Data:Text from Gtk:Text:View
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
+
         /* Get buffer */
         obj->_priv->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj));
         /* store item */
@@ -78,6 +85,11 @@ class StuffKeeper:Data:Text from Gtk:Text:View
             
         gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj), GTK_WRAP_WORD);
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
+
+#if HAVE_GTKSPELL == 1
+        /* Spell check this entry, if available */
+        gtkspell_new_attach(GTK_TEXT_VIEW(obj), NULL, NULL);
+#endif
 
         /* update the entry */
         if(obj->_priv->field)
