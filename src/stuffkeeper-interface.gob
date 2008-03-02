@@ -694,20 +694,6 @@ class StuffKeeper:Interface from G:Object
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     label1 = gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1),"<span weight='bold' size='x-large'>Fields:</span>");
                     gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
@@ -715,12 +701,6 @@ class StuffKeeper:Interface from G:Object
                     gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
 
                     
-                    
-                    
-                    
-                    
-                    
-
                     /**
                      * Get the attached schema and fill in the rest from there
                      */
