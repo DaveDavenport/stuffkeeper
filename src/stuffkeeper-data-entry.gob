@@ -5,10 +5,6 @@ requires 2.0.10
 #include "stuffkeeper-data-item.h"
 %}
 
-%ph{
-#include <config.h>
-%}
-
 class StuffKeeper:Data:Entry from Gtk:Entry 
 {
     private StuffKeeperDataItem *item = {NULL};
@@ -62,24 +58,6 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
-#if HAVE_GTKSPELL == 3
-        GError *err = NULL;
-        printf("Adding gtk spell\n");
-        if(!gtkspell_new_attach(GTK_TEXT_VIEW(obj), NULL,&err))
-        {
-            GtkWidget *errdlg;
-            errdlg = gtk_message_dialog_new(NULL,
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                    GTK_MESSAGE_ERROR,
-                    GTK_BUTTONS_CLOSE,
-                    "Error initializing spell checking: %s",
-                    err->message);
-            gtk_dialog_run(GTK_DIALOG(errdlg));
-            gtk_widget_destroy(errdlg);
-            g_error_free(err); /* don't forget to free GErrors when you're done! */
-
-        }
-#endif
 
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
