@@ -4,6 +4,7 @@ requires 2.0.10
 /* Include gtk */
 #include <gtk/gtk.h>
 #include <glade/glade.h>
+#include "sexy-icon-entry.h"
 #include <config.h>
 /* Include the database */
 
@@ -947,6 +948,8 @@ class StuffKeeper:Interface from G:Object
         StuffKeeperInterface * 
         new(void)
         {
+            GtkToolItem *item;
+            GtkWidget *ali;
             Self *self = GET_NEW;
 
             self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","win",NULL);
@@ -964,12 +967,42 @@ class StuffKeeper:Interface from G:Object
 
             self->_priv->LeftPane_edit = glade_xml_get_widget(self->_priv->xml, "LeftPane_edit");
             self->_priv->AddMenuButton = glade_xml_get_widget(self->_priv->xml, "AddMenuButton");
-            self->_priv->search_entry = glade_xml_get_widget(self->_priv->xml, "search_entry");
+
             self->_priv->item_label = glade_xml_get_widget(self->_priv->xml, "item_label");
             
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
 
+            /**
+             * Custom search widget, glade does not support, sexy-icon and screws up alignment 
+             */
+            item = gtk_tool_item_new();
+            gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), TRUE);
+            ali = gtk_alignment_new(1,0.5, 0, 0);
+            gtk_container_add(GTK_CONTAINER(item), ali);
+            /* sexy icon + setup */
+            self->_priv->search_entry = sexy_icon_entry_new();
+            /* Add clear button */
+            sexy_icon_entry_add_clear_button(SEXY_ICON_ENTRY(self->_priv->search_entry));
+            /* Add find icon */
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self->_priv->search_entry),SEXY_ICON_ENTRY_PRIMARY, 
+                GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_FIND, GTK_ICON_SIZE_MENU)));
+
+            gtk_container_add(GTK_CONTAINER(ali),self->_priv->search_entry); 
+            g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "changed", G_CALLBACK(self_search_entry_changed), self);
+
+            gtk_widget_show_all(GTK_WIDGET(item));
+            gtk_toolbar_insert(GTK_TOOLBAR(glade_xml_get_widget(self->_priv->xml, "toolbar1")), GTK_TOOL_ITEM(item),-1);
+
+
+
+
+
+
+
+
             glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            /* some testing */
+
             return self;
         }
 
