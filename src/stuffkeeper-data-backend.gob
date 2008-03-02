@@ -198,8 +198,9 @@ class StuffKeeper:Data:Backend from G:Object
                 self_schema_added(self, schema);
                 g_free(full_path);
 
-                while(iter%10 == 0 && gtk_events_pending())
+/*                while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
+                    */
                 iter++;
             }
             g_dir_close(dir);
@@ -237,9 +238,10 @@ class StuffKeeper:Data:Backend from G:Object
                 g_hash_table_insert(self->_priv->tags,id, tag);
                 self_tag_added(self, tag);
                 g_free(full_path);
-
+/*
                 while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
+*/                    
                 iter++;
             }
             g_dir_close(dir);
@@ -276,9 +278,10 @@ class StuffKeeper:Data:Backend from G:Object
                 self_item_added(self, item);
 
                 g_free(full_path);
-
+/*
                 while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
+*/                    
                 iter++;
             }
             g_dir_close(dir);

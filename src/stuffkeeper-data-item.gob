@@ -344,7 +344,7 @@ class StuffKeeper:Data:Item from G:Object
 
     public 
     void
-    set_list(self, const gchar *field, const gchar *value[], gsize length)
+    set_list(self, const gchar *field, const gchar **value, gsize length)
     {
         g_key_file_set_string_list(self->_priv->data, KEYFILE_CUSTOM, field, value,length);
         self_item_changed(self,field);

@@ -60,7 +60,7 @@ class StuffKeeper:Data:List from Gtk:VBox
                 i++;
             }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->store), &iter));
         }
-        stuffkeeper_data_item_set_list(self->_priv->item, self->_priv->field, retv, rows);
+        stuffkeeper_data_item_set_list(self->_priv->item, self->_priv->field,(const gchar **) retv, rows);
         for(;i>=0;i--)
         {
             g_free(retv[i]);
