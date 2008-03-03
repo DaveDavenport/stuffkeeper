@@ -613,7 +613,7 @@ class StuffKeeper:Interface from G:Object
             container = self->_priv->item_vbox;
 
             event =  self->_priv->item_event_box;
-            gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->base[GTK_STATE_NORMAL]));
+            gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->light[GTK_STATE_NORMAL]));
 
             list = gtk_container_get_children(GTK_CONTAINER(container));
             if(list)
