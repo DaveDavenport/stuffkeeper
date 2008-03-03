@@ -142,6 +142,9 @@ checkWAF
 echo "calling waf configure with parameters"
 $WAF configure $* || exit $EXIT_ERROR
 
+if [ -z "$DEBUG" ] ; then
+    WAF="$WAF -p"
+fi
 if [ -f "Makefile" ] ; then
     echo ""
 else
