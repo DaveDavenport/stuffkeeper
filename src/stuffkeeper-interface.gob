@@ -552,16 +552,33 @@ class StuffKeeper:Interface from G:Object
                 int found = 0;
                 gsize length = 0;
                 gchar **values = stuffkeeper_data_item_get_values(item, &length);
+                /* Normalizse the search string */
+                gchar *text1 = g_utf8_casefold(text, -1);
+                gchar *text2 = g_utf8_normalize(text1, -1, G_NORMALIZE_ALL_COMPOSE);
+
+
                 int i;
                 if(values)
                 {
                     for(i=0;i<length && !found;i++)
                     {
                         if(values[i])
-                            if(strstr(values[i], text)) found = TRUE;
+                        {
+                            gchar *sb1 = g_utf8_casefold(values[i], -1);
+                            gchar *sb2 = g_utf8_normalize(sb1, -1, G_NORMALIZE_ALL_COMPOSE);
+
+                            if(strstr(sb2,text2)) found = TRUE;
+                            /* free */
+                            g_free(sb1);
+                            g_free(sb2);
+
+                        }
                     }
                     g_strfreev(values);
                 }
+                /* free up */
+                g_free(text2);
+                g_free(text1);
                 return found;
             }
 
