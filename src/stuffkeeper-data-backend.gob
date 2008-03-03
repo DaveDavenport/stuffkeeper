@@ -189,7 +189,7 @@ class StuffKeeper:Data:Backend from G:Object
                 StuffKeeperDataSchema *schema;
                 gint *id;
                 /* create a new item */
-                schema = stuffkeeper_data_schema_new_from_file(full_path);
+                schema = stuffkeeper_data_schema_new_from_file(G_OBJECT(self),full_path);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = stuffkeeper_data_schema_get_id(schema);
@@ -398,7 +398,7 @@ class StuffKeeper:Data:Backend from G:Object
         }
         /* No tag, lets make one. */
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
-        schema = stuffkeeper_data_schema_new_with_id(path,id);
+        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),path,id);
         g_free(path);
 
         /* Add to the list */
@@ -431,7 +431,7 @@ class StuffKeeper:Data:Backend from G:Object
 
         /* No schema, lets make one. */
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
-        schema = stuffkeeper_data_schema_new_with_id(path,id);
+        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),path,id);
         g_free(path);
 
         /* Add to the list */

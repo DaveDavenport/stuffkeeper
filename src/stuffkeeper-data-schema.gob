@@ -1,7 +1,15 @@
 requires 2.0.10
 
+%h{
+#include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gtk/gtk.h>
+
+%}
+
 %ph{
 #include <glib/gstdio.h>
+#include "stuffkeeper-data-backend.h"
+
 #include <stdio.h>
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_FIELD_TYPES "field-types" 
@@ -43,7 +51,9 @@ class StuffKeeper:Data:Schema from G:Object
     private gboolean changed = {FALSE};
     private GKeyFile *data = {NULL};
     private char * path = {NULL} destroywith g_free;
-
+    /* Image matching */
+    private GdkPixbuf *pb = {NULL} destroywith g_object_unref;
+    private StuffKeeperDataBackend *skdb = {NULL};
 
 
     private GList *items = {NULL} destroywith g_list_free;
@@ -100,20 +110,34 @@ class StuffKeeper:Data:Schema from G:Object
      */
     public
     StuffKeeperDataSchema *
-        new_from_file (const gchar *file)
+        new_from_file (GObject *skdb, const gchar *file)
         {
             Self *obj = GET_NEW;
+            gchar *value;
+            obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+
             obj->_priv->data = g_key_file_new();
             obj->_priv->path = g_strdup(file);
             g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
+
+            /* load the icon, if available */
+            value = g_key_file_get_string(obj->_priv->data, KEYFILE_GENERAL, "icon", NULL); 
+            if(value)
+            {
+                gchar *path = g_build_path(G_DIR_SEPARATOR_S,stuffkeeper_data_backend_get_path(obj->_priv->skdb),"images",value,NULL);
+                obj->_priv->pb = gdk_pixbuf_new_from_file_at_scale(path, 16,16,TRUE,NULL);
+                g_free(path);
+                g_free(value);
+            }
             return obj;
         }
 
     public
      StuffKeeperDataSchema *
-        new_with_id (const gchar *path,gint id)
+        new_with_id (GObject *skdb,const gchar *path,gint id)
         {
             Self *obj = GET_NEW;
+            obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
             g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
@@ -123,10 +147,11 @@ class StuffKeeper:Data:Schema from G:Object
         /*
     public 
         StuffKeeperDataSchema *
-        new (const gchar *path)
+        new (GObject *skdb,const gchar *path)
         {
 
             Self *obj = GET_NEW;
+            obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             gint id = g_random_int();
             obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
             obj->_priv->data = g_key_file_new();
@@ -395,5 +420,25 @@ class StuffKeeper:Data:Schema from G:Object
                 g_source_remove(self->_priv->save_timeout);
                 self->_priv->save_timeout = 0;
             }
+        }
+
+
+        public
+        GdkPixbuf *
+        get_pixbuf(self)
+        {
+            if(self->_priv->pb == NULL) {
+                GError *error = NULL;
+                self->_priv->pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), "gtk-new", 16, 0, &error);
+                gdk_pixbuf_save(self->_priv->pb, "test.png", "png", NULL, NULL);
+                if(error)
+                {
+                    printf("error: %s\n", error->message);
+
+                    g_error_free(error);
+                }
+            }
+
+            return self->_priv->pb;
         }
 }
