@@ -194,6 +194,7 @@ Types</property>
                         <property name="headers_visible">False</property>
                         <property name="rules_hint">True</property>
                         <property name="enable_search">False</property>
+                        <signal name="button_press_event" handler="treeview2_button_press_event"/>
                         <signal name="row_activated" handler="item_row_activated"/>
                       </widget>
                     </child>

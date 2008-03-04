@@ -844,7 +844,42 @@ class StuffKeeper:Interface from G:Object
              }
          }
      }
+    
+    /* right mouse menu item treeview */
+    public
+    gboolean 
+    treeview2_button_press_event(self, GdkEventButton *event, GtkWidget *widget)
+    {
+        printf("treeview2 buttom press event\n");
+        if(event->button == 3)
+        {
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkTreeIter iter;
+            if(gtk_tree_selection_get_selected(selection,&model, &iter))
+            {
+                GtkWidget *menu;                
+                GtkWidget *menu_item;
+                /* create menu */
+                menu = gtk_menu_new();
 
+                menu_item = gtk_image_menu_item_new_from_stock(GTK_STOCK_OPEN, NULL);
+                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_interface_item_open), self);
+                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+
+                menu_item = gtk_image_menu_item_new_from_stock(GTK_STOCK_REMOVE, NULL);
+                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_interface_item_remove), self);
+                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+
+                /* popup the menu */
+                gtk_widget_show_all(menu);
+
+                gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
+                return FALSE;
+            }
+        }
+        return FALSE;
+    }
 
 
 
@@ -925,9 +960,6 @@ class StuffKeeper:Interface from G:Object
                     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
                 }
-
-
-
 
             }
 
@@ -1255,6 +1287,23 @@ class StuffKeeper:Interface from G:Object
         /**
          * Item popup
          */
+        public
+        void
+        interface_item_open(self)
+        {
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkTreeIter iter;
+            if(gtk_tree_selection_get_selected(selection,&model, &iter))
+            {
+                StuffKeeperDataItem *item;
+                gtk_tree_model_get(model, &iter, 2, &item, -1);
+                if(item)
+                {
+                    self_popup_item(self, item);
+                }                                                          
+            }
+        }
         public 
         void
         item_row_activated(self, GtkTreePath *path, GtkTreeViewColumn *column, GtkTreeView *view)
