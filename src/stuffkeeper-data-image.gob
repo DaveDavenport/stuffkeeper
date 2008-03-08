@@ -88,7 +88,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
         printf("button-press event\n");
         if(event->button == 1)
         {
-            GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick and image", 
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick an image", 
                         NULL, 
                         GTK_FILE_CHOOSER_ACTION_OPEN,
                         GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
@@ -106,8 +106,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                         if(file)
                         {
                             printf("Saving file: %s\n", file);
-//                            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,file);
-                                self_copy_path(self, file);
+                            self_copy_path(self, file);
                             g_free(file);
                         }
                     }

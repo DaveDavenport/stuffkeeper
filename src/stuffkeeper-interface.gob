@@ -140,6 +140,16 @@ class StuffKeeper:Interface from G:Object
             g_free(name);
 
         }
+
+        model = GTK_TREE_MODEL(self->_priv->model_items);
+        if(gtk_tree_model_get_iter_first(model, &iter))
+        {
+            do{
+                GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+                gtk_tree_model_row_changed(model, path, &iter);
+                gtk_tree_path_free(path);
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
     }
     public
     void 

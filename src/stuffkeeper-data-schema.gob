@@ -17,6 +17,7 @@ requires 2.0.10
 #define KEYFILE_FIELD_SORT  "field-sort"
 #include "stuffkeeper-data-item.h"
 #define SAVE_TIMEOUT 30000 
+#define ICON_SIZE 16
 %}
 %h{
     typedef enum _FieldType{
@@ -406,6 +407,35 @@ class StuffKeeper:Data:Schema from G:Object
             }
         }
 
+        public
+        void 
+        set_icon(self, const gchar *filename)
+        {
+            gchar *value = g_strdup_printf("%i",self_get_id(self)); 
+            gchar *dest_path = g_build_path(G_DIR_SEPARATOR_S,stuffkeeper_data_backend_get_path(self->_priv->skdb),"images",value,NULL);
+
+            /* clear */
+            g_object_unref(self->_priv->pb);
+            self->_priv->pb = NULL;
+
+            if(filename)
+            {
+                self->_priv->pb = gdk_pixbuf_new_from_file_at_scale(filename, ICON_SIZE,ICON_SIZE, TRUE, NULL);
+                gdk_pixbuf_save(self->_priv->pb, dest_path, "png", NULL,NULL);
+            
+                g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "icon", value); 
+            }
+            else 
+            {
+                g_key_file_remove_key (self->_priv->data, KEYFILE_GENERAL, "icon", NULL);
+            }
+            
+            self_mark_changed(self);
+            self_schema_changed(self);
+
+            g_free(value);
+            g_free(dest_path);
+        }
 
         public
         GdkPixbuf *
@@ -414,7 +444,6 @@ class StuffKeeper:Data:Schema from G:Object
             if(self->_priv->pb == NULL) {
                 GError *error = NULL;
                 self->_priv->pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), "gtk-new", 16, 0, &error);
-                gdk_pixbuf_save(self->_priv->pb, "test.png", "png", NULL, NULL);
                 if(error)
                 {
                     printf("error: %s\n", error->message);

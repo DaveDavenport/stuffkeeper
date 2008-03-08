@@ -235,6 +235,45 @@ private guint field_swapped_signal = 0;
             &((self->_priv->win)->style->fg[GTK_STATE_SELECTED]));
 
     }
+    public
+    gboolean
+    type_image_clicked(self, GdkEventButton *button, GtkWidget *event)
+    {
+        if(self->_priv->schema)
+        {
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick an image", 
+                    NULL, 
+                    GTK_FILE_CHOOSER_ACTION_OPEN,
+                    GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                    GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
+                    NULL);
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_NO:
+                    stuffkeeper_data_schema_set_icon(self->_priv->schema,NULL);
+                    break;
+                case GTK_RESPONSE_OK:
+                    {
+                        gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+                        if(file)
+                        {
+                            stuffkeeper_data_schema_set_icon(self->_priv->schema,file);
+                            g_free(file);
+                        }
+                    }
+                default:
+                    break;
+            }
+            gtk_widget_destroy(dialog);
+
+
+
+
+        }
+        printf("clicked\n");
+        return FALSE;
+    }
 
     /** Create the interface */
     public
