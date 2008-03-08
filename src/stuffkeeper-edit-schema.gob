@@ -37,12 +37,41 @@ class StuffKeeper:Edit:Schema from G:Object
     private GtkWidget *tree;
     private GtkWidget *win;
 
+    private guint changed_signal = 0;
     private guint field_changed_signal = 0;
     private guint field_added_signal = 0;
     private guint field_removed_signal = 0;
 private guint field_swapped_signal = 0;
 
-    public
+
+
+    private
+    void
+    schema_changed(self, StuffKeeperDataSchema *schema)
+    {
+        GtkWidget *label = glade_xml_get_widget(self->_priv->xml, "title_label");
+        GtkWidget *image = glade_xml_get_widget(self->_priv->xml, "type_image");
+        GdkPixbuf *pixbuf = stuffkeeper_data_schema_get_pixbuf(schema);
+        /**
+         * update title
+         */
+        gchar *temp;
+        temp = stuffkeeper_data_schema_get_title(schema);
+        if(temp)
+        {
+            gchar *str = g_markup_printf_escaped("<span size='large' weight='bold'>Edit Type: '%s'</span>", temp);
+            gtk_label_set_markup(GTK_LABEL(label),str);
+            g_free(str);
+            g_free(temp);
+        }
+
+        if(pixbuf)
+        {
+            gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
+        }
+    }
+
+    private
     void
     schema_field_changed(self, const gchar *field, StuffKeeperDataSchema *schema)
     {
@@ -69,7 +98,7 @@ private guint field_swapped_signal = 0;
             }while(gtk_tree_model_iter_next(model, &iter));
         }
     }
-    public
+    private
     void
     schema_field_removed(self, const gchar *removed_id, StuffKeeper:Data:Schema *schema)
     {
@@ -91,7 +120,7 @@ private guint field_swapped_signal = 0;
         }
     }
 
-    public
+    private
         void
         schema_field_added(self, const gchar *id, StuffKeeperDataSchema *schema)
         {
@@ -109,7 +138,7 @@ private guint field_swapped_signal = 0;
                     -1);
             g_free(name);
         }
-        public
+        private
         void
         schema_field_swapped(self, const gchar *id1, const gchar *id2, StuffKeeperDataSchema *schema)
         {
@@ -191,6 +220,21 @@ private guint field_swapped_signal = 0;
             }
         }
 
+    private
+    void
+    style_set(self, GtkStyle *style, GtkWidget *win)
+    {
+      gtk_widget_modify_bg(glade_xml_get_widget(self->_priv->xml, "eventbox"), 
+            GTK_STATE_NORMAL, 
+            &((self->_priv->win)->style->bg[GTK_STATE_SELECTED]));
+      gtk_widget_modify_text(glade_xml_get_widget(self->_priv->xml, "title_label"), 
+            GTK_STATE_NORMAL, 
+            &((self->_priv->win)->style->text[GTK_STATE_SELECTED]));
+      gtk_widget_modify_fg(glade_xml_get_widget(self->_priv->xml, "title_label"), 
+            GTK_STATE_NORMAL, 
+            &((self->_priv->win)->style->fg[GTK_STATE_SELECTED]));
+
+    }
 
     /** Create the interface */
     public
@@ -218,6 +262,11 @@ private guint field_swapped_signal = 0;
                 gtk_list_store_append(store,&iter);
                 gtk_list_store_set(store, &iter, 0, i, 1,FieldNames[i], -1); 
             }
+
+            g_signal_connect_swapped(G_OBJECT(self->_priv->win), "style-set", G_CALLBACK(self_style_set), self);
+      
+
+
             /* fill tree with columns */
             renderer = gtk_cell_renderer_combo_new();
             gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, NULL);
@@ -388,6 +437,11 @@ private guint field_swapped_signal = 0;
             self_schema_field_added(self, ids[i], schema); 
 
         }
+
+        self->_priv->changed_signal = g_signal_connect_swapped(G_OBJECT(schema),  
+                            "schema-changed",
+                            G_CALLBACK(self_schema_changed),
+                            self);
         self->_priv->field_changed_signal = g_signal_connect_swapped(G_OBJECT(schema),  
                             "schema-field-changed",
                             G_CALLBACK(self_schema_field_changed),
@@ -404,6 +458,7 @@ private guint field_swapped_signal = 0;
                             "schema-field-swapped",
                             G_CALLBACK(self_schema_field_swapped),
                             self);
+        self_schema_changed(self, schema);
 
     }
     override (G:Object)
@@ -412,6 +467,15 @@ private guint field_swapped_signal = 0;
     {
         Self *self = SELF(obj);
         printf("** Finalize edit schema\n");
+        if(self->_priv->changed_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->changed_signal);
+            self->_priv->changed_signal =0;
+        }
+
+
+
+
         if(self->_priv->field_changed_signal)
         {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_changed_signal);
