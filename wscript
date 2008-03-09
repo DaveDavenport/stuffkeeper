@@ -6,8 +6,9 @@ import os
 import Params
 
 # the following two variables are used by the target "waf dist"
-VERSION='0.0.1'
+VERSION='0.01'
 APPNAME='stuffkeeper'
+WEBSITE='http://sarine.nl/stuffkeeper/'
 
 # these variables are mandatory ('/' are converted automatically)
 srcdir = '.'
@@ -27,7 +28,10 @@ def configure(conf):
     conf.check_pkg('gtkspell-2.0', destvar='GTKSPELL', vnum='2.0', mandatory=False)
 
     conf.define('PACKAGE_DATADIR', conf.env['DATADIR']+APPNAME)
-    
+    conf.define('PROGRAM_NAME', APPNAME)
+    conf.define('PROGRAM_VERSION', VERSION)
+    conf.define('PROGRAM_WEBSITE', WEBSITE)
+
     # finally, write the configuration header
     conf.write_config_header('config.h')
 

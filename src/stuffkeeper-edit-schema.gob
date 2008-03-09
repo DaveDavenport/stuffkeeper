@@ -4,7 +4,7 @@ requires 2.0.10
 /* Include gtk */
 #include <gtk/gtk.h>
 #include <glade/glade.h>
-#include <config.h>
+#include "config.h"
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"

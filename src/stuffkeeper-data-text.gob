@@ -5,7 +5,7 @@ requires 2.0.10
 #include "stuffkeeper-data-item.h"
 %}
 %ph{
-#include <config.h>
+#include "config.h"
 #if HAVE_GTKSPELL == 1
     #include <gtkspell/gtkspell.h>
 #endif

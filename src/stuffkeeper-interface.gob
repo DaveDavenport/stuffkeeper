@@ -5,7 +5,7 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 #include "sexy-icon-entry.h"
-#include <config.h>
+#include "config.h"
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -1375,5 +1375,21 @@ class StuffKeeper:Interface from G:Object
                     g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED);
                 g_free(func_name);
             }
+        }
+
+        public
+        void
+        about_dialog(self)
+        {
+            GtkWidget *dialog = gtk_about_dialog_new();
+
+            gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), PROGRAM_NAME);
+            gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION);
+            gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), "Copyright 2008 Qball Cow");
+            gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), PROGRAM_WEBSITE); 
+
+            gtk_dialog_run(GTK_DIALOG(dialog));
+            gtk_widget_destroy(dialog);
+
         }
 }
