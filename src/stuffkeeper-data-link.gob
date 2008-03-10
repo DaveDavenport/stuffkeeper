@@ -56,12 +56,10 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
     /**
      * link clicked
      */
-    private
-    void
-    link_icon_clicked(self, SexyIconEntryPosition icon_pos, int button, SexyIconEntry *icon_entry)
-    {
-        if(button == 1 && icon_pos == SEXY_ICON_ENTRY_PRIMARY)
-        {
+     private
+     void
+     open_link(self, GtkEntry *entry)
+     {
             const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
             if(strlen(text) > 0)
             {
@@ -69,6 +67,15 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
                 g_spawn_command_line_async(data, NULL);
                 g_free(data);
             }
+     }
+
+    private
+    void
+    link_icon_clicked(self, SexyIconEntryPosition icon_pos, int button, SexyIconEntry *icon_entry)
+    {
+        if(button == 1 && icon_pos == SEXY_ICON_ENTRY_PRIMARY)
+        {
+            self_open_link(self, GTK_ENTRY(icon_entry));
         }
     }
 
@@ -78,7 +85,13 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
+        GdkColor color;
 
+        color.blue = 65535;
+        color.red = color.green = 0;
+        gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &color, TRUE,TRUE);
+
+        gtk_widget_modify_text(GTK_WIDGET(obj), GTK_STATE_NORMAL, &color);
 
 
         sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(obj), SEXY_ICON_ENTRY_PRIMARY,
@@ -108,7 +121,9 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
             gtk_entry_set_text(GTK_ENTRY(obj), value);
             g_free(value);
         }
+
         /* this is destroyed when self is destroyed, so no need to disconnect myself */
+        g_signal_connect_swapped(G_OBJECT(obj), "activate", G_CALLBACK(self_open_link), obj);
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);
         return GTK_WIDGET(obj);
     }
