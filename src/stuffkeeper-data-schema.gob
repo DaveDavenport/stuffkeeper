@@ -28,6 +28,8 @@ requires 2.0.10
         FIELD_TYPE_LIST = 4,
         FIELD_TYPE_TEXT = 5,
         FIELD_TYPE_IMAGE = 6,
+        FIELD_TYPE_LINK = 7,
+        FIELD_TYPE_DATE = 8,
         FIELD_TYPE_NUM_FIELDS
     } FieldType;
     extern char *FieldNames[FIELD_TYPE_NUM_FIELDS];
@@ -40,7 +42,9 @@ requires 2.0.10
         "Slider",   // FIELD_TYPE_RATING
         "List",     // FIELD_TYPE_LIST
         "Text",     // FIELD_TYPE_TEXT
-        "Image"     // FIELD_TYPE_IMAGE
+        "Image",     // FIELD_TYPE_IMAGE
+        "Link",     // FIELD_TYPE_LINK
+        "Date & Time",     // FIELD_TYPE_DATE
     };
 
     typedef struct _a { char *id; int pos; }a;

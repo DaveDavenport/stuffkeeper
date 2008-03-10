@@ -1,0 +1,129 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "sexy-icon-entry.h"
+#include "stuffkeeper-data-item.h"
+%}
+
+class StuffKeeper:Data:Link from Sexy:Icon:Entry 
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+    private gulong changed_item_entry = {0};
+    private gulong changed_entry = {0};
+
+    public
+    void
+    changed(self, gpointer data)
+    {
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        if(self->_priv->field)
+        {
+           stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
+        }else{
+            stuffkeeper_data_item_set_title(self->_priv->item, text);
+        }
+    }
+
+    public
+    void
+    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    {
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        gchar *value = NULL;
+        if(self->_priv->field)
+        {
+            if(field && strcmp(field, self->_priv->field) == 0)
+            {
+                value = stuffkeeper_data_item_get_string(item, self->_priv->field);
+            }
+        }else{
+            value = stuffkeeper_data_item_get_title(item); 
+        }
+        if(value)
+        {
+            if(strcmp(text,value))
+            {
+                g_signal_handler_block(self,self->_priv->changed_entry);
+                gtk_entry_set_text(GTK_ENTRY(self), value);
+                g_signal_handler_unblock(self,self->_priv->changed_entry);
+            }
+            g_free(value);
+        }
+    }
+    
+    /**
+     * link clicked
+     */
+    private
+    void
+    link_icon_clicked(self, SexyIconEntryPosition icon_pos, int button, SexyIconEntry *icon_entry)
+    {
+        if(button == 1 && icon_pos == SEXY_ICON_ENTRY_PRIMARY)
+        {
+            const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+            if(strlen(text) > 0)
+            {
+                gchar *data = g_strdup_printf("xdg-open '%s'", text);
+                g_spawn_command_line_async(data, NULL);
+                g_free(data);
+            }
+        }
+    }
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataItem *item, const gchar *field)
+    {
+        Self *obj = GET_NEW;
+        gchar *value =NULL;
+
+
+
+        sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(obj), SEXY_ICON_ENTRY_PRIMARY,
+            GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
+        sexy_icon_entry_set_icon_highlight(SEXY_ICON_ENTRY(obj),
+                SEXY_ICON_ENTRY_PRIMARY, TRUE);
+        gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
+
+        g_signal_connect_swapped(G_OBJECT(obj), "icon_released", G_CALLBACK(self_link_icon_clicked), obj);
+
+        /* store item */
+        obj->_priv->item = item; 
+        /* field */
+        obj->_priv->field = g_strdup(field);
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
+
+        /* update the entry */
+        if(obj->_priv->field)
+        {
+            value = stuffkeeper_data_item_get_string(item, obj->_priv->field);
+        }else{
+            value = stuffkeeper_data_item_get_title(item); 
+        }
+        if(value)
+        {
+            gtk_entry_set_text(GTK_ENTRY(obj), value);
+            g_free(value);
+        }
+        /* this is destroyed when self is destroyed, so no need to disconnect myself */
+        obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);
+        return GTK_WIDGET(obj);
+    }
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            if(self->_priv->changed_item_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+                self->_priv->changed_item_entry = 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}

@@ -70,6 +70,10 @@ class StuffKeeper:Show:Item from Gtk:Table
                     label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
                 }else if (type == FIELD_TYPE_IMAGE) {
                     label1 = stuffkeeper_data_image_new(self->_priv->item,self->_priv->retv[i]);                    
+                }else if (type == FIELD_TYPE_LINK) {
+                    label1 = stuffkeeper_data_link_new(self->_priv->item,self->_priv->retv[i]);                    
+                }else if (type == FIELD_TYPE_DATE) {
+                    label1 = stuffkeeper_data_date_new(self->_priv->item,self->_priv->retv[i]);                    
                 }else {
                     label1 = gtk_label_new("not supported\n");
                 }
