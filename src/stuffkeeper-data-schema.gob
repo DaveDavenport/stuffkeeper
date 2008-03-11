@@ -274,6 +274,7 @@ class StuffKeeper:Data:Schema from G:Object
     {
         return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_SORT,id, NULL);
     }
+
     public 
         void 
     swap_field_pos(self, const gchar *id, const gchar *id2)
@@ -342,9 +343,10 @@ class StuffKeeper:Data:Schema from G:Object
         }
         /* find new position */
         retv = self_get_fields(self,&size);
-        if(retv)
+        if(retv && size > 0)
         {
             /* get the position of the last item and put it after that */
+            printf("size: %i\n", size);
             pos = self_get_field_pos(self,retv[size-1])+1;
             g_strfreev(retv);
         }

@@ -16,6 +16,10 @@ GList *interface_list = NULL;
 BaconMessageConnection *bacon_connection = NULL;
 
 /**
+ * Config system
+ */
+GKeyFile *config_file = NULL;
+/**
  * Command line parsing stuff 
  */
 
@@ -26,12 +30,6 @@ static GOptionEntry entries[] =
   { "db-path", 'd', 0, G_OPTION_ARG_STRING, &db_path, "Path to the database", "Path" },
   { NULL }
 };
-
-
-
-
-
-
 
 
 
@@ -67,6 +65,7 @@ int main ( int argc, char **argv )
 
     /* string used the path*/
     gchar *path;
+    gchar *config_path;
     /* pointer holding the backend */
     StuffKeeperDataBackend *skdb = NULL;
 
@@ -131,13 +130,7 @@ int main ( int argc, char **argv )
     }
 
 
-
-
-    ski= stuffkeeper_interface_new();
-    interface_list = g_list_append(interface_list, ski);
-    stuffkeeper_interface_initialize_interface(ski,skdb);
-
-    /**
+      /**
      * Do filesystem checking 
      */
 
@@ -165,6 +158,35 @@ int main ( int argc, char **argv )
         }
     }
 
+
+    /* open config file */
+    printf("Opening config file\n"); 
+    config_file = g_key_file_new();
+
+    config_path = g_build_path(G_DIR_SEPARATOR_S, path, "config.cfg", NULL);
+    if(!g_file_test(path, G_FILE_TEST_EXISTS))
+    {
+        GError *error = NULL;
+        if(g_key_file_load_from_file(config_file, config_path, G_KEY_FILE_NONE, &error))
+        {
+            printf("Failed to load config file\n");
+            if(error)
+            {
+                printf("Reported error: %s\n", error->message);
+                g_error_free(error); 
+            }
+        }
+        
+    }
+
+
+
+
+    /* Create a main interface */
+    ski= stuffkeeper_interface_new();
+    interface_list = g_list_append(interface_list, ski);
+    stuffkeeper_interface_initialize_interface(ski,skdb);
+
     /* This tells the backend to populate itself */
     stuffkeeper_data_backend_load(skdb,path);
     /* path */
@@ -183,7 +205,33 @@ int main ( int argc, char **argv )
     {
         bacon_message_connection_free (bacon_connection);
     }
+    /* Savin config */
+    if(config_path)
+    {
+        gchar *content = NULL;
+        gsize length = 0;
+        GError *error = NULL;
 
+        if(g_key_file_to_data(config_file, &length, &error))
+        {
+            GError *error2 = NULL;
+            if(!g_file_set_contents(config_path, content, length, &error2))
+            {
+                printf("Failed to save file '%s': %s\n", config_path, error2->message);
+                g_error_free(error2);
+            }
+        }
+        else
+        {
+            if(error)
+            {
+                printf("Failed to serialize config file: %s\n", error->message);
+                g_error_free(error);
+            }
+        }
+        /* Free config path */
+        g_free(config_path);
+    }
 
     /* exit */
     return EXIT_SUCCESS;
