@@ -3,7 +3,6 @@
 <!--*- mode: xml -*-->
 <glade-interface>
   <widget class="GtkWindow" id="win">
-    <property name="visible">True</property>
     <property name="title" translatable="yes">StuffKeeper</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>

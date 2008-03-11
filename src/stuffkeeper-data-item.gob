@@ -394,7 +394,7 @@ class StuffKeeper:Data:Item from G:Object
         gchar **ids = NULL;
         *length = 0;
         ids = stuffkeeper_data_schema_get_fields(self->_priv->schema, length); 
-        if(ids)
+        if(ids && length >0 )
         {
             gchar **retv = g_malloc0(((*length)+2)*sizeof(gchar *));
             int i;
@@ -413,10 +413,10 @@ class StuffKeeper:Data:Item from G:Object
                     entry++;
                 }
             }
-            g_strfreev(ids);
             *length = entry;
             return retv;
         }
+        g_strfreev(ids);
         return NULL; 
     }
 

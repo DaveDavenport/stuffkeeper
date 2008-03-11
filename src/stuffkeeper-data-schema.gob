@@ -348,8 +348,9 @@ class StuffKeeper:Data:Schema from G:Object
             /* get the position of the last item and put it after that */
             printf("size: %i\n", size);
             pos = self_get_field_pos(self,retv[size-1])+1;
-            g_strfreev(retv);
+
         }
+        g_strfreev(retv);
 
         /* Add the field */
         g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, field); 

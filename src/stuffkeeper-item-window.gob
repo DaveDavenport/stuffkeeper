@@ -64,7 +64,6 @@ class StuffKeeper:Item:Window from Gtk:Dialog
             /**/
             GtkWidget *container = gtk_vbox_new(FALSE, 6);
             GtkWidget *sw = NULL; 
-            gchar **retv= NULL;
             gsize length =0;
             GtkWidget *vbox;
             GtkWidget *label1;
@@ -163,7 +162,6 @@ class StuffKeeper:Item:Window from Gtk:Dialog
              * Get the attached schema and fill in the rest from there
              */
 
-            retv = stuffkeeper_data_schema_get_fields(schema, &length);
             /* num fields + one for the tags */
             vbox = stuffkeeper_show_item_new(item);
             gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
@@ -197,7 +195,6 @@ class StuffKeeper:Item:Window from Gtk:Dialog
 
 
             gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 6);
-            g_strfreev(retv);
 
 
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);

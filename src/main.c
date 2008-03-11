@@ -44,12 +44,17 @@ static void bacon_on_message_received(const char *message, gpointer data)
     {
         if(strcmp(message, "New Window") == 0)
         {
-            StuffKeeperInterface *ski= stuffkeeper_interface_new();
+            StuffKeeperInterface *ski= stuffkeeper_interface_new(config_file);
             interface_list = g_list_append(interface_list, ski);
             stuffkeeper_interface_initialize_interface(ski,skdb);
             printf("IPC: Requested new window\n");
         }
     }
+}
+
+void interface_clear(StuffKeeperInterface *interface, gpointer data)
+{
+    g_object_unref(interface);
 }
 
 /**
@@ -164,9 +169,10 @@ int main ( int argc, char **argv )
     config_file = g_key_file_new();
 
     config_path = g_build_path(G_DIR_SEPARATOR_S, path, "config.cfg", NULL);
-    if(!g_file_test(path, G_FILE_TEST_EXISTS))
+    if(g_file_test(path, G_FILE_TEST_EXISTS))
     {
         GError *error = NULL;
+        printf("Loading config file\n");
         if(g_key_file_load_from_file(config_file, config_path, G_KEY_FILE_NONE, &error))
         {
             printf("Failed to load config file\n");
@@ -183,7 +189,7 @@ int main ( int argc, char **argv )
 
 
     /* Create a main interface */
-    ski= stuffkeeper_interface_new();
+    ski= stuffkeeper_interface_new(config_file);
     interface_list = g_list_append(interface_list, ski);
     stuffkeeper_interface_initialize_interface(ski,skdb);
 
@@ -195,6 +201,7 @@ int main ( int argc, char **argv )
     /* Start the main loop */
     gtk_main();
 
+    g_list_foreach(interface_list, (GFunc)interface_clear, NULL);
     g_list_free(interface_list);
 
     /* cleanup  */
@@ -212,7 +219,8 @@ int main ( int argc, char **argv )
         gsize length = 0;
         GError *error = NULL;
 
-        if(g_key_file_to_data(config_file, &length, &error))
+        content = g_key_file_to_data(config_file, &length, &error);
+        if(content)
         {
             GError *error2 = NULL;
             if(!g_file_set_contents(config_path, content, length, &error2))
@@ -220,6 +228,7 @@ int main ( int argc, char **argv )
                 printf("Failed to save file '%s': %s\n", config_path, error2->message);
                 g_error_free(error2);
             }
+            g_free(content);
         }
         else
         {

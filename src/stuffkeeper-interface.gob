@@ -31,6 +31,7 @@ class StuffKeeper:Interface from G:Object
     private GtkTreeModel *model_schemas = {NULL};
 
     private GtkTreeModel *model_items_filter = {NULL};
+    private GKeyFile *config_file = {NULL};
 
     /* Menu */
     /* A hash list used to store the items, the item id is the hash key */
@@ -51,6 +52,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *LeftPane_edit ;
     private GtkWidget *AddMenuButton ;
     private GtkWidget *search_entry ;
+    private GtkWidget *hpaned1;
     private GtkWidget *item_label;
 
     private StuffKeeperDataBackend *skdbg = {NULL};
@@ -509,7 +511,7 @@ class StuffKeeper:Interface from G:Object
     new_window(self)
     {
         Self *ski;
-        ski= stuffkeeper_interface_new();
+        ski= stuffkeeper_interface_new(self->_priv->config_file);
         interface_list = g_list_append(interface_list, ski);
         stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg);
     }
@@ -733,8 +735,6 @@ class StuffKeeper:Interface from G:Object
                      */
                     if(schema)
                     {
-                        gsize length;
-                        gchar **retv = stuffkeeper_data_schema_get_fields(schema, &length);
                         /* num fields + one for the tags */
                         vbox = stuffkeeper_show_item_new(item);
                         gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
@@ -763,7 +763,6 @@ class StuffKeeper:Interface from G:Object
                         
 
                         gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 6);
-                        g_strfreev(retv);
                     }
 
                 }
@@ -985,19 +984,25 @@ class StuffKeeper:Interface from G:Object
 
     public
         StuffKeeperInterface * 
-        new(void)
+        new(GKeyFile *config_file)
         {
             GtkToolItem *item;
             GtkWidget *ali;
+            int value,width,height;
+            GError *error = NULL;
             Self *self = GET_NEW;
 
             self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","win",NULL);
+
+            self->_priv->config_file = config_file;
+
             if(self->_priv->xml == NULL)
             {
                 g_object_unref(self);
                 printf("Failed top open xml file\n");
                 return NULL;
             }
+            self->_priv->hpaned1 =  glade_xml_get_widget(self->_priv->xml, "hpaned1");
             self->_priv->LeftPaneCB  = glade_xml_get_widget(self->_priv->xml, "LeftPaneCB");
             self->_priv->treeview1 = glade_xml_get_widget(self->_priv->xml, "treeview1");
             self->_priv->treeview2 = glade_xml_get_widget(self->_priv->xml, "treeview2");
@@ -1032,6 +1037,54 @@ class StuffKeeper:Interface from G:Object
             gtk_widget_show_all(GTK_WIDGET(item));
             gtk_toolbar_insert(GTK_TOOLBAR(glade_xml_get_widget(self->_priv->xml, "toolbar1")), GTK_TOOL_ITEM(item),-1);
 
+            /* read config */
+            value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "hpane", &error);
+            if(error) {
+                printf("No valid pane position: %s\n", error->message);
+                /* Free error */
+                g_error_free(error);
+                error = NULL;
+            }
+            else
+            {
+                printf("Setting position: %i\n", value);
+                gtk_paned_set_position(GTK_PANED(self->_priv->hpaned1), value);
+            }
+            width = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "width", &error);
+            if(error) {
+                g_error_free(error);
+                error = NULL;
+            } else {
+                height = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "height", &error);
+                if(error) {
+                    g_error_free(error);
+                    error = NULL;
+                } else {
+                    gtk_window_resize(GTK_WINDOW(self->_priv->win), width, height);
+                }
+            }
+            /* Move window */
+            width = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "x-pos", &error);
+            if(error) {
+                g_error_free(error);
+                error = NULL;
+            } else {
+                height = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "y-pos", &error);
+                if(error) {
+                    g_error_free(error);
+                    error = NULL;
+                } else {
+                    gtk_window_move(GTK_WINDOW(self->_priv->win), width, height);
+                }
+            }
+
+
+
+
+
+
+
+
 
 
 
@@ -1041,7 +1094,7 @@ class StuffKeeper:Interface from G:Object
 
             glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             /* some testing */
-
+            gtk_widget_show(self->_priv->win);
             return self;
         }
 
@@ -1253,6 +1306,7 @@ class StuffKeeper:Interface from G:Object
         void
         finalize(G:Object *obj)
         {
+            int value;
             Self *self = SELF(obj);
             printf("** Finalize stuffkeeper interface\n");
             if(self->_priv->signal_schema_added) { 
@@ -1293,6 +1347,21 @@ class StuffKeeper:Interface from G:Object
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_tag_removed);
                 self->_priv->signal_tag_removed = 0;
             }
+
+            value = gtk_paned_get_position(GTK_PANED(self->_priv->hpaned1));
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "hpane", value);
+            gtk_window_get_size(GTK_WINDOW(self->_priv->win), &value, NULL);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "width", value);
+            gtk_window_get_size(GTK_WINDOW(self->_priv->win), NULL, &value);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "height", value);
+            /* position */
+            gtk_window_get_position(GTK_WINDOW(self->_priv->win), &value, NULL);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "x-pos", value);
+            gtk_window_get_position(GTK_WINDOW(self->_priv->win), NULL, &value);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "y-pos", value);
+
+
+
         }
         /**
          * Item popup
