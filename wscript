@@ -19,7 +19,7 @@ def set_options(opt):
     opt.tool_options('gnu_dirs')
 
 def configure(conf):
-    conf.check_tool('compiler_cc gob2')
+    conf.check_tool('compiler_cc gob2 intltool ')
     conf.check_tool('gnu_dirs', 'waf-tools')
     conf.check_pkg('glib-2.0', destvar='GLIB', vnum='2.10.0', mandatory=True)
     conf.check_pkg('gtk+-2.0', destvar='GTK', vnum='2.10.0', mandatory=True)
@@ -38,6 +38,8 @@ def configure(conf):
 def build(bld):
     bld.add_subdirs('src')
     bld.add_subdirs('glade')
+    bld.add_subdirs('data')
+    bld.add_subdirs('po')
 
 def shutdown():
     pass

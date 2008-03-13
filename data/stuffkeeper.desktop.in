@@ -1,0 +1,9 @@
+[Desktop Entry]
+_Name=StuffKeeper
+_Comment=Another way to catalog stuff 
+Exec=stuffkeeper
+Terminal=false
+Type=Application
+Icon=gmpc.png
+Categories=GNOME;Utility;
+StartupNotify=true
