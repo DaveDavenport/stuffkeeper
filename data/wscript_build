@@ -6,7 +6,7 @@
 obj=bld.create_obj('intltool_in')
 obj.source  = 'stuffkeeper.desktop.in'
 obj.destvar = 'PREFIX'
-obj.subdir  = 'share/applications/'
+obj.subdir  = '/share/applications/'
 obj.podir   = '../po'
 obj.flags   = '-d'
 
