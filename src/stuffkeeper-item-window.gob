@@ -64,7 +64,6 @@ class StuffKeeper:Item:Window from Gtk:Dialog
             /**/
             GtkWidget *container = gtk_vbox_new(FALSE, 6);
             GtkWidget *sw = NULL; 
-            gsize length =0;
             GtkWidget *vbox;
             GtkWidget *label1;
             GtkWidget *event2; 

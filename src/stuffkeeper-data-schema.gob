@@ -63,8 +63,6 @@ class StuffKeeper:Data:Schema from G:Object
 
     private GList *items = {NULL} destroywith g_list_free;
 
-
-
     private guint save_timeout = {0};
     /**
      * Signals 
@@ -346,9 +344,7 @@ class StuffKeeper:Data:Schema from G:Object
         if(retv && size > 0)
         {
             /* get the position of the last item and put it after that */
-            printf("size: %i\n", size);
             pos = self_get_field_pos(self,retv[size-1])+1;
-
         }
         g_strfreev(retv);
 

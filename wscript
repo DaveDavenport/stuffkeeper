@@ -27,10 +27,12 @@ def configure(conf):
     conf.check_pkg('gmodule-2.0', destvar='GMODULE', vnum='2.10.0', mandatory=True)
     conf.check_pkg('gtkspell-2.0', destvar='GTKSPELL', vnum='2.0', mandatory=False)
 
+    conf.define('PACKAGE', APPNAME)
     conf.define('PACKAGE_DATADIR', conf.env['DATADIR']+APPNAME)
     conf.define('PROGRAM_NAME', APPNAME)
     conf.define('PROGRAM_VERSION', VERSION)
     conf.define('PROGRAM_WEBSITE', WEBSITE)
+    conf.define('GETTEXT_PACKAGE',APPNAME)
 
     # finally, write the configuration header
     conf.write_config_header('config.h')
