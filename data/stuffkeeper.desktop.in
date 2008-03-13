@@ -4,6 +4,6 @@ _Comment=Another way to catalog stuff
 Exec=stuffkeeper
 Terminal=false
 Type=Application
-Icon=gmpc.png
+Icon=stuffkeeper
 Categories=GNOME;Utility;
 StartupNotify=true
