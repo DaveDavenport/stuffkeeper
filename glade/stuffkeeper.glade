@@ -359,6 +359,9 @@ Types</property>
                   </widget>
                 </child>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkHBox" id="hbox1">
@@ -390,6 +393,8 @@ Types</property>
                           <widget class="GtkImage" id="type_image">
                             <property name="visible">True</property>
                             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="has_tooltip">True</property>
+                            <property name="tooltip_text">Click the icon to select another icon</property>
                             <property name="xalign">0</property>
                             <property name="stock">gtk-new</property>
                           </widget>
@@ -403,6 +408,7 @@ Types</property>
                 </child>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
