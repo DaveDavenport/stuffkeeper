@@ -493,19 +493,20 @@ class StuffKeeper:Interface from G:Object
         }
 
     public 
-    void
+    gboolean 
     close_window(self)
     {
         int n;
         interface_list = g_list_remove(interface_list, self);
         n = g_list_length(interface_list);
-        gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
+//        gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
         g_object_unref(self);
 
         if(n == 0)
         {
-            gtk_main_quit();
+           gtk_main_quit();
         }
+        return TRUE;
     }
     public
     void
@@ -1028,6 +1029,8 @@ class StuffKeeper:Interface from G:Object
             
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
 
+            gtk_widget_hide_on_delete(self->_priv->win);
+
             /**
              * Custom search widget, glade does not support, sexy-icon and screws up alignment 
              */
@@ -1052,13 +1055,13 @@ class StuffKeeper:Interface from G:Object
 
             /* read config */
             value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "hpane", &error);
-            if(error && value < 50) {
+            if(error ) {
                 debug_printf("No valid pane position: %s\n", error->message);
                 /* Free error */
                 g_error_free(error);
                 error = NULL;
             }
-            else
+            else if(value > 50)
             {
                 debug_printf("Setting position: %i\n", value);
                 gtk_paned_set_position(GTK_PANED(self->_priv->hpaned1), value);
@@ -1359,7 +1362,7 @@ class StuffKeeper:Interface from G:Object
             gtk_window_get_position(GTK_WINDOW(self->_priv->win), NULL, &value);
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "y-pos", value);
 
-
+            gtk_widget_destroy(self->_priv->win);
 
         }
         /**
