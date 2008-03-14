@@ -1054,7 +1054,7 @@ class StuffKeeper:Interface from G:Object
 
             /* read config */
             value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "hpane", &error);
-            if(error) {
+            if(error && value < 50) {
                 debug_printf("No valid pane position: %s\n", error->message);
                 /* Free error */
                 g_error_free(error);
