@@ -134,6 +134,27 @@ class StuffKeeper:Data:Backend from G:Object
         }
 
     }
+    private
+    void
+    clear_yourself(self)
+    {
+        /* Clear items */
+        if(self->_priv->items)
+        {
+            g_hash_table_foreach(self->_priv->items, (GHFunc)self_finalize_item, self);
+            g_hash_table_remove_all(self->_priv->items);
+        }
+        if(self->_priv->tags)
+        {
+            g_hash_table_foreach(self->_priv->tags, (GHFunc)self_finalize_tag, self);
+            g_hash_table_remove_all(self->_priv->tags);
+        }
+        if(self->_priv->schemas)
+        {
+            g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_finalize_schema, self);
+            g_hash_table_remove_all(self->_priv->schemas);
+        }
+    }
 
     /* Load the data */
     public
@@ -144,7 +165,14 @@ class StuffKeeper:Data:Backend from G:Object
         /* item */
         gchar *path;
         GDir *dir;
-
+    
+        /* check if there is allready data active */
+        if(self->_priv->path)
+        {
+            self_clear_yourself(self);
+            g_free(self->_priv->path);
+            self->_priv->path = NULL;
+        }
 
         /**
          * Store the path in the backend.
@@ -288,27 +316,41 @@ class StuffKeeper:Data:Backend from G:Object
             g_dir_close(dir);
         }
     }
-    
+    public
+    void
+    reload(self)
+    {
+        gchar *path = g_strdup(self_get_path(self));
+        self_load(self, path);
+        g_free(path);
+    }
+
     /**
      * Handle destroying of the object
      */
     private
     void
-    finalize_schema(gint *key, StuffKeeperDataSchema *schema, gpointer user_data)
+    finalize_schema(gint *key, StuffKeeperDataSchema *schema, Self *self) 
     {
         stuffkeeper_data_schema_save_yourself(schema);
+        if(self)
+            self_schema_removed(self, *key);
     }
     private
     void
-    finalize_item(gint *key, StuffKeeperDataItem *item, gpointer user_data)
+    finalize_item(gint *key, StuffKeeperDataItem *item, Self *self )
     {
         stuffkeeper_data_item_save_yourself(item);
+        if(self)
+            self_item_removed(self, *key);
     }
     private
     void
-    finalize_tag(gint *key, StuffKeeperDataTag *tag, gpointer user_data)
+    finalize_tag(gint *key, StuffKeeperDataTag *tag, Self *self)
     {
         stuffkeeper_data_tag_save_yourself(tag);
+        if(self)
+            self_tag_removed(self, *key);
     }
 
 

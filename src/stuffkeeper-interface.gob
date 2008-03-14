@@ -1530,16 +1530,21 @@ class StuffKeeper:Interface from G:Object
                         g_spawn_command_line_async(exec, NULL);
                         g_free(exec);
                         g_free(filename);
+                        self_reload(self);
                     }
-                    gtk_widget_destroy(dialog);
-                    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,GTK_MESSAGE_INFO, GTK_BUTTONS_OK, ("Please restart "PROGRAM_NAME));
-                    gtk_dialog_run(GTK_DIALOG(dialog));
-
                 }
                 default:
                     break;
 
             }
             gtk_widget_destroy(dialog);
+        }
+
+
+        public
+        void
+        reload(self)
+        {
+            stuffkeeper_data_backend_reload(self->_priv->skdbg);
         }
 }
