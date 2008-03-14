@@ -1491,9 +1491,11 @@ class StuffKeeper:Interface from G:Object
                         const gchar *source = stuffkeeper_data_backend_get_path(self->_priv->skdbg);
                         if(file)                                                                                      
                         {
-                            gchar *exec = g_strdup_printf("tar -cf %s%c%s.tar.gz %s",directory,G_DIR_SEPARATOR,file, source);
+                            gchar *suffix = g_path_get_dirname(directory);
+                            gchar *exec = g_strdup_printf("tar -cz -C '%s' -f '%s%c%s.tar.gz' '.'",source, directory,G_DIR_SEPARATOR,file);
                             printf("Exec: %s\n",exec);
                             g_spawn_command_line_async(exec, NULL);
+                            g_free(suffix);
                             g_free(exec);
                             g_free(directory);
                         }
@@ -1503,5 +1505,41 @@ class StuffKeeper:Interface from G:Object
             }
             gtk_widget_destroy(dialog);
             g_object_unref(xml);
+        }
+
+        public
+        void
+        restore_backup(self)
+        {
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Open archive", 
+                        NULL, 
+                        GTK_FILE_CHOOSER_ACTION_OPEN,
+                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                        GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
+                        NULL);
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_OK:
+                {
+                    const gchar *directory= stuffkeeper_data_backend_get_path(self->_priv->skdbg);
+                    gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+                    if(filename)
+                    {
+                        gchar *exec = g_strdup_printf("tar -zxf '%s' -C '%s' ",filename, directory);
+                        printf("Exec: %s\n",exec);
+                        g_spawn_command_line_async(exec, NULL);
+                        g_free(exec);
+                        g_free(filename);
+                    }
+                    gtk_widget_destroy(dialog);
+                    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,GTK_MESSAGE_INFO, GTK_BUTTONS_OK, ("Please restart "PROGRAM_NAME));
+                    gtk_dialog_run(GTK_DIALOG(dialog));
+
+                }
+                default:
+                    break;
+
+            }
+            gtk_widget_destroy(dialog);
         }
 }
