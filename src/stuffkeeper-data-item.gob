@@ -1,6 +1,7 @@
 requires 2.0.10
 
 %ph{
+#include <glib/gstdio.h>
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_CUSTOM "custom"
 /* Save a changed item after 30 seconds */

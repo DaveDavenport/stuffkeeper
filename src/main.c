@@ -1,6 +1,9 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <string.h>
 #include "debug.h"
 
 /* Include the database */

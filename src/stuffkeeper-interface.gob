@@ -1000,8 +1000,6 @@ class StuffKeeper:Interface from G:Object
         StuffKeeperInterface * 
         new(GKeyFile *config_file)
         {
-            GtkToolItem *item;
-            GtkWidget *ali;
             int value,width,height;
             GError *error = NULL;
             Self *self = GET_NEW;
@@ -1092,20 +1090,6 @@ class StuffKeeper:Interface from G:Object
                     gtk_window_move(GTK_WINDOW(self->_priv->win), width, height);
                 }
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             /* some testing */
@@ -1475,5 +1459,49 @@ class StuffKeeper:Interface from G:Object
             gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);
 
+        }
+        /** 
+         * Backup
+         */
+        public
+        void
+        filename_changed(self, GtkWidget *entry)
+        {
+            GladeXML *xml =glade_get_widget_tree(entry);
+            GtkWidget *button =  glade_xml_get_widget(xml,"save_button"); 
+            const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
+            gtk_widget_set_sensitive(button, (strlen(text) > 0)?TRUE:FALSE);
+        }
+
+        public
+        void
+        make_backup(self)
+        {
+            GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","dialog_backup",NULL);
+            GtkWidget *dialog = glade_xml_get_widget(xml,"dialog_backup");
+
+            glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case -5:
+                    {
+                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "location_chooser")));
+                        GtkWidget *entry = glade_xml_get_widget(xml, "entry_filename"); 
+                        const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
+                        const gchar *source = stuffkeeper_data_backend_get_path(self->_priv->skdbg);
+                        if(file)                                                                                      
+                        {
+                            gchar *exec = g_strdup_printf("tar -cf %s%c%s.tar.gz %s",directory,G_DIR_SEPARATOR,file, source);
+                            printf("Exec: %s\n",exec);
+                            g_spawn_command_line_async(exec, NULL);
+                            g_free(exec);
+                            g_free(directory);
+                        }
+                    }
+                default:
+                    break;
+            }
+            gtk_widget_destroy(dialog);
+            g_object_unref(xml);
         }
 }
