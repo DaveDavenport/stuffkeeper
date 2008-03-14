@@ -1,0 +1,46 @@
+Possible sqlite tables:
+
+Table: general 
+; This table contains some values about the db.
+Following data should be stored:
+* db-version, so I know what to expect, and possible how to merge.
+
+The actual data:
+
++Tag
+
+Table: Tags
+Fields:
+* ID: unique id for the tag
+* Name: Tag's name
+
++Schema's:
+
+Table: Schema
+* ID: unique id
+* Type: value-type
+* Value
+
+Type:  Name, icon, etc.
+
+Table: Schema-fields
+* Schema ID
+* Field ID
+* Type
+* Value
+
+Type: Id,Name, Order, FieldType, DefaultValue, etc.
+
++Item
+
+Table: items
+* ID
+* Type
+* Value
+Type: title,Tag,  
+
+Table: items-fields
+* Item ID
+* Field ID
+* Value
+
