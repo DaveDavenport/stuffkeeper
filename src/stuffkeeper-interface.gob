@@ -652,10 +652,15 @@ class StuffKeeper:Interface from G:Object
                 if(item)
                 {
                     /* The title */
-                    GtkWidget *vbox;
+                    GtkWidget *vbox,*vbox2;
                     GtkWidget *label1;
+                    /**
+                     * Header
+                     */
                     event2 = gtk_event_box_new();
                     vbox = gtk_hbox_new(FALSE, 6);
+                    vbox2 = gtk_vbox_new(FALSE,6);
+                    gtk_container_set_border_width(GTK_CONTAINER(vbox2), 8);
                     /* Title */
                     label1 = gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Title:</b>");
@@ -673,7 +678,7 @@ class StuffKeeper:Interface from G:Object
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Type:</b>");
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                     self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
+//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     if(schema) {
                         label1 = stuffkeeper_data_label_new_schema(schema);
@@ -684,28 +689,31 @@ class StuffKeeper:Interface from G:Object
 
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                    
-                    gtk_container_set_border_width(GTK_CONTAINER(vbox), 8);
+
 
                     self_interface_header_changed(self->_priv->treeview1, NULL, event2);
-                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),event2);            
+//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),event2);            
                     self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
+//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
-                    gtk_container_add(GTK_CONTAINER(event2), vbox);
-                    gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
-                
+
+                   // gtk_container_add(GTK_CONTAINER(event2), vbox);
+                    gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
+                    vbox = gtk_hbox_new(FALSE, 6);
                     if(stuffkeeper_data_item_get_creation_time(item) > 0)
                     {
                         label1 = gtk_label_new("");
                         time_t time = stuffkeeper_data_item_get_creation_time(item);
                         struct tm *t  = localtime(&time);
                         char buffer[256];
-                        strftime(buffer,256, "%c", t);
-                        gchar *markup = g_markup_printf_escaped("<b>Created:</b> %s", buffer); 
+                        strftime(buffer,256, "%x", t);
+                        gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",("Created"), buffer); 
                         gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
                         gtk_label_set_markup(GTK_LABEL(label1), markup);
                         g_free(markup);
-                        gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
+                        gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                        self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+//                        g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
                     }
                     if(stuffkeeper_data_item_get_modification_time(item) > 0)
                     {
@@ -713,16 +721,20 @@ class StuffKeeper:Interface from G:Object
                         time_t time = stuffkeeper_data_item_get_modification_time(item);
                         struct tm *t  = localtime(&time);
                         char buffer[256];
-                        strftime(buffer,256, "%c", t);
-                        gchar *markup = g_markup_printf_escaped("<b>Modified:</b> %s", buffer); 
+                        strftime(buffer,256, "%x", t);
+                        gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",("Modified"), buffer); 
                         gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
                         gtk_label_set_markup(GTK_LABEL(label1), markup);
                         g_free(markup);
-                        gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
+                        gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                        self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+//                        g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
                     }
+                    gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
+                    gtk_container_add(GTK_CONTAINER(event2), vbox2);
+                    gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
 
-
-
+/*
 
                     label1 = gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1),"<span weight='bold' size='x-large'>Fields:</span>");
@@ -730,7 +742,7 @@ class StuffKeeper:Interface from G:Object
                     gtk_misc_set_padding(GTK_MISC(label1), 0,4);
                     gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
 
-                    
+  */                  
                     /**
                      * Get the attached schema and fill in the rest from there
                      */
@@ -740,6 +752,7 @@ class StuffKeeper:Interface from G:Object
                         vbox = stuffkeeper_show_item_new(item);
                         gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
                         gtk_table_set_col_spacings(GTK_TABLE(vbox), 6);
+                        gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
 
 
                         gtk_box_pack_start(GTK_BOX(container),vbox, TRUE,TRUE, 0);
@@ -1020,10 +1033,10 @@ class StuffKeeper:Interface from G:Object
             /**
              * Custom search widget, glade does not support, sexy-icon and screws up alignment 
              */
-            item = gtk_tool_item_new();
-            gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), TRUE);
-            ali = gtk_alignment_new(1,0.5, 0, 0);
-            gtk_container_add(GTK_CONTAINER(item), ali);
+//            item = gtk_tool_item_new();
+//            gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), TRUE);
+//            ali = gtk_alignment_new(1,0.5, 0, 0);
+//            gtk_container_add(GTK_CONTAINER(item), ali);
             /* sexy icon + setup */
             self->_priv->search_entry = sexy_icon_entry_new();
             /* Add clear button */
@@ -1032,11 +1045,12 @@ class StuffKeeper:Interface from G:Object
             sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self->_priv->search_entry),SEXY_ICON_ENTRY_PRIMARY, 
                 GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_FIND, GTK_ICON_SIZE_MENU)));
 
-            gtk_container_add(GTK_CONTAINER(ali),self->_priv->search_entry); 
+//            gtk_container_add(GTK_CONTAINER(ali),self->_priv->search_entry); 
+            gtk_box_pack_end(GTK_BOX(glade_xml_get_widget(self->_priv->xml,"hbox3")), self->_priv->search_entry, FALSE, TRUE,0);
             g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "changed", G_CALLBACK(self_search_entry_changed), self);
 
-            gtk_widget_show_all(GTK_WIDGET(item));
-            gtk_toolbar_insert(GTK_TOOLBAR(glade_xml_get_widget(self->_priv->xml, "toolbar1")), GTK_TOOL_ITEM(item),-1);
+            gtk_widget_show_all(GTK_WIDGET(self->_priv->search_entry));
+  //          gtk_toolbar_insert(GTK_TOOLBAR(glade_xml_get_widget(self->_priv->xml, "toolbar1")), GTK_TOOL_ITEM(item),-1);
 
             /* read config */
             value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "hpane", &error);

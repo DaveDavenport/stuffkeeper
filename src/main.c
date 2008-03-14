@@ -82,6 +82,8 @@ int main ( int argc, char **argv )
     g_option_context_add_group (context, gtk_get_option_group (TRUE));
     g_option_context_parse (context, &argc, &argv, &error);
 
+
+    gtk_set_locale();
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))
     {
