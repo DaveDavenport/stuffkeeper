@@ -103,6 +103,8 @@
               <widget class="GtkMenuToolButton" id="AddMenuButton">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="is_important">True</property>
+                <property name="label" translatable="yes">Add Item</property>
                 <property name="stock_id">gtk-add</property>
                 <signal name="show_menu" handler="interface_item_add_menu"/>
                 <signal name="clicked" handler="interface_item_add"/>
@@ -116,6 +118,7 @@
               <widget class="GtkToolButton" id="toolbutton2">
                 <property name="visible">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="is_important">True</property>
                 <property name="stock_id">gtk-remove</property>
                 <signal name="clicked" handler="interface_item_remove"/>
               </widget>
@@ -152,9 +155,6 @@
 Types</property>
                         <signal name="changed" handler="left_pane_changed"/>
                       </widget>
-                      <packing>
-                        <property name="expand">False</property>
-                      </packing>
                     </child>
                     <child>
                       <widget class="GtkLabel" id="item_label">
