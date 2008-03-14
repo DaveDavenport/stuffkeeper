@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include "debug.h"
 
 /* Include the database */
 #include "stuffkeeper-data-backend.h"
@@ -39,7 +40,7 @@ static GOptionEntry entries[] =
 static void bacon_on_message_received(const char *message, gpointer data)
 {
     StuffKeeperDataBackend *skdb = STUFFKEEPER_DATA_BACKEND(data);
-    printf("IPC: got '%s'\n", (message)?message:"(null)");
+    debug_printf("IPC: got '%s'\n", (message)?message:"(null)");
     if(message)
     {
         if(strcmp(message, "New Window") == 0)
@@ -47,7 +48,7 @@ static void bacon_on_message_received(const char *message, gpointer data)
             StuffKeeperInterface *ski= stuffkeeper_interface_new(config_file);
             interface_list = g_list_append(interface_list, ski);
             stuffkeeper_interface_initialize_interface(ski,skdb);
-            printf("IPC: Requested new window\n");
+            debug_printf("IPC: Requested new window\n");
         }
     }
 }
@@ -86,7 +87,7 @@ int main ( int argc, char **argv )
     {
         /* If we failed to initialize gtk+*/
         /* Tell the user */
-        printf("Failed to initialize gtk+\n");
+        debug_printf("Failed to initialize gtk+\n");
         /* return a failure */
         return EXIT_FAILURE;
     }
@@ -96,7 +97,7 @@ int main ( int argc, char **argv )
     /* Check if creating the backend worked */
     if(!skdb)
     {
-        printf("Failed to create a backend\n");
+        debug_printf("Failed to create a backend\n");
         return EXIT_FAILURE;
     }
 
@@ -115,7 +116,7 @@ int main ( int argc, char **argv )
             /* Close the connection */
             bacon_message_connection_free (bacon_connection);
             /* Returning */
-            printf("There is allready an instance running. quitting\n");
+            debug_printf("There is allready an instance running. quitting\n");
             g_object_unref(skdb); 
             exit(EXIT_SUCCESS);
         }
@@ -128,7 +129,7 @@ int main ( int argc, char **argv )
     else
     {
         /* print an error and quit */
-        printf("Failed to setup IPC, quitting\n");
+        debug_printf("Failed to setup IPC, quitting\n");
         g_object_unref(skdb); 
         /* Return error code */
         exit(EXIT_FAILURE);
@@ -143,7 +144,7 @@ int main ( int argc, char **argv )
     if(db_path != NULL)
     {
         path = g_build_path(G_DIR_SEPARATOR_S, db_path, NULL);
-        printf("Testing path: %s\n", path);
+        debug_printf("Testing path: %s\n", path);
 
     }
     else
@@ -165,20 +166,20 @@ int main ( int argc, char **argv )
 
 
     /* open config file */
-    printf("Opening config file\n"); 
+    debug_printf("Opening config file\n"); 
     config_file = g_key_file_new();
 
     config_path = g_build_path(G_DIR_SEPARATOR_S, path, "config.cfg", NULL);
     if(g_file_test(path, G_FILE_TEST_EXISTS))
     {
         GError *error = NULL;
-        printf("Loading config file\n");
-        if(g_key_file_load_from_file(config_file, config_path, G_KEY_FILE_NONE, &error))
+        debug_printf("Loading config file\n");
+        if(!g_key_file_load_from_file(config_file, config_path, G_KEY_FILE_NONE, &error))
         {
-            printf("Failed to load config file\n");
+            debug_printf("Failed to load config file\n");
             if(error)
             {
-                printf("Reported error: %s\n", error->message);
+                debug_printf("Reported error: %s\n", error->message);
                 g_error_free(error); 
             }
         }
@@ -225,7 +226,7 @@ int main ( int argc, char **argv )
             GError *error2 = NULL;
             if(!g_file_set_contents(config_path, content, length, &error2))
             {
-                printf("Failed to save file '%s': %s\n", config_path, error2->message);
+                debug_printf("Failed to save file '%s': %s\n", config_path, error2->message);
                 g_error_free(error2);
             }
             g_free(content);
@@ -234,7 +235,7 @@ int main ( int argc, char **argv )
         {
             if(error)
             {
-                printf("Failed to serialize config file: %s\n", error->message);
+                debug_printf("Failed to serialize config file: %s\n", error->message);
                 g_error_free(error);
             }
         }

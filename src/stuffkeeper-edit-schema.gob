@@ -5,6 +5,7 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 #include "config.h"
+#include "debug.h"
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -105,7 +106,7 @@ private guint field_swapped_signal = 0;
         GtkTreeIter iter;
         
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-        printf("removing field from list\n");
+        debug_printf("removing field from list\n");
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
         {
             do{
@@ -146,7 +147,7 @@ private guint field_swapped_signal = 0;
             int found1=0, found2 = 0;
             /* lookup iters */
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-            printf("swapping field in list.\n");
+            debug_printf("swapping field in list.\n");
             if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
             {
                 do{
@@ -184,7 +185,7 @@ private guint field_swapped_signal = 0;
         {
             GtkTreeIter iter;
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-            printf("new: %s\n", new_text);
+            debug_printf("new: %s\n", new_text);
             if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
                 gchar *id;
@@ -206,7 +207,7 @@ private guint field_swapped_signal = 0;
         {
             GtkTreeIter iter;
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-            printf("new: %s\n", new_text);
+            debug_printf("new: %s\n", new_text);
             if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
                 int type;
@@ -271,7 +272,7 @@ private guint field_swapped_signal = 0;
 
 
         }
-        printf("clicked\n");
+        debug_printf("clicked\n");
         return FALSE;
     }
 
@@ -288,7 +289,7 @@ private guint field_swapped_signal = 0;
             if(self->_priv->xml == NULL)
             {
                 g_object_unref(self);
-                printf("Failed top open xml file\n");
+                debug_printf("Failed top open xml file\n");
                 return NULL;
             }
 
@@ -463,7 +464,7 @@ private guint field_swapped_signal = 0;
     {
         if(self->_priv->schema != NULL)
         {
-            printf("Allready have a schema attaches\n");
+            debug_printf("Allready have a schema attaches\n");
             return;
         }
         self->_priv->schema = schema;
@@ -505,7 +506,7 @@ private guint field_swapped_signal = 0;
     finalize(G:Object *obj)
     {
         Self *self = SELF(obj);
-        printf("** Finalize edit schema\n");
+        debug_printf("** Finalize edit schema\n");
         if(self->_priv->changed_signal)
         {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->changed_signal);

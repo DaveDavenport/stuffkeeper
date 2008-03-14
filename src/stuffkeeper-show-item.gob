@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include "debug.h"
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
@@ -146,7 +147,7 @@ class StuffKeeper:Show:Item from Gtk:Table
          finalize(G:Object *obj)
          {
             Self *self = SELF(obj);
-            printf("Cleanup item view\n");
+            debug_printf("Cleanup item view\n");
             if(self->_priv->schema_field_added)
             {
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_added);

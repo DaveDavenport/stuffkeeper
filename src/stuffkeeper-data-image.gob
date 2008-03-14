@@ -7,6 +7,7 @@ requires 2.0.10
 %}
 
 %ph{
+#include "debug.h"
 #define IMAGE_SIZE 250
 %}
 
@@ -41,7 +42,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                     if(fpath)
                     {
                         GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
-                        printf("Trying to load: %s %p\n", fpath,pb);
+                        debug_printf("Trying to load: %s %p\n", fpath,pb);
                         if(pb)
                         {
                             gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
@@ -67,9 +68,9 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
             gchar *id = g_strdup_printf("%i-%s.jpg", stuffkeeper_data_item_get_id(self->_priv->item), self->_priv->field);
             gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
 
-            printf("From '%s' --> '%s'\n", original_path, fpath);
+            debug_printf("From '%s' --> '%s'\n", original_path, fpath);
             GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
-            printf("%p\n",pb);
+            debug_printf("%p\n",pb);
             gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
             g_object_unref(pb);
 
@@ -85,7 +86,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
     private void 
     button_press_event(self, GdkEventButton *event, gpointer user_data)
     {
-        printf("button-press event\n");
+        debug_printf("button-press event\n");
         if(event->button == 1)
         {
             GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick an image", 
@@ -105,7 +106,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                         gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
                         if(file)
                         {
-                            printf("Saving file: %s\n", file);
+                            debug_printf("Saving file: %s\n", file);
                             self_copy_path(self, file);
                             g_free(file);
                         }

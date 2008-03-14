@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include "debug.h"
     #include "stuffkeeper-data-backend.h"
     #include "stuffkeeper-data-item.h"
     #include "stuffkeeper-data-schema.h"
@@ -30,10 +31,10 @@ class StuffKeeper:Item:Window from Gtk:Dialog
         item_removed(self, gint id, StuffKeeperDataBackend *skdb)
         {
             gint gid = stuffkeeper_data_item_get_id(self->_priv->item);
-            printf("%i-%i\n", gid, id);
+            debug_printf("%i-%i\n", gid, id);
             if(gid == id)
             {
-                printf("destroying\n");
+                debug_printf("destroying\n");
                 gtk_dialog_response(GTK_DIALOG(self), GTK_RESPONSE_CLOSE);
             }
         }
@@ -45,7 +46,7 @@ class StuffKeeper:Item:Window from Gtk:Dialog
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_item_removed);
                 self->_priv->signal_item_removed = 0;
             }
-            printf("response\n");
+            debug_printf("response\n");
             gtk_widget_destroy(GTK_WIDGET(self));
         }
 

@@ -5,7 +5,8 @@ requires 2.0.10
     #include "stuffkeeper-data-item.h"
     #include "stuffkeeper-data-tag.h"
 %}
-%header{
+%ph{
+    #include "debug.h"
     #include <glib/gstdio.h>
     #include <stdio.h>
     #include <string.h>

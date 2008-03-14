@@ -7,6 +7,7 @@ requires 2.0.10
 %ph{
 #include <glib/gstdio.h>
 #include <stdio.h>
+#include "debug.h"
 
 #define KEYFILE_GENERAL "general"
 #define SAVE_TIMEOUT 30000
@@ -128,7 +129,7 @@ class StuffKeeper:Data:Tag from G:Object
             {
                 char *content;
                 gsize size=0;
-                printf("Saving myself tag\n");
+                debug_printf("Saving myself tag\n");
 
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
@@ -179,7 +180,7 @@ class StuffKeeper:Data:Tag from G:Object
         finalize(G:Object *obj)
         {
             Self *self = SELF(obj);
-            printf("destroying tag\n");
+            debug_printf("destroying tag\n");
             if(self->_priv->save_timeout)
             {
                 g_source_remove(self->_priv->save_timeout);

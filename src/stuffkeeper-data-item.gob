@@ -13,6 +13,7 @@ requires 2.0.10
 %}
 
 %ph{
+    #include "debug.h"
     #include "stuffkeeper-data-backend.h"
 
 %}
@@ -97,7 +98,7 @@ class StuffKeeper:Data:Item from G:Object
 
             gsize size=0;
 
-            printf("Item Saving myself\n");
+            debug_printf("Item Saving myself\n");
             /* save tags */
             /* clear previous values */
             g_key_file_remove_key(self->_priv->data, KEYFILE_GENERAL, "tags", NULL);
@@ -162,7 +163,7 @@ class StuffKeeper:Data:Item from G:Object
             while((test = stuffkeeper_data_backend_get_item(STUFFKEEPER_DATA_BACKEND(skdb),id)) != NULL)
             {
                 /* generate new id */
-                printf("%i allready exists, re-trying\n",id);
+                debug_printf("%i allready exists, re-trying\n",id);
                 id = g_random_int();
             }
 

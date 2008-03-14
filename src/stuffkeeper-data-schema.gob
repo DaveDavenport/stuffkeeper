@@ -7,10 +7,12 @@ requires 2.0.10
 %}
 
 %ph{
+#include <stdio.h>
+#include "debug.h"
 #include <glib/gstdio.h>
 #include "stuffkeeper-data-backend.h"
 
-#include <stdio.h>
+
 #define KEYFILE_GENERAL "general"
 #define KEYFILE_FIELD_TYPES "field-types" 
 #define KEYFILE_FIELD_NAMES "field-names" 
@@ -159,7 +161,7 @@ class StuffKeeper:Data:Schema from G:Object
             {
                 char *content;
                 gsize size=0;
-                printf("Saving my schema self\n");
+                debug_printf("Saving my schema self\n");
                 content = g_key_file_to_data(self->_priv->data,&size, NULL);
                 g_file_set_contents(self->_priv->path, content, size, NULL);
                 g_free(content);
@@ -402,7 +404,7 @@ class StuffKeeper:Data:Schema from G:Object
         finalize(G:Object *obj)
         {
             Self *self = SELF(obj);
-            printf("destroying schema\n");
+            debug_printf("destroying schema\n");
             if(self->_priv->save_timeout)
             {
                 g_source_remove(self->_priv->save_timeout);
@@ -449,7 +451,7 @@ class StuffKeeper:Data:Schema from G:Object
                 self->_priv->pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), "gtk-new", 16, 0, &error);
                 if(error)
                 {
-                    printf("error: %s\n", error->message);
+                    debug_printf("error: %s\n", error->message);
 
                     g_error_free(error);
                 }

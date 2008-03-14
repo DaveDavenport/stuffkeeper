@@ -6,6 +6,7 @@ requires 2.0.10
 #include <glade/glade.h>
 #include "sexy-icon-entry.h"
 #include "config.h"
+#include "debug.h"
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -133,7 +134,7 @@ class StuffKeeper:Interface from G:Object
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
-        printf("schema changed: %i\n",id);
+        debug_printf("schema changed: %i\n",id);
         GtkWidget *item = g_hash_table_lookup(self->_priv->schemas_items, &id);
         if(item) {
             gchar *name = stuffkeeper_data_schema_get_title(schema);
@@ -859,7 +860,7 @@ class StuffKeeper:Interface from G:Object
     gboolean 
     treeview2_button_press_event(self, GdkEventButton *event, GtkWidget *widget)
     {
-        printf("treeview2 buttom press event\n");
+        debug_printf("treeview2 buttom press event\n");
         if(event->button == 3)
         {
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
@@ -908,7 +909,7 @@ class StuffKeeper:Interface from G:Object
             GtkWidget *menu;
             GtkWidget *menu_item;
 
-            printf("treeview 1 button press event\n");
+            debug_printf("treeview 1 button press event\n");
             /* Create menu */
             menu = gtk_menu_new();
 
@@ -999,7 +1000,7 @@ class StuffKeeper:Interface from G:Object
             if(self->_priv->xml == NULL)
             {
                 g_object_unref(self);
-                printf("Failed top open xml file\n");
+                debug_printf("Failed top open xml file\n");
                 return NULL;
             }
             self->_priv->hpaned1 =  glade_xml_get_widget(self->_priv->xml, "hpaned1");
@@ -1040,14 +1041,14 @@ class StuffKeeper:Interface from G:Object
             /* read config */
             value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "hpane", &error);
             if(error) {
-                printf("No valid pane position: %s\n", error->message);
+                debug_printf("No valid pane position: %s\n", error->message);
                 /* Free error */
                 g_error_free(error);
                 error = NULL;
             }
             else
             {
-                printf("Setting position: %i\n", value);
+                debug_printf("Setting position: %i\n", value);
                 gtk_paned_set_position(GTK_PANED(self->_priv->hpaned1), value);
             }
             width = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "width", &error);
@@ -1116,7 +1117,7 @@ class StuffKeeper:Interface from G:Object
     void
     interface_item_add_menu(self, GtkWidget *but)
     {
-        printf("show menu\n");
+        debug_printf("show menu\n");
 
     }
 
@@ -1124,8 +1125,8 @@ class StuffKeeper:Interface from G:Object
     void
     style_changed(GtkWidget *tree,GtkStyle *old, GtkCellRenderer *renderer)
     {
-            printf("style changed\n");
-            g_object_set(G_OBJECT(renderer), 
+        debug_printf("style changed\n");
+        g_object_set(G_OBJECT(renderer), 
                     "background-set", TRUE, "background-gdk",&(GTK_WIDGET(tree)->style->bg[GTK_STATE_SELECTED]), 
                     "foreground-set", TRUE, "foreground-gdk",&(GTK_WIDGET(tree)->style->fg[GTK_STATE_SELECTED]), 
                     NULL);
@@ -1308,7 +1309,7 @@ class StuffKeeper:Interface from G:Object
         {
             int value;
             Self *self = SELF(obj);
-            printf("** Finalize stuffkeeper interface\n");
+            debug_printf("** Finalize stuffkeeper interface\n");
             if(self->_priv->signal_schema_added) { 
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_added);
                 self->_priv->signal_schema_added = 0;
@@ -1390,7 +1391,7 @@ class StuffKeeper:Interface from G:Object
 
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkTreeIter iter;
-            printf("item row activated\n");
+            debug_printf("item row activated\n");
             if(gtk_tree_model_get_iter(model,&iter, path)) 
             {
                 StuffKeeperDataItem *item;
