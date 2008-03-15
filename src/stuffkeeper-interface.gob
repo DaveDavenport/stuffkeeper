@@ -54,6 +54,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *AddMenuButton ;
     private GtkWidget *search_entry ;
     private GtkWidget *hpaned1;
+    private GtkWidget *vpaned1;
     private GtkWidget *item_label;
 
     private StuffKeeperDataBackend *skdbg = {NULL};
@@ -1027,6 +1028,7 @@ class StuffKeeper:Interface from G:Object
                 return NULL;
             }
             self->_priv->hpaned1 =  glade_xml_get_widget(self->_priv->xml, "hpaned1");
+            self->_priv->vpaned1 =  glade_xml_get_widget(self->_priv->xml, "vpaned1");
             self->_priv->LeftPaneCB  = glade_xml_get_widget(self->_priv->xml, "LeftPaneCB");
             self->_priv->treeview1 = glade_xml_get_widget(self->_priv->xml, "treeview1");
             self->_priv->treeview2 = glade_xml_get_widget(self->_priv->xml, "treeview2");
@@ -1077,6 +1079,19 @@ class StuffKeeper:Interface from G:Object
                 debug_printf("Setting position: %i\n", value);
                 gtk_paned_set_position(GTK_PANED(self->_priv->hpaned1), value);
             }
+            value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "vpane", &error);
+            if(error ) {
+                debug_printf("No valid vpane position: %s\n", error->message);
+                /* Free error */
+                g_error_free(error);
+                error = NULL;
+            }
+            else if(value > 50)
+            {
+                debug_printf("Setting position: %i\n", value);
+                gtk_paned_set_position(GTK_PANED(self->_priv->vpaned1), value);
+            }
+
             width = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "width", &error);
             if(error) {
                 g_error_free(error);
@@ -1363,6 +1378,8 @@ class StuffKeeper:Interface from G:Object
 
             value = gtk_paned_get_position(GTK_PANED(self->_priv->hpaned1));
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "hpane", value);
+            value = gtk_paned_get_position(GTK_PANED(self->_priv->vpaned1));
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "vpane", value);
             gtk_window_get_size(GTK_WINDOW(self->_priv->win), &value, NULL);
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "width", value);
             gtk_window_get_size(GTK_WINDOW(self->_priv->win), NULL, &value);
