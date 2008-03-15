@@ -595,7 +595,6 @@ class StuffKeeper:Data:Schema from G:Object
         }
         sqlite3_finalize(stmt);
         sqlite3_free(query);
-        printf("%i fields found\n",fields);
         /* if no rows, return */
         if(fields <= 0)
         {
@@ -616,7 +615,6 @@ class StuffKeeper:Data:Schema from G:Object
         }
         else
         {
-            printf("stepping through rows\n");
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 retv[i] = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
