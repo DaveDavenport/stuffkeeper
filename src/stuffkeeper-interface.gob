@@ -529,8 +529,13 @@ class StuffKeeper:Interface from G:Object
             StuffKeeperDataItem *item;
             int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
             const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->search_entry));
+            
+            
+            
+            
             /* Get the item */
             gtk_tree_model_get(model, iter, 2,&item, -1);
+
 
             if(!item) {
                 return FALSE;
@@ -560,13 +565,19 @@ class StuffKeeper:Interface from G:Object
 
                 }while(gtk_tree_model_iter_next(model2, &piter));
             }
+            if(strlen(text) > 0)
+            {
+                return stuffkeeper_data_item_has_value(item,text); 
 
-            if(strlen(text))
+            }
+            return TRUE;
+
+/*            if(strlen(text))
             {
                 int found = 0;
                 gsize length = 0;
                 gchar **values = stuffkeeper_data_item_get_values(item, &length);
-                /* Normalizse the search string */
+            
                 gchar *text1 = g_utf8_casefold(text, -1);
                 gchar *text2 = g_utf8_normalize(text1, -1, G_NORMALIZE_ALL_COMPOSE);
 
@@ -582,7 +593,7 @@ class StuffKeeper:Interface from G:Object
                             gchar *sb2 = g_utf8_normalize(sb1, -1, G_NORMALIZE_ALL_COMPOSE);
 
                             if(strstr(sb2,text2)) found = TRUE;
-                            /* free */
+                    
                             g_free(sb1);
                             g_free(sb2);
 
@@ -590,12 +601,12 @@ class StuffKeeper:Interface from G:Object
                     }
                     g_strfreev(values);
                 }
-                /* free up */
+
                 g_free(text2);
                 g_free(text1);
                 return found;
             }
-
+*/
             return TRUE; 
         }
     public

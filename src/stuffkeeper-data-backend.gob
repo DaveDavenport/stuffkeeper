@@ -111,7 +111,7 @@ class StuffKeeper:Data:Backend from G:Object
         StuffKeeperDataItem *item;
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "items", NULL);
         /* create a new item */
-        item = stuffkeeper_data_item_new(G_OBJECT(self),path,schema);
+        item = stuffkeeper_data_item_new(G_OBJECT(self),self->_priv->sqlHandle,schema);
         g_free(path);
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
@@ -146,7 +146,7 @@ class StuffKeeper:Data:Backend from G:Object
         /* Clear items */
         if(self->_priv->items)
         {
-            g_hash_table_foreach(self->_priv->items, (GHFunc)self_finalize_item, self);
+            g_hash_table_foreach(self->_priv->items, (GHFunc)self_iterate_remove_item, self);
             g_hash_table_remove_all(self->_priv->items);
         }
         if(self->_priv->tags)
@@ -156,7 +156,7 @@ class StuffKeeper:Data:Backend from G:Object
         }
         if(self->_priv->schemas)
         {
-            g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_finalize_schema, self);
+            g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_iterate_remove_schema, self);
             g_hash_table_remove_all(self->_priv->schemas);
         }
         /* close the open db */
@@ -180,10 +180,9 @@ class StuffKeeper:Data:Backend from G:Object
     void
     load(self, const gchar *db_path)
     {
-        int iter,retv;
+        int retv;
         /* item */
         gchar *path;
-        GDir *dir;
         char *query;
         sqlite3_stmt *stmt;
         const char *tail;
@@ -233,49 +232,6 @@ class StuffKeeper:Data:Backend from G:Object
         /**
          * Read Schemas 
          */
-
-/*        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas",NULL);
-        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
-        {
-            g_mkdir(path, 0755);
-        }
-*/
-        /* Load item's */
-/*        dir = g_dir_open(path, 0, NULL);
-*/
-        /* cleanup path pointer */
-  /*      g_free(path);
-        if(dir)
-        {
-            const gchar *filename;
-            iter =0;
-            while((filename = g_dir_read_name(dir))!= NULL)
-            {
-                gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas", filename,NULL);
-                StuffKeeperDataSchema *schema;
-                gint *id;
-    */            /* create a new item */
-      /*          schema = stuffkeeper_data_schema_new_from_file(G_OBJECT(self),full_path);
-    */            /* want to copy the key, even if it is an integer */
-/*                id = g_malloc0(sizeof(gint));
-                *id = stuffkeeper_data_schema_get_id(schema);
-  */              /* insert it into my hash-list */
-/*                g_hash_table_insert(self->_priv->schemas,id, schema);
-                self_schema_added(self, schema);
-                g_free(full_path);
-*/
-/*                while(iter%10 == 0 && gtk_events_pending())
-                    gtk_main_iteration();
-                    */
-/*                iter++;
-            }
-            g_dir_close(dir);
-        }
-*/
-        /**
-         * Read tags 
-         */
-
         query = sqlite3_mprintf("SELECT SchemaId FROM Schemas WHERE type=%i",DB_SCHEMAS_TYPE_ID);
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         sqlite3_free(query);
@@ -296,7 +252,6 @@ class StuffKeeper:Data:Backend from G:Object
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
-                printf("Adding: %i-%i\n", oid,stuffkeeper_data_schema_get_id(schema));
                 /* insert it into my hash-list */
                 g_hash_table_insert(self->_priv->schemas,id,schema);
                 self_schema_added(self,schema);
@@ -325,7 +280,6 @@ class StuffKeeper:Data:Backend from G:Object
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
-                printf("Adding: %i-%i\n", oid,stuffkeeper_data_tag_get_id(tag));
                 /* insert it into my hash-list */
                 g_hash_table_insert(self->_priv->tags,id, tag);
                 self_tag_added(self, tag);
@@ -333,73 +287,58 @@ class StuffKeeper:Data:Backend from G:Object
         }
         sqlite3_finalize(stmt);
 
-
-        /* test the items directory */
-        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"items",NULL);
-        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
+        /** 
+         * Items
+         */
+        query = sqlite3_mprintf("SELECT ItemId FROM Items WHERE type=%i",DB_ITEMS_TYPE_ID);
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        sqlite3_free(query);
+        if (r != SQLITE_OK)
         {
-            g_mkdir(path, 0755);
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
         }
-
-        /* Load item's */
-        dir = g_dir_open(path, 0, NULL);
-
-        /* cleanup path pointer */
-        g_free(path);
-        if(dir)
+        else
         {
-            const gchar *filename;
-            iter = 0;
-            while((filename = g_dir_read_name(dir))!= NULL)
+            printf("stepping through rows\n");
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
-                gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"items", filename,NULL);
+                gint oid = sqlite3_column_int(stmt, 0);
                 StuffKeeperDataItem *item;
                 gint *id;
                 /* create a new item */
-                item = stuffkeeper_data_item_load_from_file(G_OBJECT(self),full_path);
+                item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
-                *id = stuffkeeper_data_item_get_id(item);
+                *id = oid; 
                 /* insert it into my hash-list */
-                g_hash_table_insert(self->_priv->items,id, item);
-                self_item_added(self, item);
-
-                g_free(full_path);
-/*
-                while(iter%10 == 0 && gtk_events_pending())
-                    gtk_main_iteration();
-*/                    
-                iter++;
+                g_hash_table_insert(self->_priv->items,id,item);
+                self_item_added(self,item);
             }
-            g_dir_close(dir);
         }
+        sqlite3_finalize(stmt);
+        /* test the items directory */
     }
+    
     /**
      * Handle destroying of the object
      */
     private
     void
-    finalize_schema(gint *key, StuffKeeperDataSchema *schema, Self *self) 
+    iterate_remove_schema(gint *key, StuffKeeperDataSchema *schema, Self *self) 
     {
-        stuffkeeper_data_schema_save_yourself(schema);
-        if(self)
-            self_schema_removed(self, *key);
+        self_schema_removed(self, *key);
     }
     private
     void
-    finalize_item(gint *key, StuffKeeperDataItem *item, Self *self )
+    iterate_remove_item(gint *key, StuffKeeperDataItem *item, Self *self )
     {
-        stuffkeeper_data_item_save_yourself(item);
-        if(self)
-            self_item_removed(self, *key);
+        self_item_removed(self, *key);
     }
     private
     void
     iterate_remove_tag(gint *key, StuffKeeperDataTag *tag, Self *self)
     {
-        if(self) {
-            self_tag_removed(self, *key);
-        }
+        self_tag_removed(self, *key);
     }
 
 
@@ -412,22 +351,17 @@ class StuffKeeper:Data:Backend from G:Object
 
         if(self->_priv->items)
         {
-            g_hash_table_foreach(self->_priv->items, (GHFunc)self_finalize_item, NULL);
             g_hash_table_destroy(self->_priv->items);
-
             self->_priv->items = NULL;
         }
         if(self->_priv->tags)
         {
             g_hash_table_destroy(self->_priv->tags);
-
             self->_priv->tags = NULL;
         }
         if(self->_priv->schemas)
         {
-            g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_finalize_schema, NULL);
             g_hash_table_destroy(self->_priv->schemas);
-
             self->_priv->schemas = NULL;
         }
 
@@ -779,5 +713,39 @@ class StuffKeeper:Data:Backend from G:Object
             sqlite3_free(query);
             sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON data(SchemaId);", NULL, NULL, NULL);
         }
+        if(!has_items) {
+            printf("Create Items table\n");
+
+            query = sqlite3_mprintf("CREATE TABLE 'Items' ("
+                    "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
+                    "'ItemId'  INTEGER," /* id of the item, taken from type=ID */
+                    "'type'	    INTEGER,"  /* the key stored in value */
+                    "'value'	TEXT" /* the value */
+                    ")");
+
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+        }
+        if(!has_items_field) {
+            printf("Create ItemsFields table\n");
+
+            query = sqlite3_mprintf("CREATE TABLE 'ItemsFields' ("
+                    "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
+                    "'ItemId'   INTEGER," /* id of the field, this is taken from the id of type=ID */
+                    "'FieldId'  INTEGER," /* Id of the schema this field belongs too */
+                    "'value'	TEXT" /* the value */
+                    ")");
+
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+            sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON data(ItemId);", NULL, NULL, NULL);
+        }
+
     }
 }

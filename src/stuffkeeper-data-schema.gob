@@ -670,8 +670,6 @@ class StuffKeeper:Data:Schema from G:Object
     set_field_type(self, const gchar *id, FieldType type)
     {
         self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, id,type);
-/*        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id,type);
- */        
         self_schema_field_changed(self,id);
   
     }
@@ -694,9 +692,6 @@ class StuffKeeper:Data:Schema from G:Object
     {
         printf("seting name: %s:%s\n", id,name);
         self_field_schemas_set_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, id,name);
-/*        
-        g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name);
-        */
         self_schema_field_changed(self,id);
 
     }
@@ -769,11 +764,7 @@ class StuffKeeper:Data:Schema from G:Object
         if (result != SQLITE_OK) {
             printf("failed: %s\n", error);
         }
-/*
-        g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_TYPES, id, NULL);
-        g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_NAMES, id, NULL);
-        g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_SORT, id, NULL);
-*/
+
         /* Mark it for saving */
         self_schema_field_removed(self, id);
     }
