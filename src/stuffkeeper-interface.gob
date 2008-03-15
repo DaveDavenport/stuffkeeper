@@ -72,6 +72,8 @@ class StuffKeeper:Interface from G:Object
     private gulong signal_item_added = {0};
     private gulong signal_item_changed = {0};
     private gulong signal_item_removed = {0};
+    
+    private gulong search_timeout = {0};
 
 
 
@@ -610,11 +612,26 @@ class StuffKeeper:Interface from G:Object
 */
             return TRUE; 
         }
+    private
+    gboolean
+    search_entry_changed_timeout(self)
+    {
+        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+
+        self->_priv->search_timeout =0;
+        /* remove it */
+        return FALSE;
+    }
+    
     public
     void
     search_entry_changed(self)
     {
-        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+        if(self->_priv->search_timeout) {
+            g_source_remove(self->_priv->search_timeout);
+            self->_priv->search_timeout = 0;
+        }
+        self->_priv->search_timeout = g_timeout_add(1000,(GSourceFunc)self_search_entry_changed_timeout, self);
     }
     
 
@@ -1375,7 +1392,10 @@ class StuffKeeper:Interface from G:Object
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_tag_removed);
                 self->_priv->signal_tag_removed = 0;
             }
-
+            if(self->_priv->search_timeout) {
+                g_source_remove(self->_priv->search_timeout);
+                self->_priv->search_timeout = 0;
+            }
             value = gtk_paned_get_position(GTK_PANED(self->_priv->hpaned1));
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "hpane", value);
             value = gtk_paned_get_position(GTK_PANED(self->_priv->vpaned1));
