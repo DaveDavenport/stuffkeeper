@@ -5,6 +5,10 @@ Table: general
 Following data should be stored:
 * db-version, so I know what to expect, and possible how to merge.
 
+Table: General
+* Key 
+* Value
+
 The actual data:
 
 +Tag
@@ -13,6 +17,7 @@ Table: Tags
 Fields:
 * ID: unique id for the tag
 * Name: Tag's name
+* Modification time
 
 +Schema's:
 
@@ -21,7 +26,7 @@ Table: Schema
 * Type: value-type
 * Value
 
-Type:  Name, icon, etc.
+Type:  Name, icon, Modification time,Creation time,etc.
 
 Table: Schema-fields
 * Schema ID
@@ -37,7 +42,7 @@ Table: items
 * ID
 * Type
 * Value
-Type: title,Tag,  
+Type: title,Tag,Modification time, creation time. 
 
 Table: items-fields
 * Item ID

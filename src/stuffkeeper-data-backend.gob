@@ -6,10 +6,12 @@ requires 2.0.10
     #include "stuffkeeper-data-tag.h"
 %}
 %ph{
-    #include "debug.h"
+#include <sqlite3.h>
+#include "debug.h"
     #include <glib/gstdio.h>
     #include <stdio.h>
     #include <string.h>
+#define DB_VERSION "0.01"
 %}
 
 
@@ -29,6 +31,9 @@ class StuffKeeper:Data:Backend from G:Object
 
     /* The path this "db" resides */
     private gchar *path = {NULL} destroywith g_free;
+
+    /* SQLite handler */
+    private sqlite3 *sqlHandle = {NULL};
 
     /**
      * Signal 
@@ -146,7 +151,7 @@ class StuffKeeper:Data:Backend from G:Object
         }
         if(self->_priv->tags)
         {
-            g_hash_table_foreach(self->_priv->tags, (GHFunc)self_finalize_tag, self);
+            g_hash_table_foreach(self->_priv->tags, (GHFunc)self_iterate_remove_tag, self);
             g_hash_table_remove_all(self->_priv->tags);
         }
         if(self->_priv->schemas)
@@ -161,7 +166,7 @@ class StuffKeeper:Data:Backend from G:Object
     void
     load(self, const gchar *db_path)
     {
-        int iter;
+        int iter,retv;
         /* item */
         gchar *path;
         GDir *dir;
@@ -172,6 +177,16 @@ class StuffKeeper:Data:Backend from G:Object
             self_clear_yourself(self);
             g_free(self->_priv->path);
             self->_priv->path = NULL;
+            if(self->_priv->sqlHandle)
+            {
+                int retv = sqlite3_close(self->_priv->sqlHandle);
+                if(retv != SQLITE_OK)
+                {
+                    printf("The following error occured while trying to close the db: %s\n",
+                            sqlite3_errmsg(self->_priv->sqlHandle));
+                }
+            }
+            self->_priv->sqlHandle = NULL;
         }
 
         /**
@@ -179,8 +194,19 @@ class StuffKeeper:Data:Backend from G:Object
          */
         self->_priv->path = g_strdup(db_path);
 
-
-
+        /**
+         * The database
+         */
+        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"database.sqlite3",NULL);
+        /* open the db */
+        retv = sqlite3_open(path, &(self->_priv->sqlHandle));
+        if(retv != SQLITE_OK)
+        {
+            g_error("Failed to open the db: %s because of '%s'", path, sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        /* Check the db */
+        self_check_sqlite_db(self);
+        g_free(path);
 
         /** image dir */
         path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"images",NULL);
@@ -238,43 +264,36 @@ class StuffKeeper:Data:Backend from G:Object
         /**
          * Read tags 
          */
-        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"tags",NULL);
-        if(!g_file_test(path, G_FILE_TEST_IS_DIR))
+        char *query = "SELECT id FROM Tags";
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r != SQLITE_OK)
         {
-            g_mkdir(path, 0755);
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
         }
-
-        /* Load item's */
-        dir = g_dir_open(path, 0, NULL);
-
-        /* cleanup path pointer */
-        g_free(path);
-        if(dir)
+        else
         {
-            const gchar *filename;
-            iter = 0;
-            while((filename = g_dir_read_name(dir))!= NULL)
+            printf("stepping through rows\n");
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
-                gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"tags", filename,NULL);
+                gint oid = sqlite3_column_int(stmt, 0);
                 StuffKeeperDataTag *tag;
                 gint *id;
                 /* create a new item */
-                tag = stuffkeeper_data_tag_new_from_file(full_path);
+                tag = stuffkeeper_data_tag_open_from_id(self->_priv->sqlHandle, oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
-                *id = stuffkeeper_data_tag_get_id(tag);
+                *id = oid; 
+                printf("Adding: %i-%i\n", oid,stuffkeeper_data_tag_get_id(tag));
                 /* insert it into my hash-list */
                 g_hash_table_insert(self->_priv->tags,id, tag);
                 self_tag_added(self, tag);
-                g_free(full_path);
-/*
-                while(iter%10 == 0 && gtk_events_pending())
-                    gtk_main_iteration();
-*/                    
-                iter++;
             }
-            g_dir_close(dir);
         }
+        sqlite3_finalize(stmt);
+
 
         /* test the items directory */
         path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"items",NULL);
@@ -346,11 +365,11 @@ class StuffKeeper:Data:Backend from G:Object
     }
     private
     void
-    finalize_tag(gint *key, StuffKeeperDataTag *tag, Self *self)
+    iterate_remove_tag(gint *key, StuffKeeperDataTag *tag, Self *self)
     {
-        stuffkeeper_data_tag_save_yourself(tag);
-        if(self)
+        if(self) {
             self_tag_removed(self, *key);
+        }
     }
 
 
@@ -370,7 +389,6 @@ class StuffKeeper:Data:Backend from G:Object
         }
         if(self->_priv->tags)
         {
-            g_hash_table_foreach(self->_priv->tags, (GHFunc)self_finalize_tag, NULL);
             g_hash_table_destroy(self->_priv->tags);
 
             self->_priv->tags = NULL;
@@ -383,6 +401,20 @@ class StuffKeeper:Data:Backend from G:Object
             self->_priv->schemas = NULL;
         }
 
+        /**
+         * Clear SQLite table
+         */
+        if(self->_priv->sqlHandle)
+        {
+            int retv = sqlite3_close(self->_priv->sqlHandle);
+            if(retv != SQLITE_OK)
+            {
+                printf("The following error occured while trying to close the db: %s\n",
+                        sqlite3_errmsg(self->_priv->sqlHandle));
+            }
+            /* set pointer to NULL */
+            self->_priv->sqlHandle = NULL;
+        }
         PARENT_HANDLER(obj);
     }
 
@@ -528,14 +560,13 @@ class StuffKeeper:Data:Backend from G:Object
         {
             return tag;
         }
+        printf("Tag not found, this aint good\n");
         /* No tag, lets make one. */
-        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "tags", NULL);
-        tag = stuffkeeper_data_tag_new_with_id(path,id);
-        g_free(path);
+        tag = stuffkeeper_data_tag_new_with_id(self->_priv->sqlHandle,id);
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
-        *ide = id;
+        *ide = stuffkeeper_data_tag_get_id(tag);
         g_hash_table_insert(self->_priv->tags,ide, tag);
 
         self_tag_added(self, tag);
@@ -555,14 +586,15 @@ class StuffKeeper:Data:Backend from G:Object
     StuffKeeperDataTag *
     new_tag(self)
     {
-         gint id = g_random_int();
-         /* Check if the random id is allready available */
-         while(self_get_tag(self, id) != NULL)
-         {
-             id = g_random_int();
-         }
+        gint *ide;
+        StuffKeeperDataTag *tag = stuffkeeper_data_tag_new(self->_priv->sqlHandle);
         /* We have a valid id now, so add it */
-        return self_add_tag(self, id);
+        /* Add to the list */
+        ide = g_malloc0(sizeof(gint));
+        *ide = stuffkeeper_data_tag_get_id(tag);
+        g_hash_table_insert(self->_priv->tags,ide, tag);
+        self_tag_added(self, tag);
+        return tag; 
     }
 
     public
@@ -600,5 +632,102 @@ class StuffKeeper:Data:Backend from G:Object
     get_path(self)
     {
         return self->_priv->path;
+    }
+
+    /**
+     * SQLITE 
+     */
+    /* function checks if all the tables exist */
+    private
+    void
+    check_sqlite_db(self)
+    {
+        /* available tables */
+        gboolean has_general = FALSE;
+        gboolean has_tags = FALSE;
+        gboolean has_schemas = FALSE;
+        gboolean has_schemas_field = FALSE;
+        gboolean has_items = FALSE;
+        gboolean has_items_field = FALSE;
+
+
+        int i;
+        int result = 0;
+        char *error = NULL;
+        char **resultp = NULL;
+        int rows, columns;
+        char *query = NULL;
+        
+        /* Check what tables exists */
+        query = sqlite3_mprintf("select tbl_name from sqlite_master where type='table'");
+        /* execute */
+        result = sqlite3_get_table(self->_priv->sqlHandle, query, &resultp, &rows, &columns,&error);
+        for (i = 1; i < (rows + 1); i++) {
+            /** Check for availible tables */
+            if (!strcmp(resultp[i], "General")) {
+                has_general = TRUE;
+            }
+            if (!strcmp(resultp[i], "Tags")) {
+                has_tags = TRUE;
+            }
+            if (!strcmp(resultp[i], "Schemas")) {
+                has_schemas = TRUE;
+            }
+            if (!strcmp(resultp[i], "SchemasField")) {
+                has_schemas_field = TRUE;
+            }
+            if (!strcmp(resultp[i], "Items")) {
+                has_items = TRUE;
+            }
+            if (!strcmp(resultp[i], "ItemsField")) {
+                has_items_field = TRUE;
+            }
+        }
+        
+        /* if not exists, create the general table */
+        if(!has_general) {
+            printf("Create general table\n");
+
+            query = sqlite3_mprintf("CREATE TABLE 'General' ("
+                    "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
+                    "'key'	    TEXT,"  /* the key stored in value */
+                    "'value'	TEXT" /* the value */
+                    ")");
+
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+            /* store db version */
+            query = sqlite3_mprintf("INSERT INTO 'General' ('key', 'value') VALUES('%q','%q')","Version", DB_VERSION);
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+        }
+        if(!has_tags) {
+            printf("Create Tags table\n");
+
+            query = sqlite3_mprintf("CREATE TABLE 'Tags' ("
+                    "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
+                    "'mtime'	INTEGER,"  /* the key stored in value */
+                    "'name'	    TEXT" /* the value */
+                    ")");
+
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+        }
+
+
+
+
+
+
+
+
     }
 }

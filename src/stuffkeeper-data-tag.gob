@@ -1,12 +1,17 @@
 requires 2.0.10
 
+%h{
+#include <sqlite3.h>
+%}
 %{
-    #include "stuffkeeper-data-item.h"
+
+#include "stuffkeeper-data-item.h"
 %}
 
 %ph{
 #include <glib/gstdio.h>
 #include <stdio.h>
+
 #include "debug.h"
 
 #define KEYFILE_GENERAL "general"
@@ -16,13 +21,9 @@ requires 2.0.10
 
 class StuffKeeper:Data:Tag from G:Object 
 {
-    private gboolean changed = {FALSE};
-    private GKeyFile *data = {NULL};
-    private char * path = {NULL} destroywith g_free;
-
     private GList *items = {NULL} destroywith g_list_free;
-
-    private guint save_timeout = {0};
+    private sqlite3 *sqlHandle = {NULL};
+    private gint id = {0};
 
     /**
      * Signals 
@@ -34,55 +35,72 @@ class StuffKeeper:Data:Tag from G:Object
         
         }
 
-    private
-        void
-        mark_changed(self)
-        {
-            if(self->_priv->save_timeout)
-            {
-                g_source_remove(self->_priv->save_timeout);
-                self->_priv->save_timeout = 0;
-            }
-            self->_priv->changed = TRUE;
-
-            self->_priv->save_timeout = g_timeout_add(SAVE_TIMEOUT, (GSourceFunc)self_save_yourself, self);
-        }
-
-
+   
     /**
      * Constructors
      */
-
+    public
+    StuffKeeperDataTag *
+    open_from_id(sqlite3 *sqlHandle, gint id)
+    {
+        Self *obj = GET_NEW;
+        obj->_priv->id = id;
+        obj->_priv->sqlHandle = sqlHandle;
+        return obj;
+    }
     public
         StuffKeeperDataTag*
-        new_from_file (const gchar *file)
+        new(sqlite3 *sqlHandle)
         {
             Self *obj = GET_NEW;
-            obj->_priv->data = g_key_file_new();
-            obj->_priv->path = g_strdup(file);
-            g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
-            /* Mark unchanged */
-            obj->_priv->changed = FALSE;
-            if(obj->_priv->save_timeout)
-            {
-                g_source_remove(obj->_priv->save_timeout);
-                obj->_priv->save_timeout = 0;
+            int result = 0;
+            char *error = NULL;
+            char *query  = NULL;
+
+
+            obj->_priv->sqlHandle = sqlHandle;
+
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Tags' ('mtime','name')"
+                 "values (%i,'%q');",
+                 (int)time(NULL), "New Tag");
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
             }
+            sqlite3_free(query);
+            obj->_priv->id = sqlite3_last_insert_rowid(obj->_priv->sqlHandle);
 
             return obj;
         }
-
     public
-        StuffKeeperDataTag*
-        new_with_id (const gchar *path,gint id)
-        {
-            Self *obj = GET_NEW;
-            obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
-            obj->_priv->data = g_key_file_new();
-            g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            self_save_yourself(obj);
-            return obj;
+    StuffKeeperDataTag*
+    new_with_id(sqlite3 *sqlHandle, gint id)
+    {
+        Self *obj = GET_NEW;
+        int result = 0;
+        char *error = NULL;
+        char *query  = NULL;
+
+
+        obj->_priv->sqlHandle = sqlHandle;
+
+        query = sqlite3_mprintf
+            ("INSERT INTO 'Tags' ('id','mtime','name')"
+             "values (%i,%i,'%q');",
+             id,(int)time(NULL), "New Tag");
+
+        result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
         }
+        sqlite3_free(query);
+        obj->_priv->id = id; 
+
+        return obj;
+    }
+
 
     /**
      * ID (ro)
@@ -91,8 +109,7 @@ class StuffKeeper:Data:Tag from G:Object
         gint
         get_id(self)
         {
-            gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "id",NULL);
-            return id;
+            return self->_priv->id;
         }
 
     /**
@@ -102,7 +119,26 @@ class StuffKeeper:Data:Tag from G:Object
     gchar *
     get_title(self)
     {
-        return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, "title", NULL); 
+        char *retv = NULL;
+        char *query = sqlite3_mprintf("SELECT name FROM Tags WHERE id=%i", self->_priv->id);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        if(retv == NULL)
+            retv = g_strdup("Failed to get row");
+
+        sqlite3_free(query);
+        return retv; 
     }
 
 
@@ -110,49 +146,36 @@ class StuffKeeper:Data:Tag from G:Object
     void
     set_title(self, const gchar *title)
     {
-        g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
+        int result;
+        char *error;
+        char *query =  sqlite3_mprintf("UPDATE Tags SET mtime=%i,name=%Q WHERE id=%i",(int)time(NULL), title, self->_priv->id);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
         self_tag_changed(self);
-        /* Mark changed */
-        self_mark_changed(self);
     }
 
 
     /**
      * Functions to manage 
      */
-    public
-        void
-        save_yourself(self)
-        {
 
-            if(self->_priv->data && self->_priv->changed == TRUE)
-            {
-                char *content;
-                gsize size=0;
-                debug_printf("Saving myself tag\n");
-
-                content = g_key_file_to_data(self->_priv->data,&size, NULL);
-                g_file_set_contents(self->_priv->path, content, size, NULL);
-
-                g_free(content);
-                /* Mark changed */
-                self->_priv->changed = FALSE;
-            }
-            if(self->_priv->save_timeout)
-            {
-                g_source_remove(self->_priv->save_timeout);
-                self->_priv->save_timeout = 0;
-            }
-        }
 
     public
         void
         delete_yourself(self)
         {
-            g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
-            g_unlink(self->_priv->path);
-            g_free(self->_priv->path);
-            self->_priv->path = NULL;
+            int result;
+            char *error;
+            char *query =  sqlite3_mprintf("DELETE FROM Tags WHERE id=%i",self->_priv->id);
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+            self->_priv->id = 0;
         }
 
     public
@@ -179,15 +202,6 @@ class StuffKeeper:Data:Tag from G:Object
         void
         finalize(G:Object *obj)
         {
-            Self *self = SELF(obj);
             debug_printf("destroying tag\n");
-            if(self->_priv->save_timeout)
-            {
-                g_source_remove(self->_priv->save_timeout);
-                self->_priv->save_timeout = 0;
-            }
         }
-
-
-
 }
