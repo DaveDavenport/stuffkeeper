@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
+#include <sqlite3.h>
 
 %}
 
@@ -13,12 +14,7 @@ requires 2.0.10
 #include "stuffkeeper-data-backend.h"
 
 
-#define KEYFILE_GENERAL "general"
-#define KEYFILE_FIELD_TYPES "field-types" 
-#define KEYFILE_FIELD_NAMES "field-names" 
-#define KEYFILE_FIELD_SORT  "field-sort"
 #include "stuffkeeper-data-item.h"
-#define SAVE_TIMEOUT 30000 
 #define ICON_SIZE 16
 %}
 %h{
@@ -50,14 +46,26 @@ requires 2.0.10
     };
 
     typedef struct _a { char *id; int pos; }a;
+%}
+%h{
+    typedef enum _DbSchemaType {
+        DB_SCHEMAS_TYPE_ID = 1,
+        DB_SCHEMAS_TYPE_MTIME = 2,
+        DB_SCHEMAS_TYPE_CTIME = 3,
+        DB_SCHEMAS_TYPE_ICON = 4,
+        DB_SCHEMAS_TYPE_NAME = 5
 
+    }DbSchemaType;
+    typedef enum _DbSchemaFieldType {
+        DB_SCHEMAS_FIELD_TYPE_ID = 1,
+        DB_SCHEMAS_FIELD_TYPE_ORDER = 2,
+        DB_SCHEMAS_FIELD_TYPE_TYPE = 3,
+        DB_SCHEMAS_FIELD_TYPE_NAME = 4
 
+    }DbSchemaFieldType;
 %}
 class StuffKeeper:Data:Schema from G:Object 
 {
-    private gboolean changed = {FALSE};
-    private GKeyFile *data = {NULL};
-    private char * path = {NULL} destroywith g_free;
     /* Image matching */
     private GdkPixbuf *pb = {NULL} destroywith g_object_unref;
     private StuffKeeperDataBackend *skdb = {NULL};
@@ -65,7 +73,8 @@ class StuffKeeper:Data:Schema from G:Object
 
     private GList *items = {NULL} destroywith g_list_free;
 
-    private guint save_timeout = {0};
+    private sqlite3 *sqlHandle = {NULL};
+    private gint id = {0};
     /**
      * Signals 
      */
@@ -96,57 +105,183 @@ class StuffKeeper:Data:Schema from G:Object
         schema_field_removed(self,const gchar *field)
         {
         }
-   private
-       void
-    mark_changed(self)
-    {
-        if(self->_priv->save_timeout)
-        {
-            g_source_remove(self->_priv->save_timeout);
-            self->_priv->save_timeout = 0;
-        }
-        self->_priv->changed = TRUE;
 
-        self->_priv->save_timeout = g_timeout_add(SAVE_TIMEOUT, (GSourceFunc)self_save_yourself, self);
-    }
+
+    /**
+     * Update mtime
+     */
+
+
+    private 
+    void
+    update_mtime(self)
+    {
+        char *query,*error;
+        int result;
+        /* modification time */
+        query = sqlite3_mprintf
+            ("UPDATE Schemas SET value='%i' WHERE SchemaId=%i and Type=%i",
+             (int)time(NULL),self->_priv->id,DB_SCHEMAS_TYPE_MTIME);
+
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            printf("failed to update mtime: %s\n", error);
+        }
+        sqlite3_free(query);
+   }
 
     /**
      * Constructors
      */
-    public
-    StuffKeeperDataSchema *
-        new_from_file (GObject *skdb, const gchar *file)
+
+   public
+       StuffKeeperDataSchema *
+        open_from_id (GObject *skdb, sqlite3 *sqlHandle, gint id) 
         {
             Self *obj = GET_NEW;
-            gchar *value;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
-
-            obj->_priv->data = g_key_file_new();
-            obj->_priv->path = g_strdup(file);
-            g_key_file_load_from_file(obj->_priv->data, obj->_priv->path, G_KEY_FILE_KEEP_COMMENTS, NULL);
-
-            /* load the icon, if available */
-            value = g_key_file_get_string(obj->_priv->data, KEYFILE_GENERAL, "icon", NULL); 
-            if(value)
-            {
-                gchar *path = g_build_path(G_DIR_SEPARATOR_S,stuffkeeper_data_backend_get_path(obj->_priv->skdb),"images",value,NULL);
-                obj->_priv->pb = gdk_pixbuf_new_from_file_at_scale(path, 16,16,TRUE,NULL);
-                g_free(path);
-                g_free(value);
-            }
+            obj->_priv->id = id;
+            obj->_priv->sqlHandle = sqlHandle;
             return obj;
         }
 
     public
-     StuffKeeperDataSchema *
-        new_with_id (GObject *skdb,const gchar *path,gint id)
+        StuffKeeperDataSchema*
+        new(GObject *skdb,sqlite3 *sqlHandle)
         {
             Self *obj = GET_NEW;
+            int result = 0;
+            char *error = NULL;
+            char *query  = NULL;
+
+
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
-            obj->_priv->path = g_strdup_printf("%s%c%i", path, G_DIR_SEPARATOR,id);
-            obj->_priv->data = g_key_file_new();
-            g_key_file_set_integer(obj->_priv->data, KEYFILE_GENERAL,"id", id);
-            self_save_yourself(obj);
+            obj->_priv->sqlHandle = sqlHandle;
+            /**
+             * Insert the first item in the list
+             */
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('type','value')"
+                 "values (%i,'%i');",
+                 DB_SCHEMAS_TYPE_ID, -1);
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            /* Get the id of the insert, this is now the unique id for this field*/
+            obj->_priv->id = sqlite3_last_insert_rowid(obj->_priv->sqlHandle);
+
+            /* update the last inserted row */
+            query = sqlite3_mprintf
+                ("UPDATE Schemas SET SchemaId='%i' WHERE id=%i and type=%i",
+                 obj->_priv->id,obj->_priv->id, DB_SCHEMAS_TYPE_ID);
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            /* creation time */
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+                 "values (%i,%i,'%i');",
+                 obj->_priv->id,DB_SCHEMAS_TYPE_CTIME, (int)time(NULL));
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            /* update mtime */
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+             "values (%i,%i,'%i');",
+             obj->_priv->id,DB_SCHEMAS_TYPE_MTIME, (int)time(NULL));
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed to update mtime: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+                 "values (%i,%i,%Q);",
+                 obj->_priv->id,DB_SCHEMAS_TYPE_NAME, "New Schema");
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            return obj;
+        }
+   public
+        StuffKeeperDataSchema*
+        new_with_id(GObject *skdb,sqlite3 *sqlHandle,gint id)
+        {
+            Self *obj = GET_NEW;
+            int result = 0;
+            char *error = NULL;
+            char *query  = NULL;
+
+
+            obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+            obj->_priv->id = id;
+            obj->_priv->sqlHandle = sqlHandle;
+
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+                 "values (%i,%i,'%i');",
+                 obj->_priv->id,DB_SCHEMAS_TYPE_ID, -1);
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+            /* creation time */
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+                 "values (%i,%i,'%i');",
+                 obj->_priv->id,DB_SCHEMAS_TYPE_CTIME, (int)time(NULL));
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            /* modification time */
+
+            /* update mtime */
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+             "values (%i,%i,'%i');",
+             obj->_priv->id,DB_SCHEMAS_TYPE_MTIME, (int)time(NULL));
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed to update mtime: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            query = sqlite3_mprintf
+                ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+                 "values (%i,%i,%Q);",
+                 obj->_priv->id,DB_SCHEMAS_TYPE_NAME, "New Schema");
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
             return obj;
         }
 
@@ -157,32 +292,29 @@ class StuffKeeper:Data:Schema from G:Object
         void
         save_yourself(self)
         {
-            if(self->_priv->data && self->_priv->changed == TRUE)
-            {
-                char *content;
-                gsize size=0;
-                debug_printf("Saving my schema self\n");
-                content = g_key_file_to_data(self->_priv->data,&size, NULL);
-                g_file_set_contents(self->_priv->path, content, size, NULL);
-                g_free(content);
-                /* reset changed */
-                self->_priv->changed = FALSE;
-            }
-            if(self->_priv->save_timeout)
-            {
-                g_source_remove(self->_priv->save_timeout);
-                self->_priv->save_timeout = 0;
-            }
+            printf("Deprecated\n");
         }
 
     public
         void
         delete_yourself(self)
         {
-            g_key_file_set_integer(self->_priv->data, KEYFILE_GENERAL,"id", -1);
-            g_unlink(self->_priv->path);
-            g_free(self->_priv->path);
-            self->_priv->path = NULL;
+            int result;
+            char *error;
+            char *query =  sqlite3_mprintf("DELETE FROM Schemas WHERE SchemaId=%i",self->_priv->id);
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+            query =  sqlite3_mprintf("DELETE FROM SchemasFields WHERE SchemaId=%i",self->_priv->id);
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);                                                                  
+            }
+            sqlite3_free(query);
+
+            self->_priv->id = 0;
         }
 
     /**
@@ -192,79 +324,309 @@ class StuffKeeper:Data:Schema from G:Object
         gint
         get_id(self)
         {
-            gint id = g_key_file_get_integer(self->_priv->data, KEYFILE_GENERAL, "id",NULL);
-            return id;
+            return self->_priv->id;
         }
 
     /**
      * Title (rw)
      */
-    public 
+    private 
     gchar *
-    get_title(self)
+    schemas_get_field(self, int fieldtype)
     {
-        return g_key_file_get_string(self->_priv->data, KEYFILE_GENERAL, "title", NULL); 
+        char *retv = NULL;
+        char *query = sqlite3_mprintf("SELECT value FROM Schemas WHERE SchemaId=%i and type=%i", self->_priv->id,fieldtype);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        sqlite3_free(query);
+        return retv; 
+
     }
+    /**
+     * Setting getting helper functions 
+     */    
+    private 
+    gchar *
+    field_schemas_get_field_string(self, int fieldtype, const char *field)
+    {
+        char *retv = NULL;
+        char *query = sqlite3_mprintf("SELECT value FROM SchemasFields WHERE SchemaId=%i and type=%i and FieldId=%q", 
+                    self->_priv->id,
+                    fieldtype,
+                    field);
+
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        sqlite3_free(query);
+        return retv; 
+
+    }
+    private 
+    gboolean
+    field_schemas_get_field_integer(self, int fieldtype, const char *field, int *out)
+    {
+        int set = FALSE;
+        char *query = sqlite3_mprintf("SELECT value FROM SchemasFields WHERE SchemaId=%i and type=%i and FieldId=%q", 
+                self->_priv->id,
+                fieldtype,
+                field);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                *out =sqlite3_column_int(stmt, 0);
+                set = TRUE;
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        sqlite3_free(query);
+        return set; 
+
+    }
+    public 
+    void
+    field_schemas_set_field_integer(self,int fieldtype,const gchar *id, const int title)
+    {
+        int result;
+        char *error;
+        char *query;
+        int val ;
+        int set;
+        set = self_field_schemas_get_field_integer(self, fieldtype,id,&val);
+        /* no field, create it */
+        if(!set)
+        {
+            query = sqlite3_mprintf("INSERT INTO 'SchemasFields' ('SchemaId','FieldId','type','value')"
+                                   "values (%i,%q,%i,%i);",
+                                    self->_priv->id,
+                                    id,
+                                    fieldtype,
+                                    title);
+        }
+        else{
+            /* if they are identical, do nothing */
+            if(title == val)
+            {
+                printf("not updating\n");
+                return;
+            }
+            /* update the title */
+            query = sqlite3_mprintf("UPDATE SchemasFields SET value=%i WHERE SchemaId=%i and type=%i and FieldId=%q", title, self->_priv->id,fieldtype,id);
+
+        }
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+        /* update mtime */
+        self_update_mtime(self);
+        /* signal that we changed */
+    //    self_schema_field_changed(self,id);
+    }
+
+    public 
+    void
+    field_schemas_set_field_string(self,int fieldtype,const gchar *id, const gchar *title)
+    {
+        int result;
+        char *error;
+        char *query;
+        char *val;
+        val = self_field_schemas_get_field_string(self, fieldtype,id);
+        /* no field, create it */
+        if(!val)
+        {
+            query = sqlite3_mprintf("INSERT INTO 'SchemasFields' ('SchemaId','FieldId','type','value')"
+                                   "values (%i,%q,%i,%Q);",
+                                    self->_priv->id,
+                                    id,
+                                    fieldtype,
+                                    title);
+        }
+        else{
+            /* if they are identical, do nothing */
+            if(strcmp(title, val) == 0)
+            {
+                g_free(val);
+                printf("not updating\n");
+                return;
+            }
+            /* update the title */
+            query = sqlite3_mprintf("UPDATE SchemasFields SET value=%Q WHERE SchemaId=%i and type=%i and FieldId=%q", 
+                    title, 
+                    self->_priv->id,
+                    fieldtype,
+                    id);
+            g_free(val);
+        }
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+        /* update mtime */
+        self_update_mtime(self);
+        /* signal that we changed */
+//        self_schema_field_changed(self,id);
+    }
+
+
+
 
 
     public 
     void
+    schemas_set_field(self,int fieldtype, const gchar *title)
+    {
+        int result;
+        char *error;
+        char *query;
+        char *val;
+        val = self_schemas_get_field(self, fieldtype);
+        /* no field, create it */
+        if(!val)
+        {
+            query = sqlite3_mprintf("INSERT INTO 'Schemas' ('SchemaId','type','value')"
+                                   "values (%i,%i,%Q);",
+                                    self->_priv->id,
+                                    fieldtype,
+                                    title);
+        }
+        else{
+            /* if they are identical, do nothing */
+            if(strcmp(title, val) == 0)
+            {
+                g_free(val);
+                printf("not updating\n");
+                return;
+            }
+            /* update the title */
+            query = sqlite3_mprintf("UPDATE Schemas SET value=%Q WHERE SchemaId=%i and type=%i", title, self->_priv->id,fieldtype);
+            g_free(val);
+        }
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+        /* update mtime */
+        self_update_mtime(self);
+        /* signal that we changed */
+//        self_schema_changed(self);
+    }
+
+    /**
+     * Title (rw)
+     */
+    public
+    void
     set_title(self, const gchar *title)
     {
-        g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "title", title);
+        self_schemas_set_field(self, DB_SCHEMAS_TYPE_NAME, title);
         self_schema_changed(self);
-        /* mark changed */
-        self_mark_changed(self);
     }
+
+    public 
+    gchar *
+    get_title(self)
+    {
+        char *retv = self_schemas_get_field(self, DB_SCHEMAS_TYPE_NAME);
+        if(!retv)
+            retv = g_strdup("Failed to get title\n");
+        return retv;
+    }
+
     /**
-     * Some nasty hacking to return a ordered list.
+     * Fields
      */
-     private 
-     int
-     sort_a_list(a *aa, a *ab)
-     {
-        return aa->pos - ab->pos;
-     }
+
     public
     gchar **
     get_fields(self, gsize *size)
     {
+        int fields =-1;
+        char *query;
         gchar **retv = NULL;
-        a *l = NULL;
-        GList *iter,*list = NULL;
-        *size = 0;
-        int i =0;
-        retv = g_key_file_get_keys(self->_priv->data, KEYFILE_FIELD_TYPES,size, NULL);
-        if(!retv)
-            return retv;
-        /* fix "old" schema's */
-        if(!g_key_file_has_group(self->_priv->data, KEYFILE_FIELD_SORT))
+        int i=0;
+        /* count the number of fields */
+        query = sqlite3_mprintf("SELECT COUNT(DISTINCT FieldId) FROM SchemasFields WHERE SchemaId=%i",self->_priv->id);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
         {
-            for(i=0;i<*size;i++)
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
-                g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,retv[i],i);
+                fields = sqlite3_column_int(stmt, 0);
             }
-            self_mark_changed(self);
         }
-
-        for( i=0;i<*size;i++)
+        else
         {
-            l = g_malloc0(sizeof(*l));
-            l->id = retv[i];
-            l->pos = self_get_field_pos(self, retv[i]);
-            list = g_list_prepend(list, l);
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
         }
-        list = g_list_sort(list, (GCompareFunc)self_sort_a_list);
-        i =0;
-        for(iter = g_list_first(list);iter;iter = g_list_next(iter))
+        sqlite3_finalize(stmt);
+        sqlite3_free(query);
+        printf("%i fields found\n",fields);
+        /* if no rows, return */
+        if(fields <= 0)
         {
-            l = iter->data;
-            retv[i] = l->id;
-            i++;
+            *size = 0;
+            return NULL;
         }
+        /* get the rows, ordered */
+        retv = g_malloc0((fields+1)*sizeof(gchar *));
+        query = sqlite3_mprintf("SELECT FieldId FROM SchemasFields WHERE SchemaId=%i and type=%i ORDER BY value ASC",
+                    self->_priv->id,
+                    DB_SCHEMAS_FIELD_TYPE_ORDER);
 
-        g_list_foreach(list, (GFunc)g_free, NULL);
-        g_list_free(list);
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        sqlite3_free(query);
+        if (r != SQLITE_OK)
+        {
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        else
+        {
+            printf("stepping through rows\n");
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                retv[i] = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
+                printf("adding id: %s\n", retv[i]);
+                i++;
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        *size = fields;
         return retv;
     }
 
@@ -272,7 +634,9 @@ class StuffKeeper:Data:Schema from G:Object
     int 
     get_field_pos(self, const gchar *id)
     {
-        return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_SORT,id, NULL);
+        int val=0;
+        self_field_schemas_get_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id,&val);
+        return val; 
     }
 
     public 
@@ -281,51 +645,60 @@ class StuffKeeper:Data:Schema from G:Object
     {
         int pos = self_get_field_pos(self, id);
         int pos2 = self_get_field_pos(self, id2);
-        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,id,pos2);
-        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,id2,pos);
 
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id,pos2);
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id2,pos);
 
-        self_schema_field_changed(self,id);
-        self_schema_field_changed(self,id2);
+        self_schema_field_changed(self, id);
+        self_schema_field_changed(self, id2);
+
         self_schema_field_swapped(self, id, id2);
-        self_mark_changed(self);
     }
 
     public 
     FieldType 
     get_field_type(self, const gchar *id)
     {
-        return g_key_file_get_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, NULL);
+        int val=0;
+        self_field_schemas_get_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, id,&val);
+        return val; 
     }
+
     /* Be carefull with this */
     public 
     void 
     set_field_type(self, const gchar *id, FieldType type)
     {
-        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id,type);
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, id,type);
+/*        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id,type);
+ */        
         self_schema_field_changed(self,id);
-        self_mark_changed(self);
+  
     }
-
-
-
-
-
 
     public
     gchar *
     get_field_name(self, const gchar *id)
     {
-        return g_key_file_get_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, NULL);
+        printf("getting name: %s\n", id);
+
+        char *retv = self_field_schemas_get_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, id);
+        if(!retv)
+            retv = g_strdup("N/A");
+        return retv; 
     }
 
     public
     void
     set_field_name(self, const gchar *id, const gchar *name)
     {
+        printf("seting name: %s:%s\n", id,name);
+        self_field_schemas_set_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, id,name);
+/*        
         g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name);
+        */
         self_schema_field_changed(self,id);
-        self_mark_changed(self);
+
     }
     /* Field editing */
     public
@@ -335,12 +708,11 @@ class StuffKeeper:Data:Schema from G:Object
         gchar **retv = NULL; 
         gsize size=0;
         int pos = 0;
-        gchar *id = g_strdup_printf("%u", (guint)g_random_int());
-        while(g_key_file_has_key(self->_priv->data, KEYFILE_FIELD_TYPES, id, NULL))
-        {
-            g_free(id);
-            id = g_strdup_printf("%u", (guint)g_random_int());
-        }
+        int result = 0;
+        char *error = NULL;
+        char *query  = NULL;
+        gint id;
+        gchar *cid = NULL;
         /* find new position */
         retv = self_get_fields(self,&size);
         if(retv && size > 0)
@@ -350,30 +722,59 @@ class StuffKeeper:Data:Schema from G:Object
         }
         g_strfreev(retv);
 
-        /* Add the field */
-        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_TYPES,id, field); 
-        g_key_file_set_string(self->_priv->data, KEYFILE_FIELD_NAMES,id, name); 
-        g_key_file_set_integer(self->_priv->data, KEYFILE_FIELD_SORT,id, pos); 
 
-        /* Mark it for saving */
-        self_mark_changed(self);
+        /* insert it */
+        query = sqlite3_mprintf("INSERT INTO 'SchemasFields' ('SchemaId','type','value')"
+                 "values (%i,%i,'%i');",
+                 self->_priv->id,
+                 DB_SCHEMAS_FIELD_TYPE_ID,
+                 -1);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        sqlite3_free(query);
+        if(result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+            return;
+        }
+        id = sqlite3_last_insert_rowid(self->_priv->sqlHandle);
+        query = sqlite3_mprintf("UPDATE SchemasFields SET FieldId='%i' WHERE id=%i",
+                        id,
+                        id);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        sqlite3_free(query);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+        }
+        
+       /* Add the field */
+        cid = g_strdup_printf("%i", id);
 
-        self_schema_field_added(self, id);
-        g_free(id);
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, cid,FIELD_TYPE_STRING);
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, cid,pos);
+        self_field_schemas_set_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, cid,name);
+
+        self_schema_field_added(self, cid);
+        g_free(cid);
     }
     public
     void
     remove_field(self, const gchar *id)
     {
-        /* Remove the type field */
+        int result;
+        char *error;
+        char *query = sqlite3_mprintf("DELETE FROM SchemasFields WHERE FieldId=%q and SchemaId=%i",
+                id,
+                self->_priv->id);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        sqlite3_free(query);
+        if (result != SQLITE_OK) {
+            printf("failed: %s\n", error);
+        }
+/*
         g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_TYPES, id, NULL);
-        /* Remove the Name field */
         g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_NAMES, id, NULL);
-        /* Remove sort field */
         g_key_file_remove_key(self->_priv->data, KEYFILE_FIELD_SORT, id, NULL);
-
+*/
         /* Mark it for saving */
-        self_mark_changed(self);
         self_schema_field_removed(self, id);
     }
 
@@ -403,15 +804,10 @@ class StuffKeeper:Data:Schema from G:Object
         void
         finalize(G:Object *obj)
         {
-            Self *self = SELF(obj);
             debug_printf("destroying schema\n");
-            if(self->_priv->save_timeout)
-            {
-                g_source_remove(self->_priv->save_timeout);
-                self->_priv->save_timeout = 0;
-            }
         }
-
+        
+        /* Icon handling */
         public
         void 
         set_icon(self, const gchar *filename)
@@ -428,14 +824,13 @@ class StuffKeeper:Data:Schema from G:Object
                 self->_priv->pb = gdk_pixbuf_new_from_file_at_scale(filename, ICON_SIZE,ICON_SIZE, TRUE, NULL);
                 gdk_pixbuf_save(self->_priv->pb, dest_path, "png", NULL,NULL);
             
-                g_key_file_set_string(self->_priv->data, KEYFILE_GENERAL, "icon", value); 
+                self_schemas_set_field(self, DB_SCHEMAS_TYPE_ICON, value);
             }
             else 
             {
-                g_key_file_remove_key (self->_priv->data, KEYFILE_GENERAL, "icon", NULL);
+                self_schemas_set_field(self, DB_SCHEMAS_TYPE_ICON, "");
             }
             
-            self_mark_changed(self);
             self_schema_changed(self);
 
             g_free(value);
@@ -448,7 +843,18 @@ class StuffKeeper:Data:Schema from G:Object
         {
             if(self->_priv->pb == NULL) {
                 GError *error = NULL;
-                self->_priv->pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), "gtk-new", 16, 0, &error);
+                gchar *filename = self_schemas_get_field(self, DB_SCHEMAS_TYPE_ICON);
+                if(filename && strlen(filename)>0)
+                {
+                    gchar *path = g_build_path(G_DIR_SEPARATOR_S,stuffkeeper_data_backend_get_path(self->_priv->skdb),"images",filename,NULL);
+                    self->_priv->pb = gdk_pixbuf_new_from_file_at_scale(path, 16,16,TRUE,&error);
+                    g_free(path);
+
+                }
+                else
+                    self->_priv->pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), "gtk-new", 16, 0, &error);
+                if(filename)
+                    g_free(filename);
                 if(error)
                 {
                     debug_printf("error: %s\n", error->message);

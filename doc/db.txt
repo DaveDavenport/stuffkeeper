@@ -23,10 +23,11 @@ Fields:
 
 Table: Schema
 * ID: unique id
+* SchemaId
 * Type: value-type
 * Value
 
-Type:  Name, icon, Modification time,Creation time,etc.
+Type:  Id,Name, icon, Modification time,Creation time,etc.
 
 Table: Schema-fields
 * Schema ID

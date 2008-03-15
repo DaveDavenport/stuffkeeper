@@ -1529,11 +1529,16 @@ class StuffKeeper:Interface from G:Object
                     if(filename)
                     {
                         gchar *exec = g_strdup_printf("tar -zxf '%s' -C '%s' ",filename, directory);
+                        gchar *path = g_strdup(stuffkeeper_data_backend_get_path(self->_priv->skdbg));
+                        stuffkeeper_data_backend_close_yourself(self->_priv->skdbg);
                         printf("Exec: %s\n",exec);
-                        g_spawn_command_line_async(exec, NULL);
+                        g_spawn_command_line_sync(exec,NULL, NULL, NULL,NULL);
                         g_free(exec);
                         g_free(filename);
-                        self_reload(self);
+                        stuffkeeper_data_backend_load(self->_priv->skdbg, path);
+
+
+                        g_free(path);
                     }
                 }
                 default:
@@ -1548,6 +1553,9 @@ class StuffKeeper:Interface from G:Object
         void
         reload(self)
         {
-            stuffkeeper_data_backend_reload(self->_priv->skdbg);
+            gchar *path = g_strdup(stuffkeeper_data_backend_get_path(self->_priv->skdbg));
+            stuffkeeper_data_backend_close_yourself(self->_priv->skdbg);
+            stuffkeeper_data_backend_load(self->_priv->skdbg, path);
+            g_free(path);
         }
 }

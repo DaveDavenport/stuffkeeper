@@ -88,8 +88,9 @@ private guint field_swapped_signal = 0;
                 {
 
                     int type = stuffkeeper_data_schema_get_field_type(schema, id);
-                    gchar *name = stuffkeeper_data_schema_get_field_name(self->_priv->schema, field);
-                    gtk_list_store_set(self->_priv->store, &iter, COL_NAME, name,
+                    gchar *name = stuffkeeper_data_schema_get_field_name(schema, id);
+                    gtk_list_store_set(self->_priv->store, &iter, 
+                            COL_NAME, name,
                             COL_TYPE, type,
                             COL_TYPE_NAME, FieldNames[type],
                             -1);
@@ -319,7 +320,7 @@ private guint field_swapped_signal = 0;
 
 
             renderer = gtk_cell_renderer_text_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_NAME, NULL);
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Name", renderer, "text", COL_NAME, NULL);
             g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
 
@@ -472,8 +473,10 @@ private guint field_swapped_signal = 0;
         gsize length;
         int i =0;
         char **ids  = stuffkeeper_data_schema_get_fields(schema, &length);
+        printf("got %i id's\n",length);
         for(i=0;i<length;i++)
         {
+            printf("Adding field with id: %s\n", ids[i]);
             self_schema_field_added(self, ids[i], schema); 
 
         }

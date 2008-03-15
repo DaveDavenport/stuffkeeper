@@ -139,9 +139,9 @@ class StuffKeeper:Data:Backend from G:Object
         }
 
     }
-    private
+    public
     void
-    clear_yourself(self)
+    close_yourself(self)
     {
         /* Clear items */
         if(self->_priv->items)
@@ -159,6 +159,20 @@ class StuffKeeper:Data:Backend from G:Object
             g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_finalize_schema, self);
             g_hash_table_remove_all(self->_priv->schemas);
         }
+        /* close the open db */
+        if(self->_priv->sqlHandle)
+        {
+            int retv = sqlite3_close(self->_priv->sqlHandle);
+            if(retv != SQLITE_OK)
+            {
+                printf("The following error occured while trying to close the db: %s\n",
+                        sqlite3_errmsg(self->_priv->sqlHandle));
+            }
+        }
+        self->_priv->sqlHandle = NULL;
+        g_free(self->_priv->path);
+        self->_priv->path = NULL;
+
     }
 
     /* Load the data */
@@ -170,23 +184,20 @@ class StuffKeeper:Data:Backend from G:Object
         /* item */
         gchar *path;
         GDir *dir;
+        char *query;
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+
+
+
+
+
     
         /* check if there is allready data active */
         if(self->_priv->path)
         {
-            self_clear_yourself(self);
-            g_free(self->_priv->path);
-            self->_priv->path = NULL;
-            if(self->_priv->sqlHandle)
-            {
-                int retv = sqlite3_close(self->_priv->sqlHandle);
-                if(retv != SQLITE_OK)
-                {
-                    printf("The following error occured while trying to close the db: %s\n",
-                            sqlite3_errmsg(self->_priv->sqlHandle));
-                }
-            }
-            self->_priv->sqlHandle = NULL;
+            self_close_yourself(self);
         }
 
         /**
@@ -223,17 +234,17 @@ class StuffKeeper:Data:Backend from G:Object
          * Read Schemas 
          */
 
-        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas",NULL);
+/*        path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas",NULL);
         if(!g_file_test(path, G_FILE_TEST_IS_DIR))
         {
             g_mkdir(path, 0755);
         }
-
+*/
         /* Load item's */
-        dir = g_dir_open(path, 0, NULL);
-
+/*        dir = g_dir_open(path, 0, NULL);
+*/
         /* cleanup path pointer */
-        g_free(path);
+  /*      g_free(path);
         if(dir)
         {
             const gchar *filename;
@@ -243,31 +254,59 @@ class StuffKeeper:Data:Backend from G:Object
                 gchar *full_path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path,"schemas", filename,NULL);
                 StuffKeeperDataSchema *schema;
                 gint *id;
-                /* create a new item */
-                schema = stuffkeeper_data_schema_new_from_file(G_OBJECT(self),full_path);
-                /* want to copy the key, even if it is an integer */
-                id = g_malloc0(sizeof(gint));
+    */            /* create a new item */
+      /*          schema = stuffkeeper_data_schema_new_from_file(G_OBJECT(self),full_path);
+    */            /* want to copy the key, even if it is an integer */
+/*                id = g_malloc0(sizeof(gint));
                 *id = stuffkeeper_data_schema_get_id(schema);
-                /* insert it into my hash-list */
-                g_hash_table_insert(self->_priv->schemas,id, schema);
+  */              /* insert it into my hash-list */
+/*                g_hash_table_insert(self->_priv->schemas,id, schema);
                 self_schema_added(self, schema);
                 g_free(full_path);
-
+*/
 /*                while(iter%10 == 0 && gtk_events_pending())
                     gtk_main_iteration();
                     */
-                iter++;
+/*                iter++;
             }
             g_dir_close(dir);
         }
-
+*/
         /**
          * Read tags 
          */
-        char *query = "SELECT id FROM Tags";
-        sqlite3_stmt *stmt;
-        const char *tail;
-        int r;
+
+        query = sqlite3_mprintf("SELECT SchemaId FROM Schemas WHERE type=%i",DB_SCHEMAS_TYPE_ID);
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        sqlite3_free(query);
+        if (r != SQLITE_OK)
+        {
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        else
+        {
+            printf("stepping through rows\n");
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                gint oid = sqlite3_column_int(stmt, 0);
+                StuffKeeperDataSchema *schema;
+                gint *id;
+                /* create a new item */
+                schema = stuffkeeper_data_schema_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
+                /* want to copy the key, even if it is an integer */
+                id = g_malloc0(sizeof(gint));
+                *id = oid; 
+                printf("Adding: %i-%i\n", oid,stuffkeeper_data_schema_get_id(schema));
+                /* insert it into my hash-list */
+                g_hash_table_insert(self->_priv->schemas,id,schema);
+                self_schema_added(self,schema);
+            }
+        }
+        sqlite3_finalize(stmt);
+        /**
+         * Read tags 
+         */
+        query = "SELECT id FROM Tags";
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r != SQLITE_OK)
         {
@@ -335,15 +374,6 @@ class StuffKeeper:Data:Backend from G:Object
             g_dir_close(dir);
         }
     }
-    public
-    void
-    reload(self)
-    {
-        gchar *path = g_strdup(self_get_path(self));
-        self_load(self, path);
-        g_free(path);
-    }
-
     /**
      * Handle destroying of the object
      */
@@ -472,9 +502,7 @@ class StuffKeeper:Data:Backend from G:Object
             return schema;
         }
         /* No tag, lets make one. */
-        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
-        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),path,id);
-        g_free(path);
+        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),self->_priv->sqlHandle,id);
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -496,19 +524,13 @@ class StuffKeeper:Data:Backend from G:Object
         new_schema(self)
     {
         gint *ide;
-        gint id = g_random_int();
+        gint id; 
         StuffKeeperDataSchema *schema;
 
-        while((schema = g_hash_table_lookup(self->_priv->schemas, &id)) != NULL)
-        {
-            id = g_random_int();
-        }
 
         /* No schema, lets make one. */
-        gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "schemas", NULL);
-        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),path,id);
-        g_free(path);
-
+        schema = stuffkeeper_data_schema_new(G_OBJECT(self),self->_priv->sqlHandle);
+        id = stuffkeeper_data_schema_get_id(schema);
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
         *ide = id;
@@ -657,7 +679,7 @@ class StuffKeeper:Data:Backend from G:Object
         char **resultp = NULL;
         int rows, columns;
         char *query = NULL;
-        
+
         /* Check what tables exists */
         query = sqlite3_mprintf("select tbl_name from sqlite_master where type='table'");
         /* execute */
@@ -673,17 +695,17 @@ class StuffKeeper:Data:Backend from G:Object
             if (!strcmp(resultp[i], "Schemas")) {
                 has_schemas = TRUE;
             }
-            if (!strcmp(resultp[i], "SchemasField")) {
+            if (!strcmp(resultp[i], "SchemasFields")) {
                 has_schemas_field = TRUE;
             }
             if (!strcmp(resultp[i], "Items")) {
                 has_items = TRUE;
             }
-            if (!strcmp(resultp[i], "ItemsField")) {
+            if (!strcmp(resultp[i], "ItemsFields")) {
                 has_items_field = TRUE;
             }
         }
-        
+        sqlite3_free(query);
         /* if not exists, create the general table */
         if(!has_general) {
             printf("Create general table\n");
@@ -720,14 +742,42 @@ class StuffKeeper:Data:Backend from G:Object
             if (result != SQLITE_OK) {
                 printf("failed: %s\n", error);
             }
+            sqlite3_free(query);
         }
 
+        if(!has_schemas) {
+            printf("Create Schemas table\n");
 
+            query = sqlite3_mprintf("CREATE TABLE 'Schemas' ("
+                    "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
+                    "'SchemaId'  INTEGER," /* id of the schema, taken from type=ID */
+                    "'type'	    INTEGER,"  /* the key stored in value */
+                    "'value'	TEXT" /* the value */
+                    ")");
 
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+        }
+        if(!has_schemas_field) {
+            printf("Create SchemasFields table\n");
 
+            query = sqlite3_mprintf("CREATE TABLE 'SchemasFields' ("
+                    "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
+                    "'FieldId'  INTEGER," /* id of the field, this is taken from the id of type=ID */
+                    "'SchemaId' INTEGER," /* Id of the schema this field belongs too */
+                    "'type'	    INTEGER,"  /* the key stored in value */
+                    "'value'	TEXT" /* the value */
+                    ")");
 
-
-
-
+            result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+            sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON data(SchemaId);", NULL, NULL, NULL);
+        }
     }
 }
