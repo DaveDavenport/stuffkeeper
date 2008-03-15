@@ -241,7 +241,6 @@ class StuffKeeper:Data:Backend from G:Object
         }
         else
         {
-            printf("stepping through rows\n");
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);
@@ -269,7 +268,6 @@ class StuffKeeper:Data:Backend from G:Object
         }
         else
         {
-            printf("stepping through rows\n");
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);
@@ -299,7 +297,6 @@ class StuffKeeper:Data:Backend from G:Object
         }
         else
         {
-            printf("stepping through rows\n");
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);

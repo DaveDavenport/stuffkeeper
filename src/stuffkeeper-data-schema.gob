@@ -620,7 +620,6 @@ class StuffKeeper:Data:Schema from G:Object
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 retv[i] = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
-                printf("adding id: %s\n", retv[i]);
                 i++;
             }
         }
@@ -678,8 +677,6 @@ class StuffKeeper:Data:Schema from G:Object
     gchar *
     get_field_name(self, const gchar *id)
     {
-        printf("getting name: %s\n", id);
-
         char *retv = self_field_schemas_get_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, id);
         if(!retv)
             retv = g_strdup("N/A");
