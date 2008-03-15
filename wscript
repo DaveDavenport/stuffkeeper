@@ -4,7 +4,6 @@
 
 import os
 import Params
-
 # the following two variables are used by the target "waf dist"
 VERSION='0.02'
 APPNAME='stuffkeeper'
