@@ -49,6 +49,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
         gtk_scale_set_value_pos(GTK_SCALE(obj), GTK_POS_RIGHT);
         gtk_range_set_range(GTK_RANGE(obj), 0, 10);
         gtk_range_set_increments(GTK_RANGE(obj),0.1,1);
+        gtk_range_set_update_policy(GTK_RANGE(obj), GTK_UPDATE_DELAYED);
 
         /* store item */
         obj->_priv->item = item; 

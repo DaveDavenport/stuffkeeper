@@ -19,9 +19,11 @@ class StuffKeeper:Data:Text from Gtk:Text:View
     private gulong changed_item_entry = {0};
     private gulong changed_entry = {0};
 
-    public
-    void
-    changed(self, gpointer data)
+
+    private guint changed_entry_timeout = {0};
+    private
+    gboolean  
+    save_changes(self)
     {
         GtkTextIter start, stop;
         gchar *text = NULL;
@@ -35,7 +37,24 @@ class StuffKeeper:Data:Text from Gtk:Text:View
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
         g_free(text);
+
+        self->_priv->changed_entry_timeout = 0;
+        return FALSE;
     }
+
+
+    public
+    void
+    changed(self, gpointer data)
+    {
+        if(self->_priv->changed_entry_timeout)
+        {
+            g_source_remove(self->_priv->changed_entry_timeout);
+        }
+        self->_priv->changed_entry_timeout = g_timeout_add(1000,(GSourceFunc)self_save_changes,self);
+
+    }
+
 
     public
     void
@@ -118,13 +137,28 @@ class StuffKeeper:Data:Text from Gtk:Text:View
                 self->_priv->changed_item_entry = 0;
             }
             /* Destroyed when the view get destroyed
-            if(self->_priv->changed_entry)
-            {
-                g_signal_handler_disconnect(self->_priv->buffer,self->_priv->changed_entry);
-                self->_priv->changed_entry = 0;
-            }
-            */
+               if(self->_priv->changed_entry)
+               {
+               g_signal_handler_disconnect(self->_priv->buffer,self->_priv->changed_entry);
+               self->_priv->changed_entry = 0;
+               }
+               */
             PARENT_HANDLER(obj);
         }
+      override (G:Object)
+      void
+      dispose (G:Object *obj)
+      {
+          Self *self = SELF(obj);
+          if(self->_priv->changed_entry_timeout)
+          {
+              g_source_remove(self->_priv->changed_entry_timeout);
+              self->_priv->changed_entry_timeout = 0;
+
+              self_save_changes(self);
+          }
+
+          PARENT_HANDLER(obj);
+      }
 
 }

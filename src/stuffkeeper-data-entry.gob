@@ -1,4 +1,4 @@
-requires 2.0.10
+
 
 %h{
 #include <gtk/gtk.h>
@@ -12,20 +12,39 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     private gulong changed_item_entry = {0};
     private gulong changed_entry = {0};
 
-    public
-    void
-    changed(self, gpointer data)
+    private guint changed_entry_timeout = {0};
+
+
+    private
+    gboolean  
+    save_changes(self)
     {
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
         if(self->_priv->field)
         {
-           stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
+            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
         }else{
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
+
+        self->_priv->changed_entry_timeout = 0;
+        return FALSE;
     }
 
-    public
+
+
+    private
+    void
+    changed(self, gpointer data)
+    {
+        if(self->_priv->changed_entry_timeout)
+        {
+            g_source_remove(self->_priv->changed_entry_timeout);
+        }
+        self->_priv->changed_entry_timeout = g_timeout_add(1000,(GSourceFunc)self_save_changes,self);
+    }
+
+    private
     void
     item_changed(self,const gchar *field, StuffKeeperDataItem *item)
     {
@@ -95,6 +114,15 @@ class StuffKeeper:Data:Entry from Gtk:Entry
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
                 self->_priv->changed_item_entry = 0;
             }
+           if(self->_priv->changed_entry_timeout)
+            {
+                g_source_remove(self->_priv->changed_entry_timeout);
+                self->_priv->changed_entry_timeout = 0;
+
+                self_save_changes(self);
+            }
+
+
             PARENT_HANDLER(obj);
         }
 
