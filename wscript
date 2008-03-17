@@ -3,7 +3,7 @@
 # Qball Cow, 2008
 
 import os
-import Params
+import Params, intltool,gnome
 # the following two variables are used by the target "waf dist"
 VERSION='0.02'
 APPNAME='stuffkeeper'
@@ -18,8 +18,10 @@ def set_options(opt):
     opt.tool_options('gnu_dirs')
 
 def configure(conf):
-    conf.check_tool('compiler_cc gob2 intltool ')
+    conf.check_tool('compiler_cc gnome gob2 intltool ')
     conf.check_tool('gnu_dirs', 'waf-tools')
+
+
     conf.check_pkg('glib-2.0', destvar='GLIB', vnum='2.10.0', mandatory=True)
     conf.check_pkg('gtk+-2.0', destvar='GTK', vnum='2.10.0', mandatory=True)
     conf.check_pkg('libglade-2.0', destvar='GLADE', vnum='2.6.0', mandatory=True)
@@ -45,4 +47,4 @@ def build(bld):
     bld.add_subdirs('pixmaps')
 
 def shutdown():
-    pass
+    gnome.postinstall_icons()
