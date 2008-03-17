@@ -6,6 +6,7 @@
     <property name="title" translatable="yes">StuffKeeper</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
+    <property name="icon-name">stuffkeeper</property>
     <signal name="delete_event" handler="close_window"/>
     <child>
       <widget class="GtkVBox" id="mainwindow_vbox">
@@ -384,6 +385,7 @@ Types</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Edit Type</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="icon-name">stuffkeeper</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="has_separator">False</property>
     <signal name="close" handler="close"/>
@@ -605,6 +607,7 @@ Types</property>
     <property name="border_width">5</property>
     <property name="resizable">False</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="icon-name">stuffkeeper</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">

@@ -78,7 +78,9 @@ int main ( int argc, char **argv )
     /* pointer holding the backend */
     StuffKeeperDataBackend *skdb = NULL;
 
-
+    /* set application name */
+    g_set_application_name("stuffkeeper");
+    gtk_window_set_default_icon_name("stuffkeeper");
 
     context = g_option_context_new ("- StuffKeeper");
     g_option_context_add_main_entries (context, entries, "stuffkeeper");

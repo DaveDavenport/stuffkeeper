@@ -1506,6 +1506,11 @@ class StuffKeeper:Interface from G:Object
             gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION);
             gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), "Copyright 2008 Qball Cow");
             gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), PROGRAM_WEBSITE); 
+            gtk_about_dialog_set_logo_icon_name(GTK_ABOUT_DIALOG(dialog), "stuffkeeper");
+
+            gchar *artists[] = {"Jakub Szypulka (http://cubestuff.wordpress.com)", NULL};
+            gtk_about_dialog_set_artists(GTK_ABOUT_DIALOG(dialog),
+                    artists);
 
             gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);

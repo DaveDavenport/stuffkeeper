@@ -28,7 +28,7 @@ def configure(conf):
     conf.check_pkg('sqlite3', destvar='SQLITE', vnum='3.4.0', mandatory=True)
 
     conf.define('PACKAGE', APPNAME)
-    conf.define('PACKAGE_DATADIR', conf.env['DATADIR']+APPNAME)
+    conf.define('PACKAGE_DATADIR', conf.env['DATADIR']+'/'+APPNAME)
     conf.define('PROGRAM_NAME', APPNAME)
     conf.define('PROGRAM_VERSION', VERSION)
     conf.define('PROGRAM_WEBSITE', WEBSITE)
@@ -42,6 +42,7 @@ def build(bld):
     bld.add_subdirs('glade')
     bld.add_subdirs('data')
     bld.add_subdirs('po')
+    bld.add_subdirs('pixmaps')
 
 def shutdown():
     pass
