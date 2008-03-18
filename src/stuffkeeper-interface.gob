@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 /* Include gtk */
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 #include <glade/glade.h>
 #include "sexy-icon-entry.h"
 #include "config.h"
@@ -25,6 +26,10 @@ requires 2.0.10
 extern GList *interface_list;
 %}
 
+%ph{
+    const gchar *artists[] = {"Jakub Szypulka (http://cubestuff.wordpress.com )", NULL};
+    const gchar *authors[] = {"Martijn Koedam (qball) <Qball@Sarine.nl>", NULL};
+%}
 
 class StuffKeeper:Interface from G:Object 
 {
@@ -1503,6 +1508,12 @@ class StuffKeeper:Interface from G:Object
         {
             open_url(uri);
         }
+        private 
+        void
+        dialog_activate_email(GtkAboutDialog *dialog, const gchar *uri, Self *self) 
+        {
+            open_email(uri);
+        }
 
         public
         void
@@ -1510,7 +1521,8 @@ class StuffKeeper:Interface from G:Object
         {
             GtkWidget *dialog = gtk_about_dialog_new();
             /* set url handler */
-            gtk_about_dialog_set_url_hook(self_dialog_activate_link,self, NULL);
+            gtk_about_dialog_set_url_hook((GtkAboutDialogActivateLinkFunc)self_dialog_activate_link,self, NULL);
+            gtk_about_dialog_set_email_hook((GtkAboutDialogActivateLinkFunc)self_dialog_activate_email,self, NULL);
             /* Set config time defines */
             gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), PROGRAM_NAME);
             gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION);
@@ -1522,9 +1534,10 @@ class StuffKeeper:Interface from G:Object
 
             gtk_about_dialog_set_logo_icon_name(GTK_ABOUT_DIALOG(dialog), "stuffkeeper");
 
-            gchar *artists[] = {"Jakub Szypulka (http://cubestuff.wordpress.com)", NULL};
-            gtk_about_dialog_set_artists(GTK_ABOUT_DIALOG(dialog),
-                    artists);
+
+            gtk_about_dialog_set_artists(GTK_ABOUT_DIALOG(dialog),artists);
+            gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dialog),authors);
+            gtk_about_dialog_set_translator_credits (GTK_ABOUT_DIALOG(dialog), _("translator-credits"));
 
             gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);

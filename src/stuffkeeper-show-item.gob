@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 #include "debug.h"
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-label.h"

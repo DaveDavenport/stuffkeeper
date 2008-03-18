@@ -4,5 +4,5 @@
  * url to open, uses xdg-open
  */
 void open_url(const char *uri);
-
+void open_email(const char *uri);
 #endif
