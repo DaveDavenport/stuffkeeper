@@ -504,6 +504,7 @@ private guint field_swapped_signal = 0;
         self_schema_changed(self, schema);
 
     }
+
     override (G:Object)
     void
     finalize(G:Object *obj)

@@ -1638,4 +1638,10 @@ class StuffKeeper:Interface from G:Object
             stuffkeeper_data_backend_load(self->_priv->skdbg, path);
             g_free(path);
         }
+        public
+            void
+            visit_homepage(self)
+            {
+                open_url(PROGRAM_WEBSITE);
+            }
 }
