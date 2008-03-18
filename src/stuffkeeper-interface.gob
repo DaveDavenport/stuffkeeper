@@ -9,6 +9,7 @@ requires 2.0.10
 #include "config.h"
 #include "debug.h"
 #include "misc.h"
+
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -28,7 +29,10 @@ extern GList *interface_list;
 
 %ph{
     const gchar *artists[] = {"Jakub Szypulka (http://cubestuff.wordpress.com )", NULL};
-    const gchar *authors[] = {"Martijn Koedam (qball) <Qball@Sarine.nl>", NULL};
+    const gchar *authors[] = {
+        "Martijn Koedam (qball) <Qball@Sarine.nl>", 
+        "Tester:\nGreg Fitzgerald",
+    NULL};
 %}
 
 class StuffKeeper:Interface from G:Object 
@@ -1529,6 +1533,8 @@ class StuffKeeper:Interface from G:Object
             gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), PROGRAM_WEBSITE); 
 
             gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), "Copyright 2008 Qball Cow");
+            gtk_about_dialog_set_license(GTK_ABOUT_DIALOG(dialog),
+                    _("GNU General Public License"));
 
 
 

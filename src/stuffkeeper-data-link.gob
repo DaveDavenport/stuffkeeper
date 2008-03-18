@@ -42,15 +42,6 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
         }
         self->_priv->changed_entry_timeout = g_timeout_add(1000,(GSourceFunc)self_save_changes,self);
 
-        /*
-        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
-        if(self->_priv->field)
-        {
-           stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
-        }else{
-            stuffkeeper_data_item_set_title(self->_priv->item, text);
-        }
-        */
     }
 
     public
@@ -90,7 +81,15 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
             const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
             if(strlen(text) > 0)
             {
-                open_url(text);
+                UrlType type = url_type(text);
+                if(type == URL_EMAIL)
+                {
+                    open_email(text);
+                }
+                else
+                {
+                    open_url(text);
+                }
             }
      }
 

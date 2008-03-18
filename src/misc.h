@@ -5,4 +5,13 @@
  */
 void open_url(const char *uri);
 void open_email(const char *uri);
+
+typedef enum _UrlType {
+    URL_HTTP,
+    URL_EMAIL,
+    URL_OTHER
+}UrlType;
+
+UrlType url_type(const char *uri);
+
 #endif
