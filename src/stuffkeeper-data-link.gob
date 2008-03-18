@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include "config.h"
 #include "misc.h"
 #include "sexy-icon-entry.h"
 #include "stuffkeeper-data-item.h"
@@ -16,7 +17,31 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
 
     private guint changed_entry_timeout = {0};
 
+    private 
+    void
+    update_icon(self)
+    {
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        UrlType type = url_type(text);
 
+
+        if(type == URL_EMAIL)
+        {
+            //GtkImage *image = gtk_image_new_from_icon_name("internet-mail", GTK_ICON_SIZE_MENU);
+            /* Hack, because somehow sexy-icon-entry does not like icon-name stuff */
+            GtkWidget *image = gtk_image_new_from_file( PACKAGE_DATADIR"/icons/hicolor/16x16/actions/internet-mail.png");
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,GTK_IMAGE(image));
+        } else if ( type == URL_HTTP )
+        {
+            GtkWidget *image = gtk_image_new_from_file( PACKAGE_DATADIR"/icons/hicolor/16x16/actions/internet-web-browser.png");
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
+                    GTK_IMAGE(image));
+        } else {
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
+                    GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
+
+        }
+    }
     private
     gboolean  
     save_changes(self)
@@ -30,21 +55,8 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
         }else{
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
-/*
-        if(type == URL_EMAIL)
-        {
-            GtkImage *image = gtk_image_new_from_icon_name("internet-mail", GTK_ICON_SIZE_MENU);
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,GTK_IMAGE(image));
-        } else if ( type == URL_HTTP )
-        {
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
-                    GTK_IMAGE(gtk_image_new_from_icon_name("internet-web-browser", GTK_ICON_SIZE_MENU)));
-        } else {
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
-                    GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
-
-        }
-*/    
+        self_update_icon(self);
+            
         self->_priv->changed_entry_timeout = 0;
         return FALSE;
     }
@@ -81,6 +93,7 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
             {
                 g_signal_handler_block(self,self->_priv->changed_entry);
                 gtk_entry_set_text(GTK_ENTRY(self), value);
+                self_update_icon(self);
                 g_signal_handler_unblock(self,self->_priv->changed_entry);
             }
             g_free(value);
@@ -135,9 +148,14 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
 
 
         sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(obj), SEXY_ICON_ENTRY_PRIMARY,
-            GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
+                GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
+
+
+
+
         sexy_icon_entry_set_icon_highlight(SEXY_ICON_ENTRY(obj),
                 SEXY_ICON_ENTRY_PRIMARY, TRUE);
+
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
         g_signal_connect_swapped(G_OBJECT(obj), "icon_released", G_CALLBACK(self_link_icon_clicked), obj);
@@ -161,7 +179,8 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
             gtk_entry_set_text(GTK_ENTRY(obj), value);
             g_free(value);
         }
-
+        self_update_icon(obj);
+        
         /* this is destroyed when self is destroyed, so no need to disconnect myself */
         g_signal_connect_swapped(G_OBJECT(obj), "activate", G_CALLBACK(self_open_link), obj);
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);

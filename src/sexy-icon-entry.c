@@ -18,10 +18,10 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA  02111-1307, USA.
  */
-
+#include <libsexy/sexy-icon-entry.h>
 #include <string.h>
 #include <gtk/gtk.h>
-#include "sexy-icon-entry.h"
+
 #define ICON_MARGIN 2
 #define MAX_ICONS 2
 
@@ -468,9 +468,10 @@ static GdkPixbuf *
 get_pixbuf_from_icon(SexyIconEntry *entry, SexyIconEntryPosition icon_pos)
 {
 	GdkPixbuf *pixbuf = NULL;
-	gchar *stock_id;
+	const gchar *stock_id;
 	SexyIconInfo *icon_info = &entry->priv->icons[icon_pos];
 	GtkIconSize size;
+	int w, h;
 
 	switch (gtk_image_get_storage_type(GTK_IMAGE(icon_info->icon)))
 	{
@@ -480,11 +481,17 @@ get_pixbuf_from_icon(SexyIconEntry *entry, SexyIconEntryPosition icon_pos)
 			break;
 
 		case GTK_IMAGE_STOCK:
-			gtk_image_get_stock(GTK_IMAGE(icon_info->icon), &stock_id, &size);
+			gtk_image_get_stock(GTK_IMAGE(icon_info->icon), (char**)&stock_id, &size);
 			pixbuf = gtk_widget_render_icon(GTK_WIDGET(entry),
 											stock_id, size, NULL);
 			break;
 
+		case GTK_IMAGE_ICON_NAME:
+			gtk_image_get_icon_name (GTK_IMAGE(icon_info->icon), &stock_id, &size);
+			gtk_icon_size_lookup (size, &w, &h);
+			pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), stock_id, size, 0, NULL);
+			break;
+          
 		default:
 			return NULL;
 	}
@@ -655,7 +662,8 @@ update_icon(GObject *obj, GParamSpec *param, SexyIconEntry *entry)
 
 		if (strcmp(name, "pixbuf")   && strcmp(name, "stock")  &&
 			strcmp(name, "image")    && strcmp(name, "pixmap") &&
-			strcmp(name, "icon_set") && strcmp(name, "pixbuf_animation"))
+			strcmp(name, "icon-set") && strcmp(name, "pixbuf-animation") &&
+			strcmp(name, "icon-name"))
 		{
 			return;
 		}
