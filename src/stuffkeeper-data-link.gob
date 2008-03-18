@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include "misc.h"
 #include "sexy-icon-entry.h"
 #include "stuffkeeper-data-item.h"
 %}
@@ -89,9 +90,7 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
             const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
             if(strlen(text) > 0)
             {
-                gchar *data = g_strdup_printf("xdg-open '%s'", text);
-                g_spawn_command_line_async(data, NULL);
-                g_free(data);
+                open_url(text);
             }
      }
 

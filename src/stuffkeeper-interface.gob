@@ -7,6 +7,7 @@ requires 2.0.10
 #include "sexy-icon-entry.h"
 #include "config.h"
 #include "debug.h"
+#include "misc.h"
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -1496,16 +1497,29 @@ class StuffKeeper:Interface from G:Object
             }
         }
 
+        private 
+        void
+        dialog_activate_link(GtkAboutDialog *dialog, const gchar *uri, Self *self) 
+        {
+            open_url(uri);
+        }
+
         public
         void
         about_dialog(self)
         {
             GtkWidget *dialog = gtk_about_dialog_new();
-
+            /* set url handler */
+            gtk_about_dialog_set_url_hook(self_dialog_activate_link,self, NULL);
+            /* Set config time defines */
             gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), PROGRAM_NAME);
             gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION);
-            gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), "Copyright 2008 Qball Cow");
             gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), PROGRAM_WEBSITE); 
+
+            gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), "Copyright 2008 Qball Cow");
+
+
+
             gtk_about_dialog_set_logo_icon_name(GTK_ABOUT_DIALOG(dialog), "stuffkeeper");
 
             gchar *artists[] = {"Jakub Szypulka (http://cubestuff.wordpress.com)", NULL};
