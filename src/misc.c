@@ -27,7 +27,7 @@ UrlType url_type(const char *uri)
         return URL_HTTP;
     }
     /* check for e-mail adres */
-    else if (g_regex_match_simple("^\\w+[\\.\\+\\_\\-\\a-z]*@?\\w+[\\.\\+\\_\\-\\a-z]*.{1}\\w{2,3}.?\\w{2,3}$", uri, G_REGEX_CASELESS,G_REGEX_MATCH_NOTEMPTY))
+    else if (g_regex_match_simple("^\\w+[\\.\\+\\_\\-\\a-z]*@+\\w+[\\.\\+\\_\\-\\a-z]*.{1}\\w{2,3}.?\\w{2,3}$", uri, G_REGEX_CASELESS,G_REGEX_MATCH_NOTEMPTY))
     {
         printf("found e-mail\n");
         return URL_EMAIL;

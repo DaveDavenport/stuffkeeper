@@ -22,13 +22,29 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
     save_changes(self)
     {
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        UrlType type = url_type(text);
+
         if(self->_priv->field)
         {
             stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
         }else{
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
+/*
+        if(type == URL_EMAIL)
+        {
+            GtkImage *image = gtk_image_new_from_icon_name("internet-mail", GTK_ICON_SIZE_MENU);
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,GTK_IMAGE(image));
+        } else if ( type == URL_HTTP )
+        {
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
+                    GTK_IMAGE(gtk_image_new_from_icon_name("internet-web-browser", GTK_ICON_SIZE_MENU)));
+        } else {
+            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
+                    GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
 
+        }
+*/    
         self->_priv->changed_entry_timeout = 0;
         return FALSE;
     }

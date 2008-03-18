@@ -88,6 +88,7 @@ int main ( int argc, char **argv )
     g_option_context_parse (context, &argc, &argv, &error);
 
 
+
     gtk_set_locale();
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))
@@ -98,6 +99,9 @@ int main ( int argc, char **argv )
         /* return a failure */
         return EXIT_FAILURE;
     }
+    gtk_icon_theme_append_search_path(gtk_icon_theme_get_default (),
+                                   PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
+
 
     /* Initialize the backend */
     skdb = stuffkeeper_data_backend_new();
