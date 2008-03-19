@@ -22,7 +22,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
-#define ICON_MARGIN 2
+#define ICON_MARGIN 0
 #define MAX_ICONS 2
 
 #define IS_VALID_ICON_ENTRY_POSITION(pos) \
