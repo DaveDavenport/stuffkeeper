@@ -27,13 +27,11 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
 
         if(type == URL_EMAIL)
         {
-            //GtkImage *image = gtk_image_new_from_icon_name("internet-mail", GTK_ICON_SIZE_MENU);
-            /* Hack, because somehow sexy-icon-entry does not like icon-name stuff */
-            GtkWidget *image = gtk_image_new_from_file( PACKAGE_DATADIR"/icons/hicolor/16x16/actions/internet-mail.png");
+            GtkWidget *image = gtk_image_new_from_icon_name("internet-mail", GTK_ICON_SIZE_MENU);
             sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,GTK_IMAGE(image));
         } else if ( type == URL_HTTP )
         {
-            GtkWidget *image = gtk_image_new_from_file( PACKAGE_DATADIR"/icons/hicolor/16x16/actions/internet-web-browser.png");
+            GtkWidget *image = gtk_image_new_from_icon_name("internet-web-browser", GTK_ICON_SIZE_MENU);
             sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
                     GTK_IMAGE(image));
         } else {
@@ -47,7 +45,6 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
     save_changes(self)
     {
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
-        UrlType type = url_type(text);
 
         if(self->_priv->field)
         {
