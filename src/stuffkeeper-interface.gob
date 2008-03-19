@@ -23,6 +23,7 @@ requires 2.0.10
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
+#include "ExportHTML.h"
 
 extern GList *interface_list;
 %}
@@ -1694,7 +1695,6 @@ class StuffKeeper:Interface from G:Object
                                 gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "location_chooser")));
                                 GtkWidget *entry = glade_xml_get_widget(xml, "entry_filename"); 
                                 const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
-                                const gchar *source = stuffkeeper_data_backend_get_path(self->_priv->skdbg);
                                 if(file)                                                                                      
                                 {
                                     export_item_to_html(item, directory,file); 
