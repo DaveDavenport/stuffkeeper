@@ -20,7 +20,7 @@ UrlType url_type(const char *uri)
 {
     /* start detecting */
     /* check for http url */
-    if(g_regex_match_simple("^http://.*", uri, G_REGEX_CASELESS,G_REGEX_MATCH_NOTEMPTY))
+    if(g_regex_match_simple("^(rsync|http|ftp|https|scp|irc)://.*", uri, G_REGEX_CASELESS,G_REGEX_MATCH_NOTEMPTY))
     {
         return URL_HTTP;
     }
