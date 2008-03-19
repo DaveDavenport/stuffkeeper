@@ -1668,4 +1668,67 @@ class StuffKeeper:Interface from G:Object
             {
                 open_url(PROGRAM_WEBSITE);
             }
+
+        public
+        void
+        export_html(self)
+        {
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkWidget *tree = self->_priv->treeview2;
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
+            GtkTreeIter iter;
+            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+            {
+                StuffKeeperDataItem *item;
+                gtk_tree_model_get(model, &iter, 2, &item, -1);
+                if(item)
+                {
+                    GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","dialog_backup",NULL);
+                    GtkWidget *dialog = glade_xml_get_widget(xml,"dialog_backup");
+
+                    glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+                    switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+                    {
+                        case -5:
+                            {
+                                gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "location_chooser")));
+                                GtkWidget *entry = glade_xml_get_widget(xml, "entry_filename"); 
+                                const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
+                                const gchar *source = stuffkeeper_data_backend_get_path(self->_priv->skdbg);
+                                if(file)                                                                                      
+                                {
+                                    export_item_to_html(item, directory,file); 
+
+                                }                                
+                            }
+                        default:
+                            break;
+                    }
+                    gtk_widget_destroy(dialog);
+                    g_object_unref(xml);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
