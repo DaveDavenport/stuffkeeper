@@ -1,9 +1,11 @@
 #! /usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2006 (ita)
+# Qball Cow  2008
 
-#install_files('PACKAGE_DATADIR', '', 'stuffkeeper.png')
-install_files('DATADIR', 'icons/hicolor/48x48/apps', 'stuffkeeper.png')
+install_files('DATADIR', 'icons/hicolor/16x16/apps', '16/stuffkeeper.png')
+install_files('DATADIR', 'icons/hicolor/48x48/apps', '48/stuffkeeper.png')
+install_files('DATADIR', 'icons/hicolor/64x64/apps', '64/stuffkeeper.png')
+
 
 install_files('PACKAGE_DATADIR', 'icons/hicolor/16x16/actions','internet-web-browser.png')
 install_files('PACKAGE_DATADIR', 'icons/hicolor/16x16/actions','internet-mail.png')
