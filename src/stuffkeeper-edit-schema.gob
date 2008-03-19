@@ -476,7 +476,6 @@ private guint field_swapped_signal = 0;
         char **ids  = stuffkeeper_data_schema_get_fields(schema, &length);
         for(i=0;i<length;i++)
         {
-            printf("Adding field with id: %s\n", ids[i]);
             self_schema_field_added(self, ids[i], schema); 
 
         }
