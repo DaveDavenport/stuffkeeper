@@ -645,7 +645,18 @@ class StuffKeeper:Interface from G:Object
         }
         self->_priv->search_timeout = g_timeout_add(1000,(GSourceFunc)self_search_entry_changed_timeout, self);
     }
-    
+   
+    private 
+    void
+    schema_edit_button_clicked(self, GtkWidget *button)
+    {
+        StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+        if(schema)
+        {
+            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            stuffkeeper_edit_schema_set_schema(skes, schema);
+        }
+    }
 
     private 
     void
@@ -695,7 +706,7 @@ class StuffKeeper:Interface from G:Object
                 {
                     /* The title */
                     GtkWidget *vbox,*vbox2;
-                    GtkWidget *label1;
+                    GtkWidget *label1,*button;
                     /**
                      * Header
                      */
@@ -728,8 +739,12 @@ class StuffKeeper:Interface from G:Object
                         label1 = gtk_label_new("N/A");
                     }
 
-
-                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    button = gtk_button_new();
+                    gtk_container_add(GTK_CONTAINER(button), label1);
+                    g_object_set_data(G_OBJECT(button), "schema", schema);
+                    gtk_button_set_relief(GTK_BUTTON(button),GTK_RELIEF_NONE); 
+                    gtk_box_pack_start(GTK_BOX(vbox),button, FALSE,TRUE, 0);
+                    g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_schema_edit_button_clicked), self);
                    
 
 
@@ -1526,6 +1541,7 @@ class StuffKeeper:Interface from G:Object
         about_dialog(self)
         {
             GtkWidget *dialog = gtk_about_dialog_new();
+            GdkPixbuf *pixbuf = NULL;
             /* set url handler */
             gtk_about_dialog_set_url_hook((GtkAboutDialogActivateLinkFunc)self_dialog_activate_link,self, NULL);
             gtk_about_dialog_set_email_hook((GtkAboutDialogActivateLinkFunc)self_dialog_activate_email,self, NULL);
@@ -1539,8 +1555,8 @@ class StuffKeeper:Interface from G:Object
                     _("GNU General Public License"));
 
 
-
-            gtk_about_dialog_set_logo_icon_name(GTK_ABOUT_DIALOG(dialog), "stuffkeeper");
+            pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), "stuffkeeper", 64, 0, NULL);
+            gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog),pixbuf);
 
 
             gtk_about_dialog_set_artists(GTK_ABOUT_DIALOG(dialog),artists);
