@@ -647,7 +647,7 @@ class StuffKeeper:Interface from G:Object
     }
     
 
-    public
+    private 
     void
     interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
     {
@@ -709,7 +709,7 @@ class StuffKeeper:Interface from G:Object
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                     self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
+//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     label1 = stuffkeeper_data_entry_new(item,NULL);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
