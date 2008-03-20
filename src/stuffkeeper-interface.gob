@@ -515,7 +515,6 @@ class StuffKeeper:Interface from G:Object
         int n;
         interface_list = g_list_remove(interface_list, self);
         n = g_list_length(interface_list);
-//        gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
         g_object_unref(self);
 
         if(n == 0)
@@ -575,7 +574,8 @@ class StuffKeeper:Interface from G:Object
                         }
                         /* if viewing types, and it matches mark found */
                         else if (type == 1 && 
-                        stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) == stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
+                            stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) == 
+                            stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
                         {
                             found = 1;
                         }
@@ -599,43 +599,6 @@ class StuffKeeper:Interface from G:Object
 
             }
             return TRUE;
-
-/*            if(strlen(text))
-            {
-                int found = 0;
-                gsize length = 0;
-                gchar **values = stuffkeeper_data_item_get_values(item, &length);
-            
-                gchar *text1 = g_utf8_casefold(text, -1);
-                gchar *text2 = g_utf8_normalize(text1, -1, G_NORMALIZE_ALL_COMPOSE);
-
-
-                int i;
-                if(values)
-                {
-                    for(i=0;i<length && !found;i++)
-                    {
-                        if(values[i])
-                        {
-                            gchar *sb1 = g_utf8_casefold(values[i], -1);
-                            gchar *sb2 = g_utf8_normalize(sb1, -1, G_NORMALIZE_ALL_COMPOSE);
-
-                            if(strstr(sb2,text2)) found = TRUE;
-                    
-                            g_free(sb1);
-                            g_free(sb2);
-
-                        }
-                    }
-                    g_strfreev(values);
-                }
-
-                g_free(text2);
-                g_free(text1);
-                return found;
-            }
-*/
-            return TRUE; 
         }
     private
     gboolean
