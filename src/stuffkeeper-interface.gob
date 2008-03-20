@@ -34,7 +34,8 @@ extern GList *interface_list;
     NULL};
     const gchar *authors[] = {
         "Martijn Koedam (qball) <Qball@Sarine.nl>", 
-        "Tester:\nGreg Fitzgerald",
+        "\nTester:",
+        "Greg Fitzgerald",
     NULL};
 %}
 
@@ -203,7 +204,12 @@ class StuffKeeper:Interface from G:Object
         GtkTreeIter iter;
         gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_tag_get_title(tag);
-        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, stuffkeeper_data_tag_get_id(tag),1,title,3,tag, 4, stuffkeeper_data_tag_num_items(tag),-1);
+        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
+                    0, stuffkeeper_data_tag_get_id(tag),
+                    1,title,
+                    3,tag, 
+                    4, stuffkeeper_data_tag_num_items(tag),
+                    -1);
         g_free(title);
     }
     public
@@ -221,7 +227,10 @@ class StuffKeeper:Interface from G:Object
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_tag_get_title(tag);
-                    gtk_list_store_set(GTK_LIST_STORE(store), &iter, 1,title, 4, stuffkeeper_data_tag_num_items(tag),-1);
+                    gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
+                            1,title, 
+                            4, stuffkeeper_data_tag_num_items(tag),
+                            -1);
                     g_free(title);
                     return;
                 }
@@ -378,9 +387,7 @@ class StuffKeeper:Interface from G:Object
             StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
             if(schema)
             {
-/*                StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
-                stuffkeeper_data_item_set_title(item,"New Item");
-  */              self_add_item(self, schema);
+                self_add_item(self, schema);
                 /* Store last added item. */
                 g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", schema);
             }
