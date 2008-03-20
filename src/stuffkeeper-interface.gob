@@ -560,6 +560,7 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter piter;
             if(gtk_tree_model_get_iter_first(model2, &piter))
             {
+                int found = -1;
                 do{
                     GObject *tag;
                     gboolean sel;
@@ -572,14 +573,25 @@ class StuffKeeper:Interface from G:Object
                         {
                             return FALSE;
                         }
+                        /* if viewing types, and it matches mark found */
                         else if (type == 1 && 
-                        stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) != stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
+                        stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) == stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
                         {
-                            return FALSE;
+                            found = 1;
+                        }
+                        /* set that there are items selected */
+                        else if (type == 1 && found == -1)
+                        {
+                            found = 0;
                         }
                     }
 
                 }while(gtk_tree_model_iter_next(model2, &piter));
+                /* if viewing types and no selected item matches return FALSE */
+                if(type == 1 && found == 0)
+                {
+                    return FALSE;
+                }
             }
             if(strlen(text) > 0)
             {
@@ -1669,7 +1681,37 @@ class StuffKeeper:Interface from G:Object
             {
                 open_url(PROGRAM_WEBSITE);
             }
-
+        /**
+         * HTML Export 
+         */
+        /* Export the whole db */
+        public
+        void
+        export_to_html(self)
+        {
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick a directory", 
+                    GTK_WINDOW(self->_priv->win), 
+                    GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER,
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, 
+                    GTK_STOCK_OPEN, GTK_RESPONSE_OK,
+                    NULL);
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_OK:
+                {
+                    gchar *dir = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+                    if(dir)
+                    {
+                       export_everything_to_html(self->_priv->skdbg,dir); 
+                       g_free(dir);
+                    }
+                }
+                default:
+                    break;
+            }
+            gtk_widget_destroy(dialog);
+        }
+        /* export selected item */
         public
         void
         export_html(self)
@@ -1709,26 +1751,4 @@ class StuffKeeper:Interface from G:Object
                 }
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

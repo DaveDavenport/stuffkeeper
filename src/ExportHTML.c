@@ -4,8 +4,94 @@
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-item.h"
 #include "ExportHTML.h"
+#include <config.h>
 
 
+
+
+void export_everything_to_html(StuffKeeperDataBackend *skdb, const char *directory)
+{
+    GList *schemas;
+    GList *items;
+    GError *err = NULL;
+    GIOChannel *gio;
+    GString *string = g_string_new("");
+    gchar *temp;
+    /* Open the output file */
+    /* build path */
+    gchar *fullpath = g_build_path(G_DIR_SEPARATOR_S, directory, "index.html", NULL);
+    gio = g_io_channel_new_file(fullpath, "w", &err);
+    g_free(fullpath);
+
+    if(err)
+    {
+        printf("Failed to open file: '%s'\n", err->message);
+        g_error_free(err);
+        return;
+    }
+    g_string_append_printf(string, "<html>\n\t\t<head>\n\t\t\t<title>%s</title>\n",PROGRAM_NAME);
+    g_string_append(string,
+                "\t\t<style type='text/css'>\n"
+                "\t\t\tbody { margin: 0px;}\n"
+                "\t\t\t#Heading {background: #333; color: #FFF; padding: .3em; margin: 0px; margin-bottom: 2em; }\n"
+                "\t\t\t#field { margin: 0px;padding: 0px;}\n"
+                "\t\t\t#field  b { 	float: left; text-align: right; display: block; width: 10em;padding-right: 0.3em;}\n"
+                "\t\t\t#textbody { margin-left: 2em;}\n"
+                "\t\t</style>"); 
+    g_string_append_printf(string, "\t\t</head>\n\t<body>\n");
+    g_string_append_printf(string, "<div id='Heading'><H1>%s</H1></div>\n",PROGRAM_NAME); 
+
+    g_string_append(string, "<div id='textbody'>"); 
+    schemas = stuffkeeper_data_backend_get_schemas(skdb);
+    if(schemas)
+    {
+        /* iterate all a schema's */
+        GList *siter;
+        for(siter = g_list_first(schemas);siter;siter = g_list_next(siter))
+        {
+            StuffKeeperDataSchema *schema = siter->data;
+            temp = stuffkeeper_data_schema_get_title(schema);
+            g_string_append_printf(string, "\t\t<H1>%s</H1>\n", temp);
+            g_free(temp);
+
+            items = stuffkeeper_data_schema_get_items(schema);
+            if(items)
+            {
+                GList *titer;
+                g_string_append(string, "\t\t<lu>");
+                for(titer =g_list_first(items);titer;titer = g_list_next(titer))
+                {
+                    StuffKeeperDataItem *item = titer->data;
+                    gchar *title = stuffkeeper_data_item_get_title(item);
+                    gchar *filename = g_strdup_printf("%i.html", stuffkeeper_data_item_get_id(item));
+                   
+                    g_string_append_printf(string, "\t\t\t<li><a href='%s'>%s</a></li>\n", filename,title);
+                    export_item_to_html(item, directory, filename);
+                    g_free(filename);
+                    g_free(title);
+                }
+                g_string_append(string, "\t\t</lu>");
+                g_list_free(items);
+            }
+        }
+        /* free the list */
+        g_list_free(schemas);
+    }
+    g_string_append(string, "</div>\n"); 
+    /* close */
+    g_string_append(string, "</body></html>");
+    printf("saving index.html\n");
+
+
+    g_io_channel_write_chars(gio, string->str, string->len, NULL, NULL);
+    g_string_free(string, TRUE);
+
+    g_io_channel_shutdown(gio, TRUE, NULL);
+}
+
+/**
+ * These are just function to get something outputted. They aren't final code, and should not go in a stable release.
+ */
 void export_item_to_html(StuffKeeperDataItem *item, const char *path, const char *filename)
 {
     StuffKeeperDataSchema *schema;
@@ -43,13 +129,16 @@ void export_item_to_html(StuffKeeperDataItem *item, const char *path, const char
                 "\t\t\tbody { margin: 0px;}\n"
                 "\t\t\t#Heading {background: #333; color: #FFF; padding: .3em; margin: 0px; margin-bottom: 2em; }\n"
                 "\t\t\t#field { margin: 0px;padding: 0px;}\n"
-                "\t\t\t#field  b { 	float: left; text-align: right; display: block; width: 10em;padding-right: 0.3em;}\n"
+                "\t\t\t#field  b { 	display: block;padding-right: 0.3em;}\n"
                 "\t\t\t#field lu { float: left;}\n"
+                "\t\t\t#field p { position: relative;display: block;width: 30em;}\n"
+
+                "\t\t\t#textbody { margin-left: 2em;}\n"
                 "\t\t</style>"); 
     g_string_append_printf(string, "\t\t</head>\n\t<body>\n");
     g_string_append_printf(string, "<div id='Heading'><H1>%s</H1></div>\n",temp); 
     g_free(temp);
-
+    g_string_append(string, "<div id='textbody'>"); 
     /* Get fields */
     fields =  stuffkeeper_data_schema_get_fields(schema, &length);
     if(fields) 
@@ -134,7 +223,7 @@ void export_item_to_html(StuffKeeperDataItem *item, const char *path, const char
     }
 
     /* close */
-    g_string_append(string, "</body></html>");
+    g_string_append(string, "\t\t</div>\n\t</body>\n</html>");
 
 
     g_io_channel_write_chars(gio, string->str, string->len, NULL, NULL);

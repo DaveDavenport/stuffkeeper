@@ -851,4 +851,11 @@ class StuffKeeper:Data:Schema from G:Object
 
             return self->_priv->pb;
         }
+
+        public
+        GList *
+        get_items(self)
+        {
+            return g_list_copy(self->_priv->items);
+        }
 }
