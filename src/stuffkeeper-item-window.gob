@@ -18,38 +18,46 @@ class StuffKeeper:Item:Window from Gtk:Dialog
     private guint signal_item_removed = {0};
     private StuffKeeperDataItem *item = {NULL};
     private StuffKeeperDataBackend *skdb= {NULL};
-    public
-        void
-        interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
-        {
-            gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
-            gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
-            gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
-        }
+    private GKeyFile *config_file = {NULL};
 
-    public
-        void
-        item_removed(self, gint id, StuffKeeperDataBackend *skdb)
+    private 
+    void
+    interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
+    {
+        gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
+    }
+
+    private
+    void
+    item_removed(self, gint id, StuffKeeperDataBackend *skdb)
+    {
+        gint gid = stuffkeeper_data_item_get_id(self->_priv->item);
+        debug_printf("%i-%i\n", gid, id);
+        if(gid == id)
         {
-            gint gid = stuffkeeper_data_item_get_id(self->_priv->item);
-            debug_printf("%i-%i\n", gid, id);
-            if(gid == id)
-            {
-                debug_printf("destroying\n");
-                gtk_dialog_response(GTK_DIALOG(self), GTK_RESPONSE_CLOSE);
-            }
+            debug_printf("destroying\n");
+            gtk_dialog_response(GTK_DIALOG(self), GTK_RESPONSE_CLOSE);
         }
-        public 
-        void
-        response(self, int response, gpointer data)
-        {
-            if(self->_priv->signal_item_removed) { 
-                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_item_removed);
-                self->_priv->signal_item_removed = 0;
-            }
-            debug_printf("response\n");
-            gtk_widget_destroy(GTK_WIDGET(self));
+    }
+
+    private 
+    void
+    response(self, int response, gpointer data)
+    {
+        int size_w, size_h;
+        if(self->_priv->signal_item_removed) { 
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_item_removed);
+            self->_priv->signal_item_removed = 0;
         }
+        debug_printf("response\n");
+        gtk_window_get_size(GTK_WINDOW(self), &size_w, &size_h);
+        g_key_file_set_integer(self->_priv->config_file, "ITEM_WINDOW", "width", size_w);
+        g_key_file_set_integer(self->_priv->config_file, "ITEM_WINDOW", "height", size_h);
+
+        gtk_widget_destroy(GTK_WIDGET(self));
+    }
     private 
     void
     schema_edit_button_clicked(self, GtkWidget *button)
@@ -66,9 +74,11 @@ class StuffKeeper:Item:Window from Gtk:Dialog
      */
     public
         void 
-        new (StuffKeeper:Data:Backend *skdb, StuffKeeper:Data:Item *item)
+        new (StuffKeeper:Data:Backend *skdb, StuffKeeper:Data:Item *item, GKeyFile *config_file)
         {                                                                                                                                            
             Self *self = GET_NEW;
+            GError *error = NULL;
+            gint width, height;
             GtkWidget *dialog = GTK_WIDGET(self);
             gtk_dialog_add_button(GTK_DIALOG(self), "gtk-close", GTK_RESPONSE_CLOSE);
             gtk_dialog_set_has_separator(GTK_DIALOG(self), FALSE);
@@ -76,10 +86,11 @@ class StuffKeeper:Item:Window from Gtk:Dialog
             /**/
             GtkWidget *container = gtk_vbox_new(FALSE, 6);
             GtkWidget *sw = NULL; 
-            GtkWidget *vbox;
-            GtkWidget *label1,*button;
+            //GtkWidget *vbox;
+            //GtkWidget *label1,*button;
             GtkWidget *event2; 
 
+            self->_priv->config_file = config_file;
             self->_priv->item = item;
             self->_priv->skdb = skdb;
             self->_priv->signal_item_removed = g_signal_connect_swapped(G_OBJECT(skdb), "item-removed",
@@ -88,14 +99,35 @@ class StuffKeeper:Item:Window from Gtk:Dialog
 
             /* set size */
             gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
+            width = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "width", &error);
+            if(error) {
+                g_error_free(error);
+                error = NULL;
+            } else {
+                height = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "height", &error);
+                if(error) {
+                    g_error_free(error);
+                    error = NULL;
+                } else {
+                    gtk_window_resize(GTK_WINDOW(self), width, height);
+                }
+            }
+
 
 
 
             gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), container, TRUE, TRUE, 0);
             gtk_container_set_border_width(GTK_CONTAINER(container), 9);
             /* The title */
-            event2 = gtk_event_box_new(); 
+            GtkWidget *vbox,*vbox2;
+            GtkWidget *label1,*button;
+            /**
+             * Header
+             */
+            event2 = gtk_event_box_new();
             vbox = gtk_hbox_new(FALSE, 6);
+            vbox2 = gtk_vbox_new(FALSE,6);
+            gtk_container_set_border_width(GTK_CONTAINER(vbox2), 8);
             /* Title */
             label1 = gtk_label_new("");
             gtk_label_set_markup(GTK_LABEL(label1), "<b>Title:</b>");
@@ -129,51 +161,51 @@ class StuffKeeper:Item:Window from Gtk:Dialog
             g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_schema_edit_button_clicked), self);
 
 
-            gtk_container_set_border_width(GTK_CONTAINER(vbox), 8);
 
             self_interface_header_changed(dialog, NULL, event2);
             g_signal_connect(dialog, "style-set", G_CALLBACK(self_interface_header_changed),event2);            
-            self_interface_header_changed(dialog, NULL, label1);
-            g_signal_connect(dialog, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
-
-            gtk_container_add(GTK_CONTAINER(event2), vbox);
-            gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
 
 
+            gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
+            vbox = gtk_hbox_new(FALSE, 6);
             if(stuffkeeper_data_item_get_creation_time(item) > 0)
             {
                 label1 = gtk_label_new("");
                 time_t time = stuffkeeper_data_item_get_creation_time(item);
                 struct tm *t  = localtime(&time);
                 char buffer[256];
-                strftime(buffer,256, "%c", t);
-                gchar *markup = g_markup_printf_escaped("<b>Created:</b> %s", buffer); 
+                strftime(buffer,256, "%x", t);
+                gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",_("Created"), buffer); 
                 gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
                 gtk_label_set_markup(GTK_LABEL(label1), markup);
                 g_free(markup);
-                gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
+                gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                self_interface_header_changed(dialog, NULL, label1);
+                g_signal_connect(dialog, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
             }
             if(stuffkeeper_data_item_get_modification_time(item) > 0)
             {
                 label1 = gtk_label_new("");
-                time_t time = stuffkeeper_data_item_get_modification_time(item);
-                struct tm *t  = localtime(&time);
-                char buffer[256];
-                strftime(buffer,256, "%c", t);
-                gchar *markup = g_markup_printf_escaped("<b>Modified:</b> %s", buffer); 
+                gchar *markup = g_markup_printf_escaped("<b>%s:</b>",_("Modified")); 
                 gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
                 gtk_label_set_markup(GTK_LABEL(label1), markup);
                 g_free(markup);
-                gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
+                gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                self_interface_header_changed(dialog, NULL, label1);
+                g_signal_connect(dialog, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
+                label1 = stuffkeeper_data_label_new_modifcation_time_item(item);
+                gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                self_interface_header_changed(dialog, NULL, label1);
+                g_signal_connect(dialog, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
             }
+            gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
+            gtk_container_add(GTK_CONTAINER(event2), vbox2);
+            gtk_box_pack_start(GTK_BOX(container),event2, FALSE,TRUE, 0);
 
-/*
-            label1 = gtk_label_new("");
-            gtk_label_set_markup(GTK_LABEL(label1),"<span weight='bold' size='x-large'>Fields:</span>");
-            gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
-            gtk_misc_set_padding(GTK_MISC(label1), 0,8);
-            gtk_box_pack_start(GTK_BOX(container),label1, FALSE,TRUE, 0);
-*/
+
+
+
+
             /**
              * Get the attached schema and fill in the rest from there
              */
@@ -188,7 +220,7 @@ class StuffKeeper:Item:Window from Gtk:Dialog
             gtk_widget_modify_bg(event2, GTK_STATE_NORMAL, &((dialog)->style->base[GTK_STATE_NORMAL]));
 
             sw = gtk_scrolled_window_new(FALSE, FALSE);
-            gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+            gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
             gtk_container_add(GTK_CONTAINER(event2), vbox);
             gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), event2);
             gtk_box_pack_start(GTK_BOX(container),sw, TRUE,TRUE, 0);

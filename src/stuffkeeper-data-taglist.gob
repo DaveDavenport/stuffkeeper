@@ -40,7 +40,7 @@ class StuffKeeper:Data:TagList from Gtk:Table
             if(length)
             {
                 node = g_list_first(self->_priv->tags);
-                gint cols = sqrt(length)+1;
+                gint cols = sqrt(length/2)+1;
                 gint rows = (int)((length)/((double)cols))+1;
                 gtk_table_resize(GTK_TABLE(self),rows,cols); 
                 int item=0;

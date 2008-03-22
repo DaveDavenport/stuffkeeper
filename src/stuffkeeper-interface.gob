@@ -1453,7 +1453,7 @@ class StuffKeeper:Interface from G:Object
         void 
         popup_item(self, StuffKeeper:Data:Item *item)
         {
-            stuffkeeper_item_window_new(self->_priv->skdbg, item);
+            stuffkeeper_item_window_new(self->_priv->skdbg, item,self->_priv->config_file);
 
         }
 
