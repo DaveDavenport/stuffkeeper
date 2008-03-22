@@ -704,7 +704,6 @@ class StuffKeeper:Interface from G:Object
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                     self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     label1 = stuffkeeper_data_entry_new(item,NULL);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
@@ -715,7 +714,6 @@ class StuffKeeper:Interface from G:Object
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Type:</b>");
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                     self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
                     if(schema) {
                         label1 = stuffkeeper_data_label_new_schema(schema);
@@ -733,12 +731,8 @@ class StuffKeeper:Interface from G:Object
 
 
                     self_interface_header_changed(self->_priv->treeview1, NULL, event2);
-//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),event2);            
-                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-//                    g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
 
 
-                   // gtk_container_add(GTK_CONTAINER(event2), vbox);
                     gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
                     vbox = gtk_hbox_new(FALSE, 6);
                     if(stuffkeeper_data_item_get_creation_time(item) > 0)
@@ -748,28 +742,26 @@ class StuffKeeper:Interface from G:Object
                         struct tm *t  = localtime(&time);
                         char buffer[256];
                         strftime(buffer,256, "%x", t);
-                        gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",("Created"), buffer); 
+                        gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",_("Created"), buffer); 
                         gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
                         gtk_label_set_markup(GTK_LABEL(label1), markup);
                         g_free(markup);
                         gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                         self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-//                        g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
                     }
                     if(stuffkeeper_data_item_get_modification_time(item) > 0)
                     {
                         label1 = gtk_label_new("");
-                        time_t time = stuffkeeper_data_item_get_modification_time(item);
-                        struct tm *t  = localtime(&time);
-                        char buffer[256];
-                        strftime(buffer,256, "%x", t);
-                        gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",("Modified"), buffer); 
+                        gchar *markup = g_markup_printf_escaped("<b>%s:</b>",_("Modified")); 
                         gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
                         gtk_label_set_markup(GTK_LABEL(label1), markup);
                         g_free(markup);
                         gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
                         self_interface_header_changed(self->_priv->treeview1, NULL, label1);
-//                        g_signal_connect(self->_priv->treeview1, "style-set", G_CALLBACK(self_interface_header_changed),label1);            
+
+                        label1 = stuffkeeper_data_label_new_modifcation_time_item(item);
+                        gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                        self_interface_header_changed(self->_priv->treeview1, NULL, label1);
                     }
                     gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
                     gtk_container_add(GTK_CONTAINER(event2), vbox2);

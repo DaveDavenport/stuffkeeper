@@ -2,9 +2,12 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include <time.h>
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-schema.h"
+#include "stuffkeeper-data-item.h"
 %}
+
 
 class StuffKeeper:Data:Label from Gtk:Label
 {
@@ -13,7 +16,7 @@ class StuffKeeper:Data:Label from Gtk:Label
     private gulong changed_item_entry = {0};
 
 
-    public
+    private
     void
     field_item_changed(self,const gchar *id, StuffKeeper:Data:Schema *schema)
     {
@@ -30,7 +33,7 @@ class StuffKeeper:Data:Label from Gtk:Label
     }
 
 
-    public
+    private
     void
     schema_item_changed(self,GObject *item, gpointer data)
     {
@@ -46,7 +49,7 @@ class StuffKeeper:Data:Label from Gtk:Label
         }
     }
 
-    public
+    private
     void
     tag_item_changed(self, GObject *item, gpointer data)
     {
@@ -63,6 +66,25 @@ class StuffKeeper:Data:Label from Gtk:Label
     }
 
 
+    private
+    void
+    item_changed(self, char *field,GObject *item)
+    {
+        if (STUFFKEEPER_IS_DATA_ITEM(self->_priv->item))
+        {
+            time_t time = stuffkeeper_data_item_get_modification_time(STUFFKEEPER_DATA_ITEM(item));
+            struct tm *t  = localtime(&time);
+            char buffer[256];
+            strftime(buffer,256, "%x", t);
+            gtk_label_set(GTK_LABEL(self), buffer);
+        }
+    }
+
+
+
+    /**
+     * Creates a label that keeps track of the name of a tag.
+     */
     public
     GtkWidget *
     new_tag(StuffKeeperDataTag *tag)
@@ -85,6 +107,10 @@ class StuffKeeper:Data:Label from Gtk:Label
         }
         return GTK_WIDGET(obj);
     }
+
+    /**
+     * Creates a label that keeps track of the name of a schema 
+     */
     public
     GtkWidget *
     new_schema(StuffKeeperDataSchema *schema)
@@ -108,8 +134,10 @@ class StuffKeeper:Data:Label from Gtk:Label
         }
         return GTK_WIDGET(obj);
     }
-
-
+    
+    /**
+     * Creates a label that keeps track of the name of a field in a schema 
+     */
     public
     GtkWidget *
     new_schema_field(StuffKeeperDataSchema *schema,const gchar *field)
@@ -139,6 +167,29 @@ class StuffKeeper:Data:Label from Gtk:Label
         }
         return GTK_WIDGET(obj);
     }
+
+    /**
+     * Creates a label that keeps track of the modification time of a tag 
+     */
+    public
+    GtkWidget *
+    new_modifcation_time_item(StuffKeeperDataItem *item)
+    {
+        Self *obj = GET_NEW;
+        gtk_misc_set_alignment(GTK_MISC(obj), 0, 0.5);
+        
+        /* store item */
+        obj->_priv->item = G_OBJECT(item); 
+            
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "item-changed", G_CALLBACK(self_item_changed), obj);
+
+        /* update the label */
+        self_item_changed(obj,NULL, obj->_priv->item);
+
+        return GTK_WIDGET(obj);
+    }
+
+
 
     override (G:Object)
         void
