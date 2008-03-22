@@ -148,6 +148,31 @@ class StuffKeeper:Data:TagList from Gtk:Table
         self_reload_data(self);
     }
 
+    private 
+    int 
+    tag_sort_func(StuffKeeperDataTag *ta, StuffKeeperDataTag *tb, StuffKeeperDataBackend *skdb)
+    {
+        int retv = 0;
+        
+        gchar *aa, *bb;
+        gchar *ca,*cb;
+
+        aa = stuffkeeper_data_tag_get_title(ta);
+        bb = stuffkeeper_data_tag_get_title(tb);
+
+        ca = g_utf8_casefold(aa, -1);
+        cb = g_utf8_casefold(bb,-1);
+        retv = g_utf8_collate(ca,cb);
+
+        g_free(ca);
+        g_free(cb);
+
+        g_free(aa);
+        g_free(bb);
+
+        return retv;
+    }
+
     public
     GtkWidget *
     new(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item)
@@ -161,8 +186,9 @@ class StuffKeeper:Data:TagList from Gtk:Table
         obj->_priv->uid_tag_added = g_signal_connect_swapped(G_OBJECT(obj->_priv->skdb), "tag-added",G_CALLBACK(self_tag_added), obj);
         obj->_priv->uid_tag_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->skdb), "tag-removed",G_CALLBACK(self_tag_removed), obj);
 
-
         GList *node,*list =  stuffkeeper_data_backend_get_tags(skdb);
+        /* Sort the tag list */
+        list = g_list_sort_with_data(list, (GCompareDataFunc)self_tag_sort_func,skdb);
         for(node=g_list_first(list);node;node = g_list_next(node))
         {
             self_tag_added(obj, node->data);
