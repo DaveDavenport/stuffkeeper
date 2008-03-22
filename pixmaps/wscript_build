@@ -5,6 +5,7 @@
 install_files('DATADIR', 'icons/hicolor/16x16/apps', '16/stuffkeeper.png')
 install_files('DATADIR', 'icons/hicolor/48x48/apps', '48/stuffkeeper.png')
 install_files('DATADIR', 'icons/hicolor/64x64/apps', '64/stuffkeeper.png')
+install_files('DATADIR', 'icons/hicolor/scalable/apps', 'scalable/stuffkeeper.svg')
 
 
 install_files('PACKAGE_DATADIR', 'icons/hicolor/16x16/actions','internet-web-browser.png')

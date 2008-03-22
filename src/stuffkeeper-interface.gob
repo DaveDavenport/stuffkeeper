@@ -29,7 +29,8 @@ extern GList *interface_list;
 %}
 
 %ph{
-    const gchar *artists[] = {"Jakub Szypulka (http://cubestuff.wordpress.com )",
+    const gchar *artists[] = {
+        "Jakub Szypulka (http://cubestuff.wordpress.com )",
         "Tango Project (http://tango.freedesktop.org/ )",
     NULL};
     const gchar *authors[] = {
