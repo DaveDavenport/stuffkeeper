@@ -274,7 +274,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
 
 
         /* store item */
-        obj->_priv->skdb = stuffkeeper_data_item_get_backend(item);
+        obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item));
         obj->_priv->item = item; 
 
 
