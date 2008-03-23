@@ -89,7 +89,7 @@ class StuffKeeper:Show:Item from Gtk:Table
             /* Title */
             label1 = gtk_label_new("");
             gtk_label_set_markup(GTK_LABEL(label1),_("<b>Tags</b>"));
-            gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
+            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
             gtk_table_attach(GTK_TABLE(self), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
             label1 =stuffkeeper_data_taglist2_new(self->_priv->item); 
             gtk_table_attach(GTK_TABLE(self), label1, 1,2,i,i+1,GTK_EXPAND|GTK_FILL, GTK_FILL, 0,0);
