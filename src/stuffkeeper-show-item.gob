@@ -15,6 +15,8 @@ requires 2.0.10
 #include "stuffkeeper-data-image.h"
 #include "stuffkeeper-data-link.h"
 #include "stuffkeeper-data-date.h"
+#include "stuffkeeper-data-taglist2.h"
+
 
 
 %}
@@ -37,6 +39,7 @@ class StuffKeeper:Show:Item from Gtk:Table
         reload_data(self)
         {
             int i;
+            GtkWidget *label1;
             GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
             for(node =list; node; node = g_list_next(node))
             {
@@ -44,11 +47,11 @@ class StuffKeeper:Show:Item from Gtk:Table
             }
             g_list_free(list);
             /** now fill it again */
-            gtk_table_resize(GTK_TABLE(self),self->_priv->length,2); 
+            gtk_table_resize(GTK_TABLE(self),self->_priv->length+1,2); 
 
             for(i=0;i<self->_priv->length;i++)                                                                             
             {
-                GtkWidget *label1;
+
                 FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
                 /* Title */
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
@@ -83,6 +86,14 @@ class StuffKeeper:Show:Item from Gtk:Table
                 }
                 gtk_table_attach(GTK_TABLE(self), label1, 1,2,i,i+1,GTK_EXPAND|GTK_FILL, GTK_FILL, 0,0);
             }
+            /* Title */
+            label1 = gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label1),_("<b>Tags</b>"));
+            gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
+            gtk_table_attach(GTK_TABLE(self), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
+            label1 =stuffkeeper_data_taglist2_new(self->_priv->item); 
+            gtk_table_attach(GTK_TABLE(self), label1, 1,2,i,i+1,GTK_EXPAND|GTK_FILL, GTK_FILL, 0,0);
+
             gtk_widget_show_all(GTK_WIDGET(self));
         }
 

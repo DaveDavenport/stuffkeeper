@@ -60,6 +60,12 @@ class StuffKeeper:Data:Item from G:Object
         /* Mark the item changed */
     }
 
+    signal last NONE (NONE)
+    void
+    item_tags_changed(self)
+    {
+
+    }
     /* Finalize functions */
     override (G:Object)
     void
@@ -798,6 +804,7 @@ class StuffKeeper:Data:Item from G:Object
             self->_priv->tags = g_list_append(self->_priv->tags, tag);
             self_items_add_field_integer(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
             self_item_changed(self,NULL);
+            self_item_tags_changed(self);
             stuffkeeper_data_tag_add_item(tag,G_OBJECT(self));
         }
     public
@@ -807,9 +814,15 @@ class StuffKeeper:Data:Item from G:Object
             self->_priv->tags = g_list_remove(self->_priv->tags, tag);
             self_items_remove_field_integer(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
             self_item_changed(self,NULL);
+            self_item_tags_changed(self);
             stuffkeeper_data_tag_remove_item(tag, G_OBJECT(self));
         }
-
+    public
+    GList * 
+    get_tags(self)
+    {
+        return g_list_copy(self->_priv->tags);
+    }
     /* Schema */
     public
         StuffKeeperDataSchema *

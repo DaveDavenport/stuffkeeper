@@ -646,9 +646,31 @@ class StuffKeeper:Interface from G:Object
     void
     interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
     {
+        g_signal_handlers_block_by_func(G_OBJECT(widget), self_interface_header_changed, wid);
         gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
         gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
         gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
+
+        g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_header_changed , wid);
+    }
+    private
+    void
+    interface_color(GtkWidget *wid)
+    {
+        g_signal_connect(G_OBJECT(wid), "style-set", G_CALLBACK(self_interface_header_changed), wid);
+    }
+    private 
+    void
+    interface_background_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
+    {
+        g_signal_handlers_block_by_func(G_OBJECT(widget), self_interface_background_changed, wid);
+        /*
+        gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
+*/
+        gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &(widget->style->light[GTK_STATE_NORMAL]));
+        g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_background_changed, wid);
     }
 
     public
@@ -663,7 +685,9 @@ class StuffKeeper:Interface from G:Object
             container = self->_priv->item_vbox;
 
             event =  self->_priv->item_event_box;
-            gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->light[GTK_STATE_NORMAL]));
+
+            g_signal_connect(G_OBJECT(event), "style-set", G_CALLBACK(self_interface_background_changed), event);
+//            gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(container->style->light[GTK_STATE_NORMAL]));
 
             list = gtk_container_get_children(GTK_CONTAINER(container));
             if(list)
@@ -703,7 +727,8 @@ class StuffKeeper:Interface from G:Object
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Title:</b>");
                     gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+//                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                    self_interface_color(label1);
 
                     label1 = stuffkeeper_data_entry_new(item,NULL);
                     gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
@@ -713,7 +738,7 @@ class StuffKeeper:Interface from G:Object
                     label1 =gtk_label_new("");
                     gtk_label_set_markup(GTK_LABEL(label1), "<b>Type:</b>");
                     gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-                    self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                    self_interface_color(label1);
 
                     if(schema) {
                         label1 = stuffkeeper_data_label_new_schema(schema);
@@ -721,6 +746,7 @@ class StuffKeeper:Interface from G:Object
                         label1 = gtk_label_new("N/A");
                     }
 
+                    self_interface_color(label1);
                     button = gtk_button_new();
                     gtk_container_add(GTK_CONTAINER(button), label1);
                     g_object_set_data(G_OBJECT(button), "schema", schema);
@@ -730,7 +756,7 @@ class StuffKeeper:Interface from G:Object
                    
 
 
-                    self_interface_header_changed(self->_priv->treeview1, NULL, event2);
+                    self_interface_color(event2);
 
 
                     gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
@@ -747,7 +773,7 @@ class StuffKeeper:Interface from G:Object
                         gtk_label_set_markup(GTK_LABEL(label1), markup);
                         g_free(markup);
                         gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-                        self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                        self_interface_color(label1);
                     }
                     if(stuffkeeper_data_item_get_modification_time(item) > 0)
                     {
@@ -757,11 +783,11 @@ class StuffKeeper:Interface from G:Object
                         gtk_label_set_markup(GTK_LABEL(label1), markup);
                         g_free(markup);
                         gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-                        self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                        self_interface_color(label1);
 
                         label1 = stuffkeeper_data_label_new_modifcation_time_item(item);
                         gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
-                        self_interface_header_changed(self->_priv->treeview1, NULL, label1);
+                        self_interface_color(label1);
                     }
                     gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
                     gtk_container_add(GTK_CONTAINER(event2), vbox2);
@@ -785,6 +811,7 @@ class StuffKeeper:Interface from G:Object
                          * Fill in the Tag list 
                          */
                         /* Title */
+                        /*
                         vbox = gtk_hbox_new(FALSE,6);
                         label1 = gtk_label_new("");
                         gchar *val = g_markup_printf_escaped("<b>%s</b>", "Tags");
@@ -802,6 +829,7 @@ class StuffKeeper:Interface from G:Object
                         
 
                         gtk_box_pack_start(GTK_BOX(container),vbox, FALSE,TRUE, 6);
+                        */
                     }
 
                 }

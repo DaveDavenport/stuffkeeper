@@ -1,0 +1,302 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-item.h"
+#include "stuffkeeper-data-tag.h"
+#include "stuffkeeper-data-label.h"
+#include <math.h>
+%}
+
+class StuffKeeper:Data:TagList2 from Gtk:Event:Box
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private StuffKeeperDataBackend *skdb = {NULL};
+
+    private gulong uid_item_changed = {0};
+    private gulong uid_tag_added = {0};
+    private gulong uid_tag_removed = {0};
+
+    /* Vbox, used to pack tags */
+    private GtkWidget *hbox = {NULL};
+    /* button for adding tags */
+    private GtkWidget *add_button = {NULL};
+    private GtkWidget *remove_button = {NULL};
+
+
+
+
+
+   
+    private 
+    void
+    tag_button_press(self, GdkEventButton *event,GtkWidget *event_box)
+    {
+       if(event->button==3)
+       {
+            StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(event_box), "tag");
+            if(tag)
+            {
+                stuffkeeper_data_item_remove_tag(self->_priv->item, tag);
+            }
+        }
+    }
+    
+
+
+    /* list of widgets so we can easily clear it */
+    private GList *tagsw = {NULL} destroywith g_list_free;
+    private
+    void
+    reload_list(self)
+    {
+        GList *tags, *iter; 
+
+        if(self->_priv->tagsw) {
+            g_list_foreach(self->_priv->tagsw,(GFunc)gtk_widget_destroy, NULL);
+            g_list_free(self->_priv->tagsw);
+            self->_priv->tagsw = NULL;
+        }
+
+        tags = stuffkeeper_data_item_get_tags(self->_priv->item);
+        tags = g_list_sort(tags, (GCompareFunc)self_tag_sort_func);
+        if(tags)
+        {
+            for(iter = g_list_first(tags);iter;iter = g_list_next(iter))
+            {
+                StuffKeeperDataTag *tag = iter->data;
+                GtkWidget *event_box = gtk_event_box_new();
+                GtkWidget *label = stuffkeeper_data_label_new_tag(tag);
+                gtk_container_add(GTK_CONTAINER(event_box), label);
+                self->_priv->tagsw = g_list_prepend(self->_priv->tagsw, event_box);
+           
+                g_signal_connect_swapped(G_OBJECT(event_box), "button-press-event", G_CALLBACK(self_tag_button_press), self);
+                gtk_event_box_set_visible_window(GTK_EVENT_BOX(event_box), FALSE);
+                gtk_box_pack_start(GTK_BOX(self->_priv->hbox), event_box, FALSE, TRUE, 0);
+
+                g_object_set_data(G_OBJECT(event_box), "tag", tag);
+                if(iter->next)
+                {
+                    label = gtk_label_new(",");
+                    self->_priv->tagsw = g_list_prepend(self->_priv->tagsw, label);
+                    gtk_box_pack_start(GTK_BOX(self->_priv->hbox), label, FALSE, TRUE, 0);
+                }
+            }
+
+            g_list_free(tags);
+        }
+        gtk_widget_show_all(GTK_WIDGET(self));
+    }
+
+
+
+    private 
+    void
+    item_changed(self, StuffKeeperDataItem *item)
+    {
+        self_reload_list(self);
+    }
+/*
+    private
+    void
+    style_set(self, GtkStyle *old,GtkWidget *event)
+    {
+        printf("style-set\n");
+        g_signal_handlers_block_by_func(G_OBJECT(self), self_style_set, event);
+        
+        gtk_widget_modify_bg(GTK_WIDGET(self), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->light[GTK_STATE_NORMAL]));
+
+        g_signal_handlers_unblock_by_func(G_OBJECT(self), self_style_set, event);
+    }
+*/
+    /**
+     * Utility
+     */
+    private 
+        int 
+    tag_sort_func(StuffKeeperDataTag *ta, StuffKeeperDataTag *tb)
+    {
+        int retv = 0;
+        
+        gchar *aa, *bb;
+        gchar *ca,*cb;
+
+        aa = stuffkeeper_data_tag_get_title(ta);
+        bb = stuffkeeper_data_tag_get_title(tb);
+
+        ca = g_utf8_casefold(aa, -1);
+        cb = g_utf8_casefold(bb,-1);
+        retv = g_utf8_collate(ca,cb);
+
+        g_free(ca);
+        g_free(cb);
+
+        g_free(aa);
+        g_free(bb);
+
+        return retv;
+    }
+
+    /**
+     * Remove tag button handling 
+     */
+    private
+    void
+    remove_tag(self, GtkMenuItem *item)
+    {
+        StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(item), "tag");
+        if(tag)
+        {
+            /* if the item does not allready have the tag, add it */
+            if(stuffkeeper_data_item_has_tag(self->_priv->item, tag))
+            {
+                stuffkeeper_data_item_remove_tag(self->_priv->item, tag);
+            }
+        }
+    }
+
+    private
+    void
+    remove_button_clicked(self, GtkWidget *button)
+    {
+        GList *iter,*list = stuffkeeper_data_item_get_tags(self->_priv->item);
+        list = g_list_sort(list, (GCompareFunc)self_tag_sort_func);
+        if(list)
+        {
+            GtkWidget*menu = gtk_menu_new();
+            for(iter = g_list_first(list); iter; iter = g_list_next(iter))
+            {
+                StuffKeeperDataTag *tag = STUFFKEEPER_DATA_TAG(iter->data);
+                gchar *title = stuffkeeper_data_tag_get_title(tag);
+                GtkWidget *item = gtk_menu_item_new_with_label(title);
+                /* add to menu */
+                gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+
+                /* attach the tag to the menu item, and connect click signal */
+                g_object_set_data(G_OBJECT(item), "tag", tag);
+                g_signal_connect_swapped(G_OBJECT(item),"activate",G_CALLBACK(self_remove_tag), self);
+                /* free title */
+                g_free(title);
+            }
+
+            g_list_free(list);
+            gtk_widget_show_all(menu);
+            gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,0,gtk_get_current_event_time());
+        }
+
+    }
+
+    /**
+     * Add tag button handling 
+     */
+    private
+    void
+    add_tag(self, GtkMenuItem *item)
+    {
+        StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(item), "tag");
+        if(tag)
+        {
+            /* if the item does not allready have the tag, add it */
+            if(!stuffkeeper_data_item_has_tag(self->_priv->item, tag))
+            {
+                stuffkeeper_data_item_add_tag(self->_priv->item, tag);
+            }
+        }
+    }
+
+    private
+    void
+    add_button_clicked(self, GtkWidget *button)
+    {
+        GList *iter,*list = stuffkeeper_data_backend_get_tags(self->_priv->skdb);
+        list = g_list_sort(list, (GCompareFunc)self_tag_sort_func);
+        if(list)
+        {
+            GtkWidget*menu = gtk_menu_new();
+            for(iter = g_list_first(list); iter; iter = g_list_next(iter))
+            {
+                StuffKeeperDataTag *tag = STUFFKEEPER_DATA_TAG(iter->data);
+                /* only add it to the menu if the item does not have the tag allready */
+                if(!stuffkeeper_data_item_has_tag(self->_priv->item, tag))
+                {
+                    gchar *title = stuffkeeper_data_tag_get_title(tag);
+                    GtkWidget *item = gtk_menu_item_new_with_label(title);
+                    /* add to menu */
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+                    
+                    /* attach the tag to the menu item, and connect click signal */
+                    g_object_set_data(G_OBJECT(item), "tag", tag);
+                    g_signal_connect_swapped(G_OBJECT(item),"activate",G_CALLBACK(self_add_tag), self);
+                    /* free title */
+                    g_free(title);
+                }
+            }
+
+            g_list_free(list);
+            gtk_widget_show_all(menu);
+            gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL,0,gtk_get_current_event_time());
+        }
+
+    }
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataItem *item)
+    {
+        Self *obj = GET_NEW;
+        gtk_event_box_set_visible_window(GTK_EVENT_BOX(obj), FALSE);
+        //        g_signal_connect(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set), obj);
+        /* hbox */
+        obj->_priv->hbox = gtk_hbox_new(FALSE, 0);
+        /* Add hbox to even box */
+        gtk_container_add(GTK_CONTAINER(obj), obj->_priv->hbox);
+
+        /* Add button */
+        obj->_priv->add_button = gtk_button_new();
+        gtk_button_set_relief(GTK_BUTTON(obj->_priv->add_button), GTK_RELIEF_NONE);
+        gtk_button_set_image(GTK_BUTTON(obj->_priv->add_button), gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+        gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->add_button, FALSE, TRUE, 0);
+
+        g_signal_connect_swapped(G_OBJECT(obj->_priv->add_button), "clicked", G_CALLBACK(self_add_button_clicked), obj);
+
+        /* Remove button */
+        obj->_priv->remove_button = gtk_button_new();
+        gtk_button_set_relief(GTK_BUTTON(obj->_priv->remove_button), GTK_RELIEF_NONE);
+        gtk_button_set_image(GTK_BUTTON(obj->_priv->remove_button), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+        gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->remove_button, FALSE, TRUE, 0);
+
+        g_signal_connect_swapped(G_OBJECT(obj->_priv->remove_button), "clicked", G_CALLBACK(self_remove_button_clicked), obj);
+
+
+
+
+
+
+        /* store item */
+        obj->_priv->skdb = stuffkeeper_data_item_get_backend(item);
+        obj->_priv->item = item; 
+
+
+        self_reload_list(obj);
+
+
+        obj->_priv->uid_item_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "item-tags-changed",G_CALLBACK(self_item_changed), obj);
+
+        return GTK_WIDGET(obj);
+    }
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            if(self->_priv->uid_item_changed)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->uid_item_changed);
+                self->_priv->uid_item_changed= 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}

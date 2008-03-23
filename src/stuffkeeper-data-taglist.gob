@@ -21,7 +21,7 @@ class StuffKeeper:Data:TagList from Gtk:Table
 
 
     private GList *tags = {NULL} destroywith g_list_free;
-    public
+    private
         void
         reload_data(self)
         {
@@ -58,7 +58,7 @@ class StuffKeeper:Data:TagList from Gtk:Table
         }
 
 
-    public
+    private
     void
     tag_changed(self, StuffKeeperDataTag *tag)
     {
@@ -86,7 +86,7 @@ class StuffKeeper:Data:TagList from Gtk:Table
         self_reload_data(self);
     }
 
-    public
+    private
     void
     event_button_press_event(self, GdkEventButton *button, GtkEventBox *event)
     {
@@ -109,7 +109,7 @@ class StuffKeeper:Data:TagList from Gtk:Table
         }
 
     }
-    public
+    private
     void
     tag_added(self, StuffKeeperDataTag *tag)
     {
@@ -128,7 +128,7 @@ class StuffKeeper:Data:TagList from Gtk:Table
         self->_priv->tags = g_list_append(self->_priv->tags, event);
         self_reload_data(self);
     }
-    public
+    private
     void
     tag_removed(self, const int id)
     {
