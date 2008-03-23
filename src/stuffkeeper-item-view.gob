@@ -1,0 +1,194 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include <glib/gi18n.h>
+#include "debug.h"
+#include "stuffkeeper-data-item.h"
+#include "stuffkeeper-data-schema.h"
+#include "stuffkeeper-show-item.h"
+#include "stuffkeeper-edit-schema.h"
+%}
+
+class StuffKeeper:Item:View from Gtk:VBox
+{
+    private StuffKeeperDataSchema *schema = {NULL};
+    private StuffKeeperDataItem *item = {NULL};
+    private 
+    void
+    schema_edit_button_clicked(self, GtkWidget *button)
+    {
+        StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+        if(schema)
+        {
+            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            stuffkeeper_edit_schema_set_schema(skes, schema);
+        }
+    }
+
+    private 
+        void
+        interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
+        {
+            g_signal_handlers_block_by_func(G_OBJECT(widget), self_interface_header_changed, wid);
+            gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
+            gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
+            gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
+
+            g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_header_changed , wid);
+        }
+    private
+        void
+        interface_color(GtkWidget *wid)
+        {
+            g_signal_connect(G_OBJECT(wid), "style-set", G_CALLBACK(self_interface_header_changed), wid);
+        }
+    private 
+        void
+        interface_background_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
+        {
+            g_signal_handlers_block_by_func(G_OBJECT(widget), self_interface_background_changed, wid);
+            gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &(widget->style->light[GTK_STATE_NORMAL]));
+            g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_background_changed, wid);
+        }
+    /**
+     * Get the widget 
+     */
+    public
+        Gtk:Widget * 
+        new(StuffKeeper:Data:Item *item)
+        {
+            Self *self = GET_NEW;
+
+            /* Get the schema  */
+            self->_priv->schema = stuffkeeper_data_item_get_schema(item);
+            /* Get the item */
+            self->_priv->item = item;
+
+            /* The title */ 
+            {
+                /* The title */
+                GtkWidget *vbox,*vbox2;
+                GtkWidget *label1,*button;
+                /**
+                 * Header
+                 */
+                GtkWidget *event2 = gtk_event_box_new();
+                vbox = gtk_hbox_new(FALSE, 6);
+                vbox2 = gtk_vbox_new(FALSE,6);
+                gtk_container_set_border_width(GTK_CONTAINER(vbox2), 8);
+                /* Title */
+                label1 = gtk_label_new("");
+                gtk_label_set_markup(GTK_LABEL(label1), _("<b>Title:</b>"));
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+                gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                self_interface_color(label1);
+
+                label1 = stuffkeeper_data_entry_new(item,NULL);
+                gtk_box_pack_start(GTK_BOX(vbox),label1, TRUE,TRUE, 0);
+
+                /* type */
+                label1 =gtk_label_new("");
+                gtk_label_set_markup(GTK_LABEL(label1), _("<b>Type:</b>"));
+                gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                self_interface_color(label1);
+
+                if(self->_priv->schema) {
+                    label1 = stuffkeeper_data_label_new_schema(self->_priv->schema);
+                } else {
+                    label1 = gtk_label_new("N/A");
+                }
+
+                self_interface_color(label1);
+                button = gtk_button_new();
+                gtk_container_add(GTK_CONTAINER(button), label1);
+                g_object_set_data(G_OBJECT(button), "schema", self->_priv->schema);
+                gtk_button_set_relief(GTK_BUTTON(button),GTK_RELIEF_NONE); 
+                gtk_box_pack_start(GTK_BOX(vbox),button, FALSE,TRUE, 0);
+                g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_schema_edit_button_clicked), self);
+
+
+
+                self_interface_color(event2);
+
+
+
+
+                gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
+
+
+                vbox = gtk_hbox_new(FALSE, 6);
+                if(stuffkeeper_data_item_get_creation_time(item) > 0)
+                {
+                    label1 = gtk_label_new("");
+                    time_t time = stuffkeeper_data_item_get_creation_time(item);
+                    struct tm *t  = localtime(&time);
+                    char buffer[256];
+                    strftime(buffer,256, "%x", t);
+                    gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s",_("Created"), buffer); 
+                    gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
+                    gtk_label_set_markup(GTK_LABEL(label1), markup);
+                    g_free(markup);
+                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    self_interface_color(label1);
+                }
+                if(stuffkeeper_data_item_get_modification_time(item) > 0)
+                {
+                    label1 = gtk_label_new("");
+                    gchar *markup = g_markup_printf_escaped("<b>%s:</b>",_("Modified")); 
+                    gtk_misc_set_alignment(GTK_MISC(label1), 0,0.5);
+                    gtk_label_set_markup(GTK_LABEL(label1), markup);
+                    g_free(markup);
+                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    self_interface_color(label1);
+
+                    label1 = stuffkeeper_data_label_new_modifcation_time_item(item);
+                    gtk_box_pack_start(GTK_BOX(vbox),label1, FALSE,TRUE, 0);
+                    self_interface_color(label1);
+                }
+                gtk_box_pack_start(GTK_BOX(vbox2), vbox, FALSE, TRUE, 0);
+                gtk_container_add(GTK_CONTAINER(event2), vbox2);
+                gtk_box_pack_start(GTK_BOX(self),event2, FALSE,TRUE, 0);
+
+
+            }
+                /**
+                 * The body 
+                 */
+            {
+                
+                GtkWidget *sw , *vbox, *event; 
+
+
+                /* Scrolled window for the body */
+                sw = gtk_scrolled_window_new(FALSE, FALSE);
+                gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+                /* vbox to color the background */
+                event = gtk_event_box_new();
+                g_signal_connect(G_OBJECT(event), "style-set", G_CALLBACK(self_interface_background_changed), event);
+
+                /* contentwidget */
+                vbox = stuffkeeper_show_item_new(item);
+                gtk_table_set_row_spacings(GTK_TABLE(vbox), 6);
+                gtk_table_set_col_spacings(GTK_TABLE(vbox), 6);
+                gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
+
+                /* add them together */
+                gtk_container_add(GTK_CONTAINER(event), vbox);
+                gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), event);
+                gtk_box_pack_start(GTK_BOX(self),sw, TRUE,TRUE, 0);
+            }
+
+            return GTK_WIDGET(self);
+        }
+
+    /**
+     * Destroying
+     */
+    override (G:Object)
+        void
+        finalize(G:Object *obj)
+        {
+            debug_printf("Cleanup item view\n");
+        }
+}
