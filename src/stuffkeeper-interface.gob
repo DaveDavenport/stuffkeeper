@@ -69,6 +69,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *item_label;
 
     private GtkWidget *item_view_container;
+    private GtkWidget *show_item_pane_menu_item;
 
     private StuffKeeperDataBackend *skdbg = {NULL};
     /**
@@ -647,6 +648,14 @@ class StuffKeeper:Interface from G:Object
             gtk_widget_modify_bg(wid, GTK_STATE_NORMAL, &(widget->style->light[GTK_STATE_NORMAL]));
             g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_background_changed, wid);
         }
+
+    public
+    void
+    item_pane_checkbox(self,GtkCheckMenuItem *item)
+    {
+        self_interface_item_selection_changed(self, gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2)));
+    }
+
     public
         void 
         interface_item_selection_changed (self, GtkTreeSelection *selection)
@@ -655,6 +664,8 @@ class StuffKeeper:Interface from G:Object
             GtkTreeModel *model;
             GtkTreeIter iter;
             GList *list;
+            gboolean show_pane = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(self->_priv->show_item_pane_menu_item));
+
             list = gtk_container_get_children(GTK_CONTAINER(self->_priv->item_view_container));
             if(list)
             {
@@ -665,6 +676,13 @@ class StuffKeeper:Interface from G:Object
                 }
                 g_list_free(list);
             }
+            if(!show_pane)
+            {
+                gtk_widget_hide(self->_priv->item_view_container);
+                return;
+            }
+
+
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             if(gtk_tree_selection_get_selected(selection, &model, &iter))
             {
@@ -689,7 +707,6 @@ class StuffKeeper:Interface from G:Object
                 gtk_container_add(GTK_CONTAINER(event),frame);
                 gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), event);
                 gtk_widget_show_all(self->_priv->item_view_container);
-                //gtk_widget_hide(self->_priv->item_view_container);
             }
             return;
         }
@@ -935,6 +952,7 @@ class StuffKeeper:Interface from G:Object
 
             self->_priv->item_label = glade_xml_get_widget(self->_priv->xml, "item_label");
             self->_priv->item_view_container = glade_xml_get_widget(self->_priv->xml, "item_view_container");
+            self->_priv->show_item_pane_menu_item = glade_xml_get_widget(self->_priv->xml, "show_item_pane_menu_item");
             
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
 
@@ -943,10 +961,6 @@ class StuffKeeper:Interface from G:Object
             /**
              * Custom search widget, glade does not support, sexy-icon and screws up alignment 
              */
-//            item = gtk_tool_item_new();
-//            gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), TRUE);
-//            ali = gtk_alignment_new(1,0.5, 0, 0);
-//            gtk_container_add(GTK_CONTAINER(item), ali);
             /* sexy icon + setup */
             self->_priv->search_entry = sexy_icon_entry_new();
             /* Add clear button */
@@ -955,12 +969,10 @@ class StuffKeeper:Interface from G:Object
             sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self->_priv->search_entry),SEXY_ICON_ENTRY_PRIMARY, 
                 GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_FIND, GTK_ICON_SIZE_MENU)));
 
-//            gtk_container_add(GTK_CONTAINER(ali),self->_priv->search_entry); 
             gtk_box_pack_end(GTK_BOX(glade_xml_get_widget(self->_priv->xml,"hbox3")), self->_priv->search_entry, FALSE, TRUE,0);
             g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "changed", G_CALLBACK(self_search_entry_changed), self);
 
             gtk_widget_show_all(GTK_WIDGET(self->_priv->search_entry));
-  //          gtk_toolbar_insert(GTK_TOOLBAR(glade_xml_get_widget(self->_priv->xml, "toolbar1")), GTK_TOOL_ITEM(item),-1);
 
             /* read config */
             value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "hpane", &error);
@@ -1016,6 +1028,14 @@ class StuffKeeper:Interface from G:Object
                     gtk_window_move(GTK_WINDOW(self->_priv->win), width, height);
                 }
             }
+            /* show pane */
+            width = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "show-item-pane", &error);
+            if(error) {
+                g_error_free(error);
+                error = NULL;
+            } else {
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(self->_priv->show_item_pane_menu_item),width);
+            }
 
 
 
@@ -1024,6 +1044,7 @@ class StuffKeeper:Interface from G:Object
             gtk_widget_show(self->_priv->win);
             /* put this after the show, or it will turn up black, for some oddball reason */
             self_interface_item_selection_changed(self, gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2)));
+
             return self;
         }
 
@@ -1291,6 +1312,10 @@ class StuffKeeper:Interface from G:Object
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "x-pos", value);
             gtk_window_get_position(GTK_WINDOW(self->_priv->win), NULL, &value);
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "y-pos", value);
+
+            value =  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(self->_priv->show_item_pane_menu_item));
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "show-item-pane", value);
+
 
             gtk_widget_destroy(self->_priv->win);
 
