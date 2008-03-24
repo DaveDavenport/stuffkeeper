@@ -59,8 +59,6 @@ class StuffKeeper:Export:HTML from G:Object
     {
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
-        GtkWidget *wid;
-        GtkCellRenderer *renderer;
 
         self->_priv->cur_item = item;
         /**
@@ -213,7 +211,7 @@ class StuffKeeper:Export:HTML from G:Object
             gchar *temp = stuffkeeper_data_item_get_title(self->_priv->cur_item);
             if(temp)
             {
-                gchar *esc = g_strescape(temp, "\"");
+                gchar *esc = g_markup_escape_text(temp, -1); 
                 for(i=0;esc[i];i++)
                 {
                     if(esc[i] == '\n')
@@ -231,7 +229,7 @@ class StuffKeeper:Export:HTML from G:Object
             {
                 StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                 gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
-                gchar *esc = g_strescape(temp,"\"");
+                gchar *esc = g_markup_escape_text(temp, -1); 
                 fputs(esc, fp_out);
                 g_free(esc);
                 g_free(temp);
@@ -239,23 +237,75 @@ class StuffKeeper:Export:HTML from G:Object
             else if(strcmp("field", buffer) == 0)
             {
                 StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
-                gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
-                if(temp)
-                {
-                    int i = 0;
-                    gchar *esc = g_strescape(temp, "\"");
-                    for(i=0;esc[i];i++)
+                FieldType type = stuffkeeper_data_schema_get_field_type(schema, self->_priv->cur_field); 
+               
+                if(type == FIELD_TYPE_LIST) {
+                    gsize len;
+                    gchar **items =stuffkeeper_data_item_get_list(self->_priv->cur_item, self->_priv->cur_field, &len);
+                    if(items)
                     {
-                        if(esc[i] == '\\' && esc[i+1] == 'n')
+                        int j;
+                        fputs("<div id='list'>",fp_out);
+                        for(j=0;j<len;j++) 
                         {
+                            gchar *esc = g_markup_escape_text(items[j], -1); 
+                            for(i=0;esc[i];i++) {
+                                if(esc[i] == '\\' && esc[i+1] == 'n') {
+                                    fputs("<BR />", fp_out);
+                                    i++;
+                                } else
+                                    fputc(esc[i], fp_out);
+                            }
                             fputs("<BR />", fp_out);
-                            i++;
+
+                            g_free(esc);
                         }
-                        else
-                            fputc(esc[i], fp_out);
+                        fputs("</div>",fp_out);
                     }
-                    g_free(esc);
-                    g_free(temp);
+
+                }else 
+                {
+                    gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
+                    if(temp)
+                    {
+
+                        gchar *esc = g_markup_escape_text(temp, -1); 
+                        int i = 0;
+
+
+                        if(type == FIELD_TYPE_LINK)
+                        {
+                            fputs("<div id='link'>",fp_out);
+                            fputs("<a href='",fp_out);
+                            fputs(temp,fp_out);
+                            fputs("'>",fp_out);
+                            for(i=0;esc[i];i++) {
+                                if(esc[i] == '\\' && esc[i+1] == 'n') {
+                                    fputs("<BR />", fp_out);
+                                    i++;
+                                } else
+                                    fputc(esc[i], fp_out);
+                            }
+                            fputs("</a>",fp_out);
+                            fputs("</div>",fp_out);
+                        }
+                        else 
+                        {
+
+                            fputs("<div id='field'>",fp_out);
+                            for(i=0;esc[i];i++) {
+                                if(esc[i] == '\\' && esc[i+1] == 'n') {
+                                    fputs("<BR />", fp_out);
+                                    i++;
+                                } else
+                                    fputc(esc[i], fp_out);
+                            }
+                            fputs("</div>",fp_out);
+
+                        }
+                        g_free(esc);
+                        g_free(temp);
+                    }
                 }
             }
 
