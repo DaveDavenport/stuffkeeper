@@ -18,6 +18,7 @@ requires 2.0.10
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
 #include "stuffkeeper-export-csv.h"
+#include "stuffkeeper-export-html.h"
 
 #include "stuffkeeper-item-view.h"
 #include "ExportHTML.h"
@@ -1563,6 +1564,8 @@ class StuffKeeper:Interface from G:Object
         void
         export_to_html(self)
         {
+
+/*
             GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick a directory", 
                     GTK_WINDOW(self->_priv->win), 
                     GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER,
@@ -1572,24 +1575,29 @@ class StuffKeeper:Interface from G:Object
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
                 case GTK_RESPONSE_OK:
-                {
-                    gchar *dir = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-                    if(dir)
                     {
-                       export_everything_to_html(self->_priv->skdbg,dir); 
-                       g_free(dir);
+                        gchar *dir = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+                        if(dir)
+                        {
+                            */
+                            stuffkeeper_export_html_new_schema(GTK_LIST_STORE(self->_priv->model_schemas));
+                            //export_everything_to_html(self->_priv->skdbg,dir); 
+/*                            g_free(dir);
+                        }
                     }
-                }
                 default:
                     break;
             }
             gtk_widget_destroy(dialog);
+            */
         }
         /* export selected item */
         public
         void
         export_html(self)
         {
+
+
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkWidget *tree = self->_priv->treeview2;
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
@@ -1600,6 +1608,8 @@ class StuffKeeper:Interface from G:Object
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
+                    stuffkeeper_export_html_new(STUFFKEEPER_DATA_ITEM(item));
+                    return;
                     GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","dialog_backup",NULL);
                     GtkWidget *dialog = glade_xml_get_widget(xml,"dialog_backup");
 

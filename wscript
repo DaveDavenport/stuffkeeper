@@ -45,6 +45,7 @@ def build(bld):
     bld.add_subdirs('data')
     bld.add_subdirs('po')
     bld.add_subdirs('pixmaps')
+    bld.add_subdirs('html')
 
 def shutdown():
     gnome.postinstall_icons()
