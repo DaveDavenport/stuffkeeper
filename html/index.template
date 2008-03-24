@@ -4,10 +4,49 @@
         <title>
             StuffKeeper - {title} 
         </title>
+        <style  TYPE="text/css"> 
+        #heading \{
+            background: #99ccFF;
+            font-size: 4em;
+            text-align: center;
+            border-bottom: 1px dotted black;
+        \}
+        body \{
+            margin: 0;
+        \}
+        #content\{
+            margin: 1em;
+        \}
+        #index\{
+            margin: 1em;
+        \}
+        #item \{
+            
+        \}
+        #item H3 \{
+            background: #FFFFCC;
+            border: 1px dotted black;
+            padding: 0.5em;
+        \}
+        </style>
     </head>
     <body>
+    <div id='heading'>
+        StuffKeeper
+    </div>
+    <div id='index'>
+    <H3>Index</H3>
+    <lu>
     [s
-        <H3>{title}</H3>
+        
+        <li><a href='#{id}'>{title}</a></li>
+    ]
+    </lu>
+    </div>
+    <div id='content'>
+    [s
+        <div id='item'>
+        <H3><a name='{id}'>{title}</a></H3>
         <table>
         [i
             <tr>
@@ -29,6 +68,8 @@
             <tr>
         ]
         </table>
+        </div>
     ]
+    </div>
     </body>
 </html>

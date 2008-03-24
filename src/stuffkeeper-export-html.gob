@@ -229,7 +229,14 @@ class StuffKeeper:Export:HTML from G:Object
                 g_free(temp);
             }
         }
-        if(self->_priv->cur_field)
+        else if(strcmp("id", buffer) == 0 && self->_priv->cur_item)
+        {
+            int id = stuffkeeper_data_item_get_id(self->_priv->cur_item); 
+            gchar *t = g_strdup_printf("%i", id);
+            fputs(t, fp_out);
+            g_free(t);
+        }       
+        else  if(self->_priv->cur_field)
         {
             if(strcmp("name", buffer) == 0)
             {
@@ -398,7 +405,12 @@ class StuffKeeper:Export:HTML from G:Object
 
         while((a = fgetc(fp_in)) != EOF)
         {
-            if(a == '{')
+            if(a == '\\')
+            {
+                a = fgetc(fp_in);
+                fputc(a,fp_out);
+            } 
+            else if(a == '{')
             {
                 self_parse_field(self,fp_in, fp_out);
             }
@@ -420,7 +432,7 @@ class StuffKeeper:Export:HTML from G:Object
                     g_strfreev(retv);
                     self->_priv->cur_field = NULL;
                 }
-                if(a == 's' && self->_priv->cur_item == NULL && self->_priv->cur_schema != NULL)
+                else if(a == 's' && self->_priv->cur_item == NULL && self->_priv->cur_schema != NULL)
                 {
                     GList *list = stuffkeeper_data_schema_get_items(self->_priv->cur_schema);
                     if(list)
