@@ -786,7 +786,7 @@ Types</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="export_csv">
-    <property name="border_width">5</property>
+    <property name="border_width">6</property>
     <property name="title" translatable="yes">Export to CSV</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
@@ -798,7 +798,7 @@ Types</property>
         <child>
           <widget class="GtkVBox" id="vbox4">
             <property name="visible">True</property>
-            <property name="border_width">9</property>
+            <property name="border_width">5</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="event_box_header">
