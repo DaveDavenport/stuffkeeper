@@ -16,7 +16,6 @@ requires 2.0.10
 #include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
-#include "stuffkeeper-data-taglist.h"
 extern GList *interface_list;
 %}
 %ph{
