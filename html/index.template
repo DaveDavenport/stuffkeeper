@@ -57,7 +57,7 @@
                     {field:string %
                     }{field:text <p>%</p>
                     }{field:link <a href='%'>%</a>
-                    }{field:slider %/10
+                    }{field:slider %/100
                     }{field:integer %
                     }{field:boolean %
                     }{field:image <img src='%' />
