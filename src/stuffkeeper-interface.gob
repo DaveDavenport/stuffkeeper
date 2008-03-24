@@ -17,6 +17,7 @@ requires 2.0.10
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
+#include "stuffkeeper-export-csv.h"
 
 #include "stuffkeeper-item-view.h"
 #include "ExportHTML.h"
@@ -1526,6 +1527,13 @@ class StuffKeeper:Interface from G:Object
          * HTML Export 
          */
         /* Export the whole db */
+        public
+        void
+        export_to_csv(self)
+        {
+            stuffkeeper_export_csv_new(STUFFKEEPER_DATA_BACKEND(self->_priv->skdbg),GTK_LIST_STORE(self->_priv->model_schemas));
+        }
+
         public
         void
         export_to_html(self)
