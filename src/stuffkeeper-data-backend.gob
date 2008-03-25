@@ -4,6 +4,7 @@ requires 2.0.10
     #include "stuffkeeper-data-schema.h"
     #include "stuffkeeper-data-item.h"
     #include "stuffkeeper-data-tag.h"
+    #include "stuffkeeper-data-item-search.h"
 %}
 %ph{
 #include <sqlite3.h>
@@ -41,6 +42,14 @@ class StuffKeeper:Data:Backend from G:Object
     /**
      * Signal 
      */
+    /* searches
+     */
+    signal last NONE (POINTER)
+    void
+    search_added(self, StuffKeeperDataItemSearch *search)
+    {
+        printf("search added\n");
+    }
     /* item */
     signal last NONE (STRING,POINTER)
     void
@@ -56,10 +65,11 @@ class StuffKeeper:Data:Backend from G:Object
 
     }
     signal last NONE (INT)
-        void
+    void
     item_removed(self, gint id)
     {
     }
+
     /* schema */
     signal last NONE (POINTER)
     void
@@ -77,6 +87,33 @@ class StuffKeeper:Data:Backend from G:Object
         void
     schema_removed(self, gint id)
     {
+    }
+    /**
+     * searches
+     */
+    public
+        GList *
+        get_searches(self)
+        {
+            printf("get searches\n");
+            return g_hash_table_get_values(self->_priv->searches);
+        }
+
+    public
+    guint
+    get_num_searches(self)
+    {
+        return g_hash_table_size(self->_priv->searches);
+    }
+
+
+    public 
+    StuffKeeperDataItemSearch *
+    get_search(self, gint id)
+    {
+        StuffKeeperDataItemSearch *item;
+        item = g_hash_table_lookup(self->_priv->searches, &id);
+        return item;
     }
 
     /**
@@ -263,6 +300,34 @@ class StuffKeeper:Data:Backend from G:Object
         /**
          * Read tags 
          */
+        query = "SELECT id FROM SearchFields GROUP by SearchID";
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r != SQLITE_OK)
+        {
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        else
+        {
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                gint oid = sqlite3_column_int(stmt, 0);
+                StuffKeeperDataItemSearch *search;
+                gint *id;
+                /* create a new item */
+                search = stuffkeeper_data_item_search_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
+                /* want to copy the key, even if it is an integer */
+                id = g_malloc0(sizeof(gint));
+                *id = oid; 
+                /* insert it into my hash-list */
+                g_hash_table_insert(self->_priv->searches,id, search);
+                self_search_added(self, search);
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        /**
+         * Read tags 
+         */
         query = "SELECT id FROM Tags";
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r != SQLITE_OK)
@@ -287,6 +352,27 @@ class StuffKeeper:Data:Backend from G:Object
             }
         }
         sqlite3_finalize(stmt);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /** 
          * Items
@@ -771,6 +857,7 @@ class StuffKeeper:Data:Backend from G:Object
             query = sqlite3_mprintf("CREATE TABLE 'SearchFields' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
                     "'SearchId'   INTEGER," /* id of the field, this is taken from the id of type=ID */
+                    "'SearchType'   INTEGER," /* id of the field, this is taken from the id of type=ID */
                     "'FieldType'  INTEGER," /* Id of the schema this field belongs too */
                     "'value'	TEXT" /* the value */
                     ")");

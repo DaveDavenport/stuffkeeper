@@ -8,32 +8,58 @@ requires 2.0.10
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-schema.h"
-#include "stuffkeeper-data-backend.h"
+
 
 
 typedef enum _SearchType {
-    SEARCH_TYPE_IS,
-    SEARCH_TYPE_IS_NOT,
-    SEARCH_TYPE_CONTAINS
+    SEARCH_TYPE_NONE = 0,
+    SEARCH_TYPE_IS = 1,
+    SEARCH_TYPE_IS_NOT = 2,
+    SEARCH_TYPE_CONTAINS = 3
 }SearchType;
 
 
 typedef enum _SearchField {
-    SEARCH_TITLE,
-    SEARCH_FIELD_SCHEMA,
-    SEARCH_FIELD_TAG,
-    SEARCH_FIELD_TITLE,
-    SEARCH_FIELD_VALUE,
-    NUM_SEARCH_FIELD
+    SEARCH_TITLE            = 0,
+    SEARCH_FIELD_SCHEMA     = 1,
+    SEARCH_FIELD_TAG        = 2,
+    SEARCH_FIELD_TITLE      = 3,
+    SEARCH_FIELD_VALUE      = 4,
+    NUM_SEARCH_FIELD        = 5
 }SearchField;
 
 %}
-
+%ph{
+#include "stuffkeeper-data-backend.h"
+%}
 
 class StuffKeeper:Data:Item:Search from G:Object 
 {
     private int is_dummy = {FALSE};
     private int id = {-1};
+    private StuffKeeperDataBackend *skdb = {NULL};
+    private sqlite3 *sqlHandle = {NULL};
+
+    private 
+    gchar *
+    items_get_field_string(self, int searchtype, int fieldtype)
+    {
+        char *retv = NULL;
+        char *query = sqlite3_mprintf("SELECT value FROM 'SearchFields' WHERE SearchId=%i and SearchType=%i and FieldType=%i", self->_priv->id,searchtype, fieldtype);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK) {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
+                retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        sqlite3_free(query);
+        return retv; 
+    }
 
     public
     GObject *
@@ -45,13 +71,29 @@ class StuffKeeper:Data:Item:Search from G:Object
     }
 
     public
+    GObject *
+    open_from_id(G:Object *skdb, sqlite3 *sqlHandle,gint id)
+    {
+        Self *self = GET_NEW;
+        self->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+        self->_priv->id = id;
+        self->_priv->sqlHandle = sqlHandle;
+        printf("new item: %i\n", id);
+
+
+        return G_OBJECT(self);
+    }
+
+    public
     int 
     match(self, StuffKeeperDataItem *item)
     {
-        if(self->_priv->is_dummy = TRUE)
+        if(self->_priv->is_dummy == TRUE)
         {
             return TRUE;
         }
+
+
 
         return FALSE; 
     }
@@ -60,7 +102,15 @@ class StuffKeeper:Data:Item:Search from G:Object
     char *
     get_title(self)
     {
-        return g_strdup(("All the entries"));
+        char *retv;
+        if(self->_priv->is_dummy == TRUE)
+        {
+            return g_strdup(("All the entries"));
+        }
+        retv = self_items_get_field_string(self,SEARCH_TYPE_NONE, SEARCH_TITLE);
+        if(!retv)
+            retv = g_strdup("Failed to get title\n");
+        return retv;
     }
 
     public
