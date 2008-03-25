@@ -41,6 +41,9 @@ class StuffKeeper:Data:Item:Search from G:Object
     private StuffKeeperDataBackend *skdb = {NULL};
     private sqlite3 *sqlHandle = {NULL};
 
+    /**
+     * Utility
+     */
     private 
     gchar *
     items_get_field_string(self, int searchtype, int fieldtype)
@@ -61,7 +64,9 @@ class StuffKeeper:Data:Item:Search from G:Object
         sqlite3_free(query);
         return retv; 
     }
-
+    /**
+     * Constructions
+     */
     public
     GObject *
     new_dummy(void)
@@ -82,6 +87,50 @@ class StuffKeeper:Data:Item:Search from G:Object
         printf("new item: %i\n", id);
         return G_OBJECT(self);
     }
+    /* Create new StuffKeeperDataBackend */
+    public 
+        StuffKeeperDataItemSearch *
+        new (G:Object *skdb, sqlite3 *sqlHandle)
+        {
+
+            Self *obj = GET_NEW;
+            int result = 0;
+            char *error = NULL;
+            char *query  = NULL;
+            obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+            obj->_priv->sqlHandle = sqlHandle;
+            /**
+             * Insert the first item in the list
+             */
+            query = sqlite3_mprintf
+                ("INSERT INTO 'SearchFields' ('SearchType','FieldType','value')"
+                 "values (%i,%i,%Q);",
+                 SEARCH_TYPE_NONE, SEARCH_TITLE, "New Search");
+
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                debug_printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            /* Get the id of the insert, this is now the unique id for this field*/
+            obj->_priv->id = sqlite3_last_insert_rowid(obj->_priv->sqlHandle);
+
+            /* update the last inserted row */
+            query = sqlite3_mprintf
+                ("UPDATE 'SearchFields' SET SearchId=%i WHERE id=%i",
+                 obj->_priv->id,obj->_priv->id);
+            result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+            if (result != SQLITE_OK) {
+                debug_printf("failed: %s\n", error);
+            }
+            sqlite3_free(query);
+
+            
+            return obj;
+        }
+
+
 
     public
     int 
@@ -174,4 +223,23 @@ class StuffKeeper:Data:Item:Search from G:Object
     {
         return self->_priv->id;
     }
+
+    public
+    void
+    delete_yourself(self)
+    {
+        int result;
+        char *error;
+        char *query = NULL; 
+
+        query = sqlite3_mprintf("DELETE FROM 'SearchFields' WHERE SearchId=%i",self->_priv->id);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+        
+        self->_priv->id = 0;
+    }
+
 }

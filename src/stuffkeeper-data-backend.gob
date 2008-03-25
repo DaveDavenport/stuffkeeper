@@ -50,6 +50,15 @@ class StuffKeeper:Data:Backend from G:Object
     {
         printf("search added\n");
     }
+    signal last NONE (INT)
+    void
+    search_removed(self, gint id)
+    {
+    }
+
+
+
+
     /* item */
     signal last NONE (STRING,POINTER)
     void
@@ -91,6 +100,40 @@ class StuffKeeper:Data:Backend from G:Object
     /**
      * searches
      */
+    public
+    StuffKeeperDataItemSearch *
+    new_search(self)
+    {
+        gint *ide;
+        StuffKeeperDataItemSearch *search = stuffkeeper_data_item_search_new(G_OBJECT(self),self->_priv->sqlHandle);
+        /* We have a valid id now, so add it */
+        /* Add to the list */
+        ide = g_malloc0(sizeof(gint));
+        *ide = stuffkeeper_data_item_search_get_id(search);
+        g_hash_table_insert(self->_priv->searches,ide, search);
+        self_search_added(self, search);
+        return search; 
+    }
+    public
+    void
+    remove_search(self, gint id)
+    {
+        StuffKeeperDataItemSearch *search = self_get_search(self, id);
+        if(!search) return;
+
+        self_search_removed(self,id);
+        if(search)
+        {
+            stuffkeeper_data_item_search_delete_yourself(search); 
+        }
+
+        if(g_hash_table_remove(self->_priv->searches, &id) == FALSE)
+        {
+            return;
+        }
+
+    }
+
     public
         GList *
         get_searches(self)
