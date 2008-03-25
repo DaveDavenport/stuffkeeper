@@ -1104,6 +1104,15 @@ class StuffKeeper:Interface from G:Object
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
+    public
+    void
+    search_type_changed(self, GtkComboBox *box)
+    {
+        int i = gtk_combo_box_get_active(box);
+        /* refilter the items list */
+        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+    }
+
     /* Add item menu */
     public
     void

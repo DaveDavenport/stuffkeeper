@@ -19,14 +19,14 @@ typedef enum _SearchType {
 }SearchType;
 
 
-typedef enum _SearchField {
+typedef enum _SearchFieldType {
     SEARCH_TITLE            = 0,
     SEARCH_FIELD_SCHEMA     = 1,
     SEARCH_FIELD_TAG        = 2,
     SEARCH_FIELD_TITLE      = 3,
     SEARCH_FIELD_VALUE      = 4,
     NUM_SEARCH_FIELD        = 5
-}SearchField;
+}SearchFieldType;
 
 %}
 %ph{
@@ -49,6 +49,7 @@ class StuffKeeper:Data:Item:Search from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
+        printf("query: %s\n", query);
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK) {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -79,8 +80,6 @@ class StuffKeeper:Data:Item:Search from G:Object
         self->_priv->id = id;
         self->_priv->sqlHandle = sqlHandle;
         printf("new item: %i\n", id);
-
-
         return G_OBJECT(self);
     }
 
@@ -92,10 +91,57 @@ class StuffKeeper:Data:Item:Search from G:Object
         {
             return TRUE;
         }
+        char *query = sqlite3_mprintf("SELECT FieldType,SearchType,value FROM 'SearchFields' WHERE SearchId=%i and SearchType!=%i", 
+                        self->_priv->id, SEARCH_TYPE_NONE);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int found = FALSE;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK && found == FALSE) {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
+                int SearchFieldType = sqlite3_column_int(stmt, 0);
+                int SearchType = sqlite3_column_int(stmt, 1);
+                char *value = sqlite3_column_text(stmt, 2);
+                gchar *comp = NULL;
+                printf("%i:%i:%s\n", SearchType,SearchFieldType, value);
 
 
 
-        return FALSE; 
+                if(SearchFieldType == SEARCH_FIELD_TITLE)
+                {
+                    comp = stuffkeeper_data_item_get_title(item);
+
+                }
+                if(comp)
+                {
+                    if(SearchType == SEARCH_TYPE_IS)                   
+                    {
+                        found = (g_utf8_collate(value,comp) == 0); 
+                    }
+                    if(SearchType == SEARCH_TYPE_CONTAINS)
+                    {
+                        gchar *sb1 = g_utf8_casefold(value, -1);
+                        gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
+                        gchar *sa1 = g_utf8_casefold(comp, -1);
+                        gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
+                        if(strstr(sa,sb) != NULL)
+                        {
+                            found = TRUE;
+                        }
+                        g_free(sa1);g_free(sb1);
+                        g_free(sa);g_free(sb);
+
+                    }
+                    g_free(comp);
+                }
+            }
+        }
+        sqlite3_finalize(stmt);
+
+
+
+        return found; 
     }
 
     public
@@ -109,7 +155,7 @@ class StuffKeeper:Data:Item:Search from G:Object
         }
         retv = self_items_get_field_string(self,SEARCH_TYPE_NONE, SEARCH_TITLE);
         if(!retv)
-            retv = g_strdup("Failed to get title\n");
+            retv = g_strdup("Failed to get title");
         return retv;
     }
 

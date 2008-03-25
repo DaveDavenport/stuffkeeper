@@ -300,7 +300,7 @@ class StuffKeeper:Data:Backend from G:Object
         /**
          * Read tags 
          */
-        query = "SELECT id FROM SearchFields GROUP by SearchID";
+        query = "SELECT SearchID FROM SearchFields GROUP by SearchID";
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r != SQLITE_OK)
         {
