@@ -10,7 +10,7 @@ requires 2.0.10
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-backend.h"
 
-/*
+
 typedef enum _SearchType {
     SEARCH_TYPE_IS,
     SEARCH_TYPE_IS_NOT,
@@ -19,13 +19,14 @@ typedef enum _SearchType {
 
 
 typedef enum _SearchField {
+    SEARCH_TITLE,
     SEARCH_FIELD_SCHEMA,
     SEARCH_FIELD_TAG,
     SEARCH_FIELD_TITLE,
     SEARCH_FIELD_VALUE,
     NUM_SEARCH_FIELD
 }SearchField;
-*/
+
 %}
 
 

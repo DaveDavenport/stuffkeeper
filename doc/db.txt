@@ -50,3 +50,12 @@ Table: items-fields
 * Field ID
 * Value
 
++Search
+
+Table: search
+* ID
+* SearchID
+* FieldType
+* Value
+
+FieldType:  search_title, search_field_schema, search_field_tag, search_field_title, search_field_value
