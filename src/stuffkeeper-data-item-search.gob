@@ -15,7 +15,8 @@ typedef enum _SearchType {
     SEARCH_TYPE_NONE = 0,
     SEARCH_TYPE_IS = 1,
     SEARCH_TYPE_IS_NOT = 2,
-    SEARCH_TYPE_CONTAINS = 3
+    SEARCH_TYPE_CONTAINS = 3,
+    SEARCH_TYPE_NOT_CONTAINS = 4
 }SearchType;
 
 
@@ -49,7 +50,6 @@ class StuffKeeper:Data:Item:Search from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        printf("query: %s\n", query);
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK) {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
@@ -95,38 +95,47 @@ class StuffKeeper:Data:Item:Search from G:Object
                         self->_priv->id, SEARCH_TYPE_NONE);
         sqlite3_stmt *stmt;
         const char *tail;
-        int found = FALSE;
+        int found = TRUE;
         int r;
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
-        if (r == SQLITE_OK && found == FALSE) {
-            if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
+        if(r == SQLITE_OK ) {
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW && found) {
                 int SearchFieldType = sqlite3_column_int(stmt, 0);
                 int SearchType = sqlite3_column_int(stmt, 1);
                 char *value = sqlite3_column_text(stmt, 2);
                 gchar *comp = NULL;
-                printf("%i:%i:%s\n", SearchType,SearchFieldType, value);
 
-
+                found = FALSE;
 
                 if(SearchFieldType == SEARCH_FIELD_TITLE)
                 {
                     comp = stuffkeeper_data_item_get_title(item);
 
                 }
+                else if (SearchFieldType == SEARCH_FIELD_SCHEMA)
+                {
+                    comp = stuffkeeper_data_schema_get_title(stuffkeeper_data_item_get_schema(item));
+                }
+
                 if(comp)
                 {
                     if(SearchType == SEARCH_TYPE_IS)                   
                     {
-                        found = (g_utf8_collate(value,comp) == 0); 
+                        int v= (g_utf8_collate(value,comp) == 0); 
+                        if((v &&SearchType == SEARCH_TYPE_IS) || (SearchType == SEARCH_TYPE_IS_NOT && !v))
+                        {
+                            found = TRUE;
+                        }
                     }
-                    if(SearchType == SEARCH_TYPE_CONTAINS)
+                    if(SearchType == SEARCH_TYPE_CONTAINS || SearchType == SEARCH_TYPE_NOT_CONTAINS )
                     {
+                        int v =  0;
                         gchar *sb1 = g_utf8_casefold(value, -1);
                         gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
                         gchar *sa1 = g_utf8_casefold(comp, -1);
                         gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
-                        if(strstr(sa,sb) != NULL)
-                        {
+                        v =(strstr(sa,sb) != NULL);
+                        if((SearchType == SEARCH_TYPE_CONTAINS && v) || (SearchType == SEARCH_TYPE_NOT_CONTAINS && !v)) {
                             found = TRUE;
                         }
                         g_free(sa1);g_free(sb1);
