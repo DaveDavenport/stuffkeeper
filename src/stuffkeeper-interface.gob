@@ -14,6 +14,7 @@ requires 2.0.10
 
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-schema.h"
+#include "stuffkeeper-data-item-search.h"
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
@@ -42,6 +43,8 @@ class StuffKeeper:Interface from G:Object
     private GtkTreeModel *model_tags = {NULL};
     private GtkTreeModel *model_items= {NULL};
     private GtkTreeModel *model_schemas = {NULL};
+    /* search items */
+    private GtkTreeModel *model_searches = {NULL};
 
     private GtkTreeModel *model_items_filter = {NULL};
     private GKeyFile *config_file = {NULL};
@@ -67,6 +70,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *hpaned1;
     private GtkWidget *vpaned1;
     private GtkWidget *item_label;
+    private GtkWidget *cb_search;
 
     private GtkWidget *item_view_container;
     private GtkWidget *show_item_pane_menu_item;
@@ -91,9 +95,24 @@ class StuffKeeper:Interface from G:Object
 
 
 
+    /**
+     * Search added
+     */
 
-
-
+    public
+    void
+    search_added(self, StuffKeeperDataItemSearch *search,  StuffKeeperDataBackend *skdb)
+    {
+        GtkTreeIter iter;
+        gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_searches), &iter);
+        gchar *title = stuffkeeper_data_item_search_get_title(search);
+        gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_searches), &iter, 
+                0, stuffkeeper_data_item_search_get_id(search),
+                1, title,
+                2, search,
+                -1);
+        g_free(title);
+    }
 
 
     /**
@@ -600,6 +619,24 @@ class StuffKeeper:Interface from G:Object
                     return FALSE;
                 }
             }
+            {
+                GtkTreeIter iter;
+                if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
+                {
+                    StuffKeeperDataItemSearch *search;
+                    gtk_tree_model_get(self->_priv->model_searches, &iter, 2, &search, -1);
+                    if(search)
+                    {
+                        if(!stuffkeeper_data_item_search_match(search, item))
+                        {
+                            return FALSE;
+                        }
+                    }
+                }
+
+
+            }
+
             if(strlen(text) > 0)
             {
                 return stuffkeeper_data_item_has_value(item,text); 
@@ -954,7 +991,10 @@ class StuffKeeper:Interface from G:Object
             self->_priv->item_view_container = glade_xml_get_widget(self->_priv->xml, "item_view_container");
             self->_priv->show_item_pane_menu_item = glade_xml_get_widget(self->_priv->xml, "show_item_pane_menu_item");
             
+             self->_priv->cb_search = glade_xml_get_widget(self->_priv->xml, "cb_search");
+            
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
+
 
             gtk_widget_hide_on_delete(self->_priv->win);
 
@@ -1233,6 +1273,23 @@ class StuffKeeper:Interface from G:Object
 
             gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB), 0);
 
+
+
+
+            self->_priv->model_searches = (GtkTreeModel *)gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
+
+            gtk_combo_box_set_model(GTK_COMBO_BOX(self->_priv->cb_search), self->_priv->model_searches);
+            {
+                GObject* search = stuffkeeper_data_item_search_new_dummy();
+                self_search_added(self, search, self->_priv->skdbg);
+            }
+
+
+            renderer = gtk_cell_renderer_text_new();
+            gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(self->_priv->cb_search), renderer, TRUE);
+            gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(self->_priv->cb_search), renderer, "text", 1);
+
+            gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->cb_search), 0);
 
             /** initial setup the list */
             gchar *data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb));
