@@ -44,11 +44,23 @@ class StuffKeeper:Data:Backend from G:Object
      */
     /* searches
      */
+
+    signal last NONE (STRING,POINTER)
+    void
+    search_changed(self,const gchar *field, StuffKeeperDataItemSearch *search)
+    {
+    }
+
+
+
     signal last NONE (POINTER)
     void
     search_added(self, StuffKeeperDataItemSearch *search)
     {
+
         printf("search added\n");
+
+        g_signal_connect_swapped(G_OBJECT(search), "search-changed", G_CALLBACK(self_search_changed), self);
     }
     signal last NONE (INT)
     void

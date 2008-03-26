@@ -29,6 +29,15 @@ typedef enum _SearchFieldType {
     NUM_SEARCH_FIELD        = 5
 }SearchFieldType;
 
+typedef struct _SearchField
+{
+    int id;
+    int field_id;
+    SearchFieldType field_type;
+    SearchType type;
+    char *value;
+}SearchField;
+
 %}
 %ph{
 #include "stuffkeeper-data-backend.h"
@@ -42,14 +51,30 @@ class StuffKeeper:Data:Item:Search from G:Object
     private sqlite3 *sqlHandle = {NULL};
 
     /**
+     * Signals
+     */
+
+    signal last NONE (POINTER)
+    void
+    search_changed(self, const gchar *id)
+    {
+
+
+    }
+
+
+    /**
      * Utility
      */
     private 
     gchar *
-    items_get_field_string(self, int searchtype, int fieldtype)
+    get_string(self, int searchtype, int fieldtype)
     {
         char *retv = NULL;
-        char *query = sqlite3_mprintf("SELECT value FROM 'SearchFields' WHERE SearchId=%i and SearchType=%i and FieldType=%i", self->_priv->id,searchtype, fieldtype);
+        char *query = sqlite3_mprintf("SELECT value FROM 'SearchFields' WHERE SearchId=%i and SearchType=%i and FieldType=%i", 
+                self->_priv->id,
+                searchtype,
+                fieldtype);
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
@@ -64,6 +89,49 @@ class StuffKeeper:Data:Item:Search from G:Object
         sqlite3_free(query);
         return retv; 
     }
+    public 
+    void
+    set_string(self,int searchtype, int fieldtype, const gchar *title)
+    {
+        int result;
+        char *error;
+        char *query;
+        char *val;
+        val = self_get_string(self, searchtype,fieldtype);
+        /* no field, create it */
+        if(!val)
+        {
+            query = sqlite3_mprintf("INSERT INTO 'SearchFields' ('SearchId','FieldType','SearchType','value')"
+                    "values (%i,%i,%i,%Q);",
+                    self->_priv->id,
+                    fieldtype,
+                    searchtype,
+                    title);
+        }
+        else{
+            /* if they are identical, do nothing */
+            if(strcmp(title, val) == 0)
+            {
+                g_free(val);
+                debug_printf("not updating\n");
+                return;
+            }
+            /* update the title */
+            query = sqlite3_mprintf("UPDATE 'SearchFields' SET value=%Q WHERE SearchId=%i and Fieldtype=%i and SearchType=%i", 
+                    title, 
+                    self->_priv->id,
+                    fieldtype,
+                    searchtype);
+            g_free(val);
+        }
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+    }
+
+
     /**
      * Constructions
      */
@@ -129,19 +197,23 @@ class StuffKeeper:Data:Item:Search from G:Object
             
             return obj;
         }
-
-
-
     public
-    int 
-    match(self, StuffKeeperDataItem *item)
+    void
+    free_search_field(SearchField*field)
     {
-        if(self->_priv->is_dummy == TRUE)
+        if(field->value)
         {
-            return TRUE;
+            g_free(field->value);
         }
-        char *query = sqlite3_mprintf("SELECT FieldType,SearchType,value FROM 'SearchFields' WHERE SearchId=%i and SearchType!=%i", 
-                        self->_priv->id, SEARCH_TYPE_NONE);
+        g_free(field);
+    }
+    public
+    GList *
+    get_search_fields(self)
+    {
+        GList *list = NULL;
+        char *query = sqlite3_mprintf("SELECT Id,SearchId,FieldType,SearchType,value FROM 'SearchFields' WHERE SearchId=%i and SearchType!=%i", 
+                self->_priv->id, SEARCH_TYPE_NONE);
         sqlite3_stmt *stmt;
         const char *tail;
         int found = TRUE;
@@ -149,54 +221,81 @@ class StuffKeeper:Data:Item:Search from G:Object
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if(r == SQLITE_OK ) {
             while((r = sqlite3_step(stmt)) == SQLITE_ROW && found) {
-                int SearchFieldType = sqlite3_column_int(stmt, 0);
-                int SearchType = sqlite3_column_int(stmt, 1);
-                char *value = sqlite3_column_text(stmt, 2);
-                gchar *comp = NULL;
-
-                found = FALSE;
-
-                if(SearchFieldType == SEARCH_FIELD_TITLE)
-                {
-                    comp = stuffkeeper_data_item_get_title(item);
-
-                }
-                else if (SearchFieldType == SEARCH_FIELD_SCHEMA)
-                {
-                    comp = stuffkeeper_data_schema_get_title(stuffkeeper_data_item_get_schema(item));
-                }
-
-                if(comp)
-                {
-                    if(SearchType == SEARCH_TYPE_IS)                   
-                    {
-                        int v= (g_utf8_collate(value,comp) == 0); 
-                        if((v &&SearchType == SEARCH_TYPE_IS) || (SearchType == SEARCH_TYPE_IS_NOT && !v))
-                        {
-                            found = TRUE;
-                        }
-                    }
-                    if(SearchType == SEARCH_TYPE_CONTAINS || SearchType == SEARCH_TYPE_NOT_CONTAINS )
-                    {
-                        int v =  0;
-                        gchar *sb1 = g_utf8_casefold(value, -1);
-                        gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
-                        gchar *sa1 = g_utf8_casefold(comp, -1);
-                        gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
-                        v =(strstr(sa,sb) != NULL);
-                        if((SearchType == SEARCH_TYPE_CONTAINS && v) || (SearchType == SEARCH_TYPE_NOT_CONTAINS && !v)) {
-                            found = TRUE;
-                        }
-                        g_free(sa1);g_free(sb1);
-                        g_free(sa);g_free(sb);
-
-                    }
-                    g_free(comp);
-                }
+                SearchField *field  = g_malloc0(sizeof(*field));
+                field->id           = sqlite3_column_int(stmt, 0);
+                field->field_id     = sqlite3_column_int(stmt, 1);
+                field->field_type   = sqlite3_column_int(stmt, 2); 
+                field->type         = sqlite3_column_int(stmt, 3);
+                field->value        = g_strdup(sqlite3_column_text(stmt, 4));
+                list = g_list_append(list, field);
             }
         }
-        sqlite3_finalize(stmt);
 
+        sqlite3_finalize(stmt);
+        return list;
+    }
+
+    public
+    int 
+    match(self, StuffKeeperDataItem *item)
+    {
+        GList *node,*list = NULL;
+        int found = TRUE;
+        if(self->_priv->is_dummy == TRUE)
+        {
+            return TRUE;
+        }
+
+        list = self_get_search_fields(self);
+        for(node = g_list_first(list);node && found;node = g_list_next(node))
+        {
+            SearchField *field = node->data;
+            gchar *comp = NULL;
+            found = FALSE;
+            if(field->field_type== SEARCH_FIELD_TITLE)
+            {
+                comp = stuffkeeper_data_item_get_title(item);
+
+            }
+            else if (field->field_type== SEARCH_FIELD_SCHEMA)
+            {
+                comp = stuffkeeper_data_schema_get_title(stuffkeeper_data_item_get_schema(item));
+            }
+
+            if(comp)
+            {
+                if(field->type == SEARCH_TYPE_IS)                   
+                {
+                    int v= (g_utf8_collate(field->value,comp) == 0); 
+                    if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
+                    {
+                        found = TRUE;
+                    }
+                }
+                if(field->type == SEARCH_TYPE_CONTAINS || field->type == SEARCH_TYPE_NOT_CONTAINS )
+                {
+                    int v =  0;
+                    gchar *sb1 = g_utf8_casefold(field->value, -1);
+                    gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
+                    gchar *sa1 = g_utf8_casefold(comp, -1);
+                    gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
+                    v =(strstr(sa,sb) != NULL);
+                    if((field->type == SEARCH_TYPE_CONTAINS && v) || (field->type == SEARCH_TYPE_NOT_CONTAINS && !v)) {
+                        found = TRUE;
+                    }
+                    g_free(sa1);g_free(sb1);
+                    g_free(sa);g_free(sb);
+
+                }
+                g_free(comp);
+            }
+
+        }
+        if(list)
+        {
+            g_list_foreach(list, self_free_search_field,NULL);
+            g_list_free(list);
+        }
 
 
         return found; 
@@ -211,10 +310,21 @@ class StuffKeeper:Data:Item:Search from G:Object
         {
             return g_strdup(("All the entries"));
         }
-        retv = self_items_get_field_string(self,SEARCH_TYPE_NONE, SEARCH_TITLE);
+        retv = self_get_string(self,SEARCH_TYPE_NONE, SEARCH_TITLE);
         if(!retv)
             retv = g_strdup("Failed to get title");
         return retv;
+    }
+    public
+    void 
+    set_title(self, const char *title)
+    {
+        if(self->_priv->is_dummy == TRUE)
+        {
+            return;
+        }
+        self_set_string(self, SEARCH_TYPE_NONE, SEARCH_TITLE, title);
+        self_search_changed(self, NULL);
     }
 
     public

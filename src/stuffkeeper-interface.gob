@@ -101,6 +101,30 @@ class StuffKeeper:Interface from G:Object
     /**
      * Search added
      */
+    public
+    void
+    search_changed(self, const gchar *field, StuffKeeperDataItemSearch *search)
+    {
+        if(!field)
+        {
+            GtkTreeIter iter;
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_searches);
+            gint id = stuffkeeper_data_item_search_get_id(search);
+            if(gtk_tree_model_get_iter_first(model, &iter))
+            {
+                do{
+                    gint oid;
+                    gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                    if(oid == id)
+                    {
+                        gchar *title = stuffkeeper_data_item_search_get_title(search);
+                        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1,title,-1);
+                        g_free(title);
+                    }
+                }while(gtk_tree_model_iter_next(model, &iter));
+            }
+        }
+    }
 
     public
     void
@@ -1261,8 +1285,8 @@ class StuffKeeper:Interface from G:Object
             if(node) g_list_free(node);
             self->_priv->signal_search_added = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "search-added",   G_CALLBACK(self_search_added),self); 
             self->_priv->signal_search_removed = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "search-removed", G_CALLBACK(self_search_removed),self);
-/*            self->_priv->signal_search_changed = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "search-changed", G_CALLBACK(self_search_changed),self);
-*/
+            self->_priv->signal_search_changed = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "search-changed", G_CALLBACK(self_search_changed),self);
+
 
 
 
@@ -1728,6 +1752,24 @@ class StuffKeeper:Interface from G:Object
                 if(search && id != -1)
                 {
                     stuffkeeper_data_backend_remove_search(self->_priv->skdbg, id);
+                }
+            }
+
+
+        }
+        public
+            void
+        edit_search(self)
+        {
+            GtkTreeIter iter;
+            if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
+            {
+                StuffKeeperDataItemSearch *search;
+                gint id;
+                gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 2, &search, -1);
+                if(search && id != -1)
+                {
+/*                    stuffkeeper_data_backend_remove_search(self->_priv->skdbg, id);*/
                 }
             }
 
