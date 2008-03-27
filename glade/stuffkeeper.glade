@@ -174,7 +174,7 @@
             <child>
               <widget class="GtkMenuItem" id="menuitem_search">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_Search</property>
+                <property name="label" translatable="yes">_Filter</property>
                 <property name="use_underline">True</property>
                 <child>
                   <widget class="GtkMenu" id="menu5">
@@ -737,27 +737,26 @@ Types</property>
                 <property name="column_spacing">6</property>
                 <property name="row_spacing">6</property>
                 <child>
-                  <widget class="GtkLabel" id="label2">
+                  <widget class="GtkLabel" id="ext_label">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">Filename:</property>
+                    <property name="label" translatable="yes">.tar.gz</property>
                   </widget>
                   <packing>
-                    <property name="x_options">GTK_FILL</property>
+                    <property name="left_attach">2</property>
+                    <property name="right_attach">3</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="label3">
+                  <widget class="GtkEntry" id="entry_filename">
                     <property name="visible">True</property>
+                    <property name="can_focus">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="xalign">1</property>
-                    <property name="label" translatable="yes">Location:</property>
+                    <signal name="changed" handler="filename_changed"/>
                   </widget>
                   <packing>
-                    <property name="top_attach">1</property>
-                    <property name="bottom_attach">2</property>
-                    <property name="x_options">GTK_FILL</property>
+                    <property name="left_attach">1</property>
+                    <property name="right_attach">2</property>
                   </packing>
                 </child>
                 <child>
@@ -774,26 +773,27 @@ Types</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkEntry" id="entry_filename">
+                  <widget class="GtkLabel" id="label3">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <signal name="changed" handler="filename_changed"/>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">Location:</property>
                   </widget>
                   <packing>
-                    <property name="left_attach">1</property>
-                    <property name="right_attach">2</property>
+                    <property name="top_attach">1</property>
+                    <property name="bottom_attach">2</property>
+                    <property name="x_options">GTK_FILL</property>
                   </packing>
                 </child>
                 <child>
-                  <widget class="GtkLabel" id="ext_label">
+                  <widget class="GtkLabel" id="label2">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="label" translatable="yes">.tar.gz</property>
+                    <property name="xalign">1</property>
+                    <property name="label" translatable="yes">Filename:</property>
                   </widget>
                   <packing>
-                    <property name="left_attach">2</property>
-                    <property name="right_attach">3</property>
+                    <property name="x_options">GTK_FILL</property>
                   </packing>
                 </child>
               </widget>
@@ -865,12 +865,31 @@ Types</property>
               <widget class="GtkEventBox" id="event_box_header">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="label_title">
+                  <widget class="GtkHBox" id="hbox12">
                     <property name="visible">True</property>
-                    <property name="xpad">6</property>
-                    <property name="ypad">6</property>
-                    <property name="label" translatable="yes">&lt;span size='x-large'&gt;Export to CSV&lt;/span&gt;</property>
-                    <property name="use_markup">True</property>
+                    <child>
+                      <widget class="GtkImage" id="image2">
+                        <property name="visible">True</property>
+                        <property name="xpad">6</property>
+                        <property name="stock">gtk-save</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_title">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="xpad">6</property>
+                        <property name="ypad">12</property>
+                        <property name="label" translatable="yes">&lt;span size='x-large' weight='bold'&gt;Export to CSV&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </widget>
                 </child>
               </widget>
@@ -883,16 +902,6 @@ Types</property>
                 <property name="visible">True</property>
                 <property name="spacing">6</property>
                 <child>
-                  <widget class="GtkImage" id="image2">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-save</property>
-                    <property name="icon_size">6</property>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                  </packing>
-                </child>
-                <child>
                   <widget class="GtkTable" id="table2">
                     <property name="visible">True</property>
                     <property name="n_rows">4</property>
@@ -900,45 +909,51 @@ Types</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
                     <child>
-                      <widget class="GtkCheckButton" id="ckb_header">
+                      <widget class="GtkComboBox" id="cb_type">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="response_id">0</property>
-                        <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label6">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Type&lt;/b&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label7">
+                      <widget class="GtkEntry" id="filename_entry">
                         <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Include header&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="text" translatable="yes">database.csv</property>
                       </widget>
                       <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label4">
+                      <widget class="GtkLabel" id="label5">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Directory&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Filename&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
@@ -958,59 +973,50 @@ Types</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label5">
+                      <widget class="GtkLabel" id="label4">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Filename&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Directory&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkEntry" id="filename_entry">
+                      <widget class="GtkLabel" id="label7">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Include header&lt;/b&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkCheckButton" id="ckb_header">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="text" translatable="yes">database.csv</property>
+                        <property name="response_id">0</property>
+                        <property name="draw_indicator">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label6">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Type&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
                         <property name="x_options">GTK_FILL</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkComboBox" id="cb_type">
-                        <property name="visible">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
                     </child>
                   </widget>
-                  <packing>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
               </widget>
               <packing>
@@ -1077,12 +1083,31 @@ Types</property>
               <widget class="GtkEventBox" id="event_box_header_html">
                 <property name="visible">True</property>
                 <child>
-                  <widget class="GtkLabel" id="label_title_html">
+                  <widget class="GtkHBox" id="hbox11">
                     <property name="visible">True</property>
-                    <property name="xpad">6</property>
-                    <property name="ypad">6</property>
-                    <property name="label" translatable="yes">&lt;span size='x-large'&gt;Export to HTML&lt;/span&gt;</property>
-                    <property name="use_markup">True</property>
+                    <child>
+                      <widget class="GtkImage" id="image4">
+                        <property name="visible">True</property>
+                        <property name="xpad">6</property>
+                        <property name="stock">gtk-save</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_title_html">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="xpad">6</property>
+                        <property name="ypad">12</property>
+                        <property name="label" translatable="yes">&lt;span size='x-large' weight='bold'&gt;Export to HTML&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </widget>
                 </child>
               </widget>
@@ -1095,38 +1120,85 @@ Types</property>
                 <property name="visible">True</property>
                 <property name="spacing">6</property>
                 <child>
-                  <widget class="GtkImage" id="image4">
-                    <property name="visible">True</property>
-                    <property name="stock">gtk-save</property>
-                    <property name="icon_size">6</property>
-                  </widget>
-                  <packing>
-                    <property name="expand">False</property>
-                  </packing>
-                </child>
-                <child>
                   <widget class="GtkTable" id="table4">
                     <property name="visible">True</property>
-                    <property name="n_rows">5</property>
+                    <property name="n_rows">4</property>
                     <property name="n_columns">2</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
                     <child>
-                      <placeholder/>
+                      <widget class="GtkFileChooserButton" id="fc_template">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <widget class="GtkLabel" id="label8">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Template&lt;/b&gt;</property>
+                        <property name="use_markup">True</property>
+                        <property name="justify">GTK_JUSTIFY_RIGHT</property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label11">
+                      <widget class="GtkComboBox" id="cb_type1">
+                        <property name="visible">True</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_type">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Directory&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Type&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkEntry" id="filename_entry1">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="text" translatable="yes">database.html</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="y_options">GTK_FILL</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label12">
+                        <property name="visible">True</property>
+                        <property name="xalign">1</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Filename&lt;/b&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
                       </packing>
@@ -1146,84 +1218,20 @@ Types</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label12">
+                      <widget class="GtkLabel" id="label11">
                         <property name="visible">True</property>
                         <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Filename&lt;/b&gt;</property>
+                        <property name="label" translatable="yes">&lt;b&gt;Directory&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
                         <property name="x_options">GTK_FILL</property>
                         <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkEntry" id="filename_entry1">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="text" translatable="yes">database.html</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_type">
-                        <property name="visible">True</property>
-                        <property name="xalign">1</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Type&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkComboBox" id="cb_type1">
-                        <property name="visible">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="y_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label8">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Template&lt;/b&gt;</property>
-                        <property name="use_markup">True</property>
-                        <property name="justify">GTK_JUSTIFY_RIGHT</property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkFileChooserButton" id="fc_template">
-                        <property name="visible">True</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
                       </packing>
                     </child>
                   </widget>
-                  <packing>
-                    <property name="position">1</property>
-                  </packing>
                 </child>
               </widget>
               <packing>
@@ -1273,7 +1281,7 @@ Types</property>
     </child>
   </widget>
   <widget class="GtkDialog" id="edit_search_dialog">
-    <property name="border_width">5</property>
+    <property name="border_width">6</property>
     <property name="title" translatable="yes">Edit search</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="default_width">500</property>
@@ -1287,17 +1295,38 @@ Types</property>
         <child>
           <widget class="GtkVBox" id="vbox5">
             <property name="visible">True</property>
+            <property name="border_width">5</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="eventbox_label">
                 <property name="visible">True</property>
                 <signal name="style_set" handler="style_set"/>
                 <child>
-                  <widget class="GtkLabel" id="title_label_search">
+                  <widget class="GtkHBox" id="hbox10">
                     <property name="visible">True</property>
-                    <property name="ypad">12</property>
-                    <property name="label" translatable="yes">&lt;span size='x-large' weight='bold'&gt;Edit search&lt;/span&gt;</property>
-                    <property name="use_markup">True</property>
+                    <child>
+                      <widget class="GtkImage" id="image3">
+                        <property name="visible">True</property>
+                        <property name="xpad">6</property>
+                        <property name="stock">gtk-edit</property>
+                      </widget>
+                      <packing>
+                        <property name="expand">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="title_label_search">
+                        <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="xpad">6</property>
+                        <property name="ypad">12</property>
+                        <property name="label" translatable="yes">&lt;span size='x-large' weight='bold'&gt;Edit filter&lt;/span&gt;</property>
+                        <property name="use_markup">True</property>
+                      </widget>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </widget>
                 </child>
               </widget>
