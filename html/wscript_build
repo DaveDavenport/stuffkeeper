@@ -3,4 +3,5 @@
 # Qball Cow, 2008
 
 install_files('PACKAGE_DATADIR', 'html', 'index.template')
+install_files('PACKAGE_DATADIR', 'html', 'index-item.template')
 

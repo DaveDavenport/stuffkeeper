@@ -1,0 +1,66 @@
+<html>
+    <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
+        <title>
+            StuffKeeper - {title} 
+        </title>
+        <style  TYPE="text/css"> 
+        #heading \{
+            background: #99ccFF;
+            font-size: 4em;
+            text-align: center;
+            border-bottom: 1px dotted black;
+        \}
+        body \{
+            margin: 0;
+        \}
+        #content\{
+            margin: 1em;
+        \}
+        #index\{
+            margin: 1em;
+        \}
+        #item \{
+            
+        \}
+        #item H3 \{
+            background: #FFFFCC;
+            border: 1px dotted black;
+            padding: 0.5em;
+        \}
+        </style>
+    </head>
+    <body>
+    <div id='heading'>
+        StuffKeeper
+    </div>
+    <div id='content'>
+    [s
+        <div id='item'>
+        <H3><a name='{id}'>{title}</a></H3>
+        <table>
+        [i
+            <tr>
+                <td align='right' valign='top'>
+                    <b>{name}</b>
+                </td>
+                <td>
+                    {field:string %
+                    }{field:text <p>%</p>
+                    }{field:link <a href='%'>%</a>
+                    }{field:slider %/100
+                    }{field:integer %
+                    }{field:boolean %
+                    }{field:image <img src='%' />
+                    }{field:list <div id='list'>
+                       }{field:list <i>%</i><BR />
+                    }{field:list </div>}
+                </td>
+            <tr>
+        ]
+        </table>
+        </div>
+    ]
+    </div>
+    </body>
+</html>

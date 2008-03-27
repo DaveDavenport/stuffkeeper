@@ -11,6 +11,11 @@ requires 2.0.10
 #include "stuffkeeper-data-item.h"
 %}
 
+%ph{
+    #define PACKAGE_HTML_TEMPLATE_FULL "/html/index.template"
+    #define PACKAGE_HTML_TEMPLATE "/html/index-item.template"
+%}
+
 class StuffKeeper:Export:HTML from G:Object
 {
     private GladeXML *xml;
@@ -20,6 +25,24 @@ class StuffKeeper:Export:HTML from G:Object
     private StuffKeeperDataSchema *cur_schema = {NULL};
     private gchar *cur_field = {NULL};
     private gchar *image_path = {NULL};
+
+    /** 
+     * Widgets 
+     */
+    private GtkWidget *fc_template = {NULL};
+    private GtkWidget *cb_type = {NULL};
+    private GtkWidget  *button_export = {NULL};
+
+    private 
+    void
+    filename_changed(self, GtkEntry *entry)
+    {
+        const char *text = gtk_entry_get_text(entry);
+        if(text[0] != '\0')
+            gtk_widget_set_sensitive(self->_priv->button_export,TRUE);
+        else
+            gtk_widget_set_sensitive(self->_priv->button_export,FALSE);
+    }
 
     public
         G:Object *
@@ -34,19 +57,30 @@ class StuffKeeper:Export:HTML from G:Object
          */
         self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
         dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
+
+
+        self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE_FULL);
         /* header */
-        /*
-        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "event_box_header")), 
-                "style-set",
-                G_CALLBACK(self_style_set), 
-                self);
-        */
-        wid = glade_xml_get_widget(self->_priv->xml, "cb_type1");
+        self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");
+        wid = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
         gtk_combo_box_set_model(GTK_COMBO_BOX(wid), GTK_TREE_MODEL(store));
         gtk_combo_box_set_active(GTK_COMBO_BOX(wid), 0);
         renderer = gtk_cell_renderer_text_new();
         gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(wid),renderer, TRUE);
         gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(wid),renderer, "text",1 );
+
+        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "event_box_header_html")), 
+                "style-set",
+                G_CALLBACK(self_style_set), 
+                self);
+        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "filename_entry1")), 
+                "changed",
+                G_CALLBACK(self_filename_changed), 
+                self);
+
+        self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
+
 
         gtk_widget_show_all(GTK_WIDGET(dialog));
         /* */
@@ -66,41 +100,36 @@ class StuffKeeper:Export:HTML from G:Object
         /**
          * Open the dialog 
          */
-        self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html",NULL);
-        dialog = glade_xml_get_widget(self->_priv->xml, "export_html");
+        self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
+        dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
+        /* file chooser */
+        self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE);
+
+        /* */
+        self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");
+        self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
+        gtk_widget_hide(self->_priv->cb_type);
+        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_type"));
+
         /* header */
         g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "event_box_header_html")), 
                 "style-set",
                 G_CALLBACK(self_style_set), 
                 self);
+        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "filename_entry1")), 
+                "changed",
+                G_CALLBACK(self_filename_changed), 
+                self);
 
-        gtk_widget_show_all(GTK_WIDGET(dialog));
+        self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
+
+        gtk_widget_show(GTK_WIDGET(dialog));
         /* */
-        g_signal_connect_swapped(G_OBJECT(dialog), "response", G_CALLBACK(self_response), self);
+        g_signal_connect_swapped(G_OBJECT(dialog), "response", G_CALLBACK(self_response2), self);
         return G_OBJECT(self); 
     }
-    /**
-     * export
-     */
-    private
-    void
-    export_to_html(self)
-    {
-        const gchar *filename = gtk_entry_get_text(GTK_ENTRY(glade_xml_get_widget(self->_priv->xml,"filename_entry_html")));
-        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml,"file_chooser_button_html")));
-        {
-            gchar *path = g_build_path(G_DIR_SEPARATOR_S, directory, filename, NULL);
-            gchar *image_path = g_build_path(G_DIR_SEPARATOR_S, directory, "images", NULL);
-            g_mkdir(image_path, 0755);
-            self->_priv->image_path = image_path;
-            self_dump_to_file(self,path);
 
-            self->_priv->image_path = NULL;
-            g_free(image_path);
-            g_free(path);
-        }
-        g_free(directory);
-    }
     /**
      * Response
      */
@@ -112,49 +141,39 @@ class StuffKeeper:Export:HTML from G:Object
         {
             case 1:
                 {
-                    GtkWidget *cb = glade_xml_get_widget(self->_priv->xml, "cb_type1"); 
                     GtkTreeIter iter;
-                    GtkTreeModel *model = gtk_combo_box_get_model(GTK_COMBO_BOX(cb));
-                    if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(cb),&iter))
+                    int have_schema = 0;
+                    GtkTreeModel *model = gtk_combo_box_get_model(GTK_COMBO_BOX(self->_priv->cb_type));
+                    have_schema = gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_type),&iter);
                     {
                         const gchar *filename = gtk_entry_get_text(GTK_ENTRY(glade_xml_get_widget(self->_priv->xml,"filename_entry1")));
-                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml,"file_chooser_button1")));
+                        gchar *directory = gtk_file_chooser_get_filename(
+                                    GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml,"file_chooser_button1")));
+                        gchar *template = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->_priv->fc_template));
                         StuffKeeperDataSchema *schema = NULL;
-                        gtk_tree_model_get(model, &iter,3, &schema, -1); 
-                        self->_priv->cur_schema = schema;
 
-
+                        if(have_schema)
                         {
+                            gtk_tree_model_get(model, &iter,3, &schema, -1); 
+                            self->_priv->cur_schema = schema;
+                        }
+
+                        if(filename){
                             gchar *path = g_build_path(G_DIR_SEPARATOR_S, directory, filename, NULL);
                             gchar *image_path = g_build_path(G_DIR_SEPARATOR_S, directory, "images", NULL);
                             g_mkdir(image_path, 0755);
                             self->_priv->image_path = image_path;
-                            self_dump_to_file(self,path );
+                            self_dump_to_file(self,template,path );
 
                             self->_priv->image_path = NULL;
                             g_free(image_path);
                             g_free(path);
                         }
+                        g_free(template);
                         g_free(directory);
 
                     }
                 }
-            default:
-                break;
-        }
-        gtk_widget_destroy(GTK_WIDGET(dialog));
-        g_object_unref(self);
-    }
-
-
-    private
-    void
-    response(self, int response, GtkWidget *dialog )
-    {
-        switch(response)
-        {
-            case 1:
-                self_export_to_html(self);
             default:
                 break;
         }
@@ -467,9 +486,9 @@ class StuffKeeper:Export:HTML from G:Object
     }
     private
     void
-    dump_to_file(self,const gchar *path)
+    dump_to_file(self,const gchar *template,const gchar *path)
     {
-        FILE *fp_in = fopen(PACKAGE_DATADIR"/html/index.template", "r");
+        FILE *fp_in = fopen(template,"r");
         FILE *fp_out = fopen(path,"w");
 
         
