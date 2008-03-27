@@ -47,7 +47,7 @@ class StuffKeeper:Data:Backend from G:Object
 
     signal last NONE (STRING,POINTER)
     void
-    search_changed(self,const gchar *field, StuffKeeperDataItemSearch *search)
+    search_changed(self,const SearchField *field, StuffKeeperDataItemSearch *search)
     {
     }
 
@@ -369,7 +369,7 @@ class StuffKeeper:Data:Backend from G:Object
                 StuffKeeperDataItemSearch *search;
                 gint *id;
                 /* create a new item */
-                search = stuffkeeper_data_item_search_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
+                search = (StuffKeeperDataItemSearch *) stuffkeeper_data_item_search_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 

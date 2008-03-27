@@ -103,7 +103,7 @@ class StuffKeeper:Interface from G:Object
      */
     public
     void
-    search_changed(self, const gchar *field, StuffKeeperDataItemSearch *search)
+    search_changed(self, const SearchField *field, StuffKeeperDataItemSearch *search)
     {
         if(!field)
         {
@@ -124,6 +124,7 @@ class StuffKeeper:Interface from G:Object
                 }while(gtk_tree_model_iter_next(model, &iter));
             }
         }
+        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
 
     public
@@ -146,7 +147,6 @@ class StuffKeeper:Interface from G:Object
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_searches);
-        printf("search removed\n");
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
             do{
@@ -1158,7 +1158,6 @@ class StuffKeeper:Interface from G:Object
     void
     search_type_changed(self, GtkComboBox *box)
     {
-        int i = gtk_combo_box_get_active(box);
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
@@ -1279,12 +1278,11 @@ class StuffKeeper:Interface from G:Object
             gtk_combo_box_set_model(GTK_COMBO_BOX(self->_priv->cb_search), self->_priv->model_searches);
             {
                 GObject* search = stuffkeeper_data_item_search_new_dummy();
-                self_search_added(self, search, self->_priv->skdbg);
+                self_search_added(self, STUFFKEEPER_DATA_ITEM_SEARCH(search), self->_priv->skdbg);
             }
             node = stuffkeeper_data_backend_get_searches(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
             {
-                printf("add search\n");
                 self_search_added(self, STUFFKEEPER_DATA_ITEM_SEARCH(iter->data),self->_priv->skdbg);
             }
             if(node) g_list_free(node);
@@ -1627,7 +1625,6 @@ class StuffKeeper:Interface from G:Object
                         {
                             gchar *suffix = g_path_get_dirname(directory);
                             gchar *exec = g_strdup_printf("tar -cz -C '%s' -f '%s%c%s.tar.gz' '.'",source, directory,G_DIR_SEPARATOR,file);
-                            printf("Exec: %s\n",exec);
                             g_spawn_command_line_async(exec, NULL);
                             g_free(suffix);
                             g_free(exec);
@@ -1662,7 +1659,6 @@ class StuffKeeper:Interface from G:Object
                         gchar *exec = g_strdup_printf("tar -zxf '%s' -C '%s' ",filename, directory);
                         gchar *path = g_strdup(stuffkeeper_data_backend_get_path(self->_priv->skdbg));
                         stuffkeeper_data_backend_close_yourself(self->_priv->skdbg);
-                        printf("Exec: %s\n",exec);
                         g_spawn_command_line_sync(exec,NULL, NULL, NULL,NULL);
                         g_free(exec);
                         g_free(filename);
@@ -1775,6 +1771,7 @@ class StuffKeeper:Interface from G:Object
                 if(search && id != -1)
                 {
 /*                    stuffkeeper_data_backend_remove_search(self->_priv->skdbg, id);*/
+                    stuffkeeper_data_item_search_edit_search_gui(search);
                 }
             }
 

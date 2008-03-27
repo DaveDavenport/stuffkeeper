@@ -2,8 +2,11 @@ requires 2.0.10
 
 %h{
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <sqlite3.h>
 #include <glib/gstdio.h>
+#include <glade/glade.h>
+#include <config.h>
 #include "debug.h"
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item.h"
@@ -16,7 +19,8 @@ typedef enum _SearchType {
     SEARCH_TYPE_IS = 1,
     SEARCH_TYPE_IS_NOT = 2,
     SEARCH_TYPE_CONTAINS = 3,
-    SEARCH_TYPE_NOT_CONTAINS = 4
+    SEARCH_TYPE_NOT_CONTAINS = 4,
+    SEARCH_TYPE_NUM_ITEMS = 5
 }SearchType;
 
 
@@ -41,6 +45,23 @@ typedef struct _SearchField
 %}
 %ph{
 #include "stuffkeeper-data-backend.h"
+    const char *SearchTypesNames[] = 
+    {
+        "Wrong Value",
+        "Is",
+        "Is Not",
+        "Contains",
+        "Does not contain"
+    };
+    const char *SearchFieldTypesNames[] = 
+    {
+        "Title",
+        "Schema",
+        "Tag",
+        "Item title",
+        "Item value"
+    };
+
 %}
 
 class StuffKeeper:Data:Item:Search from G:Object 
@@ -50,16 +71,40 @@ class StuffKeeper:Data:Item:Search from G:Object
     private StuffKeeperDataBackend *skdb = {NULL};
     private sqlite3 *sqlHandle = {NULL};
 
+    private GladeXML *xml = {NULL};
+    private GtkListStore *store = {NULL} destroywith g_object_unref;
+    private GtkListStore *type_store = {NULL} destroywith g_object_unref;
+    private GtkListStore *field_type_store = {NULL} destroywith g_object_unref;
+
+    private guint title_timeout = {0};
     /**
      * Signals
      */
-
+   
     signal last NONE (POINTER)
     void
-    search_changed(self, const gchar *id)
+    search_changed(self, const SearchField *field)
     {
-
-
+        if(field && self->_priv->store)
+        {
+            GtkTreeIter iter;
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+            if(gtk_tree_model_get_iter_first(model, &iter))
+            {
+                do{
+                    SearchField *field2 = NULL;
+                    gtk_tree_model_get(model, &iter, 0, &field2, -1);
+                    if(field2){   
+                        if(field2->id == field->id)
+                        {
+                            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+                            gtk_tree_model_row_changed(model, path, &iter);
+                            gtk_tree_path_free(path);
+                        }
+                    }
+                }while(gtk_tree_model_iter_next(model, &iter));
+            }
+        }
     }
 
 
@@ -152,7 +197,6 @@ class StuffKeeper:Data:Item:Search from G:Object
         self->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
         self->_priv->id = id;
         self->_priv->sqlHandle = sqlHandle;
-        printf("new item: %i\n", id);
         return G_OBJECT(self);
     }
     /* Create new StuffKeeperDataBackend */
@@ -207,33 +251,7 @@ class StuffKeeper:Data:Item:Search from G:Object
         }
         g_free(field);
     }
-    public
-    GList *
-    get_search_fields(self)
-    {
-        GList *list = NULL;
-        char *query = sqlite3_mprintf("SELECT Id,SearchId,FieldType,SearchType,value FROM 'SearchFields' WHERE SearchId=%i and SearchType!=%i", 
-                self->_priv->id, SEARCH_TYPE_NONE);
-        sqlite3_stmt *stmt;
-        const char *tail;
-        int found = TRUE;
-        int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
-        if(r == SQLITE_OK ) {
-            while((r = sqlite3_step(stmt)) == SQLITE_ROW && found) {
-                SearchField *field  = g_malloc0(sizeof(*field));
-                field->id           = sqlite3_column_int(stmt, 0);
-                field->field_id     = sqlite3_column_int(stmt, 1);
-                field->field_type   = sqlite3_column_int(stmt, 2); 
-                field->type         = sqlite3_column_int(stmt, 3);
-                field->value        = g_strdup(sqlite3_column_text(stmt, 4));
-                list = g_list_append(list, field);
-            }
-        }
 
-        sqlite3_finalize(stmt);
-        return list;
-    }
 
     public
     int 
@@ -257,6 +275,115 @@ class StuffKeeper:Data:Item:Search from G:Object
                 comp = stuffkeeper_data_item_get_title(item);
 
             }
+            else if (field->field_type== SEARCH_FIELD_VALUE)
+            {
+                gsize length = 0;
+                gchar **retv = NULL;
+                int i;
+                StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
+                retv = stuffkeeper_data_schema_get_fields(schema, &length);
+                if(retv)
+                {
+                    for(i=0;i<length && !found;i++)
+                    {
+                        int type = stuffkeeper_data_schema_get_field_type(schema, retv[i]);
+                        gsize len = 0;
+                        gchar **values = NULL;
+                        int j;
+                        if(type != FIELD_TYPE_LIST)
+                        {
+                            comp = stuffkeeper_data_item_get_string(item,retv[i] );
+                            len=1;
+                        }
+                        else
+                        {
+                            values = stuffkeeper_data_item_get_list(item, retv[i], &len);
+                        }
+                        for(j=0;j<len && !found;j++)
+                        {
+                            if(type == FIELD_TYPE_LIST)
+                            {
+                                comp = values[j];
+                            }
+                            if(comp)
+                            {
+                                if(field->type == SEARCH_TYPE_IS || field->type == SEARCH_TYPE_IS_NOT)
+                                {
+                                    int v= (g_utf8_collate(field->value,comp) == 0); 
+                                    if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
+                                    {
+                                        found = TRUE;
+                                    }
+                                }
+                                if(field->type == SEARCH_TYPE_CONTAINS || field->type == SEARCH_TYPE_NOT_CONTAINS )
+                                {
+                                    int v =  0;
+                                    gchar *sb1 = g_utf8_casefold(field->value, -1);
+                                    gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
+                                    gchar *sa1 = g_utf8_casefold(comp, -1);
+                                    gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
+                                    v =(strstr(sa,sb) != NULL);
+                                    if((field->type == SEARCH_TYPE_CONTAINS && v) || (field->type == SEARCH_TYPE_NOT_CONTAINS && !v)) {
+                                        found = TRUE;
+                                    }
+                                    g_free(sa1);g_free(sb1);
+                                    g_free(sa);g_free(sb);
+
+                                }
+                            }
+                        }
+                        if(type != FIELD_TYPE_LIST)
+                        {
+                            if(comp)
+                                g_free(comp);
+                        }
+                        else
+                        {
+                            g_strfreev(values);
+                        }
+                        comp = NULL;
+                    }
+                    g_strfreev(retv); 
+                }
+            }
+            else if (field->field_type== SEARCH_FIELD_TAG)
+            {
+                GList *list2, *node2;
+                list2 = stuffkeeper_data_item_get_tags(item);
+                if(list2)
+                {
+                    for(node2 = g_list_first(list2);node2 && !found;node2 = g_list_next(node2))
+                    {
+                        comp = stuffkeeper_data_tag_get_title(STUFFKEEPER_DATA_TAG(node2->data));
+                        if(field->type == SEARCH_TYPE_IS || field->type == SEARCH_TYPE_IS_NOT)
+                        {
+                            int v= (g_utf8_collate(field->value,comp) == 0); 
+                            if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
+                            {
+                                found = TRUE;
+                            }
+                        }
+                        if(field->type == SEARCH_TYPE_CONTAINS || field->type == SEARCH_TYPE_NOT_CONTAINS )
+                        {
+                            int v =  0;
+                            gchar *sb1 = g_utf8_casefold(field->value, -1);
+                            gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
+                            gchar *sa1 = g_utf8_casefold(comp, -1);
+                            gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
+                            v =(strstr(sa,sb) != NULL);
+                            if((field->type == SEARCH_TYPE_CONTAINS && v) || (field->type == SEARCH_TYPE_NOT_CONTAINS && !v)) {
+                                found = TRUE;
+                            }
+                            g_free(sa1);g_free(sb1);
+                            g_free(sa);g_free(sb);
+
+                        }
+                        g_free(comp);
+                        comp = NULL;
+                    }
+                    g_list_free(list2);
+                }
+            }
             else if (field->field_type== SEARCH_FIELD_SCHEMA)
             {
                 comp = stuffkeeper_data_schema_get_title(stuffkeeper_data_item_get_schema(item));
@@ -264,7 +391,7 @@ class StuffKeeper:Data:Item:Search from G:Object
 
             if(comp)
             {
-                if(field->type == SEARCH_TYPE_IS)                   
+                if(field->type == SEARCH_TYPE_IS || field->type == SEARCH_TYPE_IS_NOT)                   
                 {
                     int v= (g_utf8_collate(field->value,comp) == 0); 
                     if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
@@ -293,13 +420,117 @@ class StuffKeeper:Data:Item:Search from G:Object
         }
         if(list)
         {
-            g_list_foreach(list, self_free_search_field,NULL);
+            g_list_foreach(list,(GFunc)self_free_search_field,NULL);
             g_list_free(list);
         }
 
 
         return found; 
     }
+    /**
+     * Get Fields
+     */
+    public
+    GList *
+    get_search_fields(self)
+    {
+        GList *list = NULL;
+        char *query = sqlite3_mprintf("SELECT Id,SearchId,FieldType,SearchType,value FROM 'SearchFields' WHERE SearchId=%i and SearchType!=%i", 
+                self->_priv->id, SEARCH_TYPE_NONE);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int found = TRUE;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if(r == SQLITE_OK ) {
+            while((r = sqlite3_step(stmt)) == SQLITE_ROW && found) {
+                SearchField *field  = g_malloc0(sizeof(*field));
+                field->id           = sqlite3_column_int(stmt, 0);
+                field->field_id     = sqlite3_column_int(stmt, 1);
+                field->field_type   = sqlite3_column_int(stmt, 2); 
+                field->type         = sqlite3_column_int(stmt, 3);
+                field->value        = g_strdup((char *)sqlite3_column_text(stmt, 4));
+                list = g_list_append(list, field);
+            }
+        }
+
+        sqlite3_finalize(stmt);
+        return list;
+    }
+    
+    public
+    void
+    edit_search_field(self, SearchField *field)
+    {
+        int result = 0;
+        char *error = NULL;
+        char *query  = NULL;
+
+        /* update the title */
+        query = sqlite3_mprintf("UPDATE 'SearchFields' SET value=%Q , SearchId=%i , Fieldtype=%i , SearchType=%i WHERE id=%i", 
+                field->value, 
+                self->_priv->id,
+                field->field_type,
+                field->type,
+                field->id);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+        self_search_changed(self, field);
+    }
+    public
+    void
+    remove_search_field(self, SearchField *field)
+    {
+        int result;
+        char *error;
+        char *query = NULL; 
+
+        query = sqlite3_mprintf("DELETE FROM 'SearchFields' WHERE id=%i",field->id);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+    }
+
+    public
+    SearchField *
+    new_search_field(self, SearchType searchtype, SearchFieldType fieldtype, const gchar *value)
+    {
+        SearchField *field = g_malloc0(sizeof(*field));
+        int result = 0;
+        char *error = NULL;
+        char *query  = NULL;
+
+
+        query = sqlite3_mprintf("INSERT INTO 'SearchFields' ('SearchId','SearchType','FieldType','value')"
+                "values (%i,%i,%i,%Q);",
+                    self->_priv->id,
+                    searchtype,
+                    fieldtype,
+                    value);
+
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+
+        /* Get the id of the insert, this is now the unique id for this field*/
+        field->id = sqlite3_last_insert_rowid(self->_priv->sqlHandle);
+        field->field_id = self->_priv->id;
+        field->field_type = fieldtype;
+        field->type = searchtype;
+        field->value = g_strdup(value);
+
+
+        return field;
+    }
+
+    /* title */
 
     public
     char *
@@ -350,6 +581,374 @@ class StuffKeeper:Data:Item:Search from G:Object
         sqlite3_free(query);
         
         self->_priv->id = 0;
+    }
+
+
+
+    /** 
+     * Glade
+     */
+    private
+    void
+    ___glade_xml_connect_foreach(const gchar *handler_name,
+                GObject *object,
+                const gchar *signal_name,
+                const gchar *signal_data,
+                GObject *connect_object,
+                gboolean after,
+                gpointer user_data)
+    {
+        static GModule * allsymbols = NULL;
+
+        if (!allsymbols) allsymbols = g_module_open(NULL, 0);
+        if (allsymbols) {
+            gchar * func_name = g_strdup_printf("stuffkeeper_data_item_search_%s", handler_name);
+            GCallback func;
+
+            if (!g_module_symbol(allsymbols, func_name, (gpointer)&func)){
+                if (!g_module_symbol(allsymbols, handler_name, (gpointer)&func)) {
+                    g_warning("could not find signal handler '%s'.", func_name);
+                    g_free(func_name);
+                    return;
+                }
+            }
+            if (after)
+                g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
+            else
+                g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED);
+            g_free(func_name);
+        }
+    }
+    public
+    void
+    style_set(self, GtkStyle *style, GtkWidget *wid)
+    {
+        g_signal_handlers_block_by_func(G_OBJECT(wid), self_style_set,self);
+        gtk_widget_modify_bg(wid,
+                GTK_STATE_NORMAL, 
+                &((wid)->style->bg[GTK_STATE_SELECTED]));
+        gtk_widget_modify_text(glade_xml_get_widget(self->_priv->xml, "title_label_search"), 
+                GTK_STATE_NORMAL, 
+                &((wid)->style->text[GTK_STATE_SELECTED]));
+        gtk_widget_modify_fg(glade_xml_get_widget(self->_priv->xml, "title_label_search"), 
+                GTK_STATE_NORMAL, 
+                &((wid)->style->fg[GTK_STATE_SELECTED]));
+        g_signal_handlers_unblock_by_func(G_OBJECT(wid), self_style_set,self);
+    }
+
+   
+   private
+    gboolean 
+   search_title_changed_real(self)
+   {
+       GtkWidget *entry = glade_xml_get_widget(self->_priv->xml, "title_entry");
+       const gchar *title = gtk_entry_get_text(GTK_ENTRY(entry));
+       if(self->_priv->title_timeout)
+            g_source_remove(self->_priv->title_timeout);
+        self->_priv->title_timeout = 0;
+        
+        if(title)
+        {
+            self_set_title(self,title); 
+        }
+
+        return FALSE;
+    }
+
+    public
+    void
+    search_title_changed(self, GtkWidget *entry)
+    {
+        if(self->_priv->title_timeout)
+            g_source_remove(self->_priv->title_timeout);
+        self->_priv->title_timeout = g_timeout_add(1000, (GSourceFunc)self_search_title_changed_real, self);
+
+    }
+
+    private 
+    void
+    response(self, int response, GtkWidget *dialog )
+    {
+        GtkWidget *dialog = glade_xml_get_widget(self->_priv->xml, "edit_search_dialog");
+
+        if(self->_priv->title_timeout)
+        {
+            self_search_title_changed_real(self);
+        }
+
+        gtk_widget_destroy(dialog);
+            g_object_unref(self->_priv->xml);
+        self->_priv->xml = NULL;
+    }
+
+    private
+    void
+    field_get_value(GtkTreeViewColumn *column, GtkCellRenderer *renderer,GtkTreeModel *model, GtkTreeIter *iter,gpointer data)
+    {
+        SearchField *field=NULL;
+        gtk_tree_model_get(model, iter, 0, &field, -1);
+        if(field)
+        {
+            if(field->value)
+            {
+                g_object_set (GTK_CELL_RENDERER (renderer),
+                        "text", field->value,
+                        NULL);
+            }
+        }
+
+    }
+    private
+    void
+    field_set_value(self, gchar *path, gchar *new_text, GtkCellRendererText *renderer)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        if(path)
+        {
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            {
+                SearchField *field = NULL;
+                gtk_tree_model_get(model, &iter, 0, &field, -1);
+                if(field->value) g_free(field->value);
+                field->value = g_strdup(new_text);
+                self_edit_search_field(self, field);
+            }
+        }
+    }
+private
+    void
+    field_type_combo_get_value(GtkTreeViewColumn *column, GtkCellRenderer *renderer,GtkTreeModel *model, GtkTreeIter *iter,gpointer data)
+    {
+        SearchField *field=NULL;
+        gtk_tree_model_get(model, iter, 0, &field, -1);
+        if(field)
+        {
+            if(field->value)
+            {
+                g_object_set (GTK_CELL_RENDERER (renderer),
+                        "text", SearchFieldTypesNames[field->field_type],
+                        NULL);
+            }
+        }
+
+    }
+
+    private
+    void
+    field_combo_set_value( self,
+         gchar               *path,
+         gchar               *new_text,
+         GtkCellRendererCombo *renderer)
+    {
+        GtkTreeIter iter;
+        if(path && new_text){   
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+
+            SearchField *field = NULL;
+            int i = 0;
+
+            for(i=0;strcmp(new_text,SearchTypesNames[i]) && i < SEARCH_TYPE_NUM_ITEMS;i++);
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            {
+                gtk_tree_model_get(model, &iter, 0, &field, -1);
+                field->type = i;
+                self_edit_search_field(self, field);
+            }
+        }
+    }
+    private
+        void
+    field_type_combo_set_value( self,
+         gchar               *path,
+         gchar               *new_text,
+         GtkCellRendererCombo *renderer)
+    {
+        GtkTreeIter iter;
+        if(path && new_text){   
+            GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+
+            SearchField *field = NULL;
+            int i = 0;
+
+            for(i=0;strcmp(new_text,SearchFieldTypesNames[i]) && i < NUM_SEARCH_FIELD;i++);
+            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            {
+                gtk_tree_model_get(model, &iter, 0, &field, -1);
+                field->field_type = i;
+                self_edit_search_field(self, field);
+            }
+        }
+    }
+
+
+    private
+    void
+    field_combo_get_value(GtkTreeViewColumn *column, GtkCellRenderer *renderer,GtkTreeModel *model, GtkTreeIter *iter,gpointer data)
+    {
+        SearchField *field=NULL;
+        gtk_tree_model_get(model, iter, 0, &field, -1);
+        if(field)
+        {
+            if(field->value)
+            {
+                g_object_set (GTK_CELL_RENDERER (renderer),
+                        "text", SearchTypesNames[field->type],
+                        NULL);
+            }
+        }
+
+    }
+    public
+    void
+    add_field(self,GtkWidget *button)
+    {
+        SearchField *field = NULL;
+        field = self_new_search_field(self,SEARCH_TYPE_IS,SEARCH_FIELD_TITLE ,_("New Search")); 
+
+        if(self->_priv->store)
+        {
+            GtkTreeIter iter;
+            gtk_list_store_append(self->_priv->store, &iter);
+            gtk_list_store_set(self->_priv->store, &iter,0, field,-1);
+        }
+
+        self_search_changed(self, field);
+
+    }
+    public
+        void
+    remove_field(self,GtkWidget *button)
+    {
+        GtkWidget *tree = glade_xml_get_widget(self->_priv->xml, "treeview_items");
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        GtkTreeSelection *selec = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+        if(gtk_tree_selection_get_selected(selec, &model, &iter))
+        {
+            SearchField *field=NULL;
+            gtk_tree_model_get(model, &iter, 0, &field, -1);
+            self_remove_search_field( self, field);
+            gtk_list_store_remove(self->_priv->store,&iter);
+            self_search_changed(self, NULL);
+        }
+    }
+
+    public
+    void
+    edit_search_gui(self)
+    {
+        GtkWidget *dialog = NULL;
+        GtkTreeIter iter;
+        char *title;
+        GList *list, *node;
+        if(self->_priv->xml)
+        {
+            GtkWidget *win = glade_xml_get_widget(self->_priv->xml, "edit_search_dialog");
+            gtk_window_present(GTK_WINDOW(win));
+            return;
+        }
+
+
+        self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","edit_search_dialog",NULL);
+        dialog = glade_xml_get_widget(self->_priv->xml, "edit_search_dialog");
+
+        title = self_get_title(self);
+        if(title) {
+            gtk_entry_set_text(GTK_ENTRY( glade_xml_get_widget(self->_priv->xml, "title_entry")), title);
+            g_free(title);
+        }
+
+        if(self->_priv->store == NULL)
+        {
+            self->_priv->store = gtk_list_store_new(1, G_TYPE_POINTER);
+            list = self_get_search_fields(self);
+            if(list)
+            {
+                for(node = g_list_first(list);node;node = g_list_next(node))
+                {
+                    gtk_list_store_append(self->_priv->store, &iter);
+                    gtk_list_store_set(self->_priv->store, &iter,0, node->data,-1);
+                }
+                g_list_free(list);
+            }
+        }
+        if(!(self->_priv->type_store))
+        {
+            int i;
+            self->_priv->type_store = gtk_list_store_new(2, G_TYPE_INT,G_TYPE_STRING);
+            for(i=SEARCH_TYPE_IS;i<SEARCH_TYPE_NUM_ITEMS;i++)
+            {
+                gtk_list_store_append(self->_priv->type_store, &iter);
+                gtk_list_store_set(self->_priv->type_store, &iter,0,i,1, SearchTypesNames[i],-1);
+            }
+        }
+        if(!(self->_priv->field_type_store))
+        {
+            int i;
+            self->_priv->field_type_store = gtk_list_store_new(2, G_TYPE_INT,G_TYPE_STRING);
+            for(i=SEARCH_FIELD_SCHEMA;i<NUM_SEARCH_FIELD;i++)
+            {
+                gtk_list_store_append(self->_priv->field_type_store, &iter);
+                gtk_list_store_set(self->_priv->field_type_store, &iter,0,i,1, SearchFieldTypesNames[i],-1);
+            }
+        }
+
+        GtkCellRenderer *renderer;
+
+        renderer = gtk_cell_renderer_combo_new();
+        g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(self->_priv->field_type_store), NULL);
+        g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
+        g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+        gtk_tree_view_insert_column_with_data_func(
+                    GTK_TREE_VIEW(glade_xml_get_widget(self->_priv->xml, "treeview_items")),
+                    -1,
+                    "Value",
+                    renderer,
+                    self_field_type_combo_get_value,
+                    NULL,
+                    NULL);
+        g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_field_type_combo_set_value), self);
+
+        renderer = gtk_cell_renderer_combo_new();
+        g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(self->_priv->type_store), NULL);
+        g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
+        g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+        gtk_tree_view_insert_column_with_data_func(
+                    GTK_TREE_VIEW(glade_xml_get_widget(self->_priv->xml, "treeview_items")),
+                    -1,
+                    "Value",
+                    renderer,
+                    self_field_combo_get_value,
+                    NULL,
+                    NULL);
+
+        g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_field_combo_set_value), self);
+
+
+
+
+        renderer = gtk_cell_renderer_text_new();
+        gtk_tree_view_insert_column_with_data_func(
+                    GTK_TREE_VIEW(glade_xml_get_widget(self->_priv->xml, "treeview_items")),
+                    -1,
+                    "Value",
+                    renderer,
+                    self_field_get_value,
+                    NULL,
+                    NULL);
+
+        g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+        g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_field_set_value), self);
+
+
+        /** */
+        gtk_tree_view_set_model(GTK_TREE_VIEW(glade_xml_get_widget(self->_priv->xml, "treeview_items")), GTK_TREE_MODEL(self->_priv->store));
+
+        glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+        gtk_widget_show(dialog);
+
+        g_signal_connect_swapped(G_OBJECT(dialog), "response", G_CALLBACK(self_response), self);
     }
 
 }

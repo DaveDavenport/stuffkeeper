@@ -40,10 +40,10 @@ def configure(conf):
     conf.write_config_header('config.h')
 
 def build(bld):
+    bld.add_subdirs('po')
     bld.add_subdirs('src')
     bld.add_subdirs('glade')
     bld.add_subdirs('data')
-    bld.add_subdirs('po')
     bld.add_subdirs('pixmaps')
     bld.add_subdirs('html')
 
