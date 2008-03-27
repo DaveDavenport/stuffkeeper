@@ -1158,6 +1158,22 @@ class StuffKeeper:Interface from G:Object
     void
     search_type_changed(self, GtkComboBox *box)
     {
+        GtkTreeIter iter;
+        if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
+        {
+            StuffKeeperDataItemSearch *search;
+            GtkWidget *item = glade_xml_get_widget(self->_priv->xml, "menuitem_remove_search");
+            GtkWidget *item1 = glade_xml_get_widget(self->_priv->xml, "menuitem_edit_search");
+            gint id;
+            gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 2, &search, -1);
+            if(id == -1) {
+                gtk_widget_set_sensitive(item, FALSE);
+                gtk_widget_set_sensitive(item1, FALSE);
+            } else {
+                gtk_widget_set_sensitive(item, TRUE);
+                gtk_widget_set_sensitive(item1, TRUE);
+            }
+        }
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }

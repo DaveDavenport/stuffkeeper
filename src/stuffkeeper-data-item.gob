@@ -832,6 +832,50 @@ class StuffKeeper:Data:Item from G:Object
         }
 
     /**  has value */
+public
+        gboolean
+        has_value_exact(self, const gchar *value)
+        {
+            int fields =0;
+            char *query;
+            sqlite3_stmt *stmt;
+            const char *tail;
+            int r;
+            /* count the number of fields */
+            query = sqlite3_mprintf("SELECT COUNT(*) FROM ItemsFields WHERE ItemId=%i and value LIKE '%q'",self->_priv->id,value);
+            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            if (r == SQLITE_OK)
+            {
+                if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+                {
+                    fields = sqlite3_column_int(stmt, 0);
+                }
+            }
+            else
+            {
+                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+            }
+            sqlite3_finalize(stmt);
+            if(fields > 0)
+                return TRUE; 
+            /* count the number of fields */
+            query = sqlite3_mprintf("SELECT COUNT(*) FROM Items WHERE ItemId=%i and value LIKE '%q'",self->_priv->id,value);
+            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            if (r == SQLITE_OK)
+            {
+                if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+                {
+                    fields = sqlite3_column_int(stmt, 0);
+                }
+            }
+            else
+            {
+                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+            }
+            sqlite3_finalize(stmt);
+            return (fields> 0);
+        }
+
     /* usefull for searching */
     public
         gboolean
