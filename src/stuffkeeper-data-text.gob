@@ -118,7 +118,7 @@ class StuffKeeper:Data:Text from Gtk:Text:View
         g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set),obj);
 
 
-
+        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj), GTK_WRAP_WORD);
 
 
 
