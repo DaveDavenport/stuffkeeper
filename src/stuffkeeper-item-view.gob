@@ -14,6 +14,7 @@ class StuffKeeper:Item:View from Gtk:VBox
 {
     private StuffKeeperDataSchema *schema = {NULL};
     private StuffKeeperDataItem *item = {NULL};
+
     private 
     void
     schema_edit_button_clicked(self, GtkWidget *button)
@@ -181,8 +182,7 @@ class StuffKeeper:Item:View from Gtk:VBox
 
             return GTK_WIDGET(self);
         }
-
-    /**
+        /**
      * Destroying
      */
     override (G:Object)

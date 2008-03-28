@@ -38,14 +38,20 @@ class StuffKeeper:Data:SpinButton from Gtk:Spin:Button
             }
         }
     }
-
+    /* Block scrolling */
+    private 
+    gboolean
+    button_scroll_event(self, GdkEventButton *event, GtkWidget *widget)
+    {
+        return TRUE;
+    }
     public
     GtkWidget *
     new(StuffKeeperDataItem *item, const gchar *field)
     {
-        Self *obj = GET_NEW;/*_VARG(gtk_adjustment_new(0,G_MININT,G_MAXINT,1,1,1),8);*/
+        Self *obj = GET_NEW;
         int value; 
-
+        g_signal_connect_swapped(obj, "scroll-event", G_CALLBACK(self_button_scroll_event), obj);
         /* setup */
         gtk_spin_button_set_range(GTK_SPIN_BUTTON(obj), G_MININT, G_MAXINT);
         gtk_spin_button_set_increments(GTK_SPIN_BUTTON(obj),1,5);

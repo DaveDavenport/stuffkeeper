@@ -37,13 +37,21 @@ class StuffKeeper:Data:Rating from Gtk:HScale
             }
         }
     }
+    /* Block scrolling */
+    private 
+    gboolean
+    button_scroll_event(self, GdkEventButton *event, GtkWidget *widget)
+    {
+        return TRUE;
+    }
 
     public
     GtkWidget *
     new(StuffKeeperDataItem *item, const gchar *field)
     {
-        Self *obj = GET_NEW;/*_VARG(gtk_adjustment_new(0,G_MININT,G_MAXINT,1,1,1),8);*/
+        Self *obj = GET_NEW;
         int value; 
+        g_signal_connect_swapped(obj, "scroll-event", G_CALLBACK(self_button_scroll_event), obj);
 
         /* setup */
         gtk_scale_set_value_pos(GTK_SCALE(obj), GTK_POS_RIGHT);
