@@ -134,9 +134,9 @@ class StuffKeeper:Data:List from Gtk:VBox
     void
     row_editing_activated(GtkEntry *entry, GObject *obj)
     {
-        Self *self = obj;
+        Self *self = SELF(obj);
         GtkTreeIter iter;
-        GtkTreeModel *model = self->_priv->store;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
         GtkTreeSelection *select = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
         if(gtk_tree_selection_get_selected(select, &model, &iter))
         {
@@ -170,9 +170,26 @@ class StuffKeeper:Data:List from Gtk:VBox
     void
     row_editing_canceled(self, GtkCellRenderer *renderer)
     {
-
-
-
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        GtkTreeSelection *select = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
+        if(gtk_tree_selection_get_selected(select, &model, &iter))
+        {
+            GtkTreeIter iter2 =  iter;
+            printf("selected row\n");
+           if(!gtk_tree_model_iter_next(model, &iter))
+           {
+                gchar *text = NULL;
+                g_object_get(renderer, "text",&text, NULL);
+                if(text == NULL || text[0] == '\0')
+                {
+                    gtk_list_store_remove(self->_priv->store, &iter2);
+                }
+                else 
+                    g_free(text);
+                printf("text: %s\n", text);
+           }
+        }
     }
 
 
