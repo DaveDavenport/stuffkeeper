@@ -834,7 +834,7 @@ class StuffKeeper:Interface from G:Object
              {
                  GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 0);
                  GtkTreePath *path = gtk_tree_model_get_path(self->_priv->model_tags, &iter);
-                 gtk_tree_view_set_cursor_on_cell(self->_priv->treeview1, path, col,self->_priv->treeview1_renderer, TRUE);
+                 gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->treeview1), path, col,self->_priv->treeview1_renderer, TRUE);
                  gtk_tree_path_free(path);
              }
              g_free(title);
@@ -904,7 +904,7 @@ class StuffKeeper:Interface from G:Object
              {
                  GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 0);
                  GtkTreePath *path = gtk_tree_model_get_path(self->_priv->model_schemas, &iter);
-                 gtk_tree_view_set_cursor_on_cell(self->_priv->treeview1, path, col,self->_priv->treeview1_renderer, TRUE);
+                 gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->treeview1), path, col,self->_priv->treeview1_renderer, TRUE);
                  gtk_tree_path_free(path);
              }
          }
@@ -1818,6 +1818,15 @@ class StuffKeeper:Interface from G:Object
             {
                 open_url(PROGRAM_WEBSITE);
             }
+        public
+            void
+            visit_bugtracker(self)
+            {
+                open_url(PROGRAM_BUGTRACKER);
+            }
+
+
+
         /**
          * HTML Export 
          */

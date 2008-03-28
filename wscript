@@ -8,6 +8,7 @@ import Params, intltool,gnome
 VERSION='0.06'
 APPNAME='stuffkeeper'
 WEBSITE='http://sarine.nl/stuffkeeper/'
+BUGTRACKER='http://bugtracker.sarine.nl/'
 
 # these variables are mandatory ('/' are converted automatically)
 srcdir = '.'
@@ -34,6 +35,7 @@ def configure(conf):
     conf.define('PROGRAM_NAME', APPNAME)
     conf.define('PROGRAM_VERSION', VERSION)
     conf.define('PROGRAM_WEBSITE', WEBSITE)
+    conf.define('PROGRAM_BUGTRACKER', BUGTRACKER)
     conf.define('GETTEXT_PACKAGE',APPNAME)
 
     # finally, write the configuration header
