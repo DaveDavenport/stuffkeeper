@@ -56,8 +56,7 @@ class StuffKeeper:Show:Item from Gtk:Table
                 /* Title */
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
 
-                gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
-
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                 gtk_table_attach(GTK_TABLE(self), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
 
                 if(type == FIELD_TYPE_STRING)
@@ -72,10 +71,13 @@ class StuffKeeper:Show:Item from Gtk:Table
                 }else if (type == FIELD_TYPE_RATING) {
                     label1 = stuffkeeper_data_rating_new(self->_priv->item,self->_priv->retv[i]);
                 }else if (type == FIELD_TYPE_LIST) {
+                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
                     label1 = stuffkeeper_data_list_new(self->_priv->item,self->_priv->retv[i]);
                 }else if (type == FIELD_TYPE_TEXT) {
+                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
                     label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
                 }else if (type == FIELD_TYPE_IMAGE) {
+                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
                     label1 = stuffkeeper_data_image_new(self->_priv->item,self->_priv->retv[i]);                    
                 }else if (type == FIELD_TYPE_LINK) {
                     label1 = stuffkeeper_data_link_new(self->_priv->item,self->_priv->retv[i]);                    
