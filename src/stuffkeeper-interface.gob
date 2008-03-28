@@ -832,7 +832,7 @@ class StuffKeeper:Interface from G:Object
 
              if(self->_priv->treeview1_renderer)
              {
-                 GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 0);
+                 GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 1);
                  GtkTreePath *path = gtk_tree_model_get_path(self->_priv->model_tags, &iter);
                  gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->treeview1), path, col,self->_priv->treeview1_renderer, TRUE);
                  gtk_tree_path_free(path);
@@ -902,7 +902,7 @@ class StuffKeeper:Interface from G:Object
 
              if(self->_priv->treeview1_renderer)
              {
-                 GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 0);
+                 GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 1);
                  GtkTreePath *path = gtk_tree_model_get_path(self->_priv->model_schemas, &iter);
                  gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->treeview1), path, col,self->_priv->treeview1_renderer, TRUE);
                  gtk_tree_path_free(path);
@@ -1470,6 +1470,10 @@ class StuffKeeper:Interface from G:Object
             /* handle toggled */
             g_signal_connect_swapped(G_OBJECT(renderer), "toggled", G_CALLBACK(self_interface_left_pane_toggled), self);
 
+
+            gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
+            /* TAGS */
+            column = gtk_tree_view_column_new();
             /* Tag name */
             self->_priv->treeview1_renderer = renderer = gtk_cell_renderer_text_new();
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, TRUE);
