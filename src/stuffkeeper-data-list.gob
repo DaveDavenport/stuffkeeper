@@ -107,17 +107,73 @@ class StuffKeeper:Data:List from Gtk:VBox
             {
                 gtk_list_store_set(self->_priv->store, &iter, 0, new_text, -1);
                 self_save_changes(self);
-
-                if(gtk_tree_model_iter_next(model, &iter))
+                /*
+                if(gtk_tree_selection_iter_is_selected(select, &iter))
                 {
-                    GtkTreeViewColumn * col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree),0);
-                    GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
-                    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,col, renderer, TRUE);
-                    gtk_tree_path_free(path2);
+                    if(gtk_tree_model_iter_next(model, &iter))
+                    {
+                        GtkTreeViewColumn * col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree),0);
+                        GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
+                        gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,col, renderer, TRUE);
+                        gtk_tree_path_free(path2);
+                    }
+                    else
+                    {
+                        gtk_list_store_append(self->_priv->store, &iter);
+                        GtkTreeViewColumn * col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree),0);
+                        GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
+                        gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,col, renderer, TRUE);
+                        gtk_tree_path_free(path2);
+                    }
                 }
+                */
             }
         }
 
+    public
+    void
+    row_editing_activated(GtkEntry *entry, GObject *obj)
+    {
+        Self *self = obj;
+        GtkTreeIter iter;
+        GtkTreeModel *model = self->_priv->store;
+        GtkTreeSelection *select = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
+        if(gtk_tree_selection_get_selected(select, &model, &iter))
+        {
+           if(gtk_tree_model_iter_next(model, &iter))
+           {
+               GtkTreeViewColumn * col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree),0);
+               GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
+               gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,col, NULL, TRUE);
+               gtk_tree_path_free(path2);
+           }
+            else
+            {
+                gtk_list_store_append(self->_priv->store, &iter);
+                GtkTreeViewColumn * col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree),0);
+                GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
+                gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,col, /*renderer*/NULL, TRUE);
+                gtk_tree_path_free(path2);
+            }
+        }
+    }
+    public
+    void
+    row_editing_started(self, GtkCellEditable *editable, gchar *path, GtkCellRenderer *renderer)
+    {
+       g_signal_connect_after(editable, "activate", G_CALLBACK(self_row_editing_activated), self);
+
+
+    }
+
+    public
+    void
+    row_editing_canceled(self, GtkCellRenderer *renderer)
+    {
+
+
+
+    }
 
 
 
@@ -151,6 +207,8 @@ class StuffKeeper:Data:List from Gtk:VBox
         gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(obj->_priv->tree),-1,"Item", renderer, "text", 0, NULL);
         g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
         g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_row_edited), obj);        
+        g_signal_connect_swapped(G_OBJECT(renderer), "editing-canceled", G_CALLBACK(self_row_editing_canceled), obj);        
+        g_signal_connect_swapped(G_OBJECT(renderer), "editing-started", G_CALLBACK(self_row_editing_started), obj);        
 
         /* Add model */
         gtk_tree_view_set_model(GTK_TREE_VIEW(obj->_priv->tree), GTK_TREE_MODEL(obj->_priv->store));
