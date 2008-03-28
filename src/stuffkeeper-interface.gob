@@ -1873,7 +1873,8 @@ class StuffKeeper:Interface from G:Object
         void 
         new_search(self)
         {
-            stuffkeeper_data_backend_new_search(self->_priv->skdbg);
+            StuffKeeperDataItemSearch *search = stuffkeeper_data_backend_new_search(self->_priv->skdbg);
+            stuffkeeper_data_item_search_edit_search_gui(search);
         }
 
         public
