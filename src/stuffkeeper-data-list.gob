@@ -177,18 +177,19 @@ class StuffKeeper:Data:List from Gtk:VBox
         {
             GtkTreeIter iter2 =  iter;
             printf("selected row\n");
-           if(!gtk_tree_model_iter_next(model, &iter))
-           {
+            if(!gtk_tree_model_iter_next(model, &iter))
+            {
                 gchar *text = NULL;
                 g_object_get(renderer, "text",&text, NULL);
+                printf("text: %s\n", text);
                 if(text == NULL || text[0] == '\0')
                 {
                     gtk_list_store_remove(self->_priv->store, &iter2);
                 }
                 else 
                     g_free(text);
-                printf("text: %s\n", text);
-           }
+
+            }
         }
     }
 
