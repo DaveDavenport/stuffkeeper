@@ -110,8 +110,9 @@ class StuffKeeper:Data:List from Gtk:VBox
 
                 if(gtk_tree_model_iter_next(model, &iter))
                 {
+                    GtkTreeViewColumn * col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree),0);
                     GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
-                    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,NULL, NULL, FALSE);
+                    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,col, renderer, TRUE);
                     gtk_tree_path_free(path2);
                 }
             }
