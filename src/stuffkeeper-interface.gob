@@ -62,6 +62,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *LeftPaneCB ;
     private GtkWidget *treeview1 ;
     private GtkWidget *treeview2 ;
+    private GtkCellRenderer *treeview1_renderer = {NULL};
     private GtkWidget *item_vbox ;
     
     private GtkWidget *LeftPane_edit ;
@@ -413,7 +414,7 @@ class StuffKeeper:Interface from G:Object
     add_item(self, StuffKeeperDataSchema *schema)
     {
         GtkTreeIter iter;
-        StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema/*list->data*/);
+        StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
         stuffkeeper_data_item_set_title(item,"New Item");
         if(gtk_tree_model_get_iter_first(self->_priv->model_tags, &iter))
         {
@@ -813,8 +814,32 @@ class StuffKeeper:Interface from G:Object
      void
      add_tag(self, GtkMenuItem *item)
      {
+         g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_tag_added);
          StuffKeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdbg);
-         stuffkeeper_data_tag_set_title(tag, "New Tag");
+
+         stuffkeeper_data_tag_set_title(tag, _("New Tag"));
+         if(tag)
+         {
+             GtkTreeIter iter;
+             gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_tags), &iter);
+             gchar *title = stuffkeeper_data_tag_get_title(tag);
+             gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_tags), &iter, 
+                     0, stuffkeeper_data_tag_get_id(tag),
+                     1,title,
+                     3,tag, 
+                     4, stuffkeeper_data_tag_num_items(tag),
+                     -1);
+
+             if(self->_priv->treeview1_renderer)
+             {
+                 GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 0);
+                 GtkTreePath *path = gtk_tree_model_get_path(self->_priv->model_tags, &iter);
+                 gtk_tree_view_set_cursor_on_cell(self->_priv->treeview1, path, col,self->_priv->treeview1_renderer, TRUE);
+                 gtk_tree_path_free(path);
+             }
+             g_free(title);
+         }
+         g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_tag_added);
      }
      private 
      void
@@ -842,8 +867,48 @@ class StuffKeeper:Interface from G:Object
      void
      add_type(self, GtkMenuItem *item)
      {
+         g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_schema_added);
          StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
-         stuffkeeper_data_schema_set_title(schema, "New Schema");
+         stuffkeeper_data_schema_set_title(schema, _("New Schema"));
+         if(schema)
+         {
+             GtkTreeIter iter;
+             gint id;
+             gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_schemas), &iter);
+             gchar *title = stuffkeeper_data_schema_get_title(schema);
+             gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_schemas), &iter, 
+                     0, stuffkeeper_data_schema_get_id(schema),
+                     1, title,
+                     3, schema,
+                     4, stuffkeeper_data_schema_num_items(schema),-1);
+
+
+
+             id = stuffkeeper_data_schema_get_id(schema);
+             if(schema)
+             {
+                 GtkWidget *m = gtk_menu_item_new_with_label((title==NULL)?"n/a":title);
+                 gint *ide;
+                 ide = g_malloc0(sizeof(gint));
+                 *ide = id;
+                 g_hash_table_insert(self->_priv->schemas_items, ide, m); 
+                 /* menu */
+                 gtk_menu_shell_insert(GTK_MENU_SHELL(self->_priv->menu), m,-1);
+                 g_object_set_data(G_OBJECT(m), "schema", schema);
+                 g_signal_connect_swapped(G_OBJECT(m), "activate", G_CALLBACK(self_interface_item_add_menu_button), self);
+                 gtk_widget_show_all(self->_priv->menu);
+             }
+             g_free(title);
+
+             if(self->_priv->treeview1_renderer)
+             {
+                 GtkTreeViewColumn *col = gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview1), 0);
+                 GtkTreePath *path = gtk_tree_model_get_path(self->_priv->model_schemas, &iter);
+                 gtk_tree_view_set_cursor_on_cell(self->_priv->treeview1, path, col,self->_priv->treeview1_renderer, TRUE);
+                 gtk_tree_path_free(path);
+             }
+         }
+         g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_schema_added);
      }
      private 
      void
@@ -1406,7 +1471,7 @@ class StuffKeeper:Interface from G:Object
             g_signal_connect_swapped(G_OBJECT(renderer), "toggled", G_CALLBACK(self_interface_left_pane_toggled), self);
 
             /* Tag name */
-            renderer = gtk_cell_renderer_text_new();
+            self->_priv->treeview1_renderer = renderer = gtk_cell_renderer_text_new();
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, TRUE);
             gtk_tree_view_column_set_attributes(column, renderer, "text", 1, NULL);
             g_object_set(renderer, "editable", TRUE,NULL);
