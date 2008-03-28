@@ -891,7 +891,15 @@ class StuffKeeper:Interface from G:Object
     gboolean 
     treeview2_button_press_event(self, GdkEventButton *event, GtkWidget *widget)
     {
-        debug_printf("treeview2 buttom press event\n");
+
+        return FALSE;
+    }
+
+    public
+    gboolean 
+    treeview2_button_release_event(self, GdkEventButton *event, GtkWidget *widget)
+    {
+        debug_printf("treeview2 buttom release event\n");
         if(event->button == 3)
         {
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
@@ -930,9 +938,16 @@ class StuffKeeper:Interface from G:Object
 
 
     /* Right mouse button press */
+   public
+    gboolean 
+    treeview1_button_press_event(self, GdkEventButton *event, GtkWidget *widget)
+    {
+
+        return FALSE;
+    }
     public 
     gboolean
-    treeview1_button_press_event(self, GdkEventButton *event, GtkWidget *widget)
+    treeview1_button_release_event(self, GdkEventButton *event, GtkWidget *widget)
     {
 
         /* Right mouse click, ignore rest */
