@@ -107,6 +107,13 @@ class StuffKeeper:Data:List from Gtk:VBox
             {
                 gtk_list_store_set(self->_priv->store, &iter, 0, new_text, -1);
                 self_save_changes(self);
+
+                if(gtk_tree_model_iter_next(model, &iter))
+                {
+                    GtkTreePath *path2 = gtk_tree_model_get_path(model, &iter); 
+                    gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->tree),path2,NULL, NULL, FALSE);
+                    gtk_tree_path_free(path2);
+                }
             }
         }
 
