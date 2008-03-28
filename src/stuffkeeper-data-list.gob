@@ -186,7 +186,7 @@ class StuffKeeper:Data:List from Gtk:VBox
                 {
                     gtk_list_store_remove(self->_priv->store, &iter2);
                 }
-                else 
+                if(text) 
                     g_free(text);
 
             }
