@@ -243,9 +243,16 @@ class StuffKeeper:Interface from G:Object
     schema_removed(self, gint id, StuffKeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
+        GtkWidget *widget = NULL;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_schemas);
 
-        g_hash_table_remove(self->_priv->schemas_items,&id);
+
+        widget = g_hash_table_lookup(self->_priv->schemas_items,&id);
+        if(widget)
+        {
+            gtk_widget_destroy(widget);
+            g_hash_table_remove(self->_priv->schemas_items,&id);
+        }
 
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
