@@ -348,6 +348,26 @@ class StuffKeeper:Export:HTML from G:Object
             if(temp)
                 g_free(temp);
         }       
+        else if (strncasecmp(buffer,"item:tags", 9) == 0)
+        {
+            if(self->_priv->cur_item)
+            {
+                int found = 1;
+                GList *node, *list = stuffkeeper_data_item_get_tags(self->_priv->cur_item);
+
+                for(node = list;node && found ;node = g_list_next(node))
+                {
+                    StuffKeeperDataTag *tag = node->data;
+                    gchar *title = stuffkeeper_data_tag_get_title(tag);
+                    found = self_printout(&buffer[10],title,fp_out);
+                    if(title)
+                        g_free(title);
+                }
+                if(list)
+                    g_list_free(list);
+            }
+        }
+
         else  if(self->_priv->cur_field)
         {
             if(strncmp(buffer,"field",5 ) == 0)
