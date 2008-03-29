@@ -413,7 +413,7 @@ class StuffKeeper:Interface from G:Object
     void
     add_item(self, StuffKeeperDataSchema *schema)
     {
-
+        /* If the user add's an item, add it ourself, and don't listen to the signal */
         g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_item_added);
         GtkTreeIter iter;
         StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
