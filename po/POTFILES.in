@@ -1,6 +1,11 @@
 [encoding: UTF-8]
+# Data files
 data/stuffkeeper.desktop.in
+
+# glade file
 glade/stuffkeeper.glade
+
+# Source files
 src/egg-datetime.c
 src/stuffkeeper-data-backend.gob
 src/stuffkeeper-data-boolean.gob
@@ -15,12 +20,16 @@ src/stuffkeeper-data-rating.gob
 src/stuffkeeper-data-schema.gob
 src/stuffkeeper-data-spinbutton.gob
 src/stuffkeeper-data-tag.gob
-src/stuffkeeper-data-taglist.gob
+src/stuffkeeper-data-taglist2.gob
 src/stuffkeeper-data-text.gob
 src/stuffkeeper-edit-schema.gob
 src/stuffkeeper-interface.gob
 src/stuffkeeper-item-window.gob
 src/stuffkeeper-show-item.gob
+src/stuffkeeper-data-item-search.gob
+src/stuffkeeper-item-view.gob
+src/stuffkeeper-export-csv.gob
+src/stuffkeeper-export-html.gob
 src/bacon-message-connection.c
 src/egg-datetime.c
 src/main.c
