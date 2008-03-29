@@ -41,11 +41,11 @@ class StuffKeeper:Export:HTML from G:Object
 
     private
     void
-    itteration(self)
+    itteration(self, int done, int total)
     {
         if(self->_priv->progress_bar)
         {
-            gtk_progress_bar_pulse(GTK_PROGRESS_BAR(self->_priv->progress_bar));
+            gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(self->_priv->progress_bar),(double)(done/(double)total));
             while(gtk_events_pending())
                 gtk_main_iteration();
         }
@@ -115,7 +115,7 @@ class StuffKeeper:Export:HTML from G:Object
         self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
 
 
-        gtk_widget_show_all(GTK_WIDGET(dialog));
+        gtk_widget_show(GTK_WIDGET(dialog));
         /* */
         g_signal_connect_swapped(G_OBJECT(dialog), "response", G_CALLBACK(self_response2), self);
         return G_OBJECT(self); 
@@ -206,6 +206,7 @@ class StuffKeeper:Export:HTML from G:Object
                             g_mkdir(image_path, 0755);
                             self->_priv->image_path = image_path;
                             gtk_widget_set_sensitive(dialog, FALSE);
+                            gtk_widget_show(self->_priv->progress_bar);
                             self_dump_to_file(self,template,path );
 
                             self->_priv->image_path = NULL;
@@ -537,6 +538,8 @@ class StuffKeeper:Export:HTML from G:Object
                     {
                         long point = ftell(fp_in);
                         GList *node;
+                        int length = g_list_length(list);
+                        int pr = 0;
                         for(node = g_list_first(list);node ; node = g_list_next(node))
                         {
                             fseek(fp_in, point, SEEK_SET);
@@ -559,7 +562,8 @@ class StuffKeeper:Export:HTML from G:Object
                                 self_parse_file(self, fp_in, fp_out);
                             }
                             self->_priv->cur_item = NULL;
-                            self_itteration(self);
+                            self_itteration(self,pr,length);
+                            pr++;
                         }
                         
                     }
