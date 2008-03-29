@@ -37,6 +37,19 @@ class StuffKeeper:Export:HTML from G:Object
     private GtkWidget *chk_cdb = {NULL};
     private GtkWidget *chk_vis = {NULL};
     private GtkWidget  *button_export = {NULL};
+    private GtkWidget *progress_bar = {NULL};
+
+    private
+    void
+    itteration(self)
+    {
+        if(self->_priv->progress_bar)
+        {
+            gtk_progress_bar_pulse(GTK_PROGRESS_BAR(self->_priv->progress_bar));
+            while(gtk_events_pending())
+                gtk_main_iteration();
+        }
+    }
 
     private 
     void
@@ -79,6 +92,7 @@ class StuffKeeper:Export:HTML from G:Object
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE_FULL);
         /* header */
         self->_priv->button_export = glade_xml_get_widget(self->_priv->xml, "button_export2");
+        self->_priv->progress_bar = glade_xml_get_widget(self->_priv->xml, "progress_bar");
        self->_priv->chk_cdb = glade_xml_get_widget(self->_priv->xml, "chk_cdb");
        self->_priv->chk_vis = glade_xml_get_widget(self->_priv->xml, "chk_vis");
        wid = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
@@ -128,6 +142,7 @@ class StuffKeeper:Export:HTML from G:Object
 
         /* */
         self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");
+        self->_priv->progress_bar = glade_xml_get_widget(self->_priv->xml, "progress_bar");
         self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
         self->_priv->chk_cdb = glade_xml_get_widget(self->_priv->xml, "chk_cdb");
         self->_priv->chk_vis = glade_xml_get_widget(self->_priv->xml, "chk_vis");
@@ -190,6 +205,7 @@ class StuffKeeper:Export:HTML from G:Object
                             gchar *image_path = g_build_path(G_DIR_SEPARATOR_S, directory, "images", NULL);
                             g_mkdir(image_path, 0755);
                             self->_priv->image_path = image_path;
+                            gtk_widget_set_sensitive(dialog, FALSE);
                             self_dump_to_file(self,template,path );
 
                             self->_priv->image_path = NULL;
@@ -282,6 +298,7 @@ class StuffKeeper:Export:HTML from G:Object
         int i= 0;
         char buffer[1024];
 
+
         a = fgetc(fp_in);
         while(a != '}') {
             buffer[i] = a;
@@ -291,7 +308,6 @@ class StuffKeeper:Export:HTML from G:Object
         buffer[i] = '\0';
         if(strncasecmp(buffer,"schema:title", 12) == 0 )
         {
-            int i = 0;
             gchar *temp = NULL;
             if(self->_priv->cur_schema)
                 temp = stuffkeeper_data_schema_get_title(self->_priv->cur_schema);
@@ -313,7 +329,6 @@ class StuffKeeper:Export:HTML from G:Object
         }  
         else if(strncasecmp(buffer,"item:title", 10) == 0 )
         {
-            int i = 0;
             gchar *temp = NULL;
             if(self->_priv->cur_item)
                 temp = stuffkeeper_data_item_get_title(self->_priv->cur_item);
@@ -470,6 +485,9 @@ class StuffKeeper:Export:HTML from G:Object
             else if (a == '[')
             {
                 a = fgetc(fp_in);
+                /**
+                 * Iterate through all the fields in the current item
+                 */
                 if(a == 'i' && self->_priv->cur_item)
                 {
 
@@ -486,7 +504,11 @@ class StuffKeeper:Export:HTML from G:Object
                     g_strfreev(retv);
 
                     self->_priv->cur_field = NULL;
+                    
                 }
+                /**
+                 * Iterate through all the items in the current schema 
+                 */
                 else if(a == 's' && self->_priv->cur_item == NULL && self->_priv->cur_schema != NULL)
                 {
 
@@ -503,11 +525,13 @@ class StuffKeeper:Export:HTML from G:Object
                                !stuffkeeper_interface_item_is_visible(self->_priv->interface, self->_priv->cur_item))
                             {
                                 int i = 1;
-                                printf("not visible\n");
+                                char last = 0;
                                 do{
                                     a = fgetc(fp_in);
-                                    if(a == ']') i--;
-                                    if(a == '[') i++;
+                                    if(a == ']' && last != '\\') i--;
+                                    if(a == '[' && last != '\\') i++;
+
+                                    last = a;
                                 }while(a != EOF && i); 
                             }
                             else 
@@ -515,10 +539,14 @@ class StuffKeeper:Export:HTML from G:Object
                                 self_parse_file(self, fp_in, fp_out);
                             }
                             self->_priv->cur_item = NULL;
+                            self_itteration(self);
                         }
-
+                        
                     }
                 }
+                /**
+                 * Iterate through all the schemas in the current backend 
+                 */
                 else if(a == 'b' && self->_priv->cur_item == NULL && self->_priv->cur_schema == NULL)
                 {
                     GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdb);
