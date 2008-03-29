@@ -1854,7 +1854,7 @@ class StuffKeeper:Interface from G:Object
         void
         export_to_html(self)
         {
-            stuffkeeper_export_html_new_schema(self,self->_priv->skdbg,GTK_LIST_STORE(self->_priv->model_schemas));
+            stuffkeeper_export_html_new_schema(G_OBJECT(self),self->_priv->skdbg,GTK_LIST_STORE(self->_priv->model_schemas));
         }
 
         /* export selected item */
@@ -1872,7 +1872,7 @@ class StuffKeeper:Interface from G:Object
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
-                    stuffkeeper_export_html_new(self,self->_priv->skdbg,STUFFKEEPER_DATA_ITEM(item));
+                    stuffkeeper_export_html_new(G_OBJECT(self),self->_priv->skdbg,STUFFKEEPER_DATA_ITEM(item));
                     return;
                 }
             }
