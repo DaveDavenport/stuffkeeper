@@ -57,9 +57,6 @@ class StuffKeeper:Data:Backend from G:Object
     void
     search_added(self, StuffKeeperDataItemSearch *search)
     {
-
-        printf("search added\n");
-
         g_signal_connect_swapped(G_OBJECT(search), "search-changed", G_CALLBACK(self_search_changed), self);
     }
     signal last NONE (INT)
@@ -150,7 +147,6 @@ class StuffKeeper:Data:Backend from G:Object
         GList *
         get_searches(self)
         {
-            printf("get searches\n");
             return g_hash_table_get_values(self->_priv->searches);
         }
 
@@ -514,7 +510,7 @@ class StuffKeeper:Data:Backend from G:Object
             int retv = sqlite3_close(self->_priv->sqlHandle);
             if(retv != SQLITE_OK)
             {
-                printf("The following error occured while trying to close the db: %s\n",
+                debug_printf("The following error occured while trying to close the db: %s\n",
                         sqlite3_errmsg(self->_priv->sqlHandle));
             }
             /* set pointer to NULL */
@@ -657,7 +653,7 @@ class StuffKeeper:Data:Backend from G:Object
         {
             return tag;
         }
-        printf("Tag not found, this aint good\n");
+        debug_printf("Tag not found, this aint good\n");
         /* No tag, lets make one. */
         tag = stuffkeeper_data_tag_new_with_id(self->_priv->sqlHandle,id);
 
@@ -787,7 +783,7 @@ class StuffKeeper:Data:Backend from G:Object
         sqlite3_free(query);
         /* if not exists, create the general table */
         if(!has_general) {
-            printf("Create general table\n");
+            debug_printf("Create general table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'General' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -797,14 +793,14 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
             /* store db version */
             query = sqlite3_mprintf("INSERT INTO 'General' ('key', 'value') VALUES('%q','%f')","Version", DB_VERSION);
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
         }
@@ -814,7 +810,7 @@ class StuffKeeper:Data:Backend from G:Object
        
 
         if(!has_tags) {
-            printf("Create Tags table\n");
+            debug_printf("Create Tags table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'Tags' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -824,13 +820,13 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
         }
 
         if(!has_schemas) {
-            printf("Create Schemas table\n");
+            debug_printf("Create Schemas table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'Schemas' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -841,12 +837,12 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
         }
         if(!has_schemas_field) {
-            printf("Create SchemasFields table\n");
+            debug_printf("Create SchemasFields table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'SchemasFields' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -858,18 +854,18 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
             result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON SchemasFields(SchemaId);", NULL, NULL, NULL);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
 
 
         }
         if(!has_items) {
-            printf("Create Items table\n");
+            debug_printf("Create Items table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'Items' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -880,12 +876,12 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
         }
         if(!has_items_field) {
-            printf("Create ItemsFields table\n");
+            debug_printf("Create ItemsFields table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'ItemsFields' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -896,18 +892,18 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
             result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemFields(ItemId);", NULL, NULL, NULL);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
 
 
         }
         if(!has_search) {
-            printf("Create SearchFields table\n");
+            debug_printf("Create SearchFields table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'SearchFields' ("
                     "'id'		INTEGER PRIMARY KEY AUTOINCREMENT," /* not useful, but you want a row id anyway. */
@@ -919,12 +915,12 @@ class StuffKeeper:Data:Backend from G:Object
 
             result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
             result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
             if (result != SQLITE_OK) {
-                printf("failed: %s\n", error);
+                debug_printf("failed: %s\n", error);
             }
         }
 
