@@ -47,32 +47,32 @@
     </div>
     <div id='content'>
     [b
-    [s
-        <div id='item'>
-        <H3><a name='{id}'>{title}</a></H3>
-        <table>
-        [i
-            <tr>
-                <td align='right' valign='top'>
-                    <b>{name}</b>
-                </td>
-                <td>
-                    {field:string %
-                    }{field:text <p>%</p>
-                    }{field:link <a href='%'>%</a>
-                    }{field:slider %/100
-                    }{field:integer %
-                    }{field:boolean %
-                    }{field:image <img src='%' />
-                    }{field:list <div id='list'>
-                       }{field:list <i>%</i><BR />
-                    }{field:list </div>}
-                </td>
-            <tr>
+        [s
+            <div id='item'>
+            <H3><a name='{id}'>{title}</a></H3>
+            <table>
+            [i
+                <tr>
+                    <td align='right' valign='top'>
+                        <b>{name}</b>
+                    </td>
+                    <td>
+                        {field:string %
+                        }{field:text <p>%</p>
+                        }{field:link <a href='%'>%</a>
+                        }{field:slider %/100
+                        }{field:integer %
+                        }{field:boolean %
+                        }{field:image <img src='%' />
+                        }{field:list <div id='list'>
+                           }{field:list <i>%</i><BR />
+                        }{field:list </div>}
+                    </td>
+                <tr>
+            ]
+            </table>
+            </div>
         ]
-        </table>
-        </div>
-    ]
     ]
     </div>
     </body>
