@@ -9,18 +9,21 @@ requires 2.0.10
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-item.h"
+
 %}
 
 %ph{
-    #define PACKAGE_HTML_TEMPLATE_FULL "/html/index.template"
-    #define PACKAGE_HTML_TEMPLATE "/html/index-item.template"
+#include "stuffkeeper-interface.h"
+#define PACKAGE_HTML_TEMPLATE_FULL "/html/index.template"
+#define PACKAGE_HTML_TEMPLATE "/html/index-item.template"
 %}
 
 class StuffKeeper:Export:HTML from G:Object
 {
     private GladeXML *xml;
-
+    private StuffKeeperInterface  *interface = {NULL};
     /* Parser values */
+    private StuffKeeperDataBackend *skdb = {NULL};
     private StuffKeeperDataItem *cur_item = {NULL};
     private StuffKeeperDataSchema *cur_schema = {NULL};
     private gchar *cur_field = {NULL};
@@ -31,6 +34,8 @@ class StuffKeeper:Export:HTML from G:Object
      */
     private GtkWidget *fc_template = {NULL};
     private GtkWidget *cb_type = {NULL};
+    private GtkWidget *chk_cdb = {NULL};
+    private GtkWidget *chk_vis = {NULL};
     private GtkWidget  *button_export = {NULL};
 
     private 
@@ -43,15 +48,26 @@ class StuffKeeper:Export:HTML from G:Object
         else
             gtk_widget_set_sensitive(self->_priv->button_export,FALSE);
     }
+    private
+    void
+    complete_db_checked(self, GtkCheckButton *but)
+    {
+        gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->_priv->chk_cdb));
+        gtk_widget_set_sensitive(self->_priv->cb_type,!value);
+    }
 
     public
         G:Object *
-    new_schema(GtkListStore *store)
+    new_schema(G:Object *interface, StuffKeeperDataBackend *skdb,GtkListStore *store)
     {
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
         GtkWidget *wid;
         GtkCellRenderer *renderer;
+
+        self->_priv->skdb = skdb;
+        self->_priv->interface = STUFFKEEPER_INTERFACE(interface);
+
         /**
          * Open the dialog 
          */
@@ -62,8 +78,10 @@ class StuffKeeper:Export:HTML from G:Object
         self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE_FULL);
         /* header */
-        self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");
-        wid = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
+        self->_priv->button_export = glade_xml_get_widget(self->_priv->xml, "button_export2");
+       self->_priv->chk_cdb = glade_xml_get_widget(self->_priv->xml, "chk_cdb");
+       self->_priv->chk_vis = glade_xml_get_widget(self->_priv->xml, "chk_vis");
+       wid = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
         gtk_combo_box_set_model(GTK_COMBO_BOX(wid), GTK_TREE_MODEL(store));
         gtk_combo_box_set_active(GTK_COMBO_BOX(wid), 0);
         renderer = gtk_cell_renderer_text_new();
@@ -79,6 +97,7 @@ class StuffKeeper:Export:HTML from G:Object
                 G_CALLBACK(self_filename_changed), 
                 self);
 
+        g_signal_connect_swapped(G_OBJECT(self->_priv->chk_cdb), "toggled", G_CALLBACK(self_complete_db_checked), self);
         self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
 
 
@@ -91,11 +110,12 @@ class StuffKeeper:Export:HTML from G:Object
 
     public
     G:Object *
-    new(StuffKeeper:Data:Item  *item)
+    new(G:Object *interface, StuffKeeperDataBackend *skdb,StuffKeeper:Data:Item  *item)
     {
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
-
+        self->_priv->skdb = skdb;
+        self->_priv->interface = STUFFKEEPER_INTERFACE(interface);
         self->_priv->cur_item = item;
         /**
          * Open the dialog 
@@ -109,8 +129,15 @@ class StuffKeeper:Export:HTML from G:Object
         /* */
         self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");
         self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
+        self->_priv->chk_cdb = glade_xml_get_widget(self->_priv->xml, "chk_cdb");
+        self->_priv->chk_vis = glade_xml_get_widget(self->_priv->xml, "chk_vis");
         gtk_widget_hide(self->_priv->cb_type);
         gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_type"));
+
+        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_cdb"));
+        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "chk_cdb"));
+        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_vis"));
+        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "chk_vis"));
 
         /* header */
         g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "event_box_header_html")), 
@@ -121,7 +148,7 @@ class StuffKeeper:Export:HTML from G:Object
                 "changed",
                 G_CALLBACK(self_filename_changed), 
                 self);
-
+        g_signal_connect_swapped(G_OBJECT(self->_priv->chk_cdb), "toggled", G_CALLBACK(self_complete_db_checked), self);
         self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
 
         gtk_widget_show(GTK_WIDGET(dialog));
@@ -152,7 +179,7 @@ class StuffKeeper:Export:HTML from G:Object
                         gchar *template = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->_priv->fc_template));
                         StuffKeeperDataSchema *schema = NULL;
 
-                        if(have_schema)
+                        if(have_schema && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->_priv->chk_cdb)))
                         {
                             gtk_tree_model_get(model, &iter,3, &schema, -1); 
                             self->_priv->cur_schema = schema;
@@ -311,7 +338,6 @@ class StuffKeeper:Export:HTML from G:Object
                                     for(j=0;esc[j];j++) {
                                         if(esc[j] == '\n') {
                                             fputs("<BR />", fp_out);
-                                            j++;
                                         } else
                                             fputc(esc[j], fp_out);
                                     }
@@ -361,7 +387,6 @@ class StuffKeeper:Export:HTML from G:Object
                                     for(j=0;esc[j];j++) {
                                         if(esc[j] == '\n') {
                                             fputs("<BR />", fp_out);
-                                            j++;
                                         } else
                                             fputc(esc[j], fp_out);
                                     }
@@ -393,7 +418,6 @@ class StuffKeeper:Export:HTML from G:Object
                                     for(j=0;esc[j];j++) {
                                         if(esc[j] == '\n') {
                                             fputs("<BR />", fp_out);
-                                            j++;
                                         } else
                                             fputc(esc[j], fp_out);
                                     }
@@ -438,6 +462,7 @@ class StuffKeeper:Export:HTML from G:Object
                 a = fgetc(fp_in);
                 if(a == 'i' && self->_priv->cur_item)
                 {
+
                     gsize length=0;
                     char **retv = stuffkeeper_data_schema_get_fields(stuffkeeper_data_item_get_schema(self->_priv->cur_item),&length);
                     long point = ftell(fp_in);
@@ -449,10 +474,12 @@ class StuffKeeper:Export:HTML from G:Object
                         self_parse_file(self, fp_in, fp_out);
                     }
                     g_strfreev(retv);
+
                     self->_priv->cur_field = NULL;
                 }
                 else if(a == 's' && self->_priv->cur_item == NULL && self->_priv->cur_schema != NULL)
                 {
+
                     GList *list = stuffkeeper_data_schema_get_items(self->_priv->cur_schema);
                     if(list)
                     {
@@ -462,8 +489,39 @@ class StuffKeeper:Export:HTML from G:Object
                         {
                             fseek(fp_in, point, SEEK_SET);
                             self->_priv->cur_item = node->data;
-                            self_parse_file(self, fp_in, fp_out);
+                            if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->_priv->chk_vis)) && 
+                               !stuffkeeper_interface_item_is_visible(self->_priv->interface, self->_priv->cur_item))
+                            {
+                                int i = 1;
+                                printf("not visible\n");
+                                do{
+                                    a = fgetc(fp_in);
+                                    if(a == ']') i--;
+                                    if(a == '[') i++;
+                                }while(a != EOF && i); 
+                            }
+                            else 
+                            {
+                                self_parse_file(self, fp_in, fp_out);
+                            }
                             self->_priv->cur_item = NULL;
+                        }
+
+                    }
+                }
+                else if(a == 'b' && self->_priv->cur_item == NULL && self->_priv->cur_schema == NULL)
+                {
+                    GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdb);
+                    if(list)
+                    {
+                        long point = ftell(fp_in);
+                        GList *node;
+                        for(node = g_list_first(list);node ; node = g_list_next(node))
+                        {
+                            fseek(fp_in, point, SEEK_SET);
+                            self->_priv->cur_schema = node->data;
+                            self_parse_file(self, fp_in, fp_out);
+                            self->_priv->cur_schema = NULL;
                         }
 
                         g_list_free(list);
@@ -471,6 +529,12 @@ class StuffKeeper:Export:HTML from G:Object
                 }
                 else
                 {
+                    /* skip until closing tag? */
+                    /* printf("skip tag\n");
+                       do{
+                       a = fgetc(fp_in);
+                       }while(a != EOF && a != ']');
+                     */
                     self_parse_file(self, fp_in, fp_out);
                 }
             }

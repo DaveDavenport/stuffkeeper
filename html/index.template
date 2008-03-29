@@ -37,13 +37,16 @@
     <div id='index'>
     <H3>Index</H3>
     <lu>
+    [b
     [s
         
         <li><a href='#{id}'>{title}</a></li>
     ]
+    ]
     </lu>
     </div>
     <div id='content'>
+    [b
     [s
         <div id='item'>
         <H3><a name='{id}'>{title}</a></H3>
@@ -69,6 +72,7 @@
         ]
         </table>
         </div>
+    ]
     ]
     </div>
     </body>

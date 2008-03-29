@@ -615,6 +615,12 @@ class StuffKeeper:Interface from G:Object
         stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg);
     }
 
+    public
+    gboolean
+    item_is_visible(self,StuffKeeperDataItem *item)
+    {
+        return self_interface_visible_func_real(self, item);
+    }
     /**
      * Filtering the item list
      */
@@ -622,14 +628,7 @@ class StuffKeeper:Interface from G:Object
         gboolean 
         interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, StuffKeeperInterface *self) 
         {
-            GtkTreeModel *model2 = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
             StuffKeeperDataItem *item;
-            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
-            const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->search_entry));
-            
-            
-            
-            
             /* Get the item */
             gtk_tree_model_get(model, iter, 2,&item, -1);
 
@@ -637,8 +636,17 @@ class StuffKeeper:Interface from G:Object
             if(!item) {
                 return FALSE;
             }
+            return self_interface_visible_func_real(self, item);
+        }
+    private
+    gboolean
+    interface_visible_func_real(self, StuffKeeperDataItem *item)
+    {
 
-            GtkTreeIter piter;
+        int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->search_entry));
+        GtkTreeModel *model2 = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+        GtkTreeIter piter;
             if(gtk_tree_model_get_iter_first(model2, &piter))
             {
                 int found = -1;
@@ -1846,7 +1854,7 @@ class StuffKeeper:Interface from G:Object
         void
         export_to_html(self)
         {
-            stuffkeeper_export_html_new_schema(GTK_LIST_STORE(self->_priv->model_schemas));
+            stuffkeeper_export_html_new_schema(self,self->_priv->skdbg,GTK_LIST_STORE(self->_priv->model_schemas));
         }
 
         /* export selected item */
@@ -1864,7 +1872,7 @@ class StuffKeeper:Interface from G:Object
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
-                    stuffkeeper_export_html_new(STUFFKEEPER_DATA_ITEM(item));
+                    stuffkeeper_export_html_new(self,self->_priv->skdbg,STUFFKEEPER_DATA_ITEM(item));
                     return;
                 }
             }
