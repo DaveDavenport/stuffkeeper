@@ -5,7 +5,7 @@
 import os
 import Params, intltool,gnome
 # the following two variables are used by the target "waf dist"
-VERSION='0.06'
+VERSION='0.07'
 APPNAME='stuffkeeper'
 WEBSITE='http://sarine.nl/stuffkeeper/'
 BUGTRACKER='http://bugtracker.sarine.nl/'
