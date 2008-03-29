@@ -17,6 +17,11 @@
         #content\{
             margin: 1em;
         \}
+        #schema H3\{
+            background: #CCFFFF;
+            border: 1px dotted black;
+            padding: 0.5em;                      
+        \}
         #index\{
             margin: 1em;
         \}
@@ -36,25 +41,30 @@
     </div>
     <div id='index'>
     <H3>Index</H3>
-    <lu>
+
     [b
-    [s
+        {schema:id <a href='#schema:%'>}{schema:title <H3>%</H3>}{schema:id </a>}
+        <lu>
+                [s
         
-        <li><a href='#{id}'>{title}</a></li>
+                <li><a href='#{item:id %}'>{item:title %}</a></li>
+                ]
+        </lu>
     ]
-    ]
-    </lu>
+
     </div>
     <div id='content'>
-    [b
+    [b    
+        <div id='schema'>
+        {schema:id <a name='schema:%'>}{schema:title <H3>%</H3>}{schema:id </a>}
         [s
             <div id='item'>
-            <H3><a name='{id}'>{title}</a></H3>
+            <H3><a name='{item:id %}'>{item:title %}</a></H3>
             <table>
             [i
                 <tr>
                     <td align='right' valign='top'>
-                        <b>{name}</b>
+                        {field:name <b>%</b>}
                     </td>
                     <td>
                         {field:string %
@@ -73,6 +83,7 @@
             </table>
             </div>
         ]
+        </div>
     ]
     </div>
     </body>

@@ -243,6 +243,38 @@ class StuffKeeper:Export:HTML from G:Object
      * actual work is done here
      */
     private 
+    int  
+    printout(char *buffer,char * temp, FILE *fp_out)
+    {
+        int i;
+        int found = 0;
+        for(i=0; buffer[i] != '\0';i++)
+        { 
+            if(temp)
+            {
+                if(buffer[i]  == '%')
+                {
+                    gchar *esc = g_markup_escape_text(temp, -1); 
+                    int j =0;
+                    found = 1;
+                    for(j=0;esc[j];j++) {
+                        if(esc[j] == '\n') {
+                            fputs("<BR />", fp_out);
+                        } else
+                            fputc(esc[j], fp_out);
+                    }
+                    g_free(esc);
+
+                }
+                else 
+                {
+                    fputc(buffer[i], fp_out);
+                }
+            }
+        }
+        return found;
+    }
+    private 
     void 
     parse_field(self,FILE *fp_in, FILE *fp_out)
     {
@@ -257,43 +289,53 @@ class StuffKeeper:Export:HTML from G:Object
             a = fgetc(fp_in);
         };
         buffer[i] = '\0';
-        if(strcmp("title", buffer) == 0 && self->_priv->cur_item)
+        if(strncasecmp(buffer,"schema:title", 12) == 0 )
         {
             int i = 0;
-            gchar *temp = stuffkeeper_data_item_get_title(self->_priv->cur_item);
+            gchar *temp = NULL;
+            if(self->_priv->cur_schema)
+                temp = stuffkeeper_data_schema_get_title(self->_priv->cur_schema);
+            self_printout(&buffer[13], temp, fp_out);
             if(temp)
-            {
-                gchar *esc = g_markup_escape_text(temp, -1); 
-                for(i=0;esc[i];i++)
-                {
-                    if(esc[i] == '\n')
-                        fputs("<BR />", fp_out);
-                    else
-                        fputc(esc[i], fp_out);
-                }
-                g_free(esc);
                 g_free(temp);
-            }
         }
-        else if(strcmp("id", buffer) == 0 && self->_priv->cur_item)
+        else if(strncasecmp(buffer,"schema:id",9) == 0)
         {
-            int id = stuffkeeper_data_item_get_id(self->_priv->cur_item); 
-            gchar *t = g_strdup_printf("%i", id);
-            fputs(t, fp_out);
-            g_free(t);
+            gchar *temp = NULL;
+            if(self->_priv->cur_schema)
+            {
+                int id = stuffkeeper_data_schema_get_id(self->_priv->cur_schema); 
+                temp = g_strdup_printf("%i", id);
+            }
+            self_printout(&buffer[10], temp, fp_out);
+            if(temp)
+                g_free(temp);
+        }  
+        else if(strncasecmp(buffer,"item:title", 10) == 0 )
+        {
+            int i = 0;
+            gchar *temp = NULL;
+            if(self->_priv->cur_item)
+                temp = stuffkeeper_data_item_get_title(self->_priv->cur_item);
+            self_printout(&buffer[11], temp, fp_out);
+            if(temp)
+                g_free(temp);
+        }
+        else if(strncasecmp(buffer,"item:id",7) == 0)
+        {
+            gchar *temp = NULL;
+            if(self->_priv->cur_item)
+            {
+                int id = stuffkeeper_data_item_get_id(self->_priv->cur_item); 
+                temp = g_strdup_printf("%i", id);
+            }
+            self_printout(&buffer[8], temp, fp_out);
+            if(temp)
+                g_free(temp);
         }       
         else  if(self->_priv->cur_field)
         {
-            if(strcmp("name", buffer) == 0)
-            {
-                StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
-                gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
-                gchar *esc = g_markup_escape_text(temp, -1); 
-                fputs(esc, fp_out);
-                g_free(esc);
-                g_free(temp);
-            }
-            else if(strncmp(buffer,"field",5 ) == 0)
+            if(strncmp(buffer,"field",5 ) == 0)
             {
                 StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                 FieldType type = stuffkeeper_data_schema_get_field_type(schema, self->_priv->cur_field); 
@@ -302,10 +344,24 @@ class StuffKeeper:Export:HTML from G:Object
                 int found = 0;
                 for(item_type=0; item_type < FIELD_TYPE_NUM_FIELDS && 
                     strncasecmp(&buffer[6],FieldNames[item_type],strlen(FieldNames[item_type])) != 0;item_type++);
+
                 if(item_type >= FIELD_TYPE_NUM_FIELDS)
                 {
-                    printf("type unknown\n");
-                    item_type = FIELD_TYPE_STRING;
+                    /** */
+                    if(strncasecmp(&buffer[6],"name", 4) == 0)
+                    {
+                        StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
+                        gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
+                        self_printout(&buffer[10],temp,fp_out);
+                        if(temp)
+                            g_free(temp);
+                    }
+                    else
+                    {
+                        printf("type unknown\n");
+
+                    }
+                    return;
                 }
                 else if ( item_type != type)
                 {
@@ -326,28 +382,7 @@ class StuffKeeper:Export:HTML from G:Object
                         int prev_i = i;
                         for(k=0; k < len && found;k++)
                         {
-                            found = 0;
-                            for(; buffer[i] != '\0';i++)
-                            {
-                                if(buffer[i]  == '%')
-                                {
-                                    gchar *esc = g_markup_escape_text(retv[k], -1); 
-                                    int j =0;
-                                    found = 1;
-
-                                    for(j=0;esc[j];j++) {
-                                        if(esc[j] == '\n') {
-                                            fputs("<BR />", fp_out);
-                                        } else
-                                            fputc(esc[j], fp_out);
-                                    }
-                                    g_free(esc);
-                                }
-                                else 
-                                {
-                                    fputc(buffer[i], fp_out);
-                                }
-                            }
+                            found = self_printout(&buffer[i+1], retv[k], fp_out);
                             if(found)
                                 i = prev_i;
                         }
@@ -405,32 +440,7 @@ class StuffKeeper:Export:HTML from G:Object
 
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
-                        for(; buffer[i] != '\0';i++)
-                        { 
-                            if(temp)
-                            {
-                                if(buffer[i]  == '%')
-                                {
-                                    gchar *esc = g_markup_escape_text(temp, -1); 
-                                    int j =0;
-                                    found = 1;
-
-                                    for(j=0;esc[j];j++) {
-                                        if(esc[j] == '\n') {
-                                            fputs("<BR />", fp_out);
-                                        } else
-                                            fputc(esc[j], fp_out);
-                                    }
-                                    g_free(esc);
-
-                                }
-                                else 
-                                {
-                                    fputc(buffer[i], fp_out);
-                                }
-                            
-                            }
-                        }
+                        self_printout(&buffer[i+1],temp,fp_out);
                         if(temp)
                             g_free(temp);
                     }
@@ -529,12 +539,6 @@ class StuffKeeper:Export:HTML from G:Object
                 }
                 else
                 {
-                    /* skip until closing tag? */
-                    /* printf("skip tag\n");
-                       do{
-                       a = fgetc(fp_in);
-                       }while(a != EOF && a != ']');
-                     */
                     self_parse_file(self, fp_in, fp_out);
                 }
             }

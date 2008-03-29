@@ -2,7 +2,7 @@
     <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
         <title>
-            StuffKeeper - {title} 
+            StuffKeeper {item:title - %} 
         </title>
         <style  TYPE="text/css"> 
         #heading \{
@@ -37,12 +37,12 @@
     <div id='content'>
     [s
         <div id='item'>
-        <H3><a name='{id}'>{title}</a></H3>
+        <H3><a name='{item:id %}'>{item:title %}</a></H3>
         <table>
         [i
             <tr>
                 <td align='right' valign='top'>
-                    <b>{name}</b>
+                    {field:name <b>%</b>}
                 </td>
                 <td>
                     {field:string %
