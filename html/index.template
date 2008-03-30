@@ -76,10 +76,12 @@
                         }{field:image <img src='%' />
                         }{field:list <div id='list'>
                            }{field:list <i>%</i><BR />
-                        }{field:list </div>}
+                        }{field:list </div>
+                        }
                     </td>
                 <tr>
             ]
+            {item:tags <tr><td align='right'><b>Tag</b></td><td>}{item:tags %, }{item:tags </td></tr>}
             </table>
             </div>
         ]
