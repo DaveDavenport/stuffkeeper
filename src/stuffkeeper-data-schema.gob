@@ -603,7 +603,7 @@ class StuffKeeper:Data:Schema from G:Object
         }
         /* get the rows, ordered */
         retv = g_malloc0((fields+1)*sizeof(gchar *));
-        query = sqlite3_mprintf("SELECT FieldId FROM SchemasFields WHERE SchemaId=%i and type=%i ORDER BY value ASC",
+        query = sqlite3_mprintf("SELECT FieldId FROM SchemasFields WHERE SchemaId=%i and type=%i ORDER BY CAST (value AS INTEGER) ASC",
                     self->_priv->id,
                     DB_SCHEMAS_FIELD_TYPE_ORDER);
 
@@ -695,23 +695,50 @@ class StuffKeeper:Data:Schema from G:Object
     void
     add_field(self, FieldType field, const gchar *name)
     {
-        gchar **retv = NULL; 
+/*        gchar **retv = NULL; 
         gsize size=0;
-        int pos = 0;
+*/        int pos = 0;
         int result = 0;
         char *error = NULL;
         char *query  = NULL;
         gint id;
         gchar *cid = NULL;
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
         /* find new position */
-        retv = self_get_fields(self,&size);
+/*        retv = self_get_fields(self,&size);
+
         if(retv && size > 0)
         {
-            /* get the position of the last item and put it after that */
-            pos = self_get_field_pos(self,retv[size-1])+1;
+*/            /* get the position of the last item and put it after that */
+/*            pos = self_get_field_pos(self,retv[size-1])+1;
         }
         g_strfreev(retv);
+        int fields =-1;
+        char *query;
+        gchar **retv = NULL;
+        int i=0;
+        */
+        /* count the number of fields */
+        query = sqlite3_mprintf("SELECT MAX(CAST (value AS INTEGER))+1 FROM SchemasFields WHERE SchemaId=%i and type=%i",
+                    self->_priv->id,
+                    DB_SCHEMAS_FIELD_TYPE_ORDER );
 
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                pos = sqlite3_column_int(stmt, 0);
+            }
+        }
+        else
+        {
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        sqlite3_finalize(stmt);
+        sqlite3_free(query);
 
         /* insert it */
         query = sqlite3_mprintf("INSERT INTO 'SchemasFields' ('SchemaId','type','value')"
