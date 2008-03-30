@@ -60,6 +60,7 @@ def build(bld):
     bld.add_subdirs('html')
     # if git revision changes, this file needs to be rebuild.
     bld.add_manual_dependency('src/stuffkeeper-interface.gob',get_git_revision)
+    bld.add_manual_dependency('src/main.c',get_git_revision)
 
 def shutdown():
     gnome.postinstall_icons()

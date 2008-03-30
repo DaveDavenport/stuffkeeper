@@ -1711,7 +1711,14 @@ class StuffKeeper:Interface from G:Object
             gtk_about_dialog_set_email_hook((GtkAboutDialogActivateLinkFunc)self_dialog_activate_email,self, NULL);
             /* Set config time defines */
             gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), PROGRAM_NAME);
-            gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION"\nRevision: "REVISION);
+            if(strlen(REVISION)>0)
+            {
+                gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION"\nRevision: "REVISION);
+            }
+            else
+            {
+                gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION);
+            }
             gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), PROGRAM_WEBSITE); 
 
             gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), "Copyright 2008 Qball Cow");

@@ -5,6 +5,7 @@
 #include <glib/gstdio.h>
 #include <string.h>
 #include "debug.h"
+#include "revision.h"
 
 /* Include the database */
 #include "stuffkeeper-data-backend.h"
@@ -28,10 +29,12 @@ GKeyFile *config_file = NULL;
  */
 
 static gchar *db_path = NULL;
+static gboolean version = FALSE;
 
 static GOptionEntry entries[] = 
 {
   { "db-path", 'd', 0, G_OPTION_ARG_STRING, &db_path, "Path to the database", "Path" },
+  { "version", 'v', 0, G_OPTION_ARG_NONE,   &version, "Version",                NULL},
   { NULL }
 };
 
@@ -99,6 +102,16 @@ int main ( int argc, char **argv )
         /* return a failure */
         return EXIT_FAILURE;
     }
+    if(version)
+    {
+        printf("%s: %s\n", _("Version"), PROGRAM_VERSION);
+        if(strlen(REVISION)>0)
+        {
+            printf("%s: %s\n", _("Revision"), REVISION);
+        }
+        return EXIT_SUCCESS;
+    }
+
     gtk_icon_theme_append_search_path(gtk_icon_theme_get_default (),
                                    PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
 
