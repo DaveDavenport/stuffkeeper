@@ -18,6 +18,7 @@ finally:
     f.close();
 
 obj = bld.create_obj('cc', 'program')
+#obj.add_manual_dependency('src/stuffkeeper-interface.gob',output)
 obj.find_sources_in_dirs('.') # take the sources in the current folder
 obj.target = 'stuffkeeper'
 obj.uselib = 'GTK GLIB GLADE GMODULE GTKSPELL SQLITE'

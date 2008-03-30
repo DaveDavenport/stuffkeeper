@@ -4,6 +4,7 @@
 
 import os
 import Params, intltool,gnome
+from subprocess import Popen,PIPE
 # the following two variables are used by the target "waf dist"
 VERSION='0.07'
 APPNAME='stuffkeeper'
@@ -41,6 +42,14 @@ def configure(conf):
     # finally, write the configuration header
     conf.write_config_header('config.h')
 
+def get_git_revision():
+    output=""    
+    try:
+        output = Popen(["git", "rev-parse","--short", "master"], stdout=PIPE).communicate()[0]
+    except OSError, e:
+        output = ""
+    return output
+
 def build(bld):
     bld.add_subdirs('po')
     bld.add_subdirs('src')
@@ -48,6 +57,7 @@ def build(bld):
     bld.add_subdirs('data')
     bld.add_subdirs('pixmaps')
     bld.add_subdirs('html')
+    bld.add_manual_dependency('src/stuffkeeper-interface.gob',get_git_revision)
 
 def shutdown():
     gnome.postinstall_icons()
