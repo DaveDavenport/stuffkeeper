@@ -42,6 +42,7 @@ def configure(conf):
     # finally, write the configuration header
     conf.write_config_header('config.h')
 
+# prints the current git revision or ""
 def get_git_revision():
     output=""    
     try:
@@ -57,6 +58,7 @@ def build(bld):
     bld.add_subdirs('data')
     bld.add_subdirs('pixmaps')
     bld.add_subdirs('html')
+    # if git revision changes, this file needs to be rebuild.
     bld.add_manual_dependency('src/stuffkeeper-interface.gob',get_git_revision)
 
 def shutdown():

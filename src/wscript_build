@@ -2,6 +2,9 @@
 # encoding: utf-8
 # Qball Cow, 2008
 
+##
+# Create a header file
+##
 from subprocess import Popen,PIPE
 try:
     output = Popen(["git", "rev-parse","--short", "master"], stdout=PIPE).communicate()[0]
@@ -18,7 +21,6 @@ finally:
     f.close();
 
 obj = bld.create_obj('cc', 'program')
-#obj.add_manual_dependency('src/stuffkeeper-interface.gob',output)
 obj.find_sources_in_dirs('.') # take the sources in the current folder
 obj.target = 'stuffkeeper'
 obj.uselib = 'GTK GLIB GLADE GMODULE GTKSPELL SQLITE'
