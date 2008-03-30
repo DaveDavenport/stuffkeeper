@@ -2,11 +2,23 @@
 # encoding: utf-8
 # Qball Cow, 2008
 
-#install_files('PACKAGE_DATADIR', '', 'stuffkeeper.glade')
+from subprocess import Popen,PIPE
+try:
+    output = Popen(["git", "rev-parse","--short", "master"], stdout=PIPE).communicate()[0]
+except OSError, e:
+    output = ""
+
+f = open("src/revision.h", "w")
+try:
+    f.write("#ifndef __REVISION_H__\n");
+    f.write("#define __REVISION_H__\n");
+    f.write("#define REVISION \""+output.strip()+"\"\n");
+    f.write("#endif\n");
+finally:
+    f.close();
 
 obj = bld.create_obj('cc', 'program')
 obj.find_sources_in_dirs('.') # take the sources in the current folder
-#obj.packages = 'gtk+-2.0'
 obj.target = 'stuffkeeper'
 obj.uselib = 'GTK GLIB GLADE GMODULE GTKSPELL SQLITE'
 obj.includes='.'
