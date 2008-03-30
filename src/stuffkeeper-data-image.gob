@@ -75,6 +75,8 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
             g_object_unref(pb);
 
             /* store it */
+            /* clear it first, because else it does not get signald, because the value does not change */
+            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
             stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,id);
 
             g_free(fpath);

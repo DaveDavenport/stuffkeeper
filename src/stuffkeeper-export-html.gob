@@ -473,7 +473,14 @@ class StuffKeeper:Export:HTML from G:Object
                         }
                         if(temp)
                             g_free(temp);
-
+                    }
+                    else if (type == FIELD_TYPE_BOOLEAN)
+                    {
+                         int val = stuffkeeper_data_item_get_integer(self->_priv->cur_item, self->_priv->cur_field);
+                         gchar *temp = g_strdup((val)?_("True"):("False"));
+                        self_printout(&buffer[i+1],temp,fp_out);
+                        if(temp)
+                            g_free(temp);
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
                         self_printout(&buffer[i+1],temp,fp_out);
