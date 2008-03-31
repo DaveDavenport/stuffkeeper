@@ -4,6 +4,9 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <string.h>
+#include <sys/time.h>
+#include <time.h>
+
 #include "debug.h"
 #include "revision.h"
 
@@ -75,6 +78,9 @@ int main ( int argc, char **argv )
 
     StuffKeeperInterface  *ski;
 
+    struct timeval start, stop;
+
+    gettimeofday(&start, NULL);
     /* string used the path*/
     gchar *path;
     gchar *config_path;
@@ -216,13 +222,19 @@ int main ( int argc, char **argv )
     /* Create a main interface */
     ski= stuffkeeper_interface_new(config_file);
     interface_list = g_list_append(interface_list, ski);
-    stuffkeeper_interface_initialize_interface(ski,skdb);
+
 
     /* This tells the backend to populate itself */
     stuffkeeper_data_backend_load(skdb,path);
+    stuffkeeper_interface_initialize_interface(ski,skdb);
     /* path */
     g_free(path);
 
+
+    gettimeofday(&stop, NULL);
+    struct timeval diff;
+    timersub(&stop, &start, &diff);
+    printf("time elapsed since start: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));
     /* Start the main loop */
     gtk_main();
 

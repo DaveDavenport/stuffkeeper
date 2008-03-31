@@ -1,5 +1,3 @@
-requires 2.0.10
-
 %h{
     #include "stuffkeeper-data-schema.h"
     #include "stuffkeeper-data-item.h"
@@ -349,7 +347,7 @@ class StuffKeeper:Data:Backend from G:Object
         }
         sqlite3_finalize(stmt);
         /**
-         * Read tags 
+         * Read Searches 
          */
         query = "SELECT SearchID FROM SearchFields GROUP by SearchID";
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
@@ -403,27 +401,6 @@ class StuffKeeper:Data:Backend from G:Object
             }
         }
         sqlite3_finalize(stmt);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         /** 
          * Items
