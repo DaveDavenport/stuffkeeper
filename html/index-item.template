@@ -50,7 +50,7 @@
                     }{field:link <a href='%'>%</a>
                     }{field:slider %/100
                     }{field:integer %
-                    }{field:boolean %
+                    }{field:boolean <input type='checkbox' DISABLED %CHECKED:% />
                     }{field:image <img src='%' />
                     }{field:list <div id='list'>
                        }{field:list <i>%</i><BR />
