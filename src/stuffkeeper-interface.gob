@@ -1279,7 +1279,9 @@ class StuffKeeper:Interface from G:Object
                 GtkWidget *m =NULL;
                 StuffKeeperDataSchema *schema = NULL;
                 gtk_tree_model_get(self->_priv->model_schemas, &iter, 1, &title,3,&schema, -1);
-                m=gtk_menu_item_new_with_label((title==NULL)?"n/a":title);
+                m=gtk_image_menu_item_new_with_label((title==NULL)?"n/a":title);
+                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(m), 
+                    gtk_image_new_from_pixbuf(stuffkeeper_data_schema_get_pixbuf(schema)));
                 gtk_menu_shell_insert(GTK_MENU_SHELL(self->_priv->menu), m,-1);
                 g_object_set_data(G_OBJECT(m), "schema", schema);
                 g_signal_connect_swapped(G_OBJECT(m), "activate", G_CALLBACK(self_interface_item_add_menu_button), self);
