@@ -201,7 +201,9 @@ class StuffKeeper:Interface from G:Object
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
-
+        /* This is slow on reload
+         * TODO: Only reload when icons change.   
+         */
         model = GTK_TREE_MODEL(self->_priv->model_items);
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
@@ -1199,6 +1201,8 @@ class StuffKeeper:Interface from G:Object
                 gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(self->_priv->show_item_pane_menu_item),width);
             }
 
+            /* setup treeview */
+            gtk_tree_view_set_fixed_height_mode(GTK_TREE_VIEW(self->_priv->treeview2), TRUE);
 
 
             glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);

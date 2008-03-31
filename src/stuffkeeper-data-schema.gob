@@ -802,7 +802,7 @@ class StuffKeeper:Data:Schema from G:Object
         void
         add_item(self, GObject *item)
         {
-            self->_priv->items = g_list_append(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
+            self->_priv->items = g_list_prepend(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
             self_schema_changed(self);
         }
     public 
