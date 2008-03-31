@@ -346,6 +346,7 @@ class StuffKeeper:Interface from G:Object
                     1, title, 
                     2, item,
                     3, stuffkeeper_data_item_get_creation_time(item),
+                    4, stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)),
                     -1);
         g_free(title);
 
@@ -415,6 +416,7 @@ class StuffKeeper:Interface from G:Object
                     1, title, 
                     2, item,
                     3, stuffkeeper_data_item_get_creation_time(item),
+                    4, stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)),
                     -1);
             g_free(title);
 
@@ -1326,6 +1328,8 @@ class StuffKeeper:Interface from G:Object
         void 
         initialize_interface(self, StuffKeeperDataBackend *skdb)
         {
+            GError *error = NULL;
+            gint value = 0, sort_order;
             GList *iter, *node;
             GtkTreeViewColumn *column;
             GtkCellRenderer *renderer;
@@ -1345,6 +1349,8 @@ class StuffKeeper:Interface from G:Object
 
             /* Setting up backends */
             self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
+
+
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_schemas), 1, GTK_SORT_ASCENDING);
             /** Load the schemas*/
             node = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
@@ -1395,9 +1401,40 @@ class StuffKeeper:Interface from G:Object
                     G_CALLBACK(self_tag_removed),
                     self->_priv->model_tags);
 
-            self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(4, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER,G_TYPE_INT);
-            
-            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, GTK_SORT_DESCENDING);
+            self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER,G_TYPE_INT,G_TYPE_INT);
+            sort_order = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-order", &error);
+            if(error != NULL)
+            {
+                sort_order= GTK_SORT_DESCENDING;
+                g_error_free(error);
+            }
+            else
+            {
+                if(sort_order == GTK_SORT_DESCENDING)
+                {
+                    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_descending")),TRUE);
+                }else{
+                    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_ascending")),TRUE);
+                }
+            }
+            value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-column", &error);
+            if(error == NULL) {
+                gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), value, sort_order);
+                switch(value) {
+                    case 1:
+                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_title")),TRUE);
+                        break;
+                    case 4:
+                         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_schema")),TRUE);
+                        break;
+                    default:
+                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_creation_time")),TRUE);
+                        break;
+                }
+            } else {
+                g_error_free(error);
+                gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, sort_order);
+            }
             /** Load the items*/
             node = stuffkeeper_data_backend_get_items(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
@@ -1953,4 +1990,90 @@ class StuffKeeper:Interface from G:Object
 
 
         }
+
+        /**
+         * Sorting
+         */
+        public 
+            void
+        sort_item_descending(self,GtkRadioButton *style)
+        {
+            GError *error = NULL;
+            int value;
+            value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-column", &error);
+            if(error != NULL)
+            {
+                value = 3;
+                g_error_free(error);
+            }
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), value, GTK_SORT_DESCENDING);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-order", GTK_SORT_DESCENDING);
+
+
+        }
+        public 
+            void
+        sort_item_ascending(self,GtkRadioButton *style)
+        {
+            GError *error = NULL;
+            int value;
+            value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-column", &error);
+            if(error != NULL)
+            {
+                value = 3;
+                g_error_free(error);
+            }
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), value, GTK_SORT_ASCENDING);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-order", GTK_SORT_ASCENDING);
+
+        }
+
+
+
+
+        public 
+        void
+        sort_item_by_creation_time(self,GtkRadioButton *style)
+        {
+            GError *error = NULL;
+            int value;
+            value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-order", &error);
+            if(error != NULL)
+            {
+                value = GTK_SORT_DESCENDING;
+                g_error_free(error);
+            }
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, value);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-column", 3);
+        }
+        public 
+        void
+        sort_item_by_title(self,GtkRadioButton *style)
+        {
+            GError *error = NULL;
+            int value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-order", &error);
+            if(error != NULL)
+            {
+                value = GTK_SORT_ASCENDING;
+                g_error_free(error);
+            }
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 1, value);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-column", 1);
+        }
+        public 
+        void
+        sort_item_by_schema(self,GtkRadioButton *style)
+        {
+            GError *error = NULL;
+            int value = g_key_file_get_integer(self->_priv->config_file, "WINDOW", "item-sort-order", &error);
+            if(error != NULL)
+            {
+                value = GTK_SORT_DESCENDING;
+                g_error_free(error);
+            }
+            gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 4, value);
+            g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-column", 4);
+        }
+
+
 }
