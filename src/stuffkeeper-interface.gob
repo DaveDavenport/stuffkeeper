@@ -204,6 +204,7 @@ class StuffKeeper:Interface from G:Object
         /* This is slow on reload
          * TODO: Only reload when icons change.   
          */
+        /*
         model = GTK_TREE_MODEL(self->_priv->model_items);
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
@@ -213,6 +214,7 @@ class StuffKeeper:Interface from G:Object
                 gtk_tree_path_free(path);
             }while(gtk_tree_model_iter_next(model, &iter));
         }
+        */
     }
     public
     void 
@@ -368,7 +370,9 @@ class StuffKeeper:Interface from G:Object
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_item_get_title(item);
-                    gtk_list_store_set(store, &iter, 1,title, -1);
+                    gtk_list_store_set(store, &iter, 1,title, 
+                            -1);
+
                     g_free(title);
                     return;
                 }
@@ -1305,6 +1309,7 @@ class StuffKeeper:Interface from G:Object
         StuffKeeperDataItem *item;
         StuffKeeperDataSchema *schema;
         GdkPixbuf *pb;
+//        printf("get pixbuf\n");
         gtk_tree_model_get(model, iter, 2, &item, -1); 
         schema = stuffkeeper_data_item_get_schema(item);
         if(schema)
@@ -1391,6 +1396,7 @@ class StuffKeeper:Interface from G:Object
                     self->_priv->model_tags);
 
             self->_priv->model_items = (GtkTreeModel *)gtk_list_store_new(4, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER,G_TYPE_INT);
+            
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, GTK_SORT_DESCENDING);
             /** Load the items*/
             node = stuffkeeper_data_backend_get_items(self->_priv->skdbg);
@@ -1451,8 +1457,10 @@ class StuffKeeper:Interface from G:Object
             /* A filtered items */
             self->_priv->model_items_filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(self->_priv->model_items), NULL);
             renderer = gtk_cell_renderer_pixbuf_new();
+
             gtk_tree_view_insert_column_with_data_func(GTK_TREE_VIEW(self->_priv->treeview2), -1,"test", renderer, 
                     self_get_pixbuf, self, NULL);
+
             gtk_tree_view_column_set_sizing(
                         GTK_TREE_VIEW_COLUMN(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview2), 0)), 
                         GTK_TREE_VIEW_COLUMN_FIXED);
