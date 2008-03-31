@@ -802,7 +802,7 @@ class StuffKeeper:Data:Schema from G:Object
         void
         add_item(self, GObject *item)
         {
-            self->_priv->items = g_list_append(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
+            self->_priv->items = g_list_prepend(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
             self_schema_changed(self);
         }
     public 
@@ -845,6 +845,20 @@ class StuffKeeper:Data:Schema from G:Object
             }
             
             self_schema_changed(self);
+            {
+                GList *node = g_list_first(self->_priv->items);
+                /*
+                 * make the items update, this should make the main 
+                 * tree update it's icon.
+                 * bit hacky.
+                 */
+                for(;node;node = g_list_next(node))
+                {
+                    StuffKeeperDataItem *item = node->data;
+                    stuffkeeper_data_item_item_changed(item, NULL);
+                }
+
+            }
 
             g_free(value);
             g_free(dest_path);

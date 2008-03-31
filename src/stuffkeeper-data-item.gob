@@ -238,7 +238,7 @@ class StuffKeeper:Data:Item from G:Object
                     int tagid = sqlite3_column_int(stmt, 0); 
                     StuffKeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tagid);
                     debug_printf("adding tagid: %i\n", tagid);
-                    obj->_priv->tags = g_list_append(obj->_priv->tags, tag);
+                    obj->_priv->tags = g_list_prepend(obj->_priv->tags, tag);
                     stuffkeeper_data_tag_add_item(tag, G_OBJECT(obj));
                 }
             }

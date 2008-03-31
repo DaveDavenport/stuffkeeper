@@ -1,5 +1,3 @@
-requires 2.0.10
-
 %h{
     #include "stuffkeeper-data-schema.h"
     #include "stuffkeeper-data-item.h"
@@ -12,6 +10,9 @@ requires 2.0.10
     #include <glib/gstdio.h>
     #include <stdio.h>
     #include <string.h>
+#include <sys/time.h>
+#include <time.h>
+
 #define DB_VERSION 0.02
 %}
 
@@ -278,12 +279,10 @@ class StuffKeeper:Data:Backend from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
+        struct timeval start, stop;
+        struct timeval diff;
+        gettimeofday(&start, NULL);
 
-
-
-
-
-    
         /* check if there is allready data active */
         if(self->_priv->path)
         {
@@ -317,9 +316,10 @@ class StuffKeeper:Data:Backend from G:Object
         }
         g_free(path);
 
-
-
-
+        gettimeofday(&stop, NULL);
+        timersub(&stop, &start, &diff);
+        printf("time elapsed open & check db: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+        start = stop;
         /**
          * Read Schemas 
          */
@@ -348,8 +348,13 @@ class StuffKeeper:Data:Backend from G:Object
             }
         }
         sqlite3_finalize(stmt);
+        gettimeofday(&stop, NULL);
+        timersub(&stop, &start, &diff);
+        printf("time elapsed open schemas: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+        start = stop;
+
         /**
-         * Read tags 
+         * Read Searches 
          */
         query = "SELECT SearchID FROM SearchFields GROUP by SearchID";
         r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
@@ -375,6 +380,11 @@ class StuffKeeper:Data:Backend from G:Object
             }
         }
         sqlite3_finalize(stmt);
+
+        gettimeofday(&stop, NULL);
+        timersub(&stop, &start, &diff);
+        printf("time elapsed open searches: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+        start = stop;
 
         /**
          * Read tags 
@@ -404,24 +414,10 @@ class StuffKeeper:Data:Backend from G:Object
         }
         sqlite3_finalize(stmt);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        gettimeofday(&stop, NULL);
+        timersub(&stop, &start, &diff);
+        printf("time elapsed open tags: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+        start = stop;
 
 
 
@@ -453,7 +449,11 @@ class StuffKeeper:Data:Backend from G:Object
             }
         }
         sqlite3_finalize(stmt);
-        /* test the items directory */
+
+        gettimeofday(&stop, NULL);
+        timersub(&stop, &start, &diff);
+        printf("time elapsed open items: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+        start = stop;
     }
     
     /**
@@ -736,13 +736,13 @@ class StuffKeeper:Data:Backend from G:Object
     check_sqlite_db(self)
     {
         /* available tables */
-        gboolean has_general = FALSE;
-        gboolean has_tags = FALSE;
-        gboolean has_schemas = FALSE;
+        gboolean has_general    = FALSE;
+        gboolean has_tags       = FALSE;
+        gboolean has_schemas    = FALSE;
         gboolean has_schemas_field = FALSE;
-        gboolean has_items = FALSE;
+        gboolean has_items      = FALSE;
         gboolean has_items_field = FALSE;
-        gboolean has_search = FALSE;
+        gboolean has_search     = FALSE;
 
         int i;
         int result = 0;
@@ -761,28 +761,28 @@ class StuffKeeper:Data:Backend from G:Object
             if (!strcmp(resultp[i], "General")) {
                 has_general = TRUE;
             }
-            if (!strcmp(resultp[i], "Tags")) {
+            else if (!strcmp(resultp[i], "Tags")) {
                 has_tags = TRUE;
             }
-            if (!strcmp(resultp[i], "Schemas")) {
+            else if (!strcmp(resultp[i], "Schemas")) {
                 has_schemas = TRUE;
             }
-            if (!strcmp(resultp[i], "SchemasFields")) {
+            else if (!strcmp(resultp[i], "SchemasFields")) {
                 has_schemas_field = TRUE;
             }
-            if (!strcmp(resultp[i], "Items")) {
+            else if (!strcmp(resultp[i], "Items")) {
                 has_items = TRUE;
             }
-            if (!strcmp(resultp[i], "ItemsFields")) {
+            else if (!strcmp(resultp[i], "ItemsFields")) {
                 has_items_field = TRUE;
             }
-            if (!strcmp(resultp[i], "SearchFields")) {
+            else if (!strcmp(resultp[i], "SearchFields")) {
                 has_search = TRUE;
             }
         }
         sqlite3_free(query);
         /* if not exists, create the general table */
-        if(!has_general) {
+        if(G_UNLIKELY(!has_general)) {
             debug_printf("Create general table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'General' ("
@@ -809,7 +809,7 @@ class StuffKeeper:Data:Backend from G:Object
        
        
 
-        if(!has_tags) {
+        if(G_UNLIKELY(!has_tags)) {
             debug_printf("Create Tags table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'Tags' ("
@@ -825,7 +825,7 @@ class StuffKeeper:Data:Backend from G:Object
             sqlite3_free(query);
         }
 
-        if(!has_schemas) {
+        if(G_UNLIKELY(!has_schemas)) {
             debug_printf("Create Schemas table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'Schemas' ("
@@ -841,7 +841,7 @@ class StuffKeeper:Data:Backend from G:Object
             }
             sqlite3_free(query);
         }
-        if(!has_schemas_field) {
+        if(G_UNLIKELY(!has_schemas_field)) {
             debug_printf("Create SchemasFields table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'SchemasFields' ("
@@ -864,7 +864,7 @@ class StuffKeeper:Data:Backend from G:Object
 
 
         }
-        if(!has_items) {
+        if(G_UNLIKELY(!has_items)) {
             debug_printf("Create Items table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'Items' ("
@@ -880,7 +880,7 @@ class StuffKeeper:Data:Backend from G:Object
             }
             sqlite3_free(query);
         }
-        if(!has_items_field) {
+        if(G_UNLIKELY(!has_items_field)) {
             debug_printf("Create ItemsFields table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'ItemsFields' ("
@@ -902,7 +902,7 @@ class StuffKeeper:Data:Backend from G:Object
 
 
         }
-        if(!has_search) {
+        if(G_UNLIKELY(!has_search)) {
             debug_printf("Create SearchFields table\n");
 
             query = sqlite3_mprintf("CREATE TABLE 'SearchFields' ("
