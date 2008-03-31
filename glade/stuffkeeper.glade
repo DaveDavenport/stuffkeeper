@@ -198,7 +198,7 @@
                             <child>
                               <widget class="GtkRadioMenuItem" id="menu_sort_by_schema">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">by schema</property>
+                                <property name="label" translatable="yes">by type</property>
                                 <property name="use_underline">True</property>
                                 <property name="draw_as_radio">True</property>
                                 <property name="group">menu_sort_by_creation_time</property>
