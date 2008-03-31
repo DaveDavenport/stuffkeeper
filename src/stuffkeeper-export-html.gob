@@ -477,9 +477,6 @@ class StuffKeeper:Export:HTML from G:Object
                     else if (type == FIELD_TYPE_BOOLEAN)
                     {
                         int val = stuffkeeper_data_item_get_integer(self->_priv->cur_item, self->_priv->cur_field);
-//                        gchar *temp = g_strdup((val)?_("True"):("False"));
-                        //                        self_printout(&buffer[i+1],temp,fp_out);
-                        int found = 0;
                         i++;
                         for(; buffer[i] != '\0';i++)
                         { 
@@ -487,23 +484,14 @@ class StuffKeeper:Export:HTML from G:Object
                             {
                                 int end = i+1;
                                 int bbreak = i+1;
-                                int escaped = 0;
-                                gchar *esc= NULL; 
+                                int j;
                                 for(;buffer[end] != '\0' && buffer[end] != '%'; end++) 
                                 {
-                                    if(buffer[end] == '\'')
-                                        escaped = (escaped)?0:1;
-                                    if(buffer[end] == ':' && escaped == 0) bbreak = end;
+                                    if(buffer[end] == ':') bbreak = end;
                                 }
-                                if(val)
-                                {
-                                    int j;
+                                if(val) {
                                     for(j=i+1;j<bbreak;j++) fputc(buffer[j],fp_out);
-
-                                }
-                                else
-                                {
-                                    int j;
+                                } else {
                                     for(j=bbreak+1;j<end;j++) fputc(buffer[j],fp_out);
                                 }
 
@@ -515,9 +503,6 @@ class StuffKeeper:Export:HTML from G:Object
                                 fputc(buffer[i], fp_out);
                             }
                         }
-
-//                        if(temp)
-//                            g_free(temp);
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
                         self_printout(&buffer[i+1],temp,fp_out);
