@@ -1407,6 +1407,7 @@ class StuffKeeper:Interface from G:Object
             {
                 sort_order= GTK_SORT_DESCENDING;
                 g_error_free(error);
+                error = NULL;
             }
             else
             {
@@ -1433,6 +1434,7 @@ class StuffKeeper:Interface from G:Object
                 }
             } else {
                 g_error_free(error);
+                error = NULL;
                 gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, sort_order);
             }
             /** Load the items*/
@@ -2005,12 +2007,12 @@ class StuffKeeper:Interface from G:Object
             {
                 value = 3;
                 g_error_free(error);
+                error = NULL;
             }
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), value, GTK_SORT_DESCENDING);
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-order", GTK_SORT_DESCENDING);
-
-
         }
+
         public 
             void
         sort_item_ascending(self,GtkRadioButton *style)
@@ -2022,14 +2024,12 @@ class StuffKeeper:Interface from G:Object
             {
                 value = 3;
                 g_error_free(error);
+                error = NULL;
             }
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), value, GTK_SORT_ASCENDING);
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-order", GTK_SORT_ASCENDING);
 
         }
-
-
-
 
         public 
         void
@@ -2042,6 +2042,7 @@ class StuffKeeper:Interface from G:Object
             {
                 value = GTK_SORT_DESCENDING;
                 g_error_free(error);
+                error = NULL;
             }
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), 3, value);
             g_key_file_set_integer(self->_priv->config_file, "WINDOW", "item-sort-column", 3);
