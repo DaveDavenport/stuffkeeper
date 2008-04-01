@@ -6,7 +6,7 @@ import os
 import Params, intltool,gnome
 from subprocess import Popen,PIPE
 # the following two variables are used by the target "waf dist"
-VERSION='0.07'
+VERSION='0.08'
 APPNAME='stuffkeeper'
 WEBSITE='http://sarine.nl/stuffkeeper/'
 BUGTRACKER='http://bugtracker.sarine.nl/'
