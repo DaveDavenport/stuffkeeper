@@ -1584,9 +1584,12 @@ class StuffKeeper:Interface from G:Object
             gtk_tree_view_column_set_sizing(
                         GTK_TREE_VIEW_COLUMN(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview2), 0)), 
                         GTK_TREE_VIEW_COLUMN_FIXED);
-            gtk_tree_view_column_set_fixed_width(
+            
+              gtk_tree_view_column_set_fixed_width(
+
                     GTK_TREE_VIEW_COLUMN(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview2), 0)), 
-                    20);
+                    24+gtk_tree_view_column_get_spacing(GTK_TREE_VIEW_COLUMN(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->treeview2), 0))));
+
             renderer = gtk_cell_renderer_text_new();
             gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->treeview2), -1, "items", renderer, "text", 1, NULL);
             g_object_set(renderer, "editable", TRUE,NULL);
