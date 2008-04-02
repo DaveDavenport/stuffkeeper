@@ -61,6 +61,8 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *treeview1 ;
     private GtkWidget *treeview2 ;
     private GtkCellRenderer *treeview1_renderer = {NULL};
+    private GtkCellRenderer *renderer_toggle = {NULL};
+    private GtkTreeViewColumn  *column_toggle = {NULL};
     private GtkWidget *item_vbox ;
     
     private GtkWidget *LeftPane_edit ;
@@ -136,7 +138,7 @@ class StuffKeeper:Interface from G:Object
         gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_searches), &iter, 
                 0, stuffkeeper_data_item_search_get_id(search),
                 1, title,
-                2, search,
+                3, search,
                 -1);
         g_free(title);
     }
@@ -515,15 +517,33 @@ class StuffKeeper:Interface from G:Object
         void 
         interface_left_pane_toggled(self, gchar *path, GtkCellRendererToggle *renderer)
         {
+            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
             GtkTreeIter iter;
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
-            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            if(type == 2)
             {
                 gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
-                gtk_list_store_set(GTK_LIST_STORE(model), &iter, 2,value,-1);
+                if(value == FALSE)
+                {
+                        gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->cb_search), 0);
+                }else{
+                    GtkTreeIter iter;
+                    if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+                    {
+                        gtk_combo_box_set_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter);
+                    }
+                }
+            }
+            else
+            {
+                if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+                {
+                    gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
+                    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 2,value,-1);
 
-                /* refilter the items list */
-                gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+                    /* refilter the items list */
+                    gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+                }
             }
         }
 
@@ -687,7 +707,7 @@ class StuffKeeper:Interface from G:Object
                 if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
                 {
                     StuffKeeperDataItemSearch *search;
-                    gtk_tree_model_get(self->_priv->model_searches, &iter, 2, &search, -1);
+                    gtk_tree_model_get(self->_priv->model_searches, &iter, 3, &search, -1);
                     if(search)
                     {
                         if(!stuffkeeper_data_item_search_match(search, item))
@@ -1237,25 +1257,33 @@ class StuffKeeper:Interface from G:Object
     {
         int i = gtk_combo_box_get_active(box);
         if(i==0){
+            g_object_set(self->_priv->treeview1_renderer, "editable", TRUE,NULL);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
-        }else{
+        }else if (i == 1){
+            g_object_set(self->_priv->treeview1_renderer, "editable", TRUE,NULL);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
+        }else if ( i == 2) {
+            g_object_set(self->_priv->treeview1_renderer, "editable", FALSE,NULL);
+            gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_searches));
         }
+
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
+
     public
     void
     search_type_changed(self, GtkComboBox *box)
     {
-        GtkTreeIter iter;
+        GtkTreeIter iter, node;
         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
         {
             StuffKeeperDataItemSearch *search;
             GtkWidget *item = glade_xml_get_widget(self->_priv->xml, "menuitem_remove_search");
             GtkWidget *item1 = glade_xml_get_widget(self->_priv->xml, "menuitem_edit_search");
             gint id;
-            gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 2, &search, -1);
+            gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
+
             if(id == -1) {
                 gtk_widget_set_sensitive(item, FALSE);
                 gtk_widget_set_sensitive(item1, FALSE);
@@ -1263,6 +1291,12 @@ class StuffKeeper:Interface from G:Object
                 gtk_widget_set_sensitive(item, TRUE);
                 gtk_widget_set_sensitive(item1, TRUE);
             }
+            if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->model_searches), &node)) {
+                do{
+                    gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_searches), &node, 2, FALSE,-1);
+                }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->model_searches), &node));
+            }
+            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_searches), &iter, 2, TRUE,-1);
         }
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
@@ -1473,7 +1507,7 @@ class StuffKeeper:Interface from G:Object
             /**
              * Searches
              */
-            self->_priv->model_searches = (GtkTreeModel *)gtk_list_store_new(3, G_TYPE_INT,G_TYPE_STRING,G_TYPE_POINTER);
+            self->_priv->model_searches = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER, G_TYPE_INT);
 
             gtk_combo_box_set_model(GTK_COMBO_BOX(self->_priv->cb_search), self->_priv->model_searches);
             {
@@ -1541,11 +1575,11 @@ class StuffKeeper:Interface from G:Object
 
 
             /* TAGS */
-            column = gtk_tree_view_column_new();
+            self->_priv->column_toggle = column = gtk_tree_view_column_new();
 
             /* Toggle button  */
 
-            renderer = gtk_cell_renderer_toggle_new();
+            self->_priv->renderer_toggle = renderer = gtk_cell_renderer_toggle_new();
             gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
             gtk_tree_view_column_set_attributes(column, renderer, "active", 2, NULL);
             /* handle toggled */
@@ -1553,6 +1587,7 @@ class StuffKeeper:Interface from G:Object
 
 
             gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
+            
             /* TAGS */
             column = gtk_tree_view_column_new();
             /* Tag name */
@@ -1575,6 +1610,11 @@ class StuffKeeper:Interface from G:Object
             gtk_tree_view_column_set_attributes(column, renderer, "text", 4, NULL);
 
             gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
+
+            g_signal_connect_swapped(G_OBJECT(gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1))),
+                            "changed", 
+                            G_CALLBACK(self_treeview1_selection_changed), 
+                            self);
 
             gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB), 0);
 
@@ -1978,7 +2018,7 @@ class StuffKeeper:Interface from G:Object
             {
                 StuffKeeperDataItemSearch *search;
                 gint id;
-                gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 2, &search, -1);
+                gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
                 if(search && id != -1)
                 {
                     stuffkeeper_data_backend_remove_search(self->_priv->skdbg, id);
@@ -1996,7 +2036,7 @@ class StuffKeeper:Interface from G:Object
             {
                 StuffKeeperDataItemSearch *search;
                 gint id;
-                gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 2, &search, -1);
+                gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
                 if(search && id != -1)
                 {
                     stuffkeeper_data_item_search_edit_search_gui(search);
@@ -2005,7 +2045,16 @@ class StuffKeeper:Interface from G:Object
 
 
         }
+        private
+        void
+        treeview1_selection_changed(self, GtkTreeSelection *selection)
+        {
+            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+            if(type == 2)
+            {
 
+            }
+        }
         /**
          * Sorting
          */
