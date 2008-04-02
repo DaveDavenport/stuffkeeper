@@ -1062,7 +1062,7 @@ class StuffKeeper:Interface from G:Object
                     int items;
                     /* Get the number of items */
                     gtk_tree_model_get(model, &iter, 4, &items, -1);
-            
+
                     /* no items, then you can delete it*/
                     if(items ==  0)
                     {
@@ -1076,7 +1076,7 @@ class StuffKeeper:Interface from G:Object
                 }
 
             }
-            else 
+            else if (type == 1) 
             {
                 /* Add item */
                 menu_item = gtk_image_menu_item_new_with_label("New type");
@@ -1107,6 +1107,42 @@ class StuffKeeper:Interface from G:Object
 
                 }
 
+            } else if (type == 2)
+            {
+                /* Add item */
+                menu_item = gtk_image_menu_item_new_with_label("New filter");
+                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                        gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_new_search), self);
+                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                if(gtk_tree_selection_get_selected(selection,&model, &iter))
+                {
+                    int id;
+                    StuffKeeperDataItemSearch *search;
+                    /* Get the number of items */
+                    gtk_tree_model_get(model, &iter, 0, &id,3, &search, -1);
+
+                    /* no items, then you can delete it*/
+                    if(id >=  0)
+                    {
+
+                        menu_item = gtk_image_menu_item_new_with_label("Remove filter");
+                        g_object_set_data(G_OBJECT(menu_item), "search", search);
+                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_search_menu),self);
+                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+
+
+                        menu_item = gtk_image_menu_item_new_with_label("Edit filter");
+                        g_object_set_data(G_OBJECT(menu_item), "search", search);
+                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
+                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_search_menu),self);
+                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                    }
+                }
+
             }
 
             /* popup the menu */
@@ -1118,6 +1154,7 @@ class StuffKeeper:Interface from G:Object
         }
         return FALSE;
     }
+
 
     public
         StuffKeeperInterface * 
@@ -2044,6 +2081,55 @@ class StuffKeeper:Interface from G:Object
 
 
         }
+
+
+
+        public
+        void
+        remove_search_menu(self, GtkWidget *menu_item)
+        {
+            StuffKeeperDataItemSearch *search;
+            search = g_object_get_data(G_OBJECT(menu_item), "search");
+            if(search) 
+            {
+                gint id = stuffkeeper_data_item_search_get_id(search);
+                stuffkeeper_data_backend_remove_search(self->_priv->skdbg, id);
+            }
+        }
+      public
+      void
+      edit_search_menu(self,GtkWidget *menu_item)
+      {
+          StuffKeeperDataItemSearch *search;
+          search = g_object_get_data(G_OBJECT(menu_item), "search");
+          if(search)
+          {
+              stuffkeeper_data_item_search_edit_search_gui(search);
+          }
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         private
         void
         treeview1_selection_changed(self, GtkTreeSelection *selection)
