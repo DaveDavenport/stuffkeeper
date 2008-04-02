@@ -800,10 +800,21 @@ class StuffKeeper:Interface from G:Object
                 GtkWidget *frame = gtk_frame_new(NULL);
                 GtkWidget *label = gtk_label_new("");
                 GtkWidget *event = gtk_event_box_new();
+                GtkWidget *hbox = gtk_hbox_new(FALSE, 6);
+                GtkWidget *ali = gtk_alignment_new(1.0, 0.5,0,0);
+
                 gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
                 g_signal_connect(G_OBJECT(event), "style-set", G_CALLBACK(self_interface_background_changed), event);
                 gtk_label_set_markup(GTK_LABEL(label), "<b>No item to preview, select an item from the item list to preview it</b>");
-                gtk_container_add(GTK_CONTAINER(frame),label);
+
+                gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+
+                gtk_container_add(GTK_CONTAINER(ali), gtk_image_new_from_icon_name("stuffkeeper", GTK_ICON_SIZE_DIALOG));
+                 gtk_box_pack_start(GTK_BOX(hbox),ali, TRUE, TRUE, 0);               
+                gtk_box_pack_start(GTK_BOX(hbox),label, TRUE, TRUE, 0);
+
+                //gtk_container_add(GTK_CONTAINER(frame),label);
+                gtk_container_add(GTK_CONTAINER(frame),hbox);
                 gtk_container_add(GTK_CONTAINER(event),frame);
                 gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), event);
                 gtk_widget_show_all(self->_priv->item_view_container);
