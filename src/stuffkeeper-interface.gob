@@ -589,11 +589,12 @@ class StuffKeeper:Interface from G:Object
 
                 gtk_tree_model_get(model, &iter ,3,&item, -1);
 
-                if(STUFFKEEPER_IS_DATA_TAG(item))
-                {
+                if(STUFFKEEPER_IS_DATA_TAG(item)) {
                     stuffkeeper_data_tag_set_title(STUFFKEEPER_DATA_TAG(item), new_text);
                 }else if (STUFFKEEPER_IS_DATA_SCHEMA(item)){
                     stuffkeeper_data_schema_set_title(STUFFKEEPER_DATA_SCHEMA(item), new_text);
+               }else if (STUFFKEEPER_IS_DATA_ITEM_SEARCH(item)){
+                   stuffkeeper_data_item_search_set_title(STUFFKEEPER_DATA_ITEM_SEARCH(item), new_text);
                 }
                 
 
@@ -1293,13 +1294,10 @@ class StuffKeeper:Interface from G:Object
     {
         int i = gtk_combo_box_get_active(box);
         if(i==0){
-            g_object_set(self->_priv->treeview1_renderer, "editable", TRUE,NULL);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
         }else if (i == 1){
-            g_object_set(self->_priv->treeview1_renderer, "editable", TRUE,NULL);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
         }else if ( i == 2) {
-            g_object_set(self->_priv->treeview1_renderer, "editable", FALSE,NULL);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_searches));
         }
 
