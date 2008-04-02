@@ -62,7 +62,6 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *treeview2 ;
     private GtkCellRenderer *treeview1_renderer = {NULL};
     private GtkCellRenderer *renderer_toggle = {NULL};
-    private GtkTreeViewColumn  *column_toggle = {NULL};
     private GtkWidget *item_vbox ;
     
     private GtkWidget *LeftPane_edit ;
@@ -1575,7 +1574,7 @@ class StuffKeeper:Interface from G:Object
 
 
             /* TAGS */
-            self->_priv->column_toggle = column = gtk_tree_view_column_new();
+            column = gtk_tree_view_column_new();
 
             /* Toggle button  */
 

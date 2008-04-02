@@ -408,7 +408,7 @@
                         <property name="has_frame">False</property>
                         <property name="items" translatable="yes">Tags
 Types
-Searches</property>
+Filters</property>
                         <signal name="changed" handler="left_pane_changed"/>
                       </widget>
                     </child>
