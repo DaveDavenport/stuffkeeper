@@ -68,7 +68,7 @@
                     </td>
                     <td>
                         {field:string %
-                        }{field:text <p>%</p>
+                        }{field:text <pre>%</pre>
                         }{field:link <a href='%'>%</a>
                         }{field:slider %/100
                         }{field:integer %

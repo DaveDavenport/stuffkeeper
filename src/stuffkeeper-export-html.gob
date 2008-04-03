@@ -16,6 +16,15 @@ requires 2.0.10
 #include "stuffkeeper-interface.h"
 #define PACKAGE_HTML_TEMPLATE_FULL "/html/index.template"
 #define PACKAGE_HTML_TEMPLATE "/html/index-item.template"
+
+
+typedef enum _EscapeType
+{
+ESCAPE_HTML,
+ESCAPE_CSV,
+ESCAPE_NONE
+}EscapeType;
+
 %}
 
 class StuffKeeper:Export:HTML from G:Object
@@ -28,7 +37,7 @@ class StuffKeeper:Export:HTML from G:Object
     private StuffKeeperDataSchema *cur_schema = {NULL};
     private gchar *cur_field = {NULL};
     private gchar *image_path = {NULL};
-
+    private EscapeType etype = {ESCAPE_HTML};
     /** 
      * Widgets 
      */
@@ -260,8 +269,54 @@ class StuffKeeper:Export:HTML from G:Object
      * actual work is done here
      */
     private 
+        gchar *
+    CSV_strescape(const gchar *string)
+    {
+        gchar *retv= NULL;
+        int length=0,i,j;
+        /* check string != NULL */
+        if(string == NULL) {
+            return NULL;
+        }
+        /* Count string length after escaping */
+        for(i=0;string && string[i];i++)
+        {
+            if(string[i] == '"')
+                length++;
+            length++;    
+        }
+        /* Alloc space */
+        retv = g_malloc0((length+1)*sizeof(char*));
+        j=0;
+        for(i=0;string[i];i++) {
+            retv[j]=string[i];
+            if(string[i] == '"') {
+                j++;
+                retv[j]='"';
+            }
+            j++;
+        }
+        return retv;
+    }
+
+    private
+    char *escape(self, char *buffer)
+    {
+        char *retv = NULL;
+        if(self->_priv->etype == ESCAPE_HTML)
+        {
+            retv = g_markup_escape_text(buffer, -1); 
+
+        }else if(self->_priv->etype == ESCAPE_CSV){
+            retv = self_CSV_strescape(buffer);
+        }else{ // ESCAPE_NONE
+            retv = g_strdup(buffer);
+        }
+        return retv;
+    }
+    private 
     int  
-    printout(char *buffer,char * temp, FILE *fp_out)
+    printout(self,char *buffer,char * temp, FILE *fp_out)
     {
         int i;
         int found = 0;
@@ -271,15 +326,18 @@ class StuffKeeper:Export:HTML from G:Object
             {
                 if(buffer[i]  == '%')
                 {
-                    gchar *esc = g_markup_escape_text(temp, -1); 
+                    gchar *esc = self_escape(self, temp);//g_markup_escape_text(temp, -1); 
                     int j =0;
                     found = 1;
+                    /*
                     for(j=0;esc[j];j++) {
                         if(esc[j] == '\n') {
                             fputs("<BR />", fp_out);
                         } else
                             fputc(esc[j], fp_out);
                     }
+                    */
+                    fputs(esc, fp_out);
                     g_free(esc);
 
                 }
@@ -307,12 +365,24 @@ class StuffKeeper:Export:HTML from G:Object
             a = fgetc(fp_in);
         };
         buffer[i] = '\0';
-        if(strncasecmp(buffer,"schema:title", 12) == 0 )
+        if(strncasecmp(buffer, "escape:csv", 10) == 0)
+        {
+            self->_priv->etype = ESCAPE_CSV;
+        }
+        else if(strncasecmp(buffer, "escape:html", 11) == 0)
+        {
+            self->_priv->etype = ESCAPE_HTML;
+        }
+        else if(strncasecmp(buffer, "escape:none", 11) == 0)
+        {
+            self->_priv->etype = ESCAPE_NONE;
+        }
+        else if(strncasecmp(buffer,"schema:title", 12) == 0 )
         {
             gchar *temp = NULL;
             if(self->_priv->cur_schema)
                 temp = stuffkeeper_data_schema_get_title(self->_priv->cur_schema);
-            self_printout(&buffer[13], temp, fp_out);
+            self_printout(self,&buffer[13], temp, fp_out);
             if(temp)
                 g_free(temp);
         }
@@ -324,7 +394,7 @@ class StuffKeeper:Export:HTML from G:Object
                 int id = stuffkeeper_data_schema_get_id(self->_priv->cur_schema); 
                 temp = g_strdup_printf("%i", id);
             }
-            self_printout(&buffer[10], temp, fp_out);
+            self_printout(self,&buffer[10], temp, fp_out);
             if(temp)
                 g_free(temp);
         }  
@@ -333,7 +403,7 @@ class StuffKeeper:Export:HTML from G:Object
             gchar *temp = NULL;
             if(self->_priv->cur_item)
                 temp = stuffkeeper_data_item_get_title(self->_priv->cur_item);
-            self_printout(&buffer[11], temp, fp_out);
+            self_printout(self,&buffer[11], temp, fp_out);
             if(temp)
                 g_free(temp);
         }
@@ -345,7 +415,7 @@ class StuffKeeper:Export:HTML from G:Object
                 int id = stuffkeeper_data_item_get_id(self->_priv->cur_item); 
                 temp = g_strdup_printf("%i", id);
             }
-            self_printout(&buffer[8], temp, fp_out);
+            self_printout(self,&buffer[8], temp, fp_out);
             if(temp)
                 g_free(temp);
         }       
@@ -360,7 +430,7 @@ class StuffKeeper:Export:HTML from G:Object
                 {
                     StuffKeeperDataTag *tag = node->data;
                     gchar *title = stuffkeeper_data_tag_get_title(tag);
-                    found = self_printout(&buffer[10],title,fp_out);
+                    found = self_printout(self,&buffer[10],title,fp_out);
                     if(title)
                         g_free(title);
                 }
@@ -388,7 +458,7 @@ class StuffKeeper:Export:HTML from G:Object
                     {
                         StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                         gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
-                        self_printout(&buffer[10],temp,fp_out);
+                        self_printout(self,&buffer[10],temp,fp_out);
                         if(temp)
                             g_free(temp);
                     }
@@ -418,7 +488,7 @@ class StuffKeeper:Export:HTML from G:Object
                         int prev_i = i;
                         for(k=0; k < len && found;k++)
                         {
-                            found = self_printout(&buffer[i+1], retv[k], fp_out);
+                            found = self_printout(self,&buffer[i], retv[k], fp_out);
                             if(found)
                                 i = prev_i;
                         }
@@ -434,7 +504,7 @@ class StuffKeeper:Export:HTML from G:Object
                             {
                                 if(buffer[i]  == '%')
                                 {
-                                    gchar *esc = g_markup_escape_text(temp, -1); 
+                                    gchar *esc = self_escape(self, temp);//g_markup_escape_text(temp, -1); 
                                     int j =0;
                                     found = 1;
                                     fputs("images/", fp_out);
@@ -455,12 +525,15 @@ class StuffKeeper:Export:HTML from G:Object
                                         g_free(spath);
                                         g_free(dpath);
                                     }
+                                    /*
                                     for(j=0;esc[j];j++) {
                                         if(esc[j] == '\n') {
                                             fputs("<BR />", fp_out);
                                         } else
                                             fputc(esc[j], fp_out);
                                     }
+                                    */
+                                    fputs(esc,fp_out);
                                     g_free(esc);
 
                                 }
@@ -477,7 +550,6 @@ class StuffKeeper:Export:HTML from G:Object
                     else if (type == FIELD_TYPE_BOOLEAN)
                     {
                         int val = stuffkeeper_data_item_get_integer(self->_priv->cur_item, self->_priv->cur_field);
-                        i++;
                         for(; buffer[i] != '\0';i++)
                         { 
                             if(buffer[i]  == '%')
@@ -505,7 +577,7 @@ class StuffKeeper:Export:HTML from G:Object
                         }
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
-                        self_printout(&buffer[i+1],temp,fp_out);
+                        self_printout(self,&buffer[i],temp,fp_out);
                         if(temp)
                             g_free(temp);
                     }
