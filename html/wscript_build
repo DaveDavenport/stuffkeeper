@@ -2,6 +2,7 @@
 # encoding: utf-8
 # Qball Cow, 2008
 
-install_files('PACKAGE_DATADIR', 'html', 'index.template')
-install_files('PACKAGE_DATADIR', 'html', 'index-item.template')
+install_files('PACKAGE_DATADIR', 'templates', 'csv.template')
+install_files('PACKAGE_DATADIR', 'templates', 'index.template')
+install_files('PACKAGE_DATADIR', 'templates', 'index-item.template')
 

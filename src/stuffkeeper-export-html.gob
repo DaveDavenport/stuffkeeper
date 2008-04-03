@@ -14,8 +14,8 @@ requires 2.0.10
 
 %ph{
 #include "stuffkeeper-interface.h"
-#define PACKAGE_HTML_TEMPLATE_FULL "/html/index.template"
-#define PACKAGE_HTML_TEMPLATE "/html/index-item.template"
+#define PACKAGE_HTML_TEMPLATE_FULL "/templates/index.template"
+#define PACKAGE_HTML_TEMPLATE "/templates/index-item.template"
 
 
 typedef enum _EscapeType
