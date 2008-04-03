@@ -46,6 +46,12 @@ extern GList *interface_list;
         LP_AMOUNT,
         LP_NUM_ROWS
     } LPColumnType;
+
+    typedef enum _LPType {
+        LP_TYPE_TAG,
+        LP_TYPE_SCHEMA,
+        LP_TYPE_SEARCH
+    }LPType;
 %}
 
 class StuffKeeper:Interface from G:Object 
@@ -530,12 +536,12 @@ class StuffKeeper:Interface from G:Object
             int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
             GtkTreeIter iter;
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
-            if(type == 2)
+            if(type == LP_TYPE_SEARCH)
             {
                 gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
                 if(value == FALSE)
                 {
-                        gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->cb_search), 0);
+                    gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->cb_search), 0);
                 }else{
                     GtkTreeIter iter;
                     if(gtk_tree_model_get_iter_from_string(model, &iter, path))
@@ -675,7 +681,11 @@ class StuffKeeper:Interface from G:Object
         GtkTreeModel *model2 = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
         GtkTreeIter piter;
         GtkTreeIter iter;
-        if(gtk_tree_model_get_iter_first(model2, &piter))
+        /**
+         * Left pane selection filtering
+         * Only when search type is not filter
+         */
+        if(gtk_tree_model_get_iter_first(model2, &piter) && type != LP_TYPE_SEARCH)
         {
             int found = -1;
             do{
@@ -686,19 +696,19 @@ class StuffKeeper:Interface from G:Object
 
                 if(sel && tag)
                 {
-                    if(type == 0 && !stuffkeeper_data_item_has_tag(item, STUFFKEEPER_DATA_TAG(tag)))
+                    if(type == LP_TYPE_TAG && !stuffkeeper_data_item_has_tag(item, STUFFKEEPER_DATA_TAG(tag)))
                     {
                         return FALSE;
                     }
                     /* if viewing types, and it matches mark found */
-                    else if (type == 1 && 
+                    else if (type == LP_TYPE_SCHEMA && 
                              stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) == 
                              stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
                     {
                         found = 1;
                     }
                     /* set that there are items selected */
-                    else if (type == 1 && found == -1)
+                    else if (type == LP_TYPE_SCHEMA && found == -1)
                     {
                         found = 0;
                     }
@@ -706,16 +716,18 @@ class StuffKeeper:Interface from G:Object
 
             }while(gtk_tree_model_iter_next(model2, &piter));
             /* if viewing types and no selected item matches return FALSE */
-            if(type == 1 && found == 0)
+            if(type == LP_TYPE_SCHEMA && found == 0)
             {
                 return FALSE;
             }
         }
-
+        /**
+         * Execute filter 
+         */
         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
         {
             StuffKeeperDataItemSearch *search;
-            gtk_tree_model_get(self->_priv->model_searches, &iter, 3, &search, -1);
+            gtk_tree_model_get(self->_priv->model_searches, &iter, LP_ITEM, &search, -1);
             if(search)
             {
                 if(!stuffkeeper_data_item_search_match(search, item))
@@ -724,7 +736,9 @@ class StuffKeeper:Interface from G:Object
                 }
             }
         }
-
+        /**
+         * Search box 
+         */
         if(strlen(text) > 0)
         {
             return stuffkeeper_data_item_has_value(item,text); 
@@ -1054,7 +1068,7 @@ class StuffKeeper:Interface from G:Object
             /* Create menu */
             menu = gtk_menu_new();
 
-            if(type == 0)
+            if(type == LP_TYPE_TAG)
             {
                 /* Add tag */
                 menu_item = gtk_image_menu_item_new_with_label("New tag");
@@ -1081,7 +1095,7 @@ class StuffKeeper:Interface from G:Object
                 }
 
             }
-            else if (type == 1) 
+            else if (type == LP_TYPE_SCHEMA) 
             {
                 /* Add item */
                 menu_item = gtk_image_menu_item_new_with_label("New type");
@@ -1112,7 +1126,7 @@ class StuffKeeper:Interface from G:Object
 
                 }
 
-            } else if (type == 2)
+            } else if (type == LP_TYPE_SEARCH)
             {
                 /* Add item */
                 menu_item = gtk_image_menu_item_new_with_label("New filter");
@@ -2113,37 +2127,10 @@ class StuffKeeper:Interface from G:Object
           }
       }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         private
         void
         treeview1_selection_changed(self, GtkTreeSelection *selection)
         {
-            int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
-            if(type == 2)
-            {
-
-            }
         }
         /**
          * Sorting
