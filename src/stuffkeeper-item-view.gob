@@ -177,11 +177,13 @@ class StuffKeeper:Item:View from Gtk:VBox
                 /* add them together */
                 gtk_container_add(GTK_CONTAINER(event), vbox);
                 gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), event);
+                gtk_container_set_focus_vadjustment(GTK_CONTAINER(vbox), gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(sw)));
                 gtk_box_pack_start(GTK_BOX(self),sw, TRUE,TRUE, 0);
             }
 
             return GTK_WIDGET(self);
         }
+ 
         /**
      * Destroying
      */
