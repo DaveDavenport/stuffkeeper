@@ -119,7 +119,7 @@ class StuffKeeper:Data:Text from Gtk:Text:View
 
 
         gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj), GTK_WRAP_WORD);
-
+        gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(obj), FALSE);
 
 
 
