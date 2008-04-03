@@ -37,6 +37,15 @@ extern GList *interface_list;
         "\nTester:",
         "Greg Fitzgerald",
     NULL};
+
+    typedef enum _LPColumnType{
+        LP_ID, 
+        LP_TITLE,
+        LP_SELECTED,
+        LP_ITEM,
+        LP_AMOUNT,
+        LP_NUM_ROWS
+    } LPColumnType;
 %}
 
 class StuffKeeper:Interface from G:Object 
@@ -118,7 +127,9 @@ class StuffKeeper:Interface from G:Object
                     if(oid == id)
                     {
                         gchar *title = stuffkeeper_data_item_search_get_title(search);
-                        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1,title,-1);
+                        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+                            LP_TITLE,title,
+                            -1);
                         g_free(title);
                     }
                 }while(gtk_tree_model_iter_next(model, &iter));
@@ -135,9 +146,9 @@ class StuffKeeper:Interface from G:Object
         gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_searches), &iter);
         gchar *title = stuffkeeper_data_item_search_get_title(search);
         gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_searches), &iter, 
-                0, stuffkeeper_data_item_search_get_id(search),
-                1, title,
-                3, search,
+                LP_ID, stuffkeeper_data_item_search_get_id(search),
+                LP_TITLE, title,
+                LP_ITEM, search,
                 -1);
         g_free(title);
     }
@@ -151,7 +162,7 @@ class StuffKeeper:Interface from G:Object
         {
             do{
                 gint oid;
-                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
                 if(oid == id)
                 {
                     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
@@ -174,10 +185,10 @@ class StuffKeeper:Interface from G:Object
         gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_schemas), &iter);
         gchar *title = stuffkeeper_data_schema_get_title(schema);
         gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_schemas), &iter, 
-                    0, stuffkeeper_data_schema_get_id(schema),
-                    1, title,
-                    3, schema,
-                    4, stuffkeeper_data_schema_num_items(schema),-1);
+                    LP_ID, stuffkeeper_data_schema_get_id(schema),
+                    LP_TITLE, title,
+                    LP_ITEM, schema,
+                    LP_AMOUNT, stuffkeeper_data_schema_num_items(schema),-1);
 
 
         g_free(title);
@@ -193,11 +204,14 @@ class StuffKeeper:Interface from G:Object
         {
             do{
                 gint oid;
-                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_schema_get_title(schema);
-                    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 1,title, 4, stuffkeeper_data_schema_num_items(schema),-1);
+                    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+                        LP_TITLE,title, 
+                        LP_AMOUNT, stuffkeeper_data_schema_num_items(schema),
+                        -1);
                     g_free(title);
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
@@ -229,7 +243,7 @@ class StuffKeeper:Interface from G:Object
         {
             do{
                 gint oid;
-                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
                 if(oid == id)
                 {
                     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
@@ -250,10 +264,10 @@ class StuffKeeper:Interface from G:Object
         gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_tag_get_title(tag);
         gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
-                    0, stuffkeeper_data_tag_get_id(tag),
-                    1,title,
-                    3,tag, 
-                    4, stuffkeeper_data_tag_num_items(tag),
+                    LP_ID, stuffkeeper_data_tag_get_id(tag),
+                    LP_TITLE,title,
+                    LP_ITEM,tag, 
+                    LP_AMOUNT, stuffkeeper_data_tag_num_items(tag),
                     -1);
         g_free(title);
     }
@@ -268,13 +282,13 @@ class StuffKeeper:Interface from G:Object
         {
             do{
                 gint oid;
-                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
                 if(oid == id)
                 {
                     gchar *title = stuffkeeper_data_tag_get_title(tag);
                     gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
-                            1,title, 
-                            4, stuffkeeper_data_tag_num_items(tag),
+                            LP_TITLE,title, 
+                            LP_AMOUNT, stuffkeeper_data_tag_num_items(tag),
                             -1);
                     g_free(title);
                     return;
@@ -292,7 +306,7 @@ class StuffKeeper:Interface from G:Object
         {
             do{
                 gint oid;
-                gtk_tree_model_get(model, &iter, 0, &oid, -1);
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
                 if(oid == id)
                 {
                     gtk_list_store_remove(store, &iter);
@@ -316,9 +330,6 @@ class StuffKeeper:Interface from G:Object
         gchar *data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb)-1);
         gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
         g_free(data);
-
-
-
 
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
@@ -538,7 +549,7 @@ class StuffKeeper:Interface from G:Object
                 if(gtk_tree_model_get_iter_from_string(model, &iter, path))
                 {
                     gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
-                    gtk_list_store_set(GTK_LIST_STORE(model), &iter, 2,value,-1);
+                    gtk_list_store_set(GTK_LIST_STORE(model), &iter, LP_SELECTED,value,-1);
 
                     /* refilter the items list */
                     gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
@@ -567,7 +578,6 @@ class StuffKeeper:Interface from G:Object
                 {
                     stuffkeeper_data_item_set_title(item, new_text);
                 }
-
             }
         }
 
@@ -587,7 +597,7 @@ class StuffKeeper:Interface from G:Object
             {
                 GObject *item;
 
-                gtk_tree_model_get(model, &iter ,3,&item, -1);
+                gtk_tree_model_get(model, &iter ,LP_ITEM,&item, -1);
 
                 if(STUFFKEEPER_IS_DATA_TAG(item)) {
                     stuffkeeper_data_tag_set_title(STUFFKEEPER_DATA_TAG(item), new_text);
@@ -596,8 +606,6 @@ class StuffKeeper:Interface from G:Object
                }else if (STUFFKEEPER_IS_DATA_ITEM_SEARCH(item)){
                    stuffkeeper_data_item_search_set_title(STUFFKEEPER_DATA_ITEM_SEARCH(item), new_text);
                 }
-                
-
             }
         }
     /**
@@ -633,13 +641,14 @@ class StuffKeeper:Interface from G:Object
         interface_list = g_list_append(interface_list, ski);
         stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg);
     }
-
+/*
     public
     gboolean
     item_is_visible(self,StuffKeeperDataItem *item)
     {
         return self_interface_visible_func_real(self, item);
     }
+*/
     /**
      * Filtering the item list
      */
@@ -655,78 +664,73 @@ class StuffKeeper:Interface from G:Object
             if(!item) {
                 return FALSE;
             }
-            return self_interface_visible_func_real(self, item);
+            return self_item_is_visible(self, item);
         }
-    private
+    public
     gboolean
-    interface_visible_func_real(self, StuffKeeperDataItem *item)
+    item_is_visible(self, StuffKeeperDataItem *item)
     {
-
         int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->search_entry));
         GtkTreeModel *model2 = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
         GtkTreeIter piter;
-            if(gtk_tree_model_get_iter_first(model2, &piter))
-            {
-                int found = -1;
-                do{
-                    GObject *tag;
-                    gboolean sel;
-                    /* get the tag, and if it is selected */
-                    gtk_tree_model_get(model2, &piter,2,&sel, 3,&tag, -1);
+        GtkTreeIter iter;
+        if(gtk_tree_model_get_iter_first(model2, &piter))
+        {
+            int found = -1;
+            do{
+                GObject *tag;
+                gboolean sel;
+                /* get the tag, and if it is selected */
+                gtk_tree_model_get(model2, &piter,LP_SELECTED,&sel, LP_ITEM,&tag, -1);
 
-                    if(sel && tag)
+                if(sel && tag)
+                {
+                    if(type == 0 && !stuffkeeper_data_item_has_tag(item, STUFFKEEPER_DATA_TAG(tag)))
                     {
-                        if(type == 0 && !stuffkeeper_data_item_has_tag(item, STUFFKEEPER_DATA_TAG(tag)))
-                        {
-                            return FALSE;
-                        }
-                        /* if viewing types, and it matches mark found */
-                        else if (type == 1 && 
-                            stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) == 
-                            stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
-                        {
-                            found = 1;
-                        }
-                        /* set that there are items selected */
-                        else if (type == 1 && found == -1)
-                        {
-                            found = 0;
-                        }
+                        return FALSE;
                     }
+                    /* if viewing types, and it matches mark found */
+                    else if (type == 1 && 
+                             stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)) == 
+                             stuffkeeper_data_schema_get_id(STUFFKEEPER_DATA_SCHEMA(tag)))
+                    {
+                        found = 1;
+                    }
+                    /* set that there are items selected */
+                    else if (type == 1 && found == -1)
+                    {
+                        found = 0;
+                    }
+                }
 
-                }while(gtk_tree_model_iter_next(model2, &piter));
-                /* if viewing types and no selected item matches return FALSE */
-                if(type == 1 && found == 0)
+            }while(gtk_tree_model_iter_next(model2, &piter));
+            /* if viewing types and no selected item matches return FALSE */
+            if(type == 1 && found == 0)
+            {
+                return FALSE;
+            }
+        }
+
+        if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
+        {
+            StuffKeeperDataItemSearch *search;
+            gtk_tree_model_get(self->_priv->model_searches, &iter, 3, &search, -1);
+            if(search)
+            {
+                if(!stuffkeeper_data_item_search_match(search, item))
                 {
                     return FALSE;
                 }
             }
-            {
-                GtkTreeIter iter;
-                if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
-                {
-                    StuffKeeperDataItemSearch *search;
-                    gtk_tree_model_get(self->_priv->model_searches, &iter, 3, &search, -1);
-                    if(search)
-                    {
-                        if(!stuffkeeper_data_item_search_match(search, item))
-                        {
-                            return FALSE;
-                        }
-                    }
-                }
-
-
-            }
-
-            if(strlen(text) > 0)
-            {
-                return stuffkeeper_data_item_has_value(item,text); 
-
-            }
-            return TRUE;
         }
+
+        if(strlen(text) > 0)
+        {
+            return stuffkeeper_data_item_has_value(item,text); 
+        }
+        return TRUE;
+    }
     private
     gboolean
     search_entry_changed_timeout(self)
