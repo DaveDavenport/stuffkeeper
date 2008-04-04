@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define DB_VERSION 0.02
+#define DB_VERSION 0.03
 %}
 
 
@@ -962,11 +962,16 @@ class StuffKeeper:Data:Backend from G:Object
                         sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemFields(ItemId);", NULL, NULL, NULL);
                         sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
                     }
+                    if(version <= 0.02)
+                    {
+                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON Items(ItemId);", NULL, NULL, NULL);
+                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
+
+                    }
 
                     query = sqlite3_mprintf( "UPDATE 'General' SET value=%f WHERE key='Version'",DB_VERSION); 
                     sqlite3_exec(self->_priv->sqlHandle,query, NULL, NULL, NULL);
                     g_free(query);
-
                 }
 
             }
