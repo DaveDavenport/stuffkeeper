@@ -971,7 +971,7 @@ class StuffKeeper:Data:Backend from G:Object
 
                     query = sqlite3_mprintf( "UPDATE 'General' SET value=%f WHERE key='Version'",DB_VERSION); 
                     sqlite3_exec(self->_priv->sqlHandle,query, NULL, NULL, NULL);
-                    g_free(query);
+                    sqlite3_free(query);
                 }
 
             }
