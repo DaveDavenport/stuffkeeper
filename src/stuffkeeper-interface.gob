@@ -2027,15 +2027,6 @@ class StuffKeeper:Interface from G:Object
          * HTML Export 
          */
         /* Export the whole db */
-        /*
-        public
-        void
-        export_to_csv(self)
-        {
-            stuffkeeper_export_csv_new(STUFFKEEPER_DATA_BACKEND(self->_priv->skdbg),GTK_LIST_STORE(self->_priv->model_schemas));
-        }
-        */
-
         public
         void
         export_to_html(self)
@@ -2126,17 +2117,17 @@ class StuffKeeper:Interface from G:Object
                 stuffkeeper_data_backend_remove_search(self->_priv->skdbg, id);
             }
         }
-      public
-      void
-      edit_search_menu(self,GtkWidget *menu_item)
-      {
-          StuffKeeperDataItemSearch *search;
-          search = g_object_get_data(G_OBJECT(menu_item), "search");
-          if(search)
-          {
-              stuffkeeper_data_item_search_edit_search_gui(search);
-          }
-      }
+        public
+        void
+        edit_search_menu(self,GtkWidget *menu_item)
+        {
+            StuffKeeperDataItemSearch *search;
+            search = g_object_get_data(G_OBJECT(menu_item), "search");
+            if(search)
+            {
+                stuffkeeper_data_item_search_edit_search_gui(search);
+            }
+        }
 
         private
         void
