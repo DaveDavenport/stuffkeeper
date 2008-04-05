@@ -735,6 +735,11 @@ class StuffKeeper:Data:Backend from G:Object
     void
     check_sqlite_db(self)
     {
+        char *query;
+        const char *tail;
+        int r;
+        sqlite3_stmt *stmt;
+
         /* available tables */
         gboolean has_general    = FALSE;
         gboolean has_tags       = FALSE;
@@ -749,7 +754,6 @@ class StuffKeeper:Data:Backend from G:Object
         char *error = NULL;
         char **resultp = NULL;
         int rows, columns;
-        char *query = NULL;
         double version = 0.0;
 
         /* Check what tables exists */
@@ -804,10 +808,10 @@ class StuffKeeper:Data:Backend from G:Object
             }
             sqlite3_free(query);
         }
-       
-       
-       
-       
+
+
+
+
 
         if(G_UNLIKELY(!has_tags)) {
             debug_printf("Create Tags table\n");
@@ -928,54 +932,48 @@ class StuffKeeper:Data:Backend from G:Object
         /**
          * Version
          */
+        query = sqlite3_mprintf("SELECT value FROM 'General' WHERE key='Version'");
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        sqlite3_free(query);
+        if (r != SQLITE_OK)
         {
-            char *query;
-            const char *tail;
-            int r;
-            sqlite3_stmt *stmt;
-            query = sqlite3_mprintf("SELECT value FROM 'General' WHERE key='Version'");
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
-            sqlite3_free(query);
-            if (r != SQLITE_OK)
+            debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        else
+        {
+            debug_printf("stepping through rows\n");
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
-                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+                version = sqlite3_column_double(stmt, 0); 
             }
-            else
+        }
+        sqlite3_finalize(stmt);
+        if(version >= 0.0)
+        {
+            printf("Current db version is: %lf\n",version);
+            if(version != DB_VERSION )
             {
-                debug_printf("stepping through rows\n");
-                if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+                printf("New DB version: %f->%f\n", version, DB_VERSION);
+                if(version <= 0.01)
                 {
-                    version = sqlite3_column_double(stmt, 0); 
+                    printf("Adding indexes\n");
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON SchemasFields(SchemaId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemFields(ItemId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
                 }
-            }
-            sqlite3_finalize(stmt);
-            if(version >= 0.0)
-            {
-                printf("Current db version is: %lf\n",version);
-                if(version != DB_VERSION )
+                if(version <= 0.02)
                 {
-                    printf("New DB version: %f->%f\n", version, DB_VERSION);
-                    if(version <= 0.01)
-                    {
-                        printf("Adding indexes\n");
-                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON SchemasFields(SchemaId);", NULL, NULL, NULL);
-                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemFields(ItemId);", NULL, NULL, NULL);
-                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
-                    }
-                    if(version <= 0.02)
-                    {
-                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON Items(ItemId);", NULL, NULL, NULL);
-                        sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON Items(ItemId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
 
-                    }
-
-                    query = sqlite3_mprintf( "UPDATE 'General' SET value=%f WHERE key='Version'",DB_VERSION); 
-                    sqlite3_exec(self->_priv->sqlHandle,query, NULL, NULL, NULL);
-                    sqlite3_free(query);
                 }
 
+                query = sqlite3_mprintf( "UPDATE 'General' SET value=%f WHERE key='Version'",DB_VERSION); 
+                sqlite3_exec(self->_priv->sqlHandle,query, NULL, NULL, NULL);
+                sqlite3_free(query);
             }
 
         }
+
     }
 }
