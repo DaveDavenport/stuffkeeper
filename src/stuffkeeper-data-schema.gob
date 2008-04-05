@@ -29,22 +29,25 @@ requires 2.0.10
         FIELD_TYPE_LINK = 7,
         FIELD_TYPE_DATE = 8,
         FIELD_TYPE_EXPANDER = 9,
+        FIELD_TYPE_END_EXPANDER = 10,
         FIELD_TYPE_NUM_FIELDS
     } FieldType;
     extern char *FieldNames[FIELD_TYPE_NUM_FIELDS];
 %}
 %ph{
         char *FieldNames[FIELD_TYPE_NUM_FIELDS] = {
-        "String",   // FIELD_TYPE_STRING
-        "Integer",  // FIELD_TYPE_INTEGER
-        "Boolean",  // FIELD_TYPE_BOOLEAN
-        "Slider",   // FIELD_TYPE_RATING
-        "List",     // FIELD_TYPE_LIST
-        "Text",     // FIELD_TYPE_TEXT
-        "Image",     // FIELD_TYPE_IMAGE
-        "Link",     // FIELD_TYPE_LINK
-        "Date & Time",     // FIELD_TYPE_DATE
-        "Expander", //FIELD_TYPE_EXPANDER
+        "String",       // FIELD_TYPE_STRING
+        "Integer",      // FIELD_TYPE_INTEGER
+        "Boolean",      // FIELD_TYPE_BOOLEAN
+        "Slider",       // FIELD_TYPE_RATING
+        "List",         // FIELD_TYPE_LIST
+        "Text",         // FIELD_TYPE_TEXT
+        "Image",        // FIELD_TYPE_IMAGE
+        "Link",         // FIELD_TYPE_LINK
+        "Date & Time",  // FIELD_TYPE_DATE
+        "Expander",     //FIELD_TYPE_EXPANDER
+        "End expander", //FIELD_TYPE_END_EXPANDER
+
     };
 
     typedef struct _a { char *id; int pos; }a;

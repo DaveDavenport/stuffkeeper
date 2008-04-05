@@ -56,17 +56,16 @@ class StuffKeeper:Show:Item from Gtk:VBox
         for(i=0;i<self->_priv->length;i++) 
         {
             FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
-
+            label1 = NULL;
             reuse = TRUE;
             if(last_type != FIELD_TYPE_BOOLEAN || last_type != type) {
                 reuse = FALSE;
                 hbox = gtk_hbox_new(FALSE, 6);
             }
             /* Title */
-            if(type != FIELD_TYPE_EXPANDER)
+            if(type != FIELD_TYPE_EXPANDER && type != FIELD_TYPE_END_EXPANDER)
             {
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
-
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
                 gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
                 gtk_size_group_add_widget(self->_priv->group, label1);
@@ -99,10 +98,14 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 label1 = stuffkeeper_data_expander_new(self->_priv->item,self->_priv->retv[i]);                    
                 sub_part = gtk_vbox_new(FALSE, 6);
                 gtk_container_add(GTK_CONTAINER(label1), sub_part);
+            }else if (type == FIELD_TYPE_END_EXPANDER) {
+                label1 = NULL; 
+                sub_part = NULL;
             }else {
                 label1 = gtk_label_new("not supported\n");
             }
-            gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
+            if(label1)
+                gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
             if(!reuse)
             {
                 if(sub_part && type != FIELD_TYPE_EXPANDER)
