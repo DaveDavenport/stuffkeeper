@@ -41,8 +41,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
         GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
 
         /* removing old widgets */
-        for(node =list; node; node = g_list_next(node))
-        {
+        for(node =list; node; node = g_list_next(node)) {
             gtk_widget_destroy(GTK_WIDGET(node->data));
         }
         g_list_free(list);
@@ -52,13 +51,12 @@ class StuffKeeper:Show:Item from Gtk:VBox
             g_object_unref(self->_priv->group);
         self->_priv->group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
-        for(i=0;i<self->_priv->length;i++)                                                                             
+        for(i=0;i<self->_priv->length;i++) 
         {
             FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
 
             reuse = TRUE;
-            if(last_type != FIELD_TYPE_BOOLEAN || last_type != type)
-            {
+            if(last_type != FIELD_TYPE_BOOLEAN || last_type != type) {
                 reuse = FALSE;
                 hbox = gtk_hbox_new(FALSE, 6);
             }
@@ -123,7 +121,6 @@ class StuffKeeper:Show:Item from Gtk:VBox
         if(self->_priv->retv)
             g_strfreev(self->_priv->retv);
         self->_priv->length = 0;
-
         /* get new fields */
         self->_priv->retv = stuffkeeper_data_schema_get_fields(schema, &(self->_priv->length));
         /* reload */
@@ -137,7 +134,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
     new(StuffKeeper:Data:Item *item)
     {
         Self *self = GET_NEW;
-
+        gtk_box_set_spacing(GTK_BOX(self), 6);
         /* Get the schema  */
         self->_priv->schema = stuffkeeper_data_item_get_schema(item);
         /* Get the item */
@@ -157,10 +154,8 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 G_CALLBACK(self_field_changed),
                 self);
 
-
         /* update */
         self_field_changed(self, NULL, self->_priv->schema);
-
         return GTK_WIDGET(self);
     }
 
@@ -172,19 +167,15 @@ class StuffKeeper:Show:Item from Gtk:VBox
     finalize(G:Object *obj)
     {
         Self *self = SELF(obj);
-        debug_printf("Cleanup item view\n");
-        if(self->_priv->schema_field_added)
-        {
+        if(self->_priv->schema_field_added) {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_added);
             self->_priv->schema_field_added = 0;
         }
-        if(self->_priv->schema_field_removed)
-        {
+        if(self->_priv->schema_field_removed) {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_removed);
             self->_priv->schema_field_removed = 0;
         }
-        if(self->_priv->schema_field_changed)
-        {
+        if(self->_priv->schema_field_changed) {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_changed);
             self->_priv->schema_field_changed = 0;
         }
