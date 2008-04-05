@@ -16,12 +16,9 @@ requires 2.0.10
 #include "stuffkeeper-data-link.h"
 #include "stuffkeeper-data-date.h"
 #include "stuffkeeper-data-taglist2.h"
-
-
-
 %}
 
-class StuffKeeper:Show:Item from Gtk:Table
+class StuffKeeper:Show:Item from Gtk:VBox
 {
     private StuffKeeperDataSchema *schema = {NULL};
     private StuffKeeperDataItem *item = {NULL};
@@ -33,149 +30,163 @@ class StuffKeeper:Show:Item from Gtk:Table
     private guint schema_field_removed = 0;
 
     private guint schema_field_changed = 0;
+    private GtkSizeGroup *group = {NULL} destroywith g_object_unref;
 
-    public
-        void
-        reload_data(self)
+    private
+    void
+    reload_data(self)
+    {
+        int i,last_type = -1, reuse = FALSE;
+        GtkWidget *label1,*hbox = NULL;
+        GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
+
+        /* removing old widgets */
+        for(node =list; node; node = g_list_next(node))
         {
-            int i;
-            GtkWidget *label1;
-            GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
-            for(node =list; node; node = g_list_next(node))
+            gtk_widget_destroy(GTK_WIDGET(node->data));
+        }
+        g_list_free(list);
+
+        /* group */
+        if(self->_priv->group)
+            g_object_unref(self->_priv->group);
+        self->_priv->group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
+
+        for(i=0;i<self->_priv->length;i++)                                                                             
+        {
+            FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
+
+            reuse = TRUE;
+            if(last_type != FIELD_TYPE_BOOLEAN || last_type != type)
             {
-                gtk_widget_destroy(GTK_WIDGET(node->data));
-            }
-            g_list_free(list);
-            /** now fill it again */
-            gtk_table_resize(GTK_TABLE(self),self->_priv->length+1,2); 
-
-            for(i=0;i<self->_priv->length;i++)                                                                             
-            {
-
-                FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
-                /* Title */
-                label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
-
-                gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
-                gtk_table_attach(GTK_TABLE(self), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
-
-                if(type == FIELD_TYPE_STRING)
-                {
-                    label1 = stuffkeeper_data_entry_new(self->_priv->item,self->_priv->retv[i]);
-                }
-                else if (type == FIELD_TYPE_INTEGER)
-                {
-                    label1 = stuffkeeper_data_spinbutton_new(self->_priv->item,self->_priv->retv[i]);
-                }else if (type == FIELD_TYPE_BOOLEAN) {
-                    label1 = stuffkeeper_data_boolean_new(self->_priv->item,self->_priv->retv[i]);
-                }else if (type == FIELD_TYPE_RATING) {
-                    label1 = stuffkeeper_data_rating_new(self->_priv->item,self->_priv->retv[i]);
-                }else if (type == FIELD_TYPE_LIST) {
-                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
-                    label1 = stuffkeeper_data_list_new(self->_priv->item,self->_priv->retv[i]);
-                }else if (type == FIELD_TYPE_TEXT) {
-                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
-                    label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
-                }else if (type == FIELD_TYPE_IMAGE) {
-                    gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
-                    label1 = stuffkeeper_data_image_new(self->_priv->item,self->_priv->retv[i]);                    
-                }else if (type == FIELD_TYPE_LINK) {
-                    label1 = stuffkeeper_data_link_new(self->_priv->item,self->_priv->retv[i]);                    
-                }else if (type == FIELD_TYPE_DATE) {
-                    label1 = stuffkeeper_data_date_new(self->_priv->item,self->_priv->retv[i]);                    
-                }else {
-                    label1 = gtk_label_new("not supported\n");
-                }
-                gtk_table_attach(GTK_TABLE(self), label1, 1,2,i,i+1,GTK_EXPAND|GTK_FILL, GTK_FILL, 0,0);
+                reuse = FALSE;
+                hbox = gtk_hbox_new(FALSE, 6);
             }
             /* Title */
-            label1 = gtk_label_new("");
-            gtk_label_set_markup(GTK_LABEL(label1),_("<b>Tags</b>"));
-            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
-            gtk_table_attach(GTK_TABLE(self), label1, 0,1,i,i+1,GTK_SHRINK|GTK_FILL, GTK_FILL, 0,0);
-            label1 =stuffkeeper_data_taglist2_new(self->_priv->item); 
-            gtk_table_attach(GTK_TABLE(self), label1, 1,2,i,i+1,GTK_EXPAND|GTK_FILL, GTK_FILL, 0,0);
+            label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
 
-            gtk_widget_show_all(GTK_WIDGET(self));
+            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+            gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
+            gtk_size_group_add_widget(self->_priv->group, label1);
+            if(type == FIELD_TYPE_STRING) {
+                label1 = stuffkeeper_data_entry_new(self->_priv->item,self->_priv->retv[i]);
+            } else if (type == FIELD_TYPE_INTEGER) {
+                label1 = stuffkeeper_data_spinbutton_new(self->_priv->item,self->_priv->retv[i]);
+            }else if (type == FIELD_TYPE_BOOLEAN) {
+                label1 = stuffkeeper_data_boolean_new(self->_priv->item,self->_priv->retv[i]);
+                /* reset */
+                if(reuse)
+                    type = -1;
+            }else if (type == FIELD_TYPE_RATING) {
+                label1 = stuffkeeper_data_rating_new(self->_priv->item,self->_priv->retv[i]);
+            }else if (type == FIELD_TYPE_LIST) {
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
+                label1 = stuffkeeper_data_list_new(self->_priv->item,self->_priv->retv[i]);
+            }else if (type == FIELD_TYPE_TEXT) {
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
+                label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
+            }else if (type == FIELD_TYPE_IMAGE) {
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
+                label1 = stuffkeeper_data_image_new(self->_priv->item,self->_priv->retv[i]);                    
+            }else if (type == FIELD_TYPE_LINK) {
+                label1 = stuffkeeper_data_link_new(self->_priv->item,self->_priv->retv[i]);                    
+            }else if (type == FIELD_TYPE_DATE) {
+                label1 = stuffkeeper_data_date_new(self->_priv->item,self->_priv->retv[i]);                    
+            }else {
+                label1 = gtk_label_new("not supported\n");
+            }
+            gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
+            if(!reuse)
+                gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
+            last_type = type;
         }
+        /* Title */
+        hbox = gtk_hbox_new(FALSE, 6);
+        label1 = gtk_label_new("");
+        gtk_label_set_markup(GTK_LABEL(label1),_("<b>Tags</b>"));
+        gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+        gtk_size_group_add_widget(self->_priv->group, label1);
+        gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
+        /* Tag list */
+        label1 =stuffkeeper_data_taglist2_new(self->_priv->item); 
+        gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
+
+        gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
+        gtk_widget_show_all(GTK_WIDGET(self));
+    }
 
     public
-        void
-        field_changed(self, const gchar *id, StuffKeeperDataSchema *schema)
-        {
-            /* free old values */
-            if(self->_priv->retv)
-                g_strfreev(self->_priv->retv);
-            self->_priv->length = 0;
+    void
+    field_changed(self, const gchar *id, StuffKeeperDataSchema *schema)
+    {
+        /* free old values */
+        if(self->_priv->retv)
+            g_strfreev(self->_priv->retv);
+        self->_priv->length = 0;
 
-            /* get new fields */
-            self->_priv->retv = stuffkeeper_data_schema_get_fields(schema, &(self->_priv->length));
-            /* reload */
-            self_reload_data(self);
-        }
+        /* get new fields */
+        self->_priv->retv = stuffkeeper_data_schema_get_fields(schema, &(self->_priv->length));
+        /* reload */
+        self_reload_data(self);
+    }
     /**
      * Get the widget 
      */
     public
-        Gtk:Widget * 
-        new(StuffKeeper:Data:Item *item)
+    Gtk:Widget * 
+    new(StuffKeeper:Data:Item *item)
+    {
+        Self *self = GET_NEW;
+
+        /* Get the schema  */
+        self->_priv->schema = stuffkeeper_data_item_get_schema(item);
+        /* Get the item */
+        self->_priv->item = item;
+        /* Signals */
+        self->_priv->schema_field_added =   g_signal_connect_swapped(G_OBJECT(self->_priv->schema),  
+                "schema-field-added",
+                G_CALLBACK(self_field_changed),
+                self);
+        self->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(self->_priv->schema),
+                "schema-field-removed",
+                G_CALLBACK(self_field_changed),
+                self);
+
+        self->_priv->schema_field_changed= g_signal_connect_swapped(G_OBJECT(self->_priv->schema),
+                "schema-field-changed",
+                G_CALLBACK(self_field_changed),
+                self);
+
+
+        /* update */
+        self_field_changed(self, NULL, self->_priv->schema);
+
+        return GTK_WIDGET(self);
+    }
+
+    /**
+     * Destroying
+     */
+    override (G:Object)
+    void
+    finalize(G:Object *obj)
+    {
+        Self *self = SELF(obj);
+        debug_printf("Cleanup item view\n");
+        if(self->_priv->schema_field_added)
         {
-            Self *self = GET_NEW;
-
-            /* Get the schema  */
-            self->_priv->schema = stuffkeeper_data_item_get_schema(item);
-            /* Get the item */
-            self->_priv->item = item;
-            /* Signals */
-            self->_priv->schema_field_added =   g_signal_connect_swapped(G_OBJECT(self->_priv->schema),  
-                    "schema-field-added",
-                    G_CALLBACK(self_field_changed),
-                    self);
-            self->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(self->_priv->schema),
-                    "schema-field-removed",
-                    G_CALLBACK(self_field_changed),
-                    self);
-
-            self->_priv->schema_field_changed= g_signal_connect_swapped(G_OBJECT(self->_priv->schema),
-                    "schema-field-changed",
-                    G_CALLBACK(self_field_changed),
-                    self);
-
-
-
-
-
-
-
-            /* update */
-            self_field_changed(self, NULL, self->_priv->schema);
-
-            return GTK_WIDGET(self);
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_added);
+            self->_priv->schema_field_added = 0;
         }
-
-        /**
-         * Destroying
-         */
-         override (G:Object)
-         void
-         finalize(G:Object *obj)
-         {
-            Self *self = SELF(obj);
-            debug_printf("Cleanup item view\n");
-            if(self->_priv->schema_field_added)
-            {
-                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_added);
-                self->_priv->schema_field_added = 0;
-            }
-            if(self->_priv->schema_field_removed)
-            {
-                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_removed);
-                self->_priv->schema_field_removed = 0;
-            }
-            if(self->_priv->schema_field_changed)
-            {
-                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_changed);
-                self->_priv->schema_field_changed = 0;
-            }
-         }
+        if(self->_priv->schema_field_removed)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_removed);
+            self->_priv->schema_field_removed = 0;
+        }
+        if(self->_priv->schema_field_changed)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_changed);
+            self->_priv->schema_field_changed = 0;
+        }
+    }
 }
