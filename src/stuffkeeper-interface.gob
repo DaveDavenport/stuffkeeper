@@ -116,6 +116,27 @@ class StuffKeeper:Interface from G:Object
     private int item_sort_column = {3};
     private int item_sort_order = {GTK_SORT_DESCENDING};
     /**
+     */
+    private
+    void
+    filter_model_row_inserted(self, GtkTreePath *path, GtkTreeIter *iter, GtkTreeModel  *model)
+    {
+        int num_items = gtk_tree_model_iter_n_children(self->_priv->model_items_filter, NULL);
+        gchar *data = g_strdup_printf("%i", num_items); 
+        gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
+        g_free(data);
+    }
+
+    private
+    void
+    filter_model_row_deleted(self, GtkTreePath *path, GtkTreeModel *model)
+    {
+        int num_items = gtk_tree_model_iter_n_children(self->_priv->model_items_filter, NULL);
+        gchar *data = g_strdup_printf("%i", num_items); 
+        gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
+        g_free(data);
+    }
+    /**
      * Search added
      */
     public
@@ -335,9 +356,6 @@ class StuffKeeper:Interface from G:Object
         GtkTreeIter iter;
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
         GtkTreeModel *model = GTK_TREE_MODEL(store);
-        gchar *data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb)-1);
-        gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
-        g_free(data);
 
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
@@ -370,11 +388,6 @@ class StuffKeeper:Interface from G:Object
                     5,  stuffkeeper_data_item_get_modification_time(item),
                     -1);
         g_free(title);
-
-        data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb));
-        gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
-        g_free(data);
-
     }
     public
     void
@@ -441,10 +454,6 @@ class StuffKeeper:Interface from G:Object
                     5,  stuffkeeper_data_item_get_modification_time(item),
                     -1);
             g_free(title);
-
-            data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(self->_priv->skdbg));
-            gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
-            g_free(data);
 
             path = gtk_tree_model_get_path(self->_priv->model_items, &iter);
             gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL,NULL, TRUE);
@@ -1603,6 +1612,9 @@ class StuffKeeper:Interface from G:Object
              */
             /* A filtered items */
             self->_priv->model_items_filter = gtk_tree_model_filter_new(GTK_TREE_MODEL(self->_priv->model_items), NULL);
+            g_signal_connect_swapped(G_OBJECT(self->_priv->model_items_filter), "row-inserted", G_CALLBACK(self_filter_model_row_inserted), self);
+            g_signal_connect_swapped(G_OBJECT(self->_priv->model_items_filter), "row-deleted", G_CALLBACK(self_filter_model_row_deleted), self);
+
             renderer = gtk_cell_renderer_pixbuf_new();
 
             gtk_tree_view_insert_column_with_data_func(GTK_TREE_VIEW(self->_priv->treeview2), -1,"test", renderer, 
@@ -1690,11 +1702,9 @@ class StuffKeeper:Interface from G:Object
             gtk_combo_box_set_active(GTK_COMBO_BOX(self->_priv->cb_search), 0);
 
             /** initial setup the list */
-            gchar *data = g_strdup_printf("%i", stuffkeeper_data_backend_get_num_items(skdb));
-            gtk_label_set_text(GTK_LABEL(self->_priv->item_label), data);
-            g_free(data);
 
-
+            /* update label */
+            self_filter_model_row_inserted(self, NULL, NULL, NULL);
             gtk_widget_show(self->_priv->win);
         }
 
