@@ -18,7 +18,6 @@ requires 2.0.10
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
-#include "stuffkeeper-export-csv.h"
 #include "stuffkeeper-export-html.h"
 
 #include "stuffkeeper-item-view.h"
@@ -1025,7 +1024,7 @@ class StuffKeeper:Interface from G:Object
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
 
-                menu_item = gtk_image_menu_item_new_with_label("Export to html");
+                menu_item = gtk_image_menu_item_new_with_label("Export");
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_export_html_item), self);
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
@@ -2018,12 +2017,14 @@ class StuffKeeper:Interface from G:Object
          * HTML Export 
          */
         /* Export the whole db */
+        /*
         public
         void
         export_to_csv(self)
         {
             stuffkeeper_export_csv_new(STUFFKEEPER_DATA_BACKEND(self->_priv->skdbg),GTK_LIST_STORE(self->_priv->model_schemas));
         }
+        */
 
         public
         void
