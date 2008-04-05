@@ -16,6 +16,7 @@ requires 2.0.10
 #include "stuffkeeper-data-link.h"
 #include "stuffkeeper-data-date.h"
 #include "stuffkeeper-data-taglist2.h"
+#include "stuffkeeper-data-expander.h"
 %}
 
 class StuffKeeper:Show:Item from Gtk:VBox
@@ -38,6 +39,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
     {
         int i,last_type = -1, reuse = FALSE;
         GtkWidget *label1,*hbox = NULL;
+        GtkWidget *sub_part = NULL;
         GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
 
         /* removing old widgets */
@@ -61,11 +63,14 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 hbox = gtk_hbox_new(FALSE, 6);
             }
             /* Title */
-            label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
+            if(type != FIELD_TYPE_EXPANDER)
+            {
+                label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
 
-            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
-            gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
-            gtk_size_group_add_widget(self->_priv->group, label1);
+                gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+                gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
+                gtk_size_group_add_widget(self->_priv->group, label1);
+            }
             if(type == FIELD_TYPE_STRING) {
                 label1 = stuffkeeper_data_entry_new(self->_priv->item,self->_priv->retv[i]);
             } else if (type == FIELD_TYPE_INTEGER) {
@@ -90,12 +95,21 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 label1 = stuffkeeper_data_link_new(self->_priv->item,self->_priv->retv[i]);                    
             }else if (type == FIELD_TYPE_DATE) {
                 label1 = stuffkeeper_data_date_new(self->_priv->item,self->_priv->retv[i]);                    
+            }else if (type == FIELD_TYPE_EXPANDER) {
+                label1 = stuffkeeper_data_expander_new(self->_priv->item,self->_priv->retv[i]);                    
+                sub_part = gtk_vbox_new(FALSE, 6);
+                gtk_container_add(GTK_CONTAINER(label1), sub_part);
             }else {
                 label1 = gtk_label_new("not supported\n");
             }
             gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
             if(!reuse)
-                gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
+            {
+                if(sub_part && type != FIELD_TYPE_EXPANDER)
+                    gtk_box_pack_start(GTK_BOX(sub_part), hbox, FALSE, TRUE, 0);
+                else
+                    gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
+            }
             last_type = type;
         }
         /* Title */

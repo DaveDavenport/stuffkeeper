@@ -1,0 +1,79 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include "stuffkeeper-data-item.h"
+#include "stuffkeeper-data-label.h"
+%}
+
+class StuffKeeper:Data:Expander from Gtk:Expander
+{
+    private StuffKeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+    private gulong changed_item_entry = {0};
+    private gulong changed_expander = {0};
+
+    private
+    void
+    expander_changed(self, gpointer data)
+    {
+        int value = gtk_expander_get_expanded(GTK_EXPANDER(self));
+        stuffkeeper_data_item_set_integer(self->_priv->item, self->_priv->field, value);
+    }
+
+    private
+    void
+    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    {
+        if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
+        {
+            const int new_value = stuffkeeper_data_item_get_integer(item, self->_priv->field);
+            int value = gtk_expander_get_expanded(GTK_EXPANDER(self));
+            if(value != new_value)
+            {
+                g_signal_handler_block(self,self->_priv->changed_expander);
+                gtk_expander_set_expanded(GTK_EXPANDER(self), new_value);
+                g_signal_handler_unblock(self,self->_priv->changed_expander);
+            }
+        }
+    }
+
+    public
+    GtkWidget *
+    new(StuffKeeperDataItem *item, const gchar *field)
+    {
+        int new_value = 0;
+        Self *obj = GET_NEW;
+        StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
+        GtkWidget *label = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(schema),field); 
+        gtk_expander_set_label_widget(GTK_EXPANDER(obj), label);
+        /* store item */
+        obj->_priv->item = item; 
+        /* field */
+        obj->_priv->field = g_strdup(field);
+           
+
+        new_value = stuffkeeper_data_item_get_integer(item, obj->_priv->field);
+        gtk_expander_set_expanded(GTK_EXPANDER(obj), new_value);
+
+
+        obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
+        obj->_priv->changed_expander = g_signal_connect(G_OBJECT(obj), "notify::expanded", G_CALLBACK(self_expander_changed), NULL);
+
+        return GTK_WIDGET(obj);
+    }
+
+    override (G:Object)
+        void
+        finalize (G:Object *obj)
+        {
+            Self *self = SELF(obj);
+            if(self->_priv->changed_item_entry)
+            {
+                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+                self->_priv->changed_item_entry = 0;
+            }
+            PARENT_HANDLER(obj);
+        }
+
+}
