@@ -327,7 +327,6 @@ class StuffKeeper:Export:HTML from G:Object
                 if(buffer[i]  == '%')
                 {
                     gchar *esc = self_escape(self, temp);//g_markup_escape_text(temp, -1); 
-                    int j =0;
                     found = 1;
                     /*
                     for(j=0;esc[j];j++) {
@@ -505,7 +504,6 @@ class StuffKeeper:Export:HTML from G:Object
                                 if(buffer[i]  == '%')
                                 {
                                     gchar *esc = self_escape(self, temp);//g_markup_escape_text(temp, -1); 
-                                    int j =0;
                                     found = 1;
                                     fputs("images/", fp_out);
                                     if(self->_priv->image_path)

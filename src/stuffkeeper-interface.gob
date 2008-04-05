@@ -375,7 +375,6 @@ class StuffKeeper:Interface from G:Object
     item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
     {
         GtkTreeIter iter;
-        gchar *data;
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
         gtk_list_store_prepend(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_item_get_title(item);
@@ -440,7 +439,6 @@ class StuffKeeper:Interface from G:Object
         if(item)
         {
             GtkTreeIter iter;
-            gchar *data;
             GtkTreePath *path = NULL;
             GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
             gtk_list_store_append(GTK_LIST_STORE(store), &iter);
