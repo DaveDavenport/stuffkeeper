@@ -453,7 +453,11 @@ class StuffKeeper:Export:HTML from G:Object
                 if(item_type >= FIELD_TYPE_NUM_FIELDS)
                 {
                     /** */
-                    if(strncasecmp(&buffer[6],"name", 4) == 0)
+                    if(type == FIELD_TYPE_EXPANDER)
+                    {
+                        /* skip this */
+                    }
+                    else if(strncasecmp(&buffer[6],"name", 4) == 0)
                     {
                         StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                         gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
@@ -573,6 +577,8 @@ class StuffKeeper:Export:HTML from G:Object
                                 fputc(buffer[i], fp_out);
                             }
                         }
+                    }else if (type == FIELD_TYPE_EXPANDER){
+
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
                         self_printout(self,&buffer[i],temp,fp_out);

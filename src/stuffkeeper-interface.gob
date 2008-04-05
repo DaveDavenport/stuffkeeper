@@ -384,7 +384,7 @@ class StuffKeeper:Interface from G:Object
                     2, item,
                     3, stuffkeeper_data_item_get_creation_time(item),
                     4, stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)),
-                    5,  stuffkeeper_data_item_get_modification_time(item),
+                    5, stuffkeeper_data_item_get_modification_time(item),
                     -1);
         g_free(title);
     }
