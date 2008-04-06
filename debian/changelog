@@ -1,3 +1,10 @@
+stuffkeeper (0.087) hardy; urgency=low
+
+  * Building for hardy 
+
+ -- Qball Cow <Qball@Sarine.nl>  Sat, 06 Apr 2008 12:30:08 +0100
+
+
 stuffkeeper (0.086) gutsy; urgency=low
 
   * Trying to get a build to work. Take 8
