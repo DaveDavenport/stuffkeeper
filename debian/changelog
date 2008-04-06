@@ -1,3 +1,13 @@
+stuffkeeper (0.09-ubuntu1) hardy; urgency=low
+
+  * Expander Support. To hide block in the view.
+  * More startup speedups.
+  * Code cleanups.
+  * Template parser improvements.
+
+
+ -- Qball Cow <qball@sarine.nl>  Sun, 06 Apr 2008 13:14:27 +0200
+
 stuffkeeper (0.09-ubuntu0) gutsy; urgency=low
 
   * Expander Support. To hide block in the view.
