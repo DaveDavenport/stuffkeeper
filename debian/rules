@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+
+DEB_MAKE_INSTALL_TARGET  := install DESTDIR=$(CURDIR)/debian/stuffkeeper
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/class/makefile.mk
+DEB_CONFIGURE_NORMAL_ARGS := --prefix=/usr
+

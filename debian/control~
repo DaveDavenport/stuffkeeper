@@ -1,0 +1,21 @@
+Source: stuffkeeper
+Section: gnome
+Priority: optional
+Maintainer: Qball Cow <Qball@Sarine.nl> 
+Build-Depends:  debhelper (>= 5),
+                cdbs,
+                libgtk2.0-dev,
+                libglade2-dev (>= 2.6.0),
+                libgtkspell-dev (>= 2.0),
+                libsqlite3-dev (>= 3.4.0),
+                intltool,
+                gob2
+Standards-Version: 3.7.3
+
+Package: stuffkeeper
+Architecture: any 
+Depends:    ${shlibs:Depends},
+            ${misc:Depends}
+Description: An application for stuff
+ Stuffkeeper
+
