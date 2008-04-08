@@ -26,6 +26,8 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     private GtkWidget *tree;
     private GList *list = {NULL};
     private guint changed_entry_timeout = {0};
+    private GdkColor writing ;
+    private GdkColor base;
 
     private
     void
@@ -35,6 +37,8 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         {
             g_source_remove(self->_priv->changed_entry_timeout);
         }
+        if(data)
+            gtk_widget_modify_base(GTK_WIDGET(data), GTK_STATE_NORMAL, &(self->_priv->writing));
         self->_priv->changed_entry_timeout = g_timeout_add(1000,(GSourceFunc)self_save_changes,self);
     }
     private 
@@ -160,6 +164,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
             {
                 FieldRow *fr = node->data;
                 const char *value = gtk_entry_get_text(GTK_ENTRY(fr->entry));
+                gtk_widget_modify_base(GTK_WIDGET(fr->entry), GTK_STATE_NORMAL, &(self->_priv->base));
                 retv[i] = g_strdup(value);
                 i++;
             }
@@ -245,7 +250,14 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         gtk_widget_destroy(dialog);
     }
 
-
+    private 
+    void
+    style_set(self, GtkStyle *prev, GtkWidget *wid)
+    {
+        if(self->_priv->changed_entry_timeout == 0) {
+            self->_priv->base = (GTK_WIDGET(self)->style->base[GTK_STATE_NORMAL]);
+        }
+    }
     public
     GtkWidget *
     new(StuffKeeperDataItem *item,const gchar *field)
@@ -254,6 +266,16 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         GtkWidget *hbox = gtk_hbox_new(FALSE,6);
 
         GtkWidget *button;
+
+        obj->_priv->base = (GTK_WIDGET(obj)->style->base[GTK_STATE_NORMAL]);
+        obj->_priv->writing.red = 255*255;
+        obj->_priv->writing.green = 253*255;
+        obj->_priv->writing.blue = 197*255;
+        gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &(obj->_priv->writing), TRUE,TRUE);
+        g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set),obj);
+
+
+
         
         /* store item */
         obj->_priv->item = item; 
