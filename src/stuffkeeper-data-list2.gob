@@ -56,8 +56,45 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     {
         gtk_widget_destroy(row->entry);
         gtk_widget_destroy(row->remove_but);
+        gtk_widget_destroy(row->hbox);
         g_free(row);
     }
+
+    private 
+    FieldRow *
+    new_row(self, const char *text,int pos)
+    {
+        FieldRow *fr = g_malloc0(sizeof(*fr));
+        fr->hbox = gtk_hbox_new(FALSE, 0);
+        fr->entry = gtk_entry_new();
+        gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
+        gtk_entry_set_text(GTK_ENTRY(fr->entry), text);
+        gtk_box_pack_start(GTK_BOX(fr->hbox), fr->entry, TRUE, TRUE, 0);
+        fr->remove_but = gtk_button_new();
+        gtk_button_set_image(GTK_BUTTON(fr->remove_but), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+        gtk_button_set_relief(GTK_BUTTON(fr->remove_but), GTK_RELIEF_NONE);
+        gtk_box_pack_start(GTK_BOX(fr->hbox), fr->remove_but, FALSE, TRUE, 0);
+        g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
+        g_signal_connect_swapped(G_OBJECT(fr->entry), "activate", G_CALLBACK(self_row_activate), self);
+        g_object_set_data(G_OBJECT(fr->remove_but), "object", fr);
+        g_object_set_data(G_OBJECT(fr->entry), "object", fr);
+
+        g_signal_connect_swapped(G_OBJECT(fr->entry), "changed", G_CALLBACK(self_changed), self);
+        gtk_box_pack_start(GTK_BOX(self), fr->hbox, FALSE, TRUE, 0);
+        gtk_widget_show_all(fr->hbox);
+        if(pos >= 0)
+        {
+            self->_priv->list = g_list_insert(self->_priv->list, fr, pos+1);
+            printf("item: %i:%i\n", pos, g_list_index(self->_priv->list, fr));
+            gtk_box_reorder_child(GTK_BOX(self), fr->hbox,pos+1); 
+        }
+        else
+        {
+            self->_priv->list = g_list_append(self->_priv->list, fr);
+        }
+        return fr;
+    }
+
     private
     void
     row_activate(self, GtkEntry *entry)
@@ -66,29 +103,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         if(fr)
         {
             int pos = g_list_index(self->_priv->list, fr);
-            FieldRow *fr = g_malloc0(sizeof(*fr));
-
-
-            fr->hbox = gtk_hbox_new(FALSE, 0);
-            fr->entry = gtk_entry_new();
-            gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
-            gtk_entry_set_text(GTK_ENTRY(fr->entry), "");
-            gtk_box_pack_start(GTK_BOX(fr->hbox), fr->entry, TRUE, TRUE, 0);
-            fr->remove_but = gtk_button_new();
-            gtk_button_set_image(GTK_BUTTON(fr->remove_but), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-            gtk_button_set_relief(GTK_BUTTON(fr->remove_but), GTK_RELIEF_NONE);
-            gtk_box_pack_start(GTK_BOX(fr->hbox), fr->remove_but, FALSE, TRUE, 0);
-            g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
-            g_signal_connect_swapped(G_OBJECT(fr->entry), "activate", G_CALLBACK(self_row_activate), self);
-            g_object_set_data(G_OBJECT(fr->remove_but), "object", fr);
-            g_object_set_data(G_OBJECT(fr->entry), "object", fr);
-
-            g_signal_connect_swapped(G_OBJECT(fr->entry), "changed", G_CALLBACK(self_changed), self);
-            gtk_box_pack_start(GTK_BOX(self), fr->hbox, FALSE, TRUE, 0);
-            gtk_widget_show_all(fr->hbox);
-            self->_priv->list = g_list_insert(self->_priv->list, fr, pos+1);
-            gtk_box_reorder_child(GTK_BOX(self), fr->hbox,pos+1); 
-
+            fr = self_new_row(self,"",pos);
             gtk_widget_grab_focus(fr->entry);
             printf("pos: %i\n", pos);
             self_changed(self, NULL);
@@ -115,25 +130,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
                 int i;
                 for(i=0;i<length;i++)
                 {
-                    FieldRow *fr = g_malloc0(sizeof(*fr));
-                    fr->hbox = gtk_hbox_new(FALSE, 0);
-                    fr->entry = gtk_entry_new();
-                    gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
-                    gtk_entry_set_text(GTK_ENTRY(fr->entry), (value[i])?value[i]:"");
-                    gtk_box_pack_start(GTK_BOX(fr->hbox), fr->entry, TRUE, TRUE, 0);
-                    fr->remove_but = gtk_button_new();
-                    gtk_button_set_image(GTK_BUTTON(fr->remove_but), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-                    gtk_button_set_relief(GTK_BUTTON(fr->remove_but), GTK_RELIEF_NONE);
-                    gtk_box_pack_start(GTK_BOX(fr->hbox), fr->remove_but, FALSE, TRUE, 0);
-                    g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
-                    g_signal_connect_swapped(G_OBJECT(fr->entry), "activate", G_CALLBACK(self_row_activate), self);
-                    g_object_set_data(G_OBJECT(fr->remove_but), "object", fr);
-                    g_object_set_data(G_OBJECT(fr->entry), "object", fr);
-
-                    g_signal_connect_swapped(G_OBJECT(fr->entry), "changed", G_CALLBACK(self_changed), self);
-                    gtk_box_pack_start(GTK_BOX(self), fr->hbox, FALSE, TRUE, 0);
-                    gtk_widget_show_all(fr->hbox);
-                    self->_priv->list = g_list_append(self->_priv->list, fr);
+                    FieldRow *fr = self_new_row(self,value[i],-1);
                 }            
                 g_strfreev(value);
             }
@@ -157,6 +154,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
                 FieldRow *fr = node->data;
                 const char *value = gtk_entry_get_text(fr->entry);
                 retv[i] = g_strdup(value);
+                printf("%i: %s\n", i, retv[i]);
                 i++;
             }
         }
@@ -172,6 +170,8 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     void
     add_row(self)
     {
+        FieldRow *fr = self_new_row(self,"",-1);
+        /*
         FieldRow *fr = g_malloc0(sizeof(*fr));
         fr->hbox = gtk_hbox_new(FALSE, 0);
         fr->entry = gtk_entry_new();
@@ -191,7 +191,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         gtk_box_pack_start(self, fr->hbox, FALSE, TRUE, 0);
         gtk_widget_show_all(fr->hbox);
         self->_priv->list = g_list_append(self->_priv->list, fr);
-
+*/
         self_save_changes(self);
     }
  
