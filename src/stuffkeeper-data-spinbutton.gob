@@ -51,6 +51,8 @@ class StuffKeeper:Data:SpinButton from Gtk:Spin:Button
     {
         Self *obj = GET_NEW;
         int value; 
+
+        gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
         g_signal_connect_swapped(obj, "scroll-event", G_CALLBACK(self_button_scroll_event), obj);
         /* setup */
         gtk_spin_button_set_range(GTK_SPIN_BUTTON(obj), G_MININT, G_MAXINT);
