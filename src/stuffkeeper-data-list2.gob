@@ -96,6 +96,13 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     }
 
     private
+    gboolean
+    grab_focus(GtkWidget *entry)
+    {
+        gtk_widget_grab_focus(entry);
+        return FALSE;
+    }
+    private
     void
     row_activate(self, GtkEntry *entry)
     {
@@ -104,7 +111,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         {
             int pos = g_list_index(self->_priv->list, fr);
             fr = self_new_row(self,"",pos);
-            gtk_widget_grab_focus(fr->entry);
+            g_idle_add((GSourceFunc)self_grab_focus, fr->entry);
             printf("pos: %i\n", pos);
             self_changed(self, NULL);
         }
@@ -130,7 +137,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
                 int i;
                 for(i=0;i<length;i++)
                 {
-                    FieldRow *fr = self_new_row(self,value[i],-1);
+                    self_new_row(self,value[i],-1);
                 }            
                 g_strfreev(value);
             }
@@ -152,9 +159,8 @@ class StuffKeeper:Data:List2 from Gtk:VBox
             for(node = g_list_first(self->_priv->list); node;node = g_list_next(node))
             {
                 FieldRow *fr = node->data;
-                const char *value = gtk_entry_get_text(fr->entry);
+                const char *value = gtk_entry_get_text(GTK_ENTRY(fr->entry));
                 retv[i] = g_strdup(value);
-                printf("%i: %s\n", i, retv[i]);
                 i++;
             }
         }
@@ -170,28 +176,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     void
     add_row(self)
     {
-        FieldRow *fr = self_new_row(self,"",-1);
-        /*
-        FieldRow *fr = g_malloc0(sizeof(*fr));
-        fr->hbox = gtk_hbox_new(FALSE, 0);
-        fr->entry = gtk_entry_new();
-        gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
-        gtk_entry_set_text(GTK_ENTRY(fr->entry), "");
-        gtk_box_pack_start(GTK_BOX(fr->hbox), fr->entry, TRUE, TRUE, 0);
-        fr->remove_but = gtk_button_new();
-        gtk_button_set_image(GTK_BUTTON(fr->remove_but), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-        gtk_button_set_relief(GTK_BUTTON(fr->remove_but), GTK_RELIEF_NONE);
-        gtk_box_pack_start(GTK_BOX(fr->hbox), fr->remove_but, FALSE, TRUE, 0);
-        g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
-        g_signal_connect_swapped(G_OBJECT(fr->entry), "activate", G_CALLBACK(self_row_activate), self);
-        g_object_set_data(G_OBJECT(fr->remove_but), "object", fr);
-        g_object_set_data(G_OBJECT(fr->entry), "object", fr);
-
-        g_signal_connect_swapped(G_OBJECT(fr->entry), "changed", G_CALLBACK(self_changed), self);
-        gtk_box_pack_start(self, fr->hbox, FALSE, TRUE, 0);
-        gtk_widget_show_all(fr->hbox);
-        self->_priv->list = g_list_append(self->_priv->list, fr);
-*/
+        self_new_row(self,"",-1);
         self_save_changes(self);
     }
  
@@ -227,18 +212,19 @@ class StuffKeeper:Data:List2 from Gtk:VBox
                         {
                             gchar **splitted = g_strsplit(content, "\n", 0);
                             int i=0;
-/*                            
+
                             for(i=0;splitted && splitted[i];i++)
                             {
-                                GtkTreeIter iter;
                                 if(splitted[i][0] != '\0')
                                 {
+                                    /*
                                     gtk_list_store_append(GTK_LIST_STORE(self->_priv->store), &iter);
                                     gtk_list_store_set(GTK_LIST_STORE(self->_priv->store), &iter,0,splitted[i],-1);
+                                    */
+                                    self_new_row(self, splitted[i], -1);
                                 }
                             }
                             g_strfreev(splitted);
-                            */
                             self_save_changes(self);
 
                         }else{
