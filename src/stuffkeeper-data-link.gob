@@ -167,14 +167,11 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
         gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &(obj->_priv->writing), TRUE,TRUE);
 
         
-        color.blue = 65535;
+  /*      color.blue = 65535;
         color.red = color.green = 0;
         gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &color, TRUE,TRUE);
-
-
-
         gtk_widget_modify_text(GTK_WIDGET(obj), GTK_STATE_NORMAL, &color);
-
+*/
         g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set), obj);
 
 
