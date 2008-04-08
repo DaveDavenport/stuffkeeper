@@ -83,7 +83,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 label1 = stuffkeeper_data_rating_new(self->_priv->item,self->_priv->retv[i]);
             }else if (type == FIELD_TYPE_LIST) {
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
-                label1 = stuffkeeper_data_list_new(self->_priv->item,self->_priv->retv[i]);
+                label1 = stuffkeeper_data_list2_new(self->_priv->item,self->_priv->retv[i]);
             }else if (type == FIELD_TYPE_TEXT) {
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
                 label1 = stuffkeeper_data_text_new(self->_priv->item,self->_priv->retv[i]);                    
