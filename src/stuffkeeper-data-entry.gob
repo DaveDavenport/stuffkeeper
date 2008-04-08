@@ -15,7 +15,7 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     private guint changed_entry_timeout = {0};
     private GdkColor writing ;
     private GdkColor base;
-
+    private GdkColor text;
 
 
     private
@@ -31,6 +31,7 @@ class StuffKeeper:Data:Entry from Gtk:Entry
         }
 
 
+        gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->text));
         gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->base));
         self->_priv->changed_entry_timeout = 0;
         return FALSE;
@@ -47,6 +48,8 @@ class StuffKeeper:Data:Entry from Gtk:Entry
             g_source_remove(self->_priv->changed_entry_timeout);
         }
         self->_priv->changed_entry_timeout = g_timeout_add(1000,(GSourceFunc)self_save_changes,self);
+
+        gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
         gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->writing));
     }
 
@@ -82,6 +85,7 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     {
         if(self->_priv->changed_entry_timeout == 0) {
             self->_priv->base = (GTK_WIDGET(self)->style->base[GTK_STATE_NORMAL]);
+            self->_priv->text = (GTK_WIDGET(self)->style->text[GTK_STATE_NORMAL]);
         }
     }
 
@@ -98,6 +102,7 @@ class StuffKeeper:Data:Entry from Gtk:Entry
 
 
         obj->_priv->base = (GTK_WIDGET(obj)->style->base[GTK_STATE_NORMAL]);
+        obj->_priv->text = (GTK_WIDGET(obj)->style->text[GTK_STATE_NORMAL]);
         obj->_priv->writing.red = 255*255;
         obj->_priv->writing.green = 253*255;
         obj->_priv->writing.blue = 197*255;
