@@ -11,7 +11,7 @@ requires 2.0.10
 %h{
     typedef struct _FieldRow {
         GtkWidget *hbox;
-        GtkWidget *entry, *remove_but;
+        GtkWidget *entry, *remove_but, *add_but;
     
     }FieldRow;
 
@@ -79,13 +79,28 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
         gtk_entry_set_text(GTK_ENTRY(fr->entry), text);
         gtk_box_pack_start(GTK_BOX(fr->hbox), fr->entry, TRUE, TRUE, 0);
+
+        /* remove button */
         fr->remove_but = gtk_button_new();
         gtk_button_set_image(GTK_BUTTON(fr->remove_but), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
         gtk_button_set_relief(GTK_BUTTON(fr->remove_but), GTK_RELIEF_NONE);
         gtk_box_pack_start(GTK_BOX(fr->hbox), fr->remove_but, FALSE, TRUE, 0);
-        g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
-        g_signal_connect_swapped(G_OBJECT(fr->entry), "activate", G_CALLBACK(self_row_activate), self);
         g_object_set_data(G_OBJECT(fr->remove_but), "object", fr);
+        g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
+
+        /* add button */
+        fr->add_but = gtk_button_new();
+        gtk_button_set_image(GTK_BUTTON(fr->add_but), gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+        gtk_button_set_relief(GTK_BUTTON(fr->add_but), GTK_RELIEF_NONE);
+        gtk_box_pack_start(GTK_BOX(fr->hbox), fr->add_but, FALSE, TRUE, 0);
+        g_object_set_data(G_OBJECT(fr->add_but), "object", fr);
+        g_signal_connect_swapped(G_OBJECT(fr->add_but), "clicked", G_CALLBACK(self_row_activate), self);
+
+
+
+        
+        g_signal_connect_swapped(G_OBJECT(fr->entry), "activate", G_CALLBACK(self_row_activate), self);
+
         g_object_set_data(G_OBJECT(fr->entry), "object", fr);
 
         g_signal_connect_swapped(G_OBJECT(fr->entry), "changed", G_CALLBACK(self_changed), self);
