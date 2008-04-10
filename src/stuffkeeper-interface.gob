@@ -2221,14 +2221,14 @@ class StuffKeeper:Interface from G:Object
         schema_import(self)
         {
             GtkFileFilter *filter = NULL;
-            GtkWidget *dialog = gtk_file_chooser_dialog_new("Import schema", 
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Import type", 
                     NULL, 
                     GTK_FILE_CHOOSER_ACTION_OPEN,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                     GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
                     NULL);
             filter = gtk_file_filter_new();
-            gtk_file_filter_set_name(filter, "Schema type");
+            gtk_file_filter_set_name(filter, "Types files");
             gtk_file_filter_add_pattern(filter, "*.schema");
             gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
