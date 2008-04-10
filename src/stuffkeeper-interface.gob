@@ -2215,4 +2215,98 @@ class StuffKeeper:Interface from G:Object
                     self->_priv->item_sort_column,
                     self->_priv->item_sort_order);
         }
+        /* storing saving schemas */
+        public
+        void
+        schema_import(self)
+        {
+            GtkFileFilter *filter = NULL;
+            GtkWidget *dialog = gtk_file_chooser_dialog_new("Import schema", 
+                    NULL, 
+                    GTK_FILE_CHOOSER_ACTION_OPEN,
+                    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                    GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
+                    NULL);
+            filter = gtk_file_filter_new();
+            gtk_file_filter_set_name(filter, "Schema type");
+            gtk_file_filter_add_pattern(filter, "*.schema");
+            gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_OK:
+                {
+                    gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+                    stuffkeeper_data_backend_load_from_xml(self->_priv->skdbg,filename);
+                    g_free(filename);
+                }
+                default:
+                    break;
+            }
+            gtk_widget_destroy(dialog);
+        }
+    
+        public
+        void
+        entry_changed(GtkWidget *entry, GtkWidget *button)
+        {
+            const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
+            if(text[0] == '\0') {
+                gtk_widget_set_sensitive(button, FALSE);
+            } else {
+                gtk_widget_set_sensitive(button, TRUE);
+            }
+        }
+
+        public
+        void
+        schema_export(self)
+        {
+            GtkCellRenderer *renderer;
+            GtkWidget *entry, *cb_schema;
+            GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_schema_dialog",NULL);
+            GtkWidget *dialog = glade_xml_get_widget(xml,"export_schema_dialog");
+
+            /* entry */
+            entry = glade_xml_get_widget(xml, "entry_name");
+            g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(self_entry_changed), glade_xml_get_widget(xml, "save_button"));
+            cb_schema = glade_xml_get_widget(xml, "cb_schema");
+
+            gtk_combo_box_set_model(GTK_COMBO_BOX(cb_schema), GTK_TREE_MODEL(self->_priv->model_schemas));
+            gtk_combo_box_set_active(GTK_COMBO_BOX(cb_schema), 0);
+            renderer = gtk_cell_renderer_text_new();
+            gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(cb_schema),renderer, TRUE);
+            gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(cb_schema),renderer, "text",1 );
+
+
+            glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case -5:
+                    {
+                        GtkTreeIter iter;
+                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "fc_directory")));
+                        const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
+                        if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(cb_schema),&iter))
+                        {
+                            gchar *path = NULL;
+                            gchar *filename = g_strdup_printf("%s.schema", file);
+                            StuffKeeperDataSchema *schema = NULL;
+                            /* get model schema */
+                            gtk_tree_model_get(self->_priv->model_schemas, &iter,3, &schema, -1); 
+                            /* build path */
+                            path = g_build_path(G_DIR_SEPARATOR_S, directory, filename,NULL);
+                            /* save it */
+                            stuffkeeper_data_schema_save_to_xml(schema,path);
+                            g_free(path);
+                            g_free(filename);
+                        }
+                        g_free(directory);
+                    }
+                default:
+                    break;
+            }
+            gtk_widget_destroy(dialog);
+            g_object_unref(xml);
+        }
 }

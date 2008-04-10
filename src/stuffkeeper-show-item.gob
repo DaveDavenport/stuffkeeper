@@ -10,7 +10,7 @@ requires 2.0.10
 #include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
-#include "stuffkeeper-data-list.h"
+#include "stuffkeeper-data-list2.h"
 #include "stuffkeeper-data-text.h"
 #include "stuffkeeper-data-image.h"
 #include "stuffkeeper-data-link.h"

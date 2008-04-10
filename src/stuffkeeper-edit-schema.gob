@@ -328,6 +328,7 @@ private guint field_swapped_signal = 0;
 
             glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             gtk_widget_show_all(GTK_WIDGET(self->_priv->win));
+
             return self;
         }
 
@@ -500,7 +501,6 @@ private guint field_swapped_signal = 0;
                             G_CALLBACK(self_schema_field_swapped),
                             self);
         self_schema_changed(self, schema);
-
     }
 
     override (G:Object)

@@ -4,6 +4,8 @@ requires 2.0.10
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
 #include <sqlite3.h>
+#include <libxml/tree.h>
+#include <libxml/parser.h>
 
 %}
 
@@ -770,7 +772,7 @@ class StuffKeeper:Data:Schema from G:Object
        /* Add the field */
         cid = g_strdup_printf("%i", id);
 
-        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, cid,FIELD_TYPE_STRING);
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, cid,field);
         self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, cid,pos);
         self_field_schemas_set_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, cid,name);
 
@@ -904,4 +906,127 @@ class StuffKeeper:Data:Schema from G:Object
         {
             return g_list_copy(self->_priv->items);
         }
+
+        /***
+         * Saving and loading 
+         */
+         public
+         StuffKeeperDataSchema *
+         load_from_xml(GObject *skdb, sqlite3 *sqlHandle, const char *path)
+         {
+             Self *self;
+             xmlDocPtr doc;
+             xmlNodePtr root,new,fields;
+
+             doc = xmlReadFile(path, NULL, 0);
+             if(doc == NULL)
+             {
+                 printf("Failed to open xml file\n");
+                 return NULL;
+             }
+             self = self_new(skdb,sqlHandle);
+             root =  xmlDocGetRootElement(doc);
+             if(root)
+             {
+                 xmlChar *temp, *type;
+                 for(new = root->xmlChildrenNode;new;new = new->next)
+                 {
+                     if (xmlStrEqual(new->name, (const xmlChar *) "title")) {
+                         temp = xmlNodeGetContent(new);
+                         if(temp)
+                         {
+                             self_set_title(self, (char *)temp);
+                             xmlFree(temp);
+                         }
+                     }
+                     else if (xmlStrEqual(new->name, (const xmlChar *) "fields")) {
+                         for(fields = new->xmlChildrenNode;fields;fields = fields->next)
+                         {
+                             if(xmlStrEqual(fields->name, (const xmlChar *) "row"))
+                             {
+                                 type = xmlGetProp(fields, (const xmlChar *)"type");
+                                 temp = xmlNodeGetContent(fields);
+                                 if(temp)
+                                 {
+                                     FieldType itype = (int)g_ascii_strtoll ((char *)type, NULL, 0);
+                                     printf("type: %i\n", itype);
+                                     self_add_field(self, itype,(char *)temp); 
+                                     if(type)
+                                         xmlFree(type);
+                                     xmlFree(temp);
+                                 }
+                             }
+                         }
+                     }
+                 }
+             }
+
+             xmlFreeDoc(doc);
+             return self;
+         }
+
+         public
+         gboolean
+         save_to_xml(self,const char *path)
+         {
+             int i=0;
+             gsize length=0;
+             gchar **retv;
+             xmlDocPtr doc;
+             xmlNodePtr root,new,fields;
+             gchar *field = NULL;
+             /* open file */
+             doc = xmlNewDoc((xmlChar *)"1.0"); 
+             if(!doc)
+             {
+                 printf("Failed to open xml file\n");
+                 return FALSE;
+             }
+             /* create root node */
+             root = xmlNewDocNode (doc, NULL, (xmlChar *) "StuffKeeperSchema", NULL);
+             /* Set root node */
+             xmlDocSetRootElement(doc, root);
+
+             /* Save title */
+             field = self_get_title(self);
+             new = xmlNewTextChild(root, NULL, (xmlChar *)"title", (xmlChar *)field);
+             g_free(field);
+
+             /* Save fields */
+             /* create root node */
+             fields = xmlNewTextChild(root, NULL, (xmlChar *)"fields", NULL);
+             /* get fields */
+             retv = self_get_fields(self, &length);
+             for(i=0;i<length;i++)
+             {
+                 char *type;
+                 FieldType ft= self_get_field_type(self, retv[i]);
+                 /*int order = self_get_field_pos(self, retv[i]);*/
+                 char *name = self_get_field_name(self, retv[i]);
+
+                 new = xmlNewTextChild(fields, NULL, (xmlChar *)"row",(xmlChar *)name);
+
+                 /* Order */
+                /* 
+                 type = g_strdup_printf("%i",order);
+                 xmlNewProp(new, (xmlChar *) "order", (xmlChar *)type);
+                 g_free(type);
+                 */
+
+                 /* Type */
+                 type = g_strdup_printf("%i",ft);
+                 xmlNewProp(new, (xmlChar *) "type", (xmlChar *)type);
+                 g_free(type);
+
+
+                 g_free(name);
+             }
+             if(xmlSaveFormatFile(path, doc, 1) < 0)
+             {
+                 xmlFreeDoc(doc);
+                 return FALSE;
+             }
+             xmlFreeDoc(doc);
+             return TRUE;
+         }
 }

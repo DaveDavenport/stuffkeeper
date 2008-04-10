@@ -155,7 +155,7 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
-        GdkColor color;
+        //GdkColor color;
 
         obj->_priv->base = (GTK_WIDGET(obj)->style->base[GTK_STATE_NORMAL]);
         obj->_priv->text = (GTK_WIDGET(obj)->style->text[GTK_STATE_NORMAL]);

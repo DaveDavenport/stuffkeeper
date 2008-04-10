@@ -23,6 +23,6 @@ finally:
 obj = bld.create_obj('cc', 'program')
 obj.find_sources_in_dirs('.') # take the sources in the current folder
 obj.target = 'stuffkeeper'
-obj.uselib = 'GTK GLIB GLADE GMODULE GTKSPELL SQLITE'
+obj.uselib = 'GTK GLIB GLADE GMODULE GTKSPELL SQLITE LIBXML'
 obj.includes='.'
 
