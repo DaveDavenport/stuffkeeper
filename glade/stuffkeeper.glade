@@ -286,6 +286,20 @@
                   <widget class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
                     <child>
+                      <widget class="GtkImageMenuItem" id="menuitem17">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_New</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="schema_new"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image11">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-new</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkImageMenuItem" id="menuitem13">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_Import</property>
@@ -1094,8 +1108,8 @@ Filters</property>
                     <child>
                       <widget class="GtkFileChooserButton" id="file_chooser_button">
                         <property name="visible">True</property>
-                        <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                         <property name="do_overwrite_confirmation">True</property>
+                        <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -1368,8 +1382,8 @@ Filters</property>
                     <child>
                       <widget class="GtkFileChooserButton" id="file_chooser_button1">
                         <property name="visible">True</property>
-                        <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                         <property name="do_overwrite_confirmation">True</property>
+                        <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -1665,8 +1679,9 @@ Filters</property>
         <child>
           <widget class="GtkVBox" id="vbox7">
             <property name="visible">True</property>
+            <property name="spacing">6</property>
             <child>
-              <widget class="GtkEventBox" id="eventbox1">
+              <widget class="GtkEventBox" id="eventbox_schema">
                 <property name="visible">True</property>
                 <child>
                   <widget class="GtkHBox" id="hbox13">
@@ -1676,7 +1691,6 @@ Filters</property>
                       <widget class="GtkImage" id="image5">
                         <property name="visible">True</property>
                         <property name="xpad">6</property>
-                        <property name="ypad">12</property>
                         <property name="stock">gtk-edit</property>
                       </widget>
                       <packing>
@@ -1684,8 +1698,10 @@ Filters</property>
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label15">
+                      <widget class="GtkLabel" id="label_title_schema">
                         <property name="visible">True</property>
+                        <property name="xalign">0</property>
+                        <property name="ypad">12</property>
                         <property name="label" translatable="yes">&lt;span size='large' weight='bold'&gt;Export type&lt;/span&gt;</property>
                         <property name="use_markup">True</property>
                       </widget>

@@ -2216,11 +2216,40 @@ class StuffKeeper:Interface from G:Object
                     self->_priv->item_sort_order);
         }
         /* storing saving schemas */
+        private
+        void
+        schema_style_set(GtkWidget *event, GtkStyle *style, GladeXML *xml)
+        {
+            GtkWidget *dialog = glade_xml_get_widget(xml,"export_schema_dialog");
+            GtkWidget *event = glade_xml_get_widget(xml, "eventbox_schema");
+            GtkWidget *label =  glade_xml_get_widget(xml, "label_title_schema");
+            gtk_widget_modify_bg(event,
+                    GTK_STATE_NORMAL, 
+                    &((dialog)->style->bg[GTK_STATE_SELECTED]));
+            gtk_widget_modify_text(label,
+                              GTK_STATE_NORMAL, 
+                              &((dialog)->style->text[GTK_STATE_SELECTED]));
+            gtk_widget_modify_fg(label,
+                    GTK_STATE_NORMAL, 
+                              &((dialog)->style->fg[GTK_STATE_SELECTED]));
+            
+        }
+
+
+        public
+        void
+        schema_new(self)
+        {
+            StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
+            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            stuffkeeper_edit_schema_set_schema(skes, schema);
+        }
+
         public
         void
         schema_import(self)
         {
-            GtkFileFilter *filter = NULL;
+           GtkFileFilter *filter = NULL;
             GtkWidget *dialog = gtk_file_chooser_dialog_new("Import type", 
                     NULL, 
                     GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -2231,6 +2260,7 @@ class StuffKeeper:Interface from G:Object
             gtk_file_filter_set_name(filter, "Types files");
             gtk_file_filter_add_pattern(filter, "*.type");
             gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
+
 
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
@@ -2262,10 +2292,13 @@ class StuffKeeper:Interface from G:Object
         void
         schema_export(self)
         {
+            GtkWidget *event = NULL;
             GtkCellRenderer *renderer;
             GtkWidget *entry, *cb_schema;
             GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_schema_dialog",NULL);
             GtkWidget *dialog = glade_xml_get_widget(xml,"export_schema_dialog");
+
+            g_signal_connect(G_OBJECT(dialog), "style-set", G_CALLBACK(self_schema_style_set),xml);
 
             /* entry */
             entry = glade_xml_get_widget(xml, "entry_name");
