@@ -2229,7 +2229,7 @@ class StuffKeeper:Interface from G:Object
                     NULL);
             filter = gtk_file_filter_new();
             gtk_file_filter_set_name(filter, "Types files");
-            gtk_file_filter_add_pattern(filter, "*.schema");
+            gtk_file_filter_add_pattern(filter, "*.type");
             gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
@@ -2290,7 +2290,7 @@ class StuffKeeper:Interface from G:Object
                         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(cb_schema),&iter))
                         {
                             gchar *path = NULL;
-                            gchar *filename = g_strdup_printf("%s.schema", file);
+                            gchar *filename = g_strdup_printf("%s.type", file);
                             StuffKeeperDataSchema *schema = NULL;
                             /* get model schema */
                             gtk_tree_model_get(self->_priv->model_schemas, &iter,3, &schema, -1); 
