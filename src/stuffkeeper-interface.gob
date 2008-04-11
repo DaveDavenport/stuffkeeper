@@ -1795,7 +1795,11 @@ class StuffKeeper:Interface from G:Object
 
 
             gtk_widget_destroy(self->_priv->win);
-
+            
+            if(self->_priv->xml)
+            {
+                g_object_unref(self->_priv->xml);
+            }
         }
         /**
          * Item popup
