@@ -203,5 +203,6 @@ class StuffKeeper:Data:Tag from G:Object
         finalize(G:Object *obj)
         {
             debug_printf("destroying tag\n");
+            PARENT_HANDLER(obj);
         }
 }

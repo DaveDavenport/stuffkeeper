@@ -15,7 +15,7 @@ src/stuffkeeper-data-image.gob
 src/stuffkeeper-data-item.gob
 src/stuffkeeper-data-label.gob
 src/stuffkeeper-data-link.gob
-src/stuffkeeper-data-list.gob
+src/stuffkeeper-data-list2.gob
 src/stuffkeeper-data-rating.gob
 src/stuffkeeper-data-schema.gob
 src/stuffkeeper-data-spinbutton.gob
@@ -28,7 +28,6 @@ src/stuffkeeper-item-window.gob
 src/stuffkeeper-show-item.gob
 src/stuffkeeper-data-item-search.gob
 src/stuffkeeper-item-view.gob
-src/stuffkeeper-export-csv.gob
 src/stuffkeeper-export-html.gob
 src/bacon-message-connection.c
 src/egg-datetime.c

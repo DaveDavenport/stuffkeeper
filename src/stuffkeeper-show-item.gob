@@ -206,5 +206,6 @@ class StuffKeeper:Show:Item from Gtk:VBox
             g_object_unref(self->_priv->group);
             self->_priv->group = NULL;
         }
+        PARENT_HANDLER(obj);
     }
 }

@@ -825,6 +825,7 @@ class StuffKeeper:Data:Schema from G:Object
         finalize(G:Object *obj)
         {
             debug_printf("destroying schema\n");
+            PARENT_HANDLER(obj);
         }
         
         /* Icon handling */

@@ -192,5 +192,6 @@ class StuffKeeper:Item:View from Gtk:VBox
         finalize(G:Object *obj)
         {
             debug_printf("Cleanup item view\n");
+            PARENT_HANDLER(obj);
         }
 }

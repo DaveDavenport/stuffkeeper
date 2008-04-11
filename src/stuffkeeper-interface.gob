@@ -1806,6 +1806,7 @@ class StuffKeeper:Interface from G:Object
                 g_object_unref(self->_priv->model_schemas);
                 self->_priv->model_schemas = NULL;
             }
+            PARENT_HANDLER(obj);
         }
         /**
          * Item popup
