@@ -1800,6 +1800,12 @@ class StuffKeeper:Interface from G:Object
             {
                 g_object_unref(self->_priv->xml);
             }
+
+            if(self->_priv->model_schemas)
+            {
+                g_object_unref(self->_priv->model_schemas);
+                self->_priv->model_schemas = NULL;
+            }
         }
         /**
          * Item popup

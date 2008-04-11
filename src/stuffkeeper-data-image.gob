@@ -46,6 +46,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                         if(pb)
                         {
                             gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
+                            g_object_unref(pb);
                             set = TRUE;
                         }
                         g_free(fpath);
@@ -164,6 +165,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                     if(pb)
                     {
                         gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
+                        g_object_unref(pb);
                     }
                     g_free(fpath);
                 }

@@ -805,7 +805,8 @@ class StuffKeeper:Data:Backend from G:Object
             }
         }
         if(resultp)
-            sqlite3_free_table(result);
+            sqlite3_free_table(resultp);
+
         sqlite3_free(query);
         /* if not exists, create the general table */
         if(G_UNLIKELY(!has_general)) {
