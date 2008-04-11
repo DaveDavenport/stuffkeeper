@@ -1991,7 +1991,26 @@ class StuffKeeper:Interface from G:Object
         void
         restore_backup(self)
         {
-            GtkWidget *dialog = gtk_file_chooser_dialog_new("Open archive", 
+            GtkWidget *dialog = NULL;
+            
+            dialog = gtk_message_dialog_new_with_markup(
+            GTK_WINDOW(self->_priv->win), 
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_WARNING,
+            GTK_BUTTONS_OK_CANCEL,
+            _("Restoring from a backup will destroy the current database.\nUse with care."));
+
+            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+            {
+                case GTK_RESPONSE_CANCEL:
+                    gtk_widget_destroy(dialog);
+                    return;
+                default:
+                    gtk_widget_destroy(dialog);
+            }
+
+
+            dialog = gtk_file_chooser_dialog_new("Open archive", 
                         NULL, 
                         GTK_FILE_CHOOSER_ACTION_OPEN,
                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -2302,7 +2321,6 @@ class StuffKeeper:Interface from G:Object
         void
         schema_export(self)
         {
-            GtkWidget *event = NULL;
             GtkCellRenderer *renderer;
             GtkWidget *entry, *cb_schema;
             GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_schema_dialog",NULL);

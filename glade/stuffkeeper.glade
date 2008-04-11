@@ -1108,8 +1108,8 @@ Filters</property>
                     <child>
                       <widget class="GtkFileChooserButton" id="file_chooser_button">
                         <property name="visible">True</property>
-                        <property name="do_overwrite_confirmation">True</property>
                         <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                        <property name="do_overwrite_confirmation">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -1382,8 +1382,8 @@ Filters</property>
                     <child>
                       <widget class="GtkFileChooserButton" id="file_chooser_button1">
                         <property name="visible">True</property>
-                        <property name="do_overwrite_confirmation">True</property>
                         <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                        <property name="do_overwrite_confirmation">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
