@@ -501,6 +501,15 @@ class StuffKeeper:Data:Backend from G:Object
             g_hash_table_destroy(self->_priv->schemas);
             self->_priv->schemas = NULL;
         }
+        if(self->_priv->searches)
+        {
+            g_hash_table_destroy(self->_priv->searches);
+            self->_priv->searches = NULL;
+        }
+
+
+
+
 
         /**
          * Clear SQLite table
