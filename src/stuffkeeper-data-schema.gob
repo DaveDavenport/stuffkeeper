@@ -700,6 +700,36 @@ class StuffKeeper:Data:Schema from G:Object
     }
 
     public
+    int
+    has_generated_title(self)
+    {
+        int fields =0;
+        char *query;
+        /* count the number of fields */
+        query = sqlite3_mprintf("SELECT COUNT(DISTINCT FieldId) FROM SchemasFields WHERE SchemaId=%i and type=%i and value=1",
+                self->_priv->id,
+                DB_SCHEMAS_FIELD_TYPE_IN_TITLE);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                fields = sqlite3_column_int(stmt, 0);
+            }
+        }
+        else
+        {
+            printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        sqlite3_finalize(stmt);
+        sqlite3_free(query);
+        return fields;
+    }
+
+    public
     void
     set_field_in_title(self,  const gchar *id, const int in_title)
     {

@@ -511,58 +511,65 @@ class StuffKeeper:Data:Item from G:Object
         void
         set_title(self, const gchar *title)
         {
-            /*
-            self_items_set_field_string(self, DB_ITEMS_TYPE_NAME, title);
-            self_item_changed(self,NULL);
-            */
-            printf("No longer supported\n");
-        }
 
+            if(stuffkeeper_data_schema_has_generated_title(self->_priv->schema) > 0)
+            {
+                printf("not allowed with a generated title\n");
+            }
+            else
+            {
+                self_items_set_field_string(self, DB_ITEMS_TYPE_NAME, title);
+                self_item_changed(self,NULL);
+            }
+    }
     public 
         gchar *
         get_title(self)
         {
-            gsize length = 0;
-            gchar **retv = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length);
-            if(retv)
+            if(stuffkeeper_data_schema_has_generated_title(self->_priv->schema) > 0)
             {
-                int i=0;
-                int first =0;
-                gchar *ret = NULL;
-                GString *string = g_string_new("");
-                for(i=0;i<length;i++)
+                gsize length = 0;
+                gchar **retv = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length);
+                if(retv)
                 {
-                    if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, retv[i]))
+                    int i=0;
+                    int first =0;
+                    gchar *ret = NULL;
+                    GString *string = g_string_new("");
+                    for(i=0;i<length;i++)
                     {
-                        gchar *name=  self_get_string(self, retv[i]);
-                        if(first && name && name[0] != '\0')
+                        if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, retv[i]))
                         {
-                            g_string_append(string," - ");
+                            gchar *name=  self_get_string(self, retv[i]);
+                            if(first && name && name[0] != '\0')
+                            {
+                                g_string_append(string," - ");
+                            }
+                            if(name && name[0] != '\0')
+                            {
+                                g_string_append(string, name);
+                                g_free(name);
+                            }
+                            if(!first)
+                                first = 1;
                         }
-                        if(name && name[0] != '\0')
-                        {
-                            g_string_append(string, name);
-                            g_free(name);
-                        }
-                        if(!first)
-                            first = 1;
                     }
+                    if(!first)
+                        g_string_append(string, _("N/A"));
+
+                    ret = string->str;
+                    g_string_free(string, FALSE);
+                    g_strfreev(retv);
+                    return ret;
                 }
-                if(!first)
-                    g_string_append(string, _("N/A"));
-
-                ret = string->str;
-                g_string_free(string, FALSE);
-                g_strfreev(retv);
-                return ret;
+            }else
+            {
+                char *retv = self_items_get_field_string(self, DB_ITEMS_TYPE_NAME);
+                if(!retv)
+                    retv = g_strdup("Failed to get title\n");
+                return retv;
             }
-            return g_strdup("N/A");
-           /* char *retv = self_items_get_field_string(self, DB_ITEMS_TYPE_NAME);
-            if(!retv)
-                retv = g_strdup("Failed to get title\n");
-            return retv;
-            */
-
+            return NULL;
         }
     /**
      * Creation Time (ro)
