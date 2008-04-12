@@ -109,7 +109,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         if(pos >= 0)
         {
             self->_priv->list = g_list_insert(self->_priv->list, fr, pos+1);
-            printf("item: %i:%i\n", pos, g_list_index(self->_priv->list, fr));
+            printf("item: %i:%i\n", pos+1, g_list_index(self->_priv->list, fr));
             gtk_box_reorder_child(GTK_BOX(self), fr->hbox,pos+1); 
         }
         else
@@ -133,7 +133,12 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         FieldRow *fr = g_object_get_data(G_OBJECT(entry), "object");
         if(fr)
         {
-            int pos = g_list_index(self->_priv->list, fr);
+            int pos = g_list_index(g_list_first(self->_priv->list), fr);
+            if(pos+1 == g_list_length(self->_priv->list))
+            {
+                printf("appending\n");
+                pos = -1;
+            }
             fr = self_new_row(self,"",pos);
             g_idle_add((GSourceFunc)self_grab_focus, fr->entry);
             printf("pos: %i\n", pos);
