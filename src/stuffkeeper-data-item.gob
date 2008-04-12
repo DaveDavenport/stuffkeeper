@@ -307,8 +307,9 @@ class StuffKeeper:Data:Item from G:Object
     {
         int result;
         char *error,*query;
-        if(stuffkeeper_data_schema_get_field_in_title(schema, id))
-            self_item_changed(self, NULL);
+/*        if(stuffkeeper_data_schema_get_field_in_title(schema, id))*/
+        /* update title */
+        self_item_changed(self, NULL);
     }
 
     /**************************************
@@ -521,7 +522,7 @@ class StuffKeeper:Data:Item from G:Object
         gchar *
         get_title(self)
         {
-            gsize *length = 0;
+            gsize length = 0;
             gchar **retv = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length);
             if(retv)
             {
