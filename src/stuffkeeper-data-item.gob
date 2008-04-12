@@ -491,7 +491,12 @@ class StuffKeeper:Data:Item from G:Object
             return set; 
         }
 
-
+    public
+    int
+    has_generated_title(self)
+    {
+        return stuffkeeper_data_schema_has_generated_title(self->_priv->schema);
+    }
 
     /**
      * ID (ro)

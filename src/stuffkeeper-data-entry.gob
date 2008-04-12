@@ -67,6 +67,10 @@ class StuffKeeper:Data:Entry from Gtk:Entry
             }
         }else{
             value = stuffkeeper_data_item_get_title(item); 
+            if(stuffkeeper_data_item_has_generated_title(item))
+                gtk_editable_set_editable(GTK_EDITABLE(self), FALSE);
+            else
+                gtk_editable_set_editable(GTK_EDITABLE(self), TRUE);
         }
         if(value)
         {
@@ -123,6 +127,10 @@ class StuffKeeper:Data:Entry from Gtk:Entry
             value = stuffkeeper_data_item_get_string(item, obj->_priv->field);
         }else{
             value = stuffkeeper_data_item_get_title(item); 
+            if(stuffkeeper_data_item_has_generated_title(item))
+                gtk_editable_set_editable(GTK_EDITABLE(obj), FALSE);
+            else
+                gtk_editable_set_editable(GTK_EDITABLE(obj), TRUE);
         }
         if(value)
         {
