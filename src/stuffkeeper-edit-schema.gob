@@ -406,7 +406,7 @@ private guint field_swapped_signal = 0;
         void
         add_field(self)
         {
-            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field");
+            stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field",FALSE);
         }
     
    public 

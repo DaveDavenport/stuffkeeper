@@ -717,7 +717,7 @@ class StuffKeeper:Data:Schema from G:Object
     /* Field editing */
     public
     void
-    add_field(self, FieldType field, const gchar *name)
+    add_field(self, FieldType field, const gchar *name, int in_title)
     {
 /*        gchar **retv = NULL; 
         gsize size=0;
@@ -792,6 +792,7 @@ class StuffKeeper:Data:Schema from G:Object
         self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_TYPE, cid,field);
         self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, cid,pos);
         self_field_schemas_set_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, cid,name);
+        self_set_field_in_title(self, cid, in_title);
 
         self_schema_field_added(self, cid);
         g_free(cid);
@@ -962,13 +963,16 @@ class StuffKeeper:Data:Schema from G:Object
                          {
                              if(xmlStrEqual(fields->name, (const xmlChar *) "row"))
                              {
+                                 xmlChar *in_title = xmlGetProp(fields, (const xmlChar *)"in_title");
                                  type = xmlGetProp(fields, (const xmlChar *)"type");
+                                 
                                  temp = xmlNodeGetContent(fields);
                                  if(temp)
                                  {
+                                     int iin_title = (in_title)? (int)g_ascii_strtoll ((char *)in_title, NULL, 0):0;
                                      FieldType itype = (int)g_ascii_strtoll ((char *)type, NULL, 0);
                                      printf("type: %i\n", itype);
-                                     self_add_field(self, itype,(char *)temp); 
+                                     self_add_field(self, itype,(char *)temp,iin_title); 
                                      if(type)
                                          xmlFree(type);
                                      xmlFree(temp);
@@ -1021,6 +1025,7 @@ class StuffKeeper:Data:Schema from G:Object
                  FieldType ft= self_get_field_type(self, retv[i]);
                  /*int order = self_get_field_pos(self, retv[i]);*/
                  char *name = self_get_field_name(self, retv[i]);
+                 int in_title= self_get_field_in_title(self, retv[i]);
 
                  new = xmlNewTextChild(fields, NULL, (xmlChar *)"row",(xmlChar *)name);
 
@@ -1036,6 +1041,10 @@ class StuffKeeper:Data:Schema from G:Object
                  xmlNewProp(new, (xmlChar *) "type", (xmlChar *)type);
                  g_free(type);
 
+                 /* in_title*/
+                 type = g_strdup_printf("%i",in_title);
+                 xmlNewProp(new, (xmlChar *) "in_title", (xmlChar *)type);
+                 g_free(type);
 
                  g_free(name);
              }
