@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define DB_VERSION 0.04
+#define DB_VERSION 0.05
 %}
 
 
@@ -937,7 +937,7 @@ class StuffKeeper:Data:Backend from G:Object
                 debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
-            result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId2 ON ItemFields(ItemId);", NULL, NULL, NULL);
+            result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId2 ON ItemsFields(ItemId);", NULL, NULL, NULL);
             if (result != SQLITE_OK) {
                 debug_printf("failed: %s\n", error);
             }
@@ -996,7 +996,7 @@ class StuffKeeper:Data:Backend from G:Object
                 {
                     printf("Adding indexes\n");
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON SchemasFields(SchemaId);", NULL, NULL, NULL);
-                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemFields(ItemId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemsFields(ItemId);", NULL, NULL, NULL);
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
                 }
                 if(version <= 0.02)
@@ -1005,10 +1005,11 @@ class StuffKeeper:Data:Backend from G:Object
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
 
                 }
-                else if (version <= 0.03)
+                else if (version <= 0.04)
                 {
+                    /* Add the indexes again, sqlite seems to overwrite the values */
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON Items(ItemId);", NULL, NULL, NULL);
-                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId2 ON ItemFields(ItemId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId2 ON ItemsFields(ItemId);", NULL, NULL, NULL);
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId2 ON SchemasFields(SchemaId);", NULL, NULL, NULL);
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
