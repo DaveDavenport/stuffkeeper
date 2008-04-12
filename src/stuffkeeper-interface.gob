@@ -173,9 +173,9 @@ class StuffKeeper:Interface from G:Object
     search_added(self, StuffKeeperDataItemSearch *search,  StuffKeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
-        gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_searches), &iter);
         gchar *title = stuffkeeper_data_item_search_get_title(search);
-        gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_searches), &iter, 
+
+        gtk_list_store_insert_with_values(GTK_LIST_STORE(self->_priv->model_searches), &iter, -1,
                 LP_ID, stuffkeeper_data_item_search_get_id(search),
                 LP_TITLE, title,
                 LP_ITEM, search,
@@ -212,9 +212,8 @@ class StuffKeeper:Interface from G:Object
     schema_added(self, StuffKeeperDataSchema *schema,StuffKeeperDataBackend *skdb )
     {
         GtkTreeIter iter;
-        gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_schemas), &iter);
         gchar *title = stuffkeeper_data_schema_get_title(schema);
-        gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_schemas), &iter, 
+        gtk_list_store_insert_with_values(GTK_LIST_STORE(self->_priv->model_schemas), &iter, -1,
                     LP_ID, stuffkeeper_data_schema_get_id(schema),
                     LP_TITLE, title,
                     LP_ITEM, schema,
@@ -246,20 +245,6 @@ class StuffKeeper:Interface from G:Object
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
-        /* This is slow on reload
-         * TODO: Only reload when icons change.   
-         */
-        /*
-        model = GTK_TREE_MODEL(self->_priv->model_items);
-        if(gtk_tree_model_get_iter_first(model, &iter))
-        {
-            do{
-                GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
-                gtk_tree_model_row_changed(model, path, &iter);
-                gtk_tree_path_free(path);
-            }while(gtk_tree_model_iter_next(model, &iter));
-        }
-        */
     }
     public
     void 
@@ -291,9 +276,8 @@ class StuffKeeper:Interface from G:Object
     tag_added(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
     {
         GtkTreeIter iter;
-        gtk_list_store_append(GTK_LIST_STORE(store), &iter);
         gchar *title = stuffkeeper_data_tag_get_title(tag);
-        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
+        gtk_list_store_insert_with_values(GTK_LIST_STORE(store), &iter, -1,
                     LP_ID, stuffkeeper_data_tag_get_id(tag),
                     LP_TITLE,title,
                     LP_ITEM,tag, 
@@ -379,9 +363,7 @@ class StuffKeeper:Interface from G:Object
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
 
         gchar *title = stuffkeeper_data_item_get_title(item);
-/*        gtk_list_store_prepend(GTK_LIST_STORE(store), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
-        */
+
         gtk_list_store_insert_with_values(GTK_LIST_STORE(store), &iter,-1,
                     0, stuffkeeper_data_item_get_id(item),
                     1, title, 
@@ -445,9 +427,11 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter iter;
             GtkTreePath *path = NULL;
             GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
-            gtk_list_store_append(GTK_LIST_STORE(store), &iter);
+/*            gtk_list_store_append(GTK_LIST_STORE(store), &iter);*/
             gchar *title = stuffkeeper_data_item_get_title(item);
-            gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
+/*            gtk_list_store_set(GTK_LIST_STORE(store), &iter, */
+
+            gtk_list_store_insert_with_values(GTK_LIST_STORE(store), &iter,-1,
                     0, stuffkeeper_data_item_get_id(item),
                     1, title, 
                     2, item,
@@ -662,14 +646,7 @@ class StuffKeeper:Interface from G:Object
         interface_list = g_list_append(interface_list, ski);
         stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg);
     }
-/*
-    public
-    gboolean
-    item_is_visible(self,StuffKeeperDataItem *item)
-    {
-        return self_interface_visible_func_real(self, item);
-    }
-*/
+
     /**
      * Filtering the item list
      */
