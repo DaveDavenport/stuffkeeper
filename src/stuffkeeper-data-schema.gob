@@ -67,7 +67,8 @@ requires 2.0.10
         DB_SCHEMAS_FIELD_TYPE_ID = 1,
         DB_SCHEMAS_FIELD_TYPE_ORDER = 2,
         DB_SCHEMAS_FIELD_TYPE_TYPE = 3,
-        DB_SCHEMAS_FIELD_TYPE_NAME = 4
+        DB_SCHEMAS_FIELD_TYPE_NAME = 4,
+        DB_SCHEMAS_FIELD_TYPE_IN_TITLE = 5
 
     }DbSchemaFieldType;
 %}
@@ -696,6 +697,22 @@ class StuffKeeper:Data:Schema from G:Object
         self_field_schemas_set_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, id,name);
         self_schema_field_changed(self,id);
 
+    }
+
+    public
+    void
+    set_field_in_title(self,  const gchar *id, const int in_title)
+    {
+        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_IN_TITLE, id,in_title);
+        self_schema_field_changed(self,id);
+    }
+    public 
+    int 
+    get_field_in_title(self, const gchar *id)
+    {
+        int val=0;
+        self_field_schemas_get_field_integer(self, DB_SCHEMAS_FIELD_TYPE_IN_TITLE, id,&val);
+        return val; 
     }
     /* Field editing */
     public

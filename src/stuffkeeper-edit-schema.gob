@@ -25,6 +25,7 @@ extern GList *interface_list;
         COL_TYPE,
         COL_NAME,
         COL_TYPE_NAME,
+        COL_IN_TITLE,
         NUM_ROWS
     }StoreFields;
 %}
@@ -32,7 +33,7 @@ extern GList *interface_list;
 class StuffKeeper:Edit:Schema from G:Object 
 {
     private StuffKeeper:Data:Schema *schema = {NULL};
-    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING)}  destroywith g_object_unref;
+    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN)}  destroywith g_object_unref;
 
     private GladeXML *xml;
     private GtkWidget *tree;
@@ -89,10 +90,12 @@ private guint field_swapped_signal = 0;
 
                     int type = stuffkeeper_data_schema_get_field_type(schema, id);
                     gchar *name = stuffkeeper_data_schema_get_field_name(schema, id);
+                    gboolean in_title = (gboolean)  stuffkeeper_data_schema_get_field_in_title(schema, id);
                     gtk_list_store_set(self->_priv->store, &iter, 
                             COL_NAME, name,
                             COL_TYPE, type,
                             COL_TYPE_NAME, FieldNames[type],
+                            COL_IN_TITLE, in_title,
                             -1);
                     g_free(name);
                     return;
@@ -130,13 +133,16 @@ private guint field_swapped_signal = 0;
             GtkTreeIter iter;
             gchar *name;
             int type = stuffkeeper_data_schema_get_field_type(schema, id);
+            gboolean in_title = (gboolean)  stuffkeeper_data_schema_get_field_in_title(schema, id);
             gtk_list_store_append(self->_priv->store, &iter);
             name = stuffkeeper_data_schema_get_field_name(schema, id);
+
             gtk_list_store_set(self->_priv->store, &iter, 
                     COL_ID, id, 
                     COL_TYPE, type ,
                     COL_NAME, name,
                     COL_TYPE_NAME, FieldNames[type],
+                    COL_IN_TITLE, in_title,
                     -1);
             g_free(name);
         }
@@ -221,6 +227,24 @@ private guint field_swapped_signal = 0;
                 g_free(id);
             }
         }
+    private
+    void
+    interface_in_title_toggled(self, gchar *path, GtkCellRendererToggle *renderer)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+        {
+            int type;
+            int active = !gtk_cell_renderer_toggle_get_active(renderer);
+            gchar *id = NULL;
+            gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+
+            /* somehow type is not found default to string */
+            stuffkeeper_data_schema_set_field_in_title(self->_priv->schema,id, active);
+            g_free(id);
+        }
+    }
 
     private
     void
@@ -323,6 +347,11 @@ private guint field_swapped_signal = 0;
             gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Name", renderer, "text", COL_NAME, NULL);
             g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
+
+            renderer = gtk_cell_renderer_toggle_new();
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"In title", renderer, "active", COL_IN_TITLE, NULL);
+            g_signal_connect_swapped(G_OBJECT(renderer), "toggled", G_CALLBACK(self_interface_in_title_toggled), self);
+
 
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->tree), GTK_TREE_MODEL(self->_priv->store));
 

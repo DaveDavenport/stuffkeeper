@@ -47,6 +47,7 @@ class StuffKeeper:Data:Item from G:Object
     private StuffKeeperDataSchema *schema = {NULL};
 
     private guint schema_field_removed = {0};
+    private guint schema_field_changed = {0};
 
     private gint id = {0};
     private sqlite3 *sqlHandle = {NULL};
@@ -78,6 +79,11 @@ class StuffKeeper:Data:Item from G:Object
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema),self->_priv->schema_field_removed );
             self->_priv->schema_field_removed = 0; 
         }
+        if(self->_priv->schema_field_changed )
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema),self->_priv->schema_field_changed );
+            self->_priv->schema_field_changed = 0; 
+        } 
         PARENT_HANDLER(obj);
     }
 
@@ -262,6 +268,8 @@ class StuffKeeper:Data:Item from G:Object
                     obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
                     obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", 
                             G_CALLBACK(self_item_schema_field_removed), obj);
+                    obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
+                            G_CALLBACK(self_item_schema_field_changed), obj);
                     stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
                 }
             }
@@ -292,6 +300,15 @@ class StuffKeeper:Data:Item from G:Object
         /* update mtime */
         self_update_mtime(self);
 
+    }
+    private 
+    void
+    item_schema_field_changed(self, const char *id, StuffKeeperDataSchema *schema)
+    {
+        int result;
+        char *error,*query;
+        if(stuffkeeper_data_schema_get_field_in_title(schema, id))
+            self_item_changed(self, NULL);
     }
 
     /**************************************
@@ -493,18 +510,58 @@ class StuffKeeper:Data:Item from G:Object
         void
         set_title(self, const gchar *title)
         {
+            /*
             self_items_set_field_string(self, DB_ITEMS_TYPE_NAME, title);
             self_item_changed(self,NULL);
+            */
+            printf("No longer supported\n");
         }
 
     public 
         gchar *
         get_title(self)
         {
-            char *retv = self_items_get_field_string(self, DB_ITEMS_TYPE_NAME);
+            gsize *length = 0;
+            gchar **retv = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length);
+            if(retv)
+            {
+                int i=0;
+                int first =0;
+                gchar *ret = NULL;
+                GString *string = g_string_new("");
+                for(i=0;i<length;i++)
+                {
+                    if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, retv[i]))
+                    {
+                        gchar *name=  self_get_string(self, retv[i]);
+                        if(first)
+                        {
+                            g_string_append(string," - ");
+                        }
+                        if(name)
+                        {
+                            g_string_append(string, name);
+                            g_free(name);
+                        }
+                        if(!first)
+                            first = 1;
+                    }
+                }
+                if(!first)
+                    g_string_append(string, _("N/A"));
+
+                ret = string->str;
+                g_string_free(string, FALSE);
+                g_strfreev(retv);
+                return ret;
+            }
+            return g_strdup("N/A");
+           /* char *retv = self_items_get_field_string(self, DB_ITEMS_TYPE_NAME);
             if(!retv)
                 retv = g_strdup("Failed to get title\n");
             return retv;
+            */
+
         }
     /**
      * Creation Time (ro)
