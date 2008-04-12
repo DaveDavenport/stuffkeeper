@@ -21,7 +21,8 @@ requires 2.0.10
             DB_ITEMS_TYPE_MTIME = 3,
             DB_ITEMS_TYPE_CTIME = 4,
             DB_ITEMS_TYPE_TAG = 5,
-            DB_ITEMS_TYPE_NAME = 6
+            DB_ITEMS_TYPE_NAME = 6,
+            DB_ITEMS_TYPE_NAME_GENERATED_CACHE = 7
 
         }DbItemType;
         typedef enum _DbItemFieldType {
@@ -59,6 +60,15 @@ class StuffKeeper:Data:Item from G:Object
     item_changed(self, const gchar *field)
     {
         /* Mark the item changed */
+        if(field)
+        {
+
+            if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, field))
+            { 
+                self_title_cache_refresh(self);
+                self_item_changed(self, NULL);
+            }
+        }
     }
 
     signal last NONE (NONE)
@@ -215,7 +225,7 @@ class StuffKeeper:Data:Item from G:Object
 
     public
         StuffKeeperDataItem *
-        open_from_id (G:Object *skdb, sqlite3 *sqlHandle,gint id)
+        open_from_id (G:Object *skdb, sqlite3 *sqlHandle,gint id,gint schemaid)
         {
             char *query;
             const char *tail;
@@ -230,7 +240,7 @@ class StuffKeeper:Data:Item from G:Object
 
             query = sqlite3_mprintf("SELECT value FROM Items WHERE ItemId=%i and type=%i ORDER BY value ASC",
                     obj->_priv->id, DB_ITEMS_TYPE_TAG);
-            r = sqlite3_prepare(obj->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(obj->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             sqlite3_free(query);
             if (r != SQLITE_OK)
             {
@@ -249,10 +259,18 @@ class StuffKeeper:Data:Item from G:Object
                 }
             }
             sqlite3_finalize(stmt);
+            /* Load schemas */
+            obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
+            obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", 
+                    G_CALLBACK(self_item_schema_field_removed), obj);
+            obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
+                    G_CALLBACK(self_item_schema_field_changed), obj);
+            stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
 
+/*
             query = sqlite3_mprintf("SELECT value FROM Items WHERE ItemId=%i and type=%i ORDER BY value ASC",
                     obj->_priv->id, DB_ITEMS_TYPE_SCHEMA);
-            r = sqlite3_prepare(obj->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(obj->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             sqlite3_free(query);
             if (r != SQLITE_OK)
             {
@@ -274,7 +292,7 @@ class StuffKeeper:Data:Item from G:Object
                 }
             }
             sqlite3_finalize(stmt);
-
+*/
             return obj;
         }
 
@@ -305,10 +323,8 @@ class StuffKeeper:Data:Item from G:Object
     void
     item_schema_field_changed(self, const char *id, StuffKeeperDataSchema *schema)
     {
-        int result;
-        char *error,*query;
-/*        if(stuffkeeper_data_schema_get_field_in_title(schema, id))*/
         /* update title */
+        self_title_cache_refresh(self);
         self_item_changed(self, NULL);
     }
 
@@ -422,7 +438,7 @@ class StuffKeeper:Data:Item from G:Object
             sqlite3_stmt *stmt;
             const char *tail;
             int r;
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK) {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
                     retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
@@ -476,7 +492,7 @@ class StuffKeeper:Data:Item from G:Object
             sqlite3_stmt *stmt;
             const char *tail;
             int r;
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -527,55 +543,92 @@ class StuffKeeper:Data:Item from G:Object
                 self_item_changed(self,NULL);
             }
     }
-    public 
-        gchar *
-        get_title(self)
+    private
+    gchar *
+    generate_title(self)
+    {
+        gsize length = 0;
+        gchar **retv;
+        retv = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length);
+        if(retv)
         {
-            if(stuffkeeper_data_schema_has_generated_title(self->_priv->schema) > 0)
+            int i=0;
+            int first =0;
+            gchar *ret = NULL;
+            GString *string = g_string_new("");
+            for(i=0;i<length;i++)
             {
-                gsize length = 0;
-                gchar **retv = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length);
-                if(retv)
+                if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, retv[i]))
                 {
-                    int i=0;
-                    int first =0;
-                    gchar *ret = NULL;
-                    GString *string = g_string_new("");
-                    for(i=0;i<length;i++)
+                    gchar *name=  self_get_string(self, retv[i]);
+                    if(first && name && name[0] != '\0')
                     {
-                        if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, retv[i]))
-                        {
-                            gchar *name=  self_get_string(self, retv[i]);
-                            if(first && name && name[0] != '\0')
-                            {
-                                g_string_append(string," - ");
-                            }
-                            if(name && name[0] != '\0')
-                            {
-                                g_string_append(string, name);
-                                g_free(name);
-                            }
-                            if(!first)
-                                first = 1;
-                        }
+                        g_string_append(string," - ");
+                    }
+                    if(name && name[0] != '\0')
+                    {
+                        g_string_append(string, name);
+                        g_free(name);
                     }
                     if(!first)
-                        g_string_append(string, _("N/A"));
-
-                    ret = string->str;
-                    g_string_free(string, FALSE);
-                    g_strfreev(retv);
-                    return ret;
+                        first = 1;
                 }
-            }else
-            {
-                char *retv = self_items_get_field_string(self, DB_ITEMS_TYPE_NAME);
-                if(!retv)
-                    retv = g_strdup("Failed to get title\n");
-                return retv;
             }
-            return NULL;
+            if(!first)
+                g_string_append(string, _("N/A"));
+
+            ret = string->str;
+            g_string_free(string, FALSE);
+            g_strfreev(retv);
+            return ret;
         }
+        return g_strdup(_("N/A"));
+    }
+    private
+    void
+    title_cache_refresh(self)
+    {
+        int result;
+        char *error,*query;
+        char *value = self_generate_title(self);
+        printf("free title cache\n");
+        /* no field, create it */
+        query = sqlite3_mprintf("UPDATE 'Items' SET value=%Q WHERE ItemId=%i and type=%i", 
+                                value,
+                                self->_priv->id,
+                                DB_ITEMS_TYPE_NAME_GENERATED_CACHE);
+        g_free(value);
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+    }
+
+    public 
+    gchar *
+    get_title(self)
+    {
+        if(stuffkeeper_data_schema_has_generated_title(self->_priv->schema) > 0)
+        {
+            char *val= self_items_get_field_string(self, DB_ITEMS_TYPE_NAME_GENERATED_CACHE);
+            if(val)
+            {
+                return val;
+            }
+            printf("generate title\n");
+            val = self_generate_title(self);
+            self_items_set_field_string(self, DB_ITEMS_TYPE_NAME_GENERATED_CACHE, val);
+            return val;
+        }else
+        {
+            char *retv = self_items_get_field_string(self, DB_ITEMS_TYPE_NAME);
+            if(!retv)
+                retv = g_strdup(_("Failed to get title"));
+            return retv;
+        }
+        return NULL;
+    }
     /**
      * Creation Time (ro)
      */
@@ -615,7 +668,7 @@ class StuffKeeper:Data:Item from G:Object
             sqlite3_stmt *stmt;
             const char *tail;
             int r;
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -685,7 +738,7 @@ class StuffKeeper:Data:Item from G:Object
             sqlite3_stmt *stmt;
             const char *tail;
             int r;
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -779,7 +832,7 @@ class StuffKeeper:Data:Item from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -807,7 +860,7 @@ class StuffKeeper:Data:Item from G:Object
                 field
                 );
 
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         sqlite3_free(query);
         if (r != SQLITE_OK)
         {
@@ -913,7 +966,7 @@ public
             int r;
             /* count the number of fields */
             query = sqlite3_mprintf("SELECT COUNT(*) FROM ItemsFields WHERE ItemId=%i and value LIKE '%q'",self->_priv->id,value);
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -930,7 +983,7 @@ public
                 return TRUE; 
             /* count the number of fields */
             query = sqlite3_mprintf("SELECT COUNT(*) FROM Items WHERE ItemId=%i and value LIKE '%q'",self->_priv->id,value);
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -958,7 +1011,7 @@ public
             int r;
             /* count the number of fields */
             query = sqlite3_mprintf("SELECT COUNT(*) FROM ItemsFields WHERE ItemId=%i and value LIKE '%%%q%%'",self->_priv->id,value);
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -975,7 +1028,7 @@ public
                 return TRUE; 
             /* count the number of fields */
             query = sqlite3_mprintf("SELECT COUNT(*) FROM Items WHERE ItemId=%i and value LIKE '%%%q%%'",self->_priv->id,value);
-            r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
             if (r == SQLITE_OK)
             {
                 if((r = sqlite3_step(stmt)) == SQLITE_ROW)

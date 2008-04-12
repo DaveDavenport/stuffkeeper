@@ -83,6 +83,7 @@ class StuffKeeper:Data:Schema from G:Object
 
     private sqlite3 *sqlHandle = {NULL};
     private gint id = {0};
+    private gint generated_title = {-1};
     /**
      * Signals 
      */
@@ -347,7 +348,7 @@ class StuffKeeper:Data:Schema from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -377,7 +378,7 @@ class StuffKeeper:Data:Schema from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -403,7 +404,7 @@ class StuffKeeper:Data:Schema from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -589,7 +590,7 @@ class StuffKeeper:Data:Schema from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -615,7 +616,7 @@ class StuffKeeper:Data:Schema from G:Object
                     self->_priv->id,
                     DB_SCHEMAS_FIELD_TYPE_ORDER);
 
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         sqlite3_free(query);
         if (r != SQLITE_OK)
         {
@@ -703,16 +704,23 @@ class StuffKeeper:Data:Schema from G:Object
     int
     has_generated_title(self)
     {
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
         int fields =0;
         char *query;
+        /*buffer */
+        if(self->_priv->generated_title >= 0)
+            return self->_priv->generated_title;
+
         /* count the number of fields */
         query = sqlite3_mprintf("SELECT COUNT(DISTINCT FieldId) FROM SchemasFields WHERE SchemaId=%i and type=%i and value=1",
                 self->_priv->id,
                 DB_SCHEMAS_FIELD_TYPE_IN_TITLE);
-        sqlite3_stmt *stmt;
-        const char *tail;
-        int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+
+
+
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -726,6 +734,8 @@ class StuffKeeper:Data:Schema from G:Object
         }
         sqlite3_finalize(stmt);
         sqlite3_free(query);
+
+        self->_priv->generated_title = fields;
         return fields;
     }
 
@@ -734,7 +744,12 @@ class StuffKeeper:Data:Schema from G:Object
     set_field_in_title(self,  const gchar *id, const int in_title)
     {
         self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_IN_TITLE, id,in_title);
+        self->_priv->generated_title = -1;
+
+        printf("set transaction, can cause large amount of updates\n");
+        stuffkeeper_data_backend_begin_transaction(self->_priv->skdb);
         self_schema_field_changed(self,id);
+        stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
     }
     public 
     int 
@@ -779,7 +794,7 @@ class StuffKeeper:Data:Schema from G:Object
                     self->_priv->id,
                     DB_SCHEMAS_FIELD_TYPE_ORDER );
 
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)
@@ -843,7 +858,10 @@ class StuffKeeper:Data:Schema from G:Object
         }
 
         /* Mark it for saving */
+        printf("set transaction, can cause large amount of updates\n");
+        stuffkeeper_data_backend_begin_transaction(self->_priv->skdb);
         self_schema_field_removed(self, id);
+        stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
     }
 
     /* Item handling */
@@ -973,6 +991,8 @@ class StuffKeeper:Data:Schema from G:Object
                  printf("Failed to open xml file\n");
                  return NULL;
              }
+             printf("set transaction, can cause large amount of updates\n");
+             stuffkeeper_data_backend_begin_transaction(skdb);
              self = self_new(skdb,sqlHandle);
              root =  xmlDocGetRootElement(doc);
              if(root)
@@ -1012,7 +1032,7 @@ class StuffKeeper:Data:Schema from G:Object
                      }
                  }
              }
-
+             stuffkeeper_data_backend_end_transaction(skdb);
              xmlFreeDoc(doc);
              return self;
          }

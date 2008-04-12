@@ -124,7 +124,7 @@ class StuffKeeper:Data:Tag from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK)
         {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW)

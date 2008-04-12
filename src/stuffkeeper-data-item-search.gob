@@ -123,7 +123,7 @@ class StuffKeeper:Data:Item:Search from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r == SQLITE_OK) {
             if((r = sqlite3_step(stmt)) == SQLITE_ROW) {
                 retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
@@ -390,7 +390,7 @@ class StuffKeeper:Data:Item:Search from G:Object
         const char *tail;
         int found = TRUE;
         int r;
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if(r == SQLITE_OK ) {
             while((r = sqlite3_step(stmt)) == SQLITE_ROW && found) {
                 SearchField *field  = g_malloc0(sizeof(*field));

@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define DB_VERSION 0.03
+#define DB_VERSION 0.04
 %}
 
 
@@ -39,7 +39,7 @@ class StuffKeeper:Data:Backend from G:Object
 
     /* SQLite handler */
     private sqlite3 *sqlHandle = {NULL};
-
+    private gint transaction = {0};
     /**
      * Signal 
      */
@@ -324,7 +324,7 @@ class StuffKeeper:Data:Backend from G:Object
          * Read Schemas 
          */
         query = sqlite3_mprintf("SELECT SchemaId FROM Schemas WHERE type=%i",DB_SCHEMAS_TYPE_ID);
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         sqlite3_free(query);
         if (r != SQLITE_OK)
         {
@@ -357,7 +357,7 @@ class StuffKeeper:Data:Backend from G:Object
          * Read Searches 
          */
         query = "SELECT SearchID FROM SearchFields GROUP by SearchID";
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r != SQLITE_OK)
         {
             printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
@@ -390,7 +390,7 @@ class StuffKeeper:Data:Backend from G:Object
          * Read tags 
          */
         query = "SELECT id FROM Tags";
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         if (r != SQLITE_OK)
         {
             printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
@@ -424,8 +424,9 @@ class StuffKeeper:Data:Backend from G:Object
         /** 
          * Items
          */
-        query = sqlite3_mprintf("SELECT ItemId FROM Items WHERE type=%i",DB_ITEMS_TYPE_ID);
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        /* also get schemaid, saves an extra N extra queries */
+        query = sqlite3_mprintf("SELECT ItemId,value FROM Items WHERE type=%i",DB_ITEMS_TYPE_SCHEMA);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         sqlite3_free(query);
         if (r != SQLITE_OK)
         {
@@ -436,10 +437,11 @@ class StuffKeeper:Data:Backend from G:Object
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);
+                int schemaid = sqlite3_column_int(stmt, 1);
                 StuffKeeperDataItem *item;
                 gint *id;
                 /* create a new item */
-                item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
+                item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid,schemaid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -876,6 +878,8 @@ class StuffKeeper:Data:Backend from G:Object
                 debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
+
+            sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
         }
         if(G_UNLIKELY(!has_schemas_field)) {
             debug_printf("Create SchemasFields table\n");
@@ -893,7 +897,7 @@ class StuffKeeper:Data:Backend from G:Object
                 debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
-            result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON SchemasFields(SchemaId);", NULL, NULL, NULL);
+            result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId2 ON SchemasFields(SchemaId);", NULL, NULL, NULL);
             if (result != SQLITE_OK) {
                 debug_printf("failed: %s\n", error);
             }
@@ -915,6 +919,8 @@ class StuffKeeper:Data:Backend from G:Object
                 debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
+
+            sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON Items(ItemId);", NULL, NULL, NULL);
         }
         if(G_UNLIKELY(!has_items_field)) {
             debug_printf("Create ItemsFields table\n");
@@ -931,7 +937,7 @@ class StuffKeeper:Data:Backend from G:Object
                 debug_printf("failed: %s\n", error);
             }
             sqlite3_free(query);
-            result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON ItemFields(ItemId);", NULL, NULL, NULL);
+            result = sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId2 ON ItemFields(ItemId);", NULL, NULL, NULL);
             if (result != SQLITE_OK) {
                 debug_printf("failed: %s\n", error);
             }
@@ -965,7 +971,7 @@ class StuffKeeper:Data:Backend from G:Object
          * Version
          */
         query = sqlite3_mprintf("SELECT value FROM 'General' WHERE key='Version'");
-        r = sqlite3_prepare(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
         sqlite3_free(query);
         if (r != SQLITE_OK)
         {
@@ -999,6 +1005,14 @@ class StuffKeeper:Data:Backend from G:Object
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
 
                 }
+                else if (version <= 0.03)
+                {
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId ON Items(ItemId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX ItemId2 ON ItemFields(ItemId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId ON Schemas(SchemaId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId2 ON SchemasFields(SchemaId);", NULL, NULL, NULL);
+                    sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
+                }
 
                 query = sqlite3_mprintf( "UPDATE 'General' SET value=%f WHERE key='Version'",DB_VERSION); 
                 sqlite3_exec(self->_priv->sqlHandle,query, NULL, NULL, NULL);
@@ -1008,4 +1022,29 @@ class StuffKeeper:Data:Backend from G:Object
         }
 
     }
+
+    public
+        void
+        begin_transaction(self)
+        {
+            if(self->_priv->transaction)
+            {
+                self->_priv->transaction++;
+                return;
+            }
+            printf("begin transaction\n");
+            sqlite3_exec(self->_priv->sqlHandle, "BEGIN TRANSACTION", NULL, NULL, NULL);
+            self->_priv->transaction++;
+        }
+
+    public
+        void
+        end_transaction(self)
+        {
+            self->_priv->transaction--;
+            if(self->_priv->transaction)
+                return;
+            printf("end transaction\n");
+            sqlite3_exec(self->_priv->sqlHandle, "END TRANSACTION", NULL, NULL, NULL);
+        }
 }
