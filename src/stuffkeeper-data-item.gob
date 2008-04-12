@@ -535,11 +535,11 @@ class StuffKeeper:Data:Item from G:Object
                     if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, retv[i]))
                     {
                         gchar *name=  self_get_string(self, retv[i]);
-                        if(first)
+                        if(first && name && name[0] != '\0')
                         {
                             g_string_append(string," - ");
                         }
-                        if(name)
+                        if(name && name[0] != '\0')
                         {
                             g_string_append(string, name);
                             g_free(name);
