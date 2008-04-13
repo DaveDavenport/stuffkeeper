@@ -218,6 +218,21 @@ class StuffKeeper:Data:Item from G:Object
             }
             sqlite3_free(query);
 
+
+            /* Load schemas */
+            obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", 
+                    G_CALLBACK(self_item_schema_field_removed), obj);
+            obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
+                    G_CALLBACK(self_item_schema_field_changed), obj);
+
+
+
+
+
+
+
+
+
             stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
 
             return obj;
