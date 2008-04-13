@@ -190,7 +190,6 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                 GTK_SIGNAL_FUNC (self_drag_data_recieved),obj);
 
         /* this is destroyed when self is destroyed, so no need to disconnect myself */
-//        obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "button-press-event", G_CALLBACK(self_button_press_event), NULL);
         return GTK_WIDGET(obj);
     }
@@ -224,15 +223,20 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
             /* process url */
             if(strncmp(url[0], "file://",7) == 0)
             {
-                gchar *stripped = &((url[0])[7]);
-                GdkPixbufFormat *finfo = gdk_pixbuf_get_file_info(stripped, NULL, NULL);
-                /* if the pixbuf loader can open it, copy it */
-                if(finfo)
+                gchar *stripped = g_filename_from_uri(url[0], NULL, NULL); 
+                if(stripped)
                 {
-                    self_copy_path(self, &((url[0])[7]));
-                    g_strfreev(url);
-                    gtk_drag_finish(context, TRUE, FALSE, time);
-                    return;
+                    GdkPixbufFormat *finfo = gdk_pixbuf_get_file_info(stripped, NULL, NULL);
+                    /* if the pixbuf loader can open it, copy it */
+                    if(finfo)
+                    {
+                        self_copy_path(self, &((url[0])[7]));
+                        g_strfreev(url);
+                        g_free(stripped);
+                        gtk_drag_finish(context, TRUE, FALSE, time);
+                        return;
+                    }
+                    g_free(stripped);
                 }
             }
             /* Failed to open, show a popup */
