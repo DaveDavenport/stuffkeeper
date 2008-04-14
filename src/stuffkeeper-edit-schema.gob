@@ -235,7 +235,6 @@ private guint field_swapped_signal = 0;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
         if(gtk_tree_model_get_iter_from_string(model, &iter, path))
         {
-            int type;
             int active = !gtk_cell_renderer_toggle_get_active(renderer);
             gchar *id = NULL;
             gtk_tree_model_get(model, &iter, COL_ID, &id, -1);

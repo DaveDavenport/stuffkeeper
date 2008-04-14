@@ -997,7 +997,7 @@ class StuffKeeper:Data:Schema from G:Object
                  return NULL;
              }
              printf("set transaction, can cause large amount of updates\n");
-             stuffkeeper_data_backend_begin_transaction(skdb);
+             stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(skdb));
              self = self_new(skdb,sqlHandle);
              root =  xmlDocGetRootElement(doc);
              if(root)
@@ -1037,7 +1037,7 @@ class StuffKeeper:Data:Schema from G:Object
                      }
                  }
              }
-             stuffkeeper_data_backend_end_transaction(skdb);
+             stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(skdb));
              xmlFreeDoc(doc);
              return self;
          }
