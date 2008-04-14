@@ -118,7 +118,6 @@ class StuffKeeper:Data:List2 from Gtk:VBox
             self->_priv->list = g_list_insert(self->_priv->list, fr, pos+1);
             printf("item: %i:%i\n", pos+1, g_list_index(self->_priv->list, fr));
             gtk_box_reorder_child(GTK_BOX(self->_priv->vbox), fr->hbox,pos+1); 
-            printf("total length: %i %i\n", g_list_length(self->_priv->list), g_list_length(gtk_container_get_children(self->_priv->vbox)));
         }
         else
         {
