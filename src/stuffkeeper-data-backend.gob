@@ -45,7 +45,7 @@ class StuffKeeper:Data:Backend from G:Object
      */
     /* searches
      */
-
+    private
     signal last NONE (STRING,POINTER)
     void
     search_changed(self,const SearchField *field, StuffKeeperDataItemSearch *search)
@@ -53,13 +53,15 @@ class StuffKeeper:Data:Backend from G:Object
     }
 
 
-
+    private
     signal last NONE (POINTER)
     void
     search_added(self, StuffKeeperDataItemSearch *search)
     {
         g_signal_connect_swapped(G_OBJECT(search), "search-changed", G_CALLBACK(self_search_changed), self);
     }
+
+    private
     signal last NONE (INT)
     void
     search_removed(self, gint id)
@@ -70,12 +72,14 @@ class StuffKeeper:Data:Backend from G:Object
 
 
     /* item */
+    private
     signal last NONE (STRING,POINTER)
     void
     item_changed(self, const gchar *field,StuffKeeperDataItem *item)
     {
     }
 
+    private
     signal last NONE (POINTER)
     void
     item_added(self, StuffKeeperDataItem *item)
@@ -83,6 +87,8 @@ class StuffKeeper:Data:Backend from G:Object
         g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), self);
 
     }
+
+    private
     signal last NONE (INT)
     void
     item_removed(self, gint id)
@@ -90,18 +96,21 @@ class StuffKeeper:Data:Backend from G:Object
     }
 
     /* schema */
+    private
     signal last NONE (POINTER)
     void
     schema_changed(self, StuffKeeperDataSchema *schema)
     {
     }
 
+    private
     signal last NONE (POINTER)
     void
     schema_added(self, StuffKeeperDataSchema *schema)
     {
         g_signal_connect_swapped(G_OBJECT(schema), "schema-changed", G_CALLBACK(self_schema_changed), self);
     }
+    private
     signal last NONE (INT)
         void
     schema_removed(self, gint id)
@@ -548,12 +557,14 @@ class StuffKeeper:Data:Backend from G:Object
      * Tags
      */
     /* signals  */
+    private
     signal last NONE (POINTER)
     void
     tag_changed(self, StuffKeeperDataTag *tag)
     {
     }
 
+    private
     signal last NONE (POINTER)
         void
         tag_added(self, StuffKeeperDataTag *tag)
@@ -562,6 +573,7 @@ class StuffKeeper:Data:Backend from G:Object
             g_signal_connect_swapped(G_OBJECT(tag), "tag-changed", G_CALLBACK(self_tag_changed), self);
         }
 
+    private
     signal last NONE (INT)
     void
     tag_removed(self,const int id)

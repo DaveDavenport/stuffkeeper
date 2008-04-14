@@ -130,7 +130,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
         gtk_widget_show_all(GTK_WIDGET(self));
     }
 
-    public
+    private 
     void
     field_changed(self, const gchar *id, StuffKeeperDataSchema *schema)
     {

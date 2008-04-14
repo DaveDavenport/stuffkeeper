@@ -140,7 +140,7 @@ class StuffKeeper:Interface from G:Object
     /**
      * Search added
      */
-    public
+    private 
     void
     search_changed(self, const SearchField *field, StuffKeeperDataItemSearch *search)
     {
@@ -168,7 +168,7 @@ class StuffKeeper:Interface from G:Object
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
     }
 
-    public
+    private
     void
     search_added(self, StuffKeeperDataItemSearch *search,  StuffKeeperDataBackend *skdb)
     {
@@ -182,7 +182,7 @@ class StuffKeeper:Interface from G:Object
                 -1);
         g_free(title);
     }
-    public
+    private
         void 
     search_removed(self, gint id, StuffKeeperDataBackend *skdb)
     {
@@ -207,7 +207,7 @@ class StuffKeeper:Interface from G:Object
     /**
      * Keep Schema's GtkListStore up2date
      */
-    public
+    private
     void 
     schema_added(self, StuffKeeperDataSchema *schema,StuffKeeperDataBackend *skdb )
     {
@@ -222,7 +222,7 @@ class StuffKeeper:Interface from G:Object
 
         g_free(title);
     }
-    public
+    private
     void 
     schema_changed(self, StuffKeeperDataSchema *schema, StuffKeeperDataBackend *skdb)
     {
@@ -246,7 +246,7 @@ class StuffKeeper:Interface from G:Object
             }while(gtk_tree_model_iter_next(model, &iter));
         }
     }
-    public
+    private
     void 
     schema_removed(self, gint id, StuffKeeperDataBackend *skdb)
     {
@@ -271,7 +271,7 @@ class StuffKeeper:Interface from G:Object
     /**
      * Keep Tag's GtkListStore up2date
      */
-    public
+    private
     void 
     tag_added(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
     {
@@ -285,7 +285,7 @@ class StuffKeeper:Interface from G:Object
                     -1);
         g_free(title);
     }
-    public
+    private
     void 
     tag_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
     {
@@ -310,7 +310,7 @@ class StuffKeeper:Interface from G:Object
             }while(gtk_tree_model_iter_next(model, &iter));
         }
     }
-    public
+    private
     void 
     tag_removed(StuffKeeperDataBackend *skdb, gint id, GtkListStore *store)
     {
@@ -334,7 +334,7 @@ class StuffKeeper:Interface from G:Object
      * Item GtkListStore
      * Update the gtk-list-store with signals from the backend
      */
-    public
+    private
     void
     item_removed(StuffKeeperDataBackend *skdb, gint id,StuffKeeperInterface *self) 
     {
@@ -355,7 +355,7 @@ class StuffKeeper:Interface from G:Object
             }while(gtk_tree_model_iter_next(model, &iter));
         }
     }
-    public
+    private
     void
     item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
     {
@@ -374,7 +374,7 @@ class StuffKeeper:Interface from G:Object
                     -1);
         g_free(title);
     }
-    public
+    private
     void
     item_changed(StuffKeeperDataBackend *skdb, const gchar *field, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
     {
@@ -471,7 +471,7 @@ class StuffKeeper:Interface from G:Object
 
         }
 
-    public
+    private
         void 
         interface_item_add_menu_button(self, GtkWidget *button)
         {
@@ -528,7 +528,7 @@ class StuffKeeper:Interface from G:Object
     /**
      * Tag is enabled/disabled
      */
-    public
+    private
         void 
         interface_left_pane_toggled(self, gchar *path, GtkCellRendererToggle *renderer)
         {
@@ -562,7 +562,7 @@ class StuffKeeper:Interface from G:Object
             }
         }
 
-    public
+    private
         void interface_item_title_edited
         (
          self,
@@ -586,7 +586,7 @@ class StuffKeeper:Interface from G:Object
             }
         }
 
-    public
+    private
         void interface_left_pane_edited 
         (
          self,
@@ -786,7 +786,7 @@ class StuffKeeper:Interface from G:Object
         self_interface_item_selection_changed(self, gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2)));
     }
 
-    public
+   private 
         void 
         interface_item_selection_changed (self, GtkTreeSelection *selection)
         {

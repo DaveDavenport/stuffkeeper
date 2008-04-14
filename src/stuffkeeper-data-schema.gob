@@ -87,28 +87,33 @@ class StuffKeeper:Data:Schema from G:Object
     /**
      * Signals 
      */
+    private
     signal last NONE (NONE)
         void
         schema_changed(self)
         {
 
         }
+    private
     signal last NONE (STRING)
         void
         schema_field_changed(self,const gchar *field)
         {
         }
-   signal last NONE (STRING)
+    private
+    signal last NONE (STRING)
         void
         schema_field_added(self,const gchar *field)
         {
         }
-   signal last NONE (STRING,STRING)
+    private
+    signal last NONE (STRING,STRING)
         void
         schema_field_swapped(self,const gchar *field, const gchar *field2)
         {
         }
 
+    private
    signal last NONE (STRING)
         void
         schema_field_removed(self,const gchar *field)

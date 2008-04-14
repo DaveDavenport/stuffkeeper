@@ -28,6 +28,7 @@ class StuffKeeper:Data:Tag from G:Object
     /**
      * Signals 
      */
+    private
     signal last NONE (NONE)
         void
         tag_changed(self)

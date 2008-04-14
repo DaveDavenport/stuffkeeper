@@ -55,6 +55,7 @@ class StuffKeeper:Data:Item from G:Object
     /**
      * Signals 
      */
+    public 
     signal last NONE (STRING)
     void
     item_changed(self, const gchar *field)
@@ -71,6 +72,7 @@ class StuffKeeper:Data:Item from G:Object
         }
     }
 
+    private
     signal last NONE (NONE)
     void
     item_tags_changed(self)

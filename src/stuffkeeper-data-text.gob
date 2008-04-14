@@ -48,7 +48,7 @@ class StuffKeeper:Data:Text from Gtk:Text:View
     }
 
 
-    public
+    private 
     void
     changed(self, gpointer data)
     {
@@ -62,7 +62,7 @@ class StuffKeeper:Data:Text from Gtk:Text:View
     }
 
 
-    public
+    private 
     void
     item_changed(self,const gchar *field, StuffKeeperDataItem *item)
     {

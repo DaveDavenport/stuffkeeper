@@ -181,7 +181,7 @@ private guint field_swapped_signal = 0;
 
         }
 
-    public
+        private
         void interface_field_edited
         (
          self,
@@ -203,7 +203,7 @@ private guint field_swapped_signal = 0;
 
             }
         }
-    public
+    private
         void interface_type_edited
         (
          self,
