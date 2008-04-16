@@ -33,9 +33,10 @@ extern GList *interface_list;
         "Tango Project (http://tango.freedesktop.org/ )",
     NULL};
     const gchar *authors[] = {
-        "Martijn Koedam (qball) <Qball@Sarine.nl>", 
+        "Martijn Koedam (qball) <Qball@Stuffkeeper.org>", 
         "\nTester:",
         "Greg Fitzgerald",
+        "Rasi <rasi@stuffkeeper.org>",
     NULL};
 
     typedef enum _LPColumnType{

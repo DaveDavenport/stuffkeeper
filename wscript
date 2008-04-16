@@ -8,7 +8,7 @@ from subprocess import Popen,PIPE
 # the following two variables are used by the target "waf dist"
 VERSION='0.09'
 APPNAME='stuffkeeper'
-WEBSITE='http://sarine.nl/stuffkeeper/'
+WEBSITE='http://stuffkeeper.org/'
 BUGTRACKER='http://bugtracker.sarine.nl/'
 
 # these variables are mandatory ('/' are converted automatically)
