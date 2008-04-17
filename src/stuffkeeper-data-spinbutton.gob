@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include "misc.h"
 #include "stuffkeeper-data-item.h"
 %}
 
@@ -51,8 +52,8 @@ class StuffKeeper:Data:SpinButton from Gtk:Spin:Button
     {
         Self *obj = GET_NEW;
         int value; 
-
-        gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
+        if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
+            gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
         g_signal_connect_swapped(obj, "scroll-event", G_CALLBACK(self_button_scroll_event), obj);
         /* setup */
         gtk_spin_button_set_range(GTK_SPIN_BUTTON(obj), G_MININT, G_MAXINT);

@@ -2,6 +2,7 @@
 
 %h{
 #include <gtk/gtk.h>
+#include "misc.h"
 #include "stuffkeeper-data-item.h"
 %}
 
@@ -101,6 +102,7 @@ class StuffKeeper:Data:Entry from Gtk:Entry
         Self *obj = GET_NEW;
         gchar *value =NULL;
 
+        if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
 

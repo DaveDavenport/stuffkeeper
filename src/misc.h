@@ -3,6 +3,7 @@
 /**
  * url to open, uses xdg-open
  */
+extern GKeyFile *config_file;
 void open_url(const char *uri);
 void open_email(const char *uri);
 

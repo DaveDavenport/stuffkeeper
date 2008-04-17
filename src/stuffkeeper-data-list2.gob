@@ -3,7 +3,7 @@ requires 2.0.10
 %h{
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-
+#include "misc.h"
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item.h"
 %}
@@ -83,7 +83,8 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         FieldRow *fr = g_malloc0(sizeof(*fr));
         fr->hbox = gtk_hbox_new(FALSE, 0);
         fr->entry = gtk_entry_new();
-        gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
+        if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
+            gtk_entry_set_has_frame(GTK_ENTRY(fr->entry), FALSE);
         gtk_entry_set_text(GTK_ENTRY(fr->entry), text);
         gtk_box_pack_start(GTK_BOX(fr->hbox), fr->entry, TRUE, TRUE, 0);
 

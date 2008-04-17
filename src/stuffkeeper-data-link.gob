@@ -183,7 +183,7 @@ class StuffKeeper:Data:Link from Sexy:Icon:Entry
 
         sexy_icon_entry_set_icon_highlight(SEXY_ICON_ENTRY(obj),
                 SEXY_ICON_ENTRY_PRIMARY, TRUE);
-
+        if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
         g_signal_connect_swapped(G_OBJECT(obj), "icon_released", G_CALLBACK(self_link_icon_clicked), obj);
