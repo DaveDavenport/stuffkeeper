@@ -11,7 +11,6 @@
     <row type="2" in_title="0">Read</row>
     <row type="0" in_title="0">Language</row>
     <row type="1" in_title="0">Release year</row>
-    <row type="0" in_title="0">Uitgeleend aan</row>
     <row type="7" in_title="0">Url</row>
   </fields>
 </StuffKeeperSchema>
