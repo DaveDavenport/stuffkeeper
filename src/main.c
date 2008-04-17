@@ -75,7 +75,7 @@ int main ( int argc, char **argv )
 {
     GError *error = NULL;
     GOptionContext *context;
-
+    gboolean first_run = FALSE;
     StuffKeeperInterface  *ski;
 
     struct timeval start, stop;
@@ -91,6 +91,7 @@ int main ( int argc, char **argv )
     g_set_application_name("stuffkeeper");
     gtk_window_set_default_icon_name("stuffkeeper");
 
+    /* Parse command line options */
     context = g_option_context_new ("- StuffKeeper");
     g_option_context_add_main_entries (context, entries, "stuffkeeper");
     g_option_context_add_group (context, gtk_get_option_group (TRUE));
@@ -192,6 +193,7 @@ int main ( int argc, char **argv )
             g_error("Failed to create: %s\n", path);
             return EXIT_FAILURE;
         }
+        first_run = TRUE;
     }
 
 
@@ -240,6 +242,14 @@ int main ( int argc, char **argv )
     gettimeofday(&stop, NULL);
     timersub(&stop, &start, &diff);
     printf("time elapsed until gtk_main(): %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));
+
+
+    if(first_run)
+    {
+        printf("Initial run of stuffkeeper\n");
+        stuffkeeper_interface_first_run(ski);
+    }
+
     /* Start the main loop */
     gtk_main();
 

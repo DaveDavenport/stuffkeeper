@@ -2355,4 +2355,36 @@ class StuffKeeper:Interface from G:Object
             gtk_widget_destroy(dialog);
             g_object_unref(xml);
         }
+
+
+        /**
+         * First run 
+         */
+        public
+        void
+        first_run(self)
+        {
+            GDir *dir;
+            GError *error;
+            gchar *path = g_build_path(G_DIR_SEPARATOR_S,PACKAGE_DATADIR, "types",NULL);
+            /* open the directory */
+            dir = g_dir_open(path, 0, &error);
+            if(error)
+            {
+                printf("Error opening: '%s': '%s'\n", path, error->message);
+                g_error_free(error);
+            }
+            if(dir)
+            {
+                const char *filename = NULL;
+                while((filename = g_dir_read_name(dir)))
+                {
+                    gchar *full_path = g_build_path(G_DIR_SEPARATOR_S,PACKAGE_DATADIR, "types",filename,NULL);
+                    stuffkeeper_data_backend_load_from_xml(self->_priv->skdbg, full_path);
+                    g_free(full_path);
+                }
+                g_dir_close(dir);
+            }
+            g_free(path);
+        }
 }

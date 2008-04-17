@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<StuffKeeperSchema>
+  <title>Book</title>
+  <fields>
+    <row type="0" in_title="1">Title</row>
+    <row type="0" in_title="1">Author</row>
+    <row type="0" in_title="1">Serie</row>
+    <row type="6" in_title="0">Cover</row>
+    <row type="5" in_title="0">Summary</row>
+    <row type="0" in_title="0">ISBN</row>
+    <row type="2" in_title="0">Read</row>
+    <row type="0" in_title="0">Language</row>
+    <row type="1" in_title="0">Release year</row>
+    <row type="0" in_title="0">Uitgeleend aan</row>
+    <row type="7" in_title="0">Url</row>
+  </fields>
+</StuffKeeperSchema>

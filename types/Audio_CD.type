@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<StuffKeeperSchema>
+  <title>Audio CD</title>
+  <fields>
+    <row type="0" in_title="1">Artist</row>
+    <row type="0" in_title="1">Title</row>
+    <row type="6" in_title="0">Cover</row>
+    <row type="3" in_title="0">Rating</row>
+    <row type="2" in_title="0">Ripped</row>
+    <row type="2" in_title="0">Compilation</row>
+    <row type="1" in_title="0">#CD's</row>
+    <row type="1" in_title="0">Release Year</row>
+    <row type="9" in_title="0">Tracks</row>
+    <row type="1" in_title="0"># Tracks</row>
+    <row type="4" in_title="0">Track listing</row>
+    <row type="10" in_title="0">New Field</row>
+    <row type="0" in_title="0">Label</row>
+    <row type="7" in_title="0">Weblink</row>
+    <row type="5" in_title="0">Comments</row>
+  </fields>
+</StuffKeeperSchema>
