@@ -2365,7 +2365,7 @@ class StuffKeeper:Interface from G:Object
         first_run(self)
         {
             GDir *dir;
-            GError *error;
+            GError *error = NULL;
             gchar *path = g_build_path(G_DIR_SEPARATOR_S,PACKAGE_DATADIR, "types",NULL);
             /* open the directory */
             dir = g_dir_open(path, 0, &error);
