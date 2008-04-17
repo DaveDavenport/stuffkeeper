@@ -338,7 +338,7 @@ private guint field_swapped_signal = 0;
             g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
             g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_type_edited), self);
-
+            gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree), 0), TRUE);
 
 
 
@@ -346,11 +346,12 @@ private guint field_swapped_signal = 0;
             gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Name", renderer, "text", COL_NAME, NULL);
             g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
+            gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree), 1), TRUE);
 
             renderer = gtk_cell_renderer_toggle_new();
             gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"In title", renderer, "active", COL_IN_TITLE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "toggled", G_CALLBACK(self_interface_in_title_toggled), self);
-
+            gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree), 2), FALSE);
 
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->tree), GTK_TREE_MODEL(self->_priv->store));
 
