@@ -37,7 +37,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
     void
     reload_data(self)
     {
-        int i,last_type = -1, reuse = FALSE;
+        int i,last_type = -1, reuse = FALSE, split = FALSE;
         GtkWidget *label1,*hbox = NULL;
         GtkWidget *sub_part = NULL;
         GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
@@ -58,12 +58,14 @@ class StuffKeeper:Show:Item from Gtk:VBox
             FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
             label1 = NULL;
             reuse = TRUE;
-            if(last_type != FIELD_TYPE_BOOLEAN || last_type != type) {
+/*            if(last_type != FIELD_TYPE_BOOLEAN || last_type != type) {*/
+            if(!split || sub_part != NULL){
                 reuse = FALSE;
                 hbox = gtk_hbox_new(FALSE, 6);
             }
+            printf("%i:%i\n", i,type);
             /* Title */
-            if(type != FIELD_TYPE_EXPANDER && type != FIELD_TYPE_END_EXPANDER)
+            if(type < FIELD_TYPE_EXPANDER)
             {
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
@@ -74,6 +76,10 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 label1 = stuffkeeper_data_entry_new(self->_priv->item,self->_priv->retv[i]);
             } else if (type == FIELD_TYPE_INTEGER) {
                 label1 = stuffkeeper_data_spinbutton_new(self->_priv->item,self->_priv->retv[i]);
+            } else if (type == FIELD_TYPE_VSPLIT) {
+                split = TRUE;
+            } else if (type == FIELD_TYPE_END_SPLIT) {
+                split = FALSE;
             }else if (type == FIELD_TYPE_BOOLEAN) {
                 label1 = stuffkeeper_data_boolean_new(self->_priv->item,self->_priv->retv[i]);
                 /* reset */
@@ -98,19 +104,28 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 label1 = stuffkeeper_data_expander_new(self->_priv->item,self->_priv->retv[i]);                    
                 sub_part = gtk_vbox_new(FALSE, 6);
                 gtk_container_add(GTK_CONTAINER(label1), sub_part);
+
+                if(split)
+                {
+                    gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
+                    hbox = gtk_hbox_new(FALSE, 6);
+                }
+
+                split = FALSE;
             }else if (type == FIELD_TYPE_END_EXPANDER) {
                 label1 = NULL; 
                 sub_part = NULL;
+              //  split = FALSE;
             }else {
                 label1 = gtk_label_new("not supported\n");
             }
             if(label1)
                 gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
-            if(!reuse)
+//            if(!split|| subpart)
             {
                 if(sub_part && type != FIELD_TYPE_EXPANDER)
                     gtk_box_pack_start(GTK_BOX(sub_part), hbox, FALSE, TRUE, 0);
-                else
+                else if(!split)
                     gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
             }
             last_type = type;
