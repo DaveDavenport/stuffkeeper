@@ -32,9 +32,9 @@ requires 2.0.10
         FIELD_TYPE_DATE = 8,
         FIELD_TYPE_EXPANDER = 9,
         FIELD_TYPE_END_EXPANDER = 10,
-        FIELD_TYPE_VSPLIT = 11,
-        FIELD_TYPE_END_SPLIT = 12,
-        FIELD_TYPE_HSPLIT = 13,
+        FIELD_TYPE_VPACKING = 11,
+        FIELD_TYPE_END_PACKING = 12,
+        FIELD_TYPE_HPACKING = 13,
         FIELD_TYPE_NUM_FIELDS
     } FieldType;
     extern char *FieldNames[FIELD_TYPE_NUM_FIELDS];
@@ -52,9 +52,9 @@ requires 2.0.10
         "Date & Time",  // FIELD_TYPE_DATE
         "Expander",     //FIELD_TYPE_EXPANDER
         "End expander", //FIELD_TYPE_END_EXPANDER
-        "vertical split", // FIELD_TYPE_VSPLIT
-        "end split", // FIELD_TYPE_END_SPLIT
-        "horizontal split", // FIELD_TYPE_VSPLIT
+        "vertical packing", // FIELD_TYPE_VPACKING
+        "end packing", // FIELD_TYPE_END_PACKING
+        "horizontal packing", // FIELD_TYPE_VPACKING
 
     };
 
