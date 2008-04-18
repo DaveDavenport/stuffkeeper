@@ -59,13 +59,13 @@ class StuffKeeper:Show:Item from Gtk:VBox
         for(i=0;i<self->_priv->length;i++) 
         {
             GtkWidget *vbox = g_queue_peek_head(queue);
-            gint split = GPOINTER_TO_INT(g_object_get_data(vbox, "split"));
+            gint split =0;// GPOINTER_TO_INT(g_object_get_data(vbox, "split"));
             FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
             label1 = NULL;
-  //          reuse = TRUE;
+            int reuse = TRUE;
 
-            if(!split){//(last_type != FIELD_TYPE_BOOLEAN || last_type != type) {
-//                reuse = FALSE;
+            if(type != FIELD_TYPE_END_SPLIT){//!split){//(last_type != FIELD_TYPE_BOOLEAN || last_type != type) {
+                reuse = FALSE;
                 hbox = gtk_hbox_new(FALSE, 6);
             }
             /* Title */
@@ -81,11 +81,32 @@ class StuffKeeper:Show:Item from Gtk:VBox
             } else if (type == FIELD_TYPE_INTEGER) {
                 label1 = stuffkeeper_data_spinbutton_new(self->_priv->item,self->_priv->retv[i]);
             } else if (type == FIELD_TYPE_VSPLIT) {
-                g_object_set_data(vbox, "split", GINT_TO_POINTER(1));
-                split = TRUE;
+                GtkWidget *ali = gtk_alignment_new(0.0,0,1,1);
+                GtkWidget *box;
+//                g_object_set_data(vbox, "split", GINT_TO_POINTER(1));
+//                split = TRUE;
+                label1 =ali;
+
+                box = gtk_vbox_new(FALSE, 6);
+                gtk_container_add(GTK_CONTAINER(ali), box);
+//                g_object_set_data(box, "split", GINT_TO_POINTER(0));
+                g_queue_push_head(queue, box);
+            } else if (type == FIELD_TYPE_HSPLIT) {
+                GtkWidget *ali = gtk_alignment_new(0.0,0,1,1);
+                GtkWidget *box;
+//                g_object_set_data(vbox, "split", GINT_TO_POINTER(1));
+//                split = TRUE;
+                label1 = ali;
+                box = gtk_hbox_new(FALSE, 6);
+                gtk_container_add(GTK_CONTAINER(ali), box);
+
+//                g_object_set_data(box, "split", GINT_TO_POINTER(0));
+                g_queue_push_head(queue, box);
             } else if (type == FIELD_TYPE_END_SPLIT) {
-                g_object_set_data(vbox, "split", GINT_TO_POINTER(0));
-                split = FALSE;
+//                g_object_set_data(vbox, "split", GINT_TO_POINTER(0));
+//                split = TRUE;
+                g_queue_pop_head(queue);
+         //       label1 = gtk_label_new("aap");
             }else if (type == FIELD_TYPE_BOOLEAN) {
                 label1 = stuffkeeper_data_boolean_new(self->_priv->item,self->_priv->retv[i]);
                 /* reset */
@@ -130,8 +151,8 @@ class StuffKeeper:Show:Item from Gtk:VBox
             }
             if(label1)
                 gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
-            //if(!reuse)
-            if(!split){
+            if(!reuse){
+//            if(!split){
                 /*
                 if(sub_part && type != FIELD_TYPE_EXPANDER)
                     gtk_box_pack_start(GTK_BOX(sub_part), hbox, FALSE, TRUE, 0);
