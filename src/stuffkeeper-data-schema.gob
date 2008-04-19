@@ -119,12 +119,6 @@ class StuffKeeper:Data:Schema from G:Object
     {
 
     }
-    private
-    signal last NONE (STRING,STRING)
-        void
-        schema_field_swapped(self,const gchar *field, const gchar *field2)
-        {
-        }
 
     private
    signal last NONE (STRING)
@@ -663,23 +657,7 @@ class StuffKeeper:Data:Schema from G:Object
         self_field_schemas_get_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id,&val);
         return val; 
     }
-/*
-    public 
-        void 
-    swap_field_pos(self, const gchar *id, const gchar *id2)
-    {
-        int pos = self_get_field_pos(self, id);
-        int pos2 = self_get_field_pos(self, id2);
 
-        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id,pos2);
-        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id2,pos);
-
-        self_schema_field_changed(self, id);
-        self_schema_field_changed(self, id2);
-
-        self_schema_field_swapped(self, id, id2);
-    }
-*/
     public 
     FieldType 
     get_field_type(self, const gchar *id)
