@@ -113,6 +113,13 @@ class StuffKeeper:Data:Schema from G:Object
         {
         }
     private
+    signal last NONE (NONE)
+    void
+    schema_fields_reordered(self)
+    {
+
+    }
+    private
     signal last NONE (STRING,STRING)
         void
         schema_field_swapped(self,const gchar *field, const gchar *field2)
@@ -1121,6 +1128,59 @@ class StuffKeeper:Data:Schema from G:Object
          GObject *
          get_backend(self)
          {
+             printf("get backend\n");
             return self->_priv->skdb;
          }
+
+        public
+        void
+        field_reorder(self, const char **fields)
+        {
+            sqlite3_stmt *stmt;
+            const char *tail;
+            int r,i;
+            int num_fields =0;
+            int input_num_fields;
+
+            char *query;
+            if(!fields)
+            {
+                printf("Nothing todo\n");
+                return;
+            }
+            /* count the number of fields */
+            query = sqlite3_mprintf("SELECT COUNT(DISTINCT FieldId) FROM SchemasFields WHERE SchemaId=%i",self->_priv->id);
+
+
+
+            r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+            if (r == SQLITE_OK)
+            {
+                if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+                {
+                    num_fields = sqlite3_column_int(stmt, 0);
+                }
+            }
+            else
+            {
+                printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+            }
+            sqlite3_finalize(stmt);
+            sqlite3_free(query);
+
+           for(input_num_fields=0;fields[input_num_fields];input_num_fields++); 
+
+            if(input_num_fields != num_fields)
+            {
+                printf("number of fields reorder does not match total number of fields\n");
+                printf("%i - %i\n", input_num_fields,num_fields);
+                return;
+            }
+            for(i=0;i<num_fields;i++)
+            {
+                self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER,fields[i],i);
+            }
+            self_update_mtime(self);
+            self_schema_fields_reordered(self);
+        }
 }

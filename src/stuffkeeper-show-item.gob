@@ -31,6 +31,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
     private guint schema_field_removed = 0;
 
     private guint schema_field_changed = 0;
+    private guint schema_fields_reordered = 0;
     private GtkSizeGroup *group = {NULL} destroywith g_object_unref;
 
     private
@@ -150,6 +151,12 @@ class StuffKeeper:Show:Item from Gtk:VBox
         g_queue_free(queue);
     }
 
+    private
+    void
+    fields_reordered(self, StuffKeeperDataSchema *schema)
+    {
+        self_field_changed(self, NULL, schema);
+    }
     private 
     void
     field_changed(self, const gchar *id, StuffKeeperDataSchema *schema)
@@ -190,6 +197,14 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 "schema-field-changed",
                 G_CALLBACK(self_field_changed),
                 self);
+        self->_priv->schema_fields_reordered= g_signal_connect_swapped(G_OBJECT(self->_priv->schema),
+                "schema-fields-reordered",
+                G_CALLBACK(self_fields_reordered),
+                self);
+
+
+
+
 
         /* update */
         self_field_changed(self, NULL, self->_priv->schema);
@@ -215,6 +230,10 @@ class StuffKeeper:Show:Item from Gtk:VBox
         if(self->_priv->schema_field_changed) {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_field_changed);
             self->_priv->schema_field_changed = 0;
+        }
+        if(self->_priv->schema_fields_reordered) {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->schema_fields_reordered);
+            self->_priv->schema_fields_reordered = 0;
         }
         if(self->_priv->retv)
         {

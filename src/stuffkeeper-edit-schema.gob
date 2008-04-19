@@ -399,10 +399,42 @@ private guint field_swapped_signal = 0;
             }
         }
 
+    private
+    void
+    apply_order(self)
+    {
+        int i;
+        int length = gtk_tree_model_iter_n_children(GTK_TREE_MODEL(self->_priv->store), NULL);
+        if(length)
+        {
+            int i=0;
+            GtkTreeIter iter;
+            char **retv = g_malloc0((length+1)*sizeof(char *));
+            if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
+            {
+                do{
+                    gchar *id;
+                    gtk_tree_model_get(GTK_TREE_MODEL(self->_priv->store), &iter, COL_ID, &id, -1);
+                    retv[i] = id;
+                    i++;
+                }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->store), &iter));
+            }
+            stuffkeeper_data_schema_field_reorder(self->_priv->schema, retv);
+            g_strfreev(retv);
+        }
+    }
+    public
+    void
+    reorder_apply(self)
+    {
+        self_apply_order(self);
+    }
+
     public
         void
         close(self)
         {
+            self_apply_order(self);
             gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
             g_object_unref(self->_priv->xml);
             g_object_unref(self);
@@ -421,6 +453,7 @@ private guint field_swapped_signal = 0;
    void
    move_field_up(self)
    {
+       return;
        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
        GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
         GtkTreeIter siter,piter;
@@ -450,6 +483,7 @@ private guint field_swapped_signal = 0;
    void
    move_field_down(self)
    {
+       return;
        GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
        GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
        GtkTreeIter siter,piter;
