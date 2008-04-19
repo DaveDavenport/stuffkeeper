@@ -448,7 +448,7 @@ private guint field_swapped_signal = 0;
             stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field",FALSE);
             stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
         }
-    
+/*    
    public 
    void
    move_field_up(self)
@@ -502,6 +502,7 @@ private guint field_swapped_signal = 0;
            }
        }
    }
+   */
    public
    void
    remove_field(self)

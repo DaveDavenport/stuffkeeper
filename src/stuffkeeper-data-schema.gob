@@ -663,7 +663,7 @@ class StuffKeeper:Data:Schema from G:Object
         self_field_schemas_get_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER, id,&val);
         return val; 
     }
-
+/*
     public 
         void 
     swap_field_pos(self, const gchar *id, const gchar *id2)
@@ -679,7 +679,7 @@ class StuffKeeper:Data:Schema from G:Object
 
         self_schema_field_swapped(self, id, id2);
     }
-
+*/
     public 
     FieldType 
     get_field_type(self, const gchar *id)
@@ -762,13 +762,16 @@ class StuffKeeper:Data:Schema from G:Object
     void
     set_field_in_title(self,  const gchar *id, const int in_title)
     {
-        self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_IN_TITLE, id,in_title);
-        self->_priv->generated_title = -1;
+        int changed = self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_IN_TITLE, id,in_title);
+        if(changed)
+        {
+            self->_priv->generated_title = -1;
 
-        printf("set transaction, can cause large amount of updates\n");
-        stuffkeeper_data_backend_begin_transaction(self->_priv->skdb);
-        self_schema_field_changed(self,id);
-        stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
+            printf("set transaction, can cause large amount of updates\n");
+            stuffkeeper_data_backend_begin_transaction(self->_priv->skdb);
+            self_schema_field_changed(self,id);
+            stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
+        }
     }
     public 
     int 
