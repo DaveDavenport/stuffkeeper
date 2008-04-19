@@ -86,7 +86,7 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 g_queue_push_head(queue, box);
             } else if (type == FIELD_TYPE_HPACKING) {
                 GtkWidget *box;
-                label1 =box = gtk_hbox_new(FALSE, 6);
+                label1 =box = gtk_hbox_new(TRUE, 6);
                 g_queue_push_head(queue, box);
             } else if (type == FIELD_TYPE_END_PACKING) {
                 if(g_queue_get_length(queue) > 1)
