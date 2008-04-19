@@ -122,6 +122,9 @@ class StuffKeeper:Data:Text from Gtk:Scrolled:Window
         obj->_priv->text_view = gtk_text_view_new();//gtk_scrolled_window_new(NULL, NULL);
         gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj->_priv->text_view), GTK_WRAP_WORD);
         gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(obj->_priv->text_view), FALSE);
+
+        gtk_text_view_set_left_margin(GTK_TEXT_VIEW(obj->_priv->text_view), 3);
+        gtk_text_view_set_right_margin(GTK_TEXT_VIEW(obj->_priv->text_view), 3);
         //gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(obj), obj->_priv->text_view);
         gtk_container_add(GTK_CONTAINER(obj), obj->_priv->text_view);
         gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(obj), GTK_POLICY_AUTOMATIC,GTK_POLICY_NEVER);
