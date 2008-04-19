@@ -437,8 +437,8 @@ class StuffKeeper:Data:Schema from G:Object
         return set; 
 
     }
-    public 
-    void
+    private 
+    int 
     field_schemas_set_field_integer(self,int fieldtype,const gchar *id, const int title)
     {
         int result;
@@ -462,7 +462,7 @@ class StuffKeeper:Data:Schema from G:Object
             if(title == val)
             {
                 printf("not updating\n");
-                return;
+                return FALSE;
             }
             /* update the title */
             query = sqlite3_mprintf("UPDATE SchemasFields SET value=%i WHERE SchemaId=%i and type=%i and FieldId=%q", title, self->_priv->id,fieldtype,id);
@@ -477,6 +477,7 @@ class StuffKeeper:Data:Schema from G:Object
         self_update_mtime(self);
         /* signal that we changed */
     //    self_schema_field_changed(self,id);
+        return TRUE;
     }
 
     public 
@@ -1139,6 +1140,7 @@ class StuffKeeper:Data:Schema from G:Object
             sqlite3_stmt *stmt;
             const char *tail;
             int r,i;
+            int changed = 0;
             int num_fields =0;
             int input_num_fields;
 
@@ -1178,9 +1180,12 @@ class StuffKeeper:Data:Schema from G:Object
             }
             for(i=0;i<num_fields;i++)
             {
-                self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER,fields[i],i);
+                changed += self_field_schemas_set_field_integer(self, DB_SCHEMAS_FIELD_TYPE_ORDER,fields[i],i);
             }
-            self_update_mtime(self);
-            self_schema_fields_reordered(self);
+            if(changed>0)
+            {
+                self_update_mtime(self);
+                self_schema_fields_reordered(self);
+            }
         }
 }
