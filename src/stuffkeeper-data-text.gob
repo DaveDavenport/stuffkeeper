@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include "misc.h"
 #include "stuffkeeper-data-item.h"
 %}
 %ph{
@@ -11,7 +12,7 @@ requires 2.0.10
 #endif
 %}
 
-class StuffKeeper:Data:Text from Gtk:Text:View
+class StuffKeeper:Data:Text from Gtk:Scrolled:Window
 {
     private StuffKeeperDataItem *item = {NULL};
     private GtkTextBuffer *buffer = {NULL};
@@ -20,6 +21,7 @@ class StuffKeeper:Data:Text from Gtk:Text:View
     private gulong changed_entry = {0};
     private GdkColor writing ;
     private GdkColor base;
+    private GtkWidget *text_view = NULL;
 
 
 
@@ -117,26 +119,33 @@ class StuffKeeper:Data:Text from Gtk:Text:View
         gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &(obj->_priv->writing), TRUE,TRUE);
         g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set),obj);
 
-
-        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj), GTK_WRAP_WORD);
-        gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(obj), FALSE);
-
-
-
+        obj->_priv->text_view = gtk_text_view_new();//gtk_scrolled_window_new(NULL, NULL);
+        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj->_priv->text_view), GTK_WRAP_WORD);
+        gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(obj->_priv->text_view), FALSE);
+        //gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(obj), obj->_priv->text_view);
+        gtk_container_add(GTK_CONTAINER(obj), obj->_priv->text_view);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(obj), GTK_POLICY_AUTOMATIC,GTK_POLICY_NEVER);
+        if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
+        {
+            printf("blaat\n");
+            gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(obj),GTK_SHADOW_NONE);
+        }else {
+            gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(obj),GTK_SHADOW_ETCHED_IN);
+        }
 
         /* Get buffer */
-        obj->_priv->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj));
+        obj->_priv->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj->_priv->text_view));
         /* store item */
         obj->_priv->item = item; 
         /* field */
         obj->_priv->field = g_strdup(field);
             
-        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj), GTK_WRAP_WORD);
+        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj->_priv->text_view), GTK_WRAP_WORD);
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
 #if HAVE_GTKSPELL == 1
         /* Spell check this entry, if available */
-        gtkspell_new_attach(GTK_TEXT_VIEW(obj), NULL, NULL);
+        gtkspell_new_attach(GTK_TEXT_VIEW(obj->_priv->text_view), NULL, NULL);
 #endif
 
         /* update the entry */
