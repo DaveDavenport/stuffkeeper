@@ -455,7 +455,6 @@ class StuffKeeper:Data:Schema from G:Object
             /* if they are identical, do nothing */
             if(title == val)
             {
-                printf("not updating\n");
                 return FALSE;
             }
             /* update the title */
@@ -498,7 +497,6 @@ class StuffKeeper:Data:Schema from G:Object
             if(strcmp(title, val) == 0)
             {
                 g_free(val);
-                printf("not updating\n");
                 return;
             }
             /* update the title */
@@ -547,7 +545,6 @@ class StuffKeeper:Data:Schema from G:Object
             if(strcmp(title, val) == 0)
             {
                 g_free(val);
-                printf("not updating\n");
                 return;
             }
             /* update the title */
