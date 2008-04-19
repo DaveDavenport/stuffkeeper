@@ -316,7 +316,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
 
         obj->_priv->vbox = gtk_vbox_new(TRUE, 6);
 
-        gtk_box_pack_start(GTK_BOX(obj),obj->_priv->vbox, TRUE, TRUE,0);
+        gtk_box_pack_start(GTK_BOX(obj),obj->_priv->vbox, FALSE, TRUE,0);
         
         /* store item */
         obj->_priv->item = item; 
@@ -343,7 +343,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_add_row), obj);
 
 
-        gtk_box_pack_end(GTK_BOX(obj),hbox, FALSE, TRUE,0);
+        gtk_box_pack_start(GTK_BOX(obj),hbox, FALSE, TRUE,0);
 
         gtk_drag_dest_set(GTK_WIDGET(obj),
                 GTK_DEST_DEFAULT_ALL,
