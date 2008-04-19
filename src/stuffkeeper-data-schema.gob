@@ -1117,4 +1117,10 @@ class StuffKeeper:Data:Schema from G:Object
              xmlFreeDoc(doc);
              return TRUE;
          }
+         public
+         GObject *
+         get_backend(self)
+         {
+            return self->_priv->skdb;
+         }
 }

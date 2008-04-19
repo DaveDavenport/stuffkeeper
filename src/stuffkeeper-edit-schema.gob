@@ -197,7 +197,9 @@ private guint field_swapped_signal = 0;
             {
                 gchar *id;
                 gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                stuffkeeper_data_backend_begin_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                 stuffkeeper_data_schema_set_field_name(self->_priv->schema, id,new_text);
+                stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                 g_free(id);
 
 
@@ -223,7 +225,9 @@ private guint field_swapped_signal = 0;
                 for(type=0;strcmp(new_text,FieldNames[type]) && type < FIELD_TYPE_NUM_FIELDS;type++);
                 /* somehow type is not found default to string */
                 if(type == FIELD_TYPE_NUM_FIELDS) type = FIELD_TYPE_STRING; 
+                stuffkeeper_data_backend_begin_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                 stuffkeeper_data_schema_set_field_type(self->_priv->schema,id, type);
+                stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                 g_free(id);
             }
         }
@@ -240,7 +244,9 @@ private guint field_swapped_signal = 0;
             gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
 
             /* somehow type is not found default to string */
+            stuffkeeper_data_backend_begin_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
             stuffkeeper_data_schema_set_field_in_title(self->_priv->schema,id, active);
+            stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
             g_free(id);
         }
     }
@@ -406,7 +412,9 @@ private guint field_swapped_signal = 0;
         void
         add_field(self)
         {
+            stuffkeeper_data_backend_begin_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
             stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_STRING, "New Field",FALSE);
+            stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
         }
     
    public 
@@ -428,9 +436,9 @@ private guint field_swapped_signal = 0;
                         gchar *sid = NULL, *pid = NULL;
                         gtk_tree_model_get(model, &siter, COL_ID, &sid, -1);
                         gtk_tree_model_get(model, &piter, COL_ID, &pid, -1);
-                        
+                        stuffkeeper_data_backend_begin_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                         stuffkeeper_data_schema_swap_field_pos(self->_priv->schema, sid,pid); 
-
+                        stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                         g_free(sid); g_free(pid);
                     }
                 }
@@ -453,9 +461,9 @@ private guint field_swapped_signal = 0;
                gchar *sid = NULL, *pid = NULL;
                gtk_tree_model_get(model, &siter, COL_ID, &sid, -1);
                gtk_tree_model_get(model, &piter, COL_ID, &pid, -1);
-
+            stuffkeeper_data_backend_begin_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                stuffkeeper_data_schema_swap_field_pos(self->_priv->schema, sid,pid); 
-
+            stuffkeeper_data_backend_end_transaction(stuffkeeper_data_schema_get_backend(self->_priv->schema));
                g_free(sid); g_free(pid);
            }
        }
