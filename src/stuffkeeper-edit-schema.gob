@@ -38,6 +38,7 @@ class StuffKeeper:Edit:Schema from G:Object
     private GladeXML *xml;
     private GtkWidget *tree;
     private GtkWidget *win;
+    private GtkWidget *preview_box;
 
     private guint changed_signal = 0;
     private guint field_changed_signal = 0;
@@ -286,6 +287,114 @@ private guint fields_reordered_signal = 0;
         return FALSE;
     }
 
+    private
+    void
+    reload_preview_del(self,  GtkTreePath *path, GtkTreeModel *model)
+    {
+        self_reload_preview(self);
+    }
+
+    private
+    void
+    reload_preview_ins(self,  GtkTreePath *path,GtkTreeIter *iter, GtkTreeModel *model)
+    {
+        self_reload_preview(self);
+    }
+    private
+    void
+    reload_preview(self)
+    {
+        GtkWidget *vbox = gtk_vbox_new(FALSE, 6);
+        GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self->_priv->preview_box));
+        GQueue *queue = g_queue_new();
+        GtkTreeIter iter;
+        gint depth = 0;
+        /* removing old widgets */
+        for(node =list; node; node = g_list_next(node)) {
+            gtk_widget_destroy(GTK_WIDGET(node->data));
+        }
+        g_list_free(list);
+
+        gtk_container_add(GTK_CONTAINER(self->_priv->preview_box), vbox);
+        
+        g_queue_push_head(queue, vbox);
+        if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
+        {
+            do{
+                GtkWidget *vbox = g_queue_peek_head(queue);
+                FieldType type;
+                gchar *name;
+                GdkColor color;
+                gtk_tree_model_get(GTK_TREE_MODEL(self->_priv->store), &iter,COL_TYPE ,&type, COL_NAME, &name, -1);
+
+
+                if (type == FIELD_TYPE_VPACKING) {
+
+                    GtkWidget *box = gtk_vbox_new(FALSE, 6);
+                    GtkWidget *event = gtk_event_box_new();
+                    gtk_container_add(GTK_CONTAINER(event), box);
+                    gtk_container_set_border_width(GTK_CONTAINER(event), 6);
+                    g_queue_push_head(queue, box);
+                    gtk_box_pack_start(GTK_BOX(vbox), event, FALSE, TRUE, 0);
+                    vbox = box;
+
+                    color.red   = ((depth%3) == 0)?65535:256*128;
+                    color.blue  = ((depth%3) == 1)?65535:256*128;
+                    color.green = ((depth%3) == 2)?65535:256*128;
+                    gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &color);
+                    depth++;
+                } else if (type == FIELD_TYPE_HPACKING) {
+                    GtkWidget *event = gtk_event_box_new();
+                    GtkWidget *box = gtk_hbox_new(TRUE, 6);
+                    gtk_container_add(GTK_CONTAINER(event), box);
+                    gtk_container_set_border_width(GTK_CONTAINER(event), 6);
+                    g_queue_push_head(queue, box);
+                    gtk_box_pack_start(GTK_BOX(vbox), event, FALSE, TRUE, 0);
+                    vbox = box;
+                    color.red   = ((depth%3) == 0)?65535:256*128;
+                    color.blue  = ((depth%3) == 1)?65535:256*128;
+                    color.green = ((depth%3) == 2)?65535:256*128;
+                    gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &color);
+
+                    depth++;
+                } else if (type == FIELD_TYPE_EXPANDER) {
+                    GtkWidget *expander = gtk_expander_new(name);
+                    GtkWidget *event = gtk_event_box_new(); 
+                    GtkWidget *box = gtk_hbox_new(TRUE, 6);
+                    gtk_container_add(GTK_CONTAINER(event), box);
+                    gtk_container_set_border_width(GTK_CONTAINER(event), 6);
+                    g_queue_push_head(queue, box);
+                    gtk_container_add(GTK_CONTAINER(expander), event);
+                    gtk_box_pack_start(GTK_BOX(vbox), expander, FALSE, TRUE, 0);
+                    vbox = box;
+                    color.red   = ((depth%3) == 0)?65535:256*128;
+                    color.blue  = ((depth%3) == 1)?65535:256*128;
+                    color.green = ((depth%3) == 2)?65535:256*128;
+                    gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &color);
+                    gtk_expander_set_expanded(GTK_EXPANDER(expander), TRUE);
+                    depth++;
+                } else if (type == FIELD_TYPE_END_PACKING || type == FIELD_TYPE_END_EXPANDER) {
+                    if(g_queue_get_length(queue) > 1)
+                        g_queue_pop_head(queue);
+                    else
+                        printf("Popped one to many\n");
+                    depth--;
+                }
+                else
+                {
+                    GtkWidget *label = gtk_label_new(name);
+                    gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
+                    gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
+                    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+                }
+                g_free(name);
+            }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->store), &iter));
+        }
+
+        g_queue_free(queue);
+        gtk_widget_show_all(self->_priv->preview_box);
+    }
+
     /** Create the interface */
     public
         StuffKeeper:Edit:Schema * 
@@ -303,9 +412,18 @@ private guint fields_reordered_signal = 0;
                 debug_printf("Failed top open xml file\n");
                 return NULL;
             }
-
             self->_priv->tree = glade_xml_get_widget(self->_priv->xml, "tree");
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "edit_schema_dialog");
+
+            self->_priv->preview_box = gtk_frame_new(NULL);
+            g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-deleted", G_CALLBACK(self_reload_preview_del), self);
+            g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-inserted", G_CALLBACK(self_reload_preview_ins), self);
+            g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-changed", G_CALLBACK(self_reload_preview_ins), self);
+            gtk_paned_add2(GTK_PANED(glade_xml_get_widget(self->_priv->xml, "hpaned2")),
+                    self->_priv->preview_box);
+
+
+
 
             for(i=0; i <FIELD_TYPE_NUM_FIELDS;i++)
             {
@@ -534,9 +652,13 @@ private guint fields_reordered_signal = 0;
             g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->changed_signal);
             self->_priv->changed_signal =0;
         }
+/*        if(self->_priv->preview_box)
+        {
+            gtk_widget_destroy(self->_priv->preview_box);
+            self->_priv->preview_box  = NULL;
+        }
 
-
-
+*/
 
         if(self->_priv->field_changed_signal)
         {
