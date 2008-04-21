@@ -26,6 +26,8 @@ extern GList *interface_list;
         COL_NAME,
         COL_TYPE_NAME,
         COL_IN_TITLE,
+        COL_NAME_EDITABLE,
+        COL_TYPE_EDITABLE,
         NUM_ROWS
     }StoreFields;
 %}
@@ -33,7 +35,7 @@ extern GList *interface_list;
 class StuffKeeper:Edit:Schema from G:Object 
 {
     private StuffKeeper:Data:Schema *schema = {NULL};
-    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN)}  destroywith g_object_unref;
+    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN)}  destroywith g_object_unref;
 
     private GladeXML *xml;
     private GtkWidget *tree;
@@ -44,9 +46,11 @@ class StuffKeeper:Edit:Schema from G:Object
     private guint field_changed_signal = 0;
     private guint field_added_signal = 0;
     private guint field_removed_signal = 0;
-private guint fields_reordered_signal = 0;
+    private guint fields_reordered_signal = 0;
 
-
+    private guint model_changed_signal = 0;
+    private guint model_added_signal = 0;
+    private guint model_removed_signal = 0;
 
     private
     void
@@ -92,11 +96,25 @@ private guint fields_reordered_signal = 0;
                     int type = stuffkeeper_data_schema_get_field_type(schema, id);
                     gchar *name = stuffkeeper_data_schema_get_field_name(schema, id);
                     gboolean in_title = (gboolean)  stuffkeeper_data_schema_get_field_in_title(schema, id);
+                    gboolean editable = TRUE;
+                    gboolean type_editable = TRUE;
+                    if(type == FIELD_TYPE_END_EXPANDER ||  type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_END_PACKING)
+                    {
+                        editable = FALSE;
+                        type_editable = FALSE;
+                    }
+                    if (type == FIELD_TYPE_EXPANDER) type_editable = FALSE;
+
+
+
+
                     gtk_list_store_set(self->_priv->store, &iter, 
                             COL_NAME, name,
                             COL_TYPE, type,
                             COL_TYPE_NAME, FieldNames[type],
+                            COL_NAME_EDITABLE, editable,
                             COL_IN_TITLE, in_title,
+                            COL_TYPE_EDITABLE, type_editable,
                             -1);
                     g_free(name);
                     return;
@@ -134,9 +152,16 @@ private guint fields_reordered_signal = 0;
             GtkTreeIter iter;
             gchar *name;
             int type = stuffkeeper_data_schema_get_field_type(schema, id);
+            gboolean editable = TRUE, type_editable =TRUE;
             gboolean in_title = (gboolean)  stuffkeeper_data_schema_get_field_in_title(schema, id);
             gtk_list_store_append(self->_priv->store, &iter);
             name = stuffkeeper_data_schema_get_field_name(schema, id);
+            if(type == FIELD_TYPE_END_EXPANDER ||  type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_END_PACKING)
+            {
+                editable = FALSE;
+                type_editable = FALSE;
+            }
+            if (type == FIELD_TYPE_EXPANDER) type_editable = FALSE;
 
             gtk_list_store_set(self->_priv->store, &iter, 
                     COL_ID, id, 
@@ -144,6 +169,8 @@ private guint fields_reordered_signal = 0;
                     COL_NAME, name,
                     COL_TYPE_NAME, FieldNames[type],
                     COL_IN_TITLE, in_title,
+                    COL_NAME_EDITABLE, editable,
+                    COL_TYPE_EDITABLE, type_editable,
                     -1);
             g_free(name);
         }
@@ -304,10 +331,11 @@ private guint fields_reordered_signal = 0;
     void
     reload_preview(self)
     {
-        GtkWidget *vbox = gtk_vbox_new(FALSE, 6);
+        GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
         GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self->_priv->preview_box));
         GQueue *queue = g_queue_new();
         GtkTreeIter iter;
+        GtkWidget *label;
         gint depth = 0;
         /* removing old widgets */
         for(node =list; node; node = g_list_next(node)) {
@@ -316,7 +344,12 @@ private guint fields_reordered_signal = 0;
         g_list_free(list);
 
         gtk_container_add(GTK_CONTAINER(self->_priv->preview_box), vbox);
-        
+        label = gtk_label_new("");
+        gtk_label_set_markup(GTK_LABEL(label), "<span size='x-large'>Preview layout</span>");
+        gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
+        gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+        gtk_misc_set_padding(GTK_MISC(label), 0,6);
+
         g_queue_push_head(queue, vbox);
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
         {
@@ -360,7 +393,7 @@ private guint fields_reordered_signal = 0;
                 } else if (type == FIELD_TYPE_EXPANDER) {
                     GtkWidget *expander = gtk_expander_new(name);
                     GtkWidget *event = gtk_event_box_new(); 
-                    GtkWidget *box = gtk_hbox_new(TRUE, 6);
+                    GtkWidget *box = gtk_vbox_new(TRUE, 6);
                     gtk_container_add(GTK_CONTAINER(event), box);
                     gtk_container_set_border_width(GTK_CONTAINER(event), 6);
                     g_queue_push_head(queue, box);
@@ -382,15 +415,30 @@ private guint fields_reordered_signal = 0;
                 }
                 else
                 {
+                    GtkWidget *event = gtk_event_box_new(); 
                     GtkWidget *label = gtk_label_new(name);
                     gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
+                    gtk_misc_set_padding(GTK_MISC(label), 6,6);
                     gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
-                    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+                    color.red   = ((depth%3) == 0)?65535:256*128;
+                    color.blue  = ((depth%3) == 1)?65535:256*128;
+                    color.green = ((depth%3) == 2)?65535:256*128;
+                    gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &color);
+                    gtk_container_add(GTK_CONTAINER(event), label);
+                    gtk_container_set_border_width(GTK_CONTAINER(event), 6);
+                    gtk_box_pack_start(GTK_BOX(vbox), event, FALSE, TRUE, 0);
                 }
                 g_free(name);
             }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->store), &iter));
         }
-
+        if(depth)
+        {
+            label = gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label), "<span size='large'>Missing ending padding/expander</span>");
+            gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
+            gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+            gtk_misc_set_padding(GTK_MISC(label), 0,6);
+        }
         g_queue_free(queue);
         gtk_widget_show_all(self->_priv->preview_box);
     }
@@ -416,16 +464,13 @@ private guint fields_reordered_signal = 0;
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "edit_schema_dialog");
 
             self->_priv->preview_box = gtk_frame_new(NULL);
-            g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-deleted", G_CALLBACK(self_reload_preview_del), self);
-            g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-inserted", G_CALLBACK(self_reload_preview_ins), self);
-            g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-changed", G_CALLBACK(self_reload_preview_ins), self);
-            gtk_paned_add2(GTK_PANED(glade_xml_get_widget(self->_priv->xml, "hpaned2")),
+           gtk_paned_add2(GTK_PANED(glade_xml_get_widget(self->_priv->xml, "hpaned2")),
                     self->_priv->preview_box);
 
 
 
 
-            for(i=0; i <FIELD_TYPE_NUM_FIELDS;i++)
+            for(i=0; i <FIELD_TYPE_EXPANDER;i++)
             {
                 GtkTreeIter iter;
                 gtk_list_store_append(store,&iter);
@@ -438,19 +483,19 @@ private guint fields_reordered_signal = 0;
 
             /* fill tree with columns */
             renderer = gtk_cell_renderer_combo_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, NULL);
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, "editable", COL_TYPE_EDITABLE,NULL);
             g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(store), NULL);
             g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
-            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
+//            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_type_edited), self);
             gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree), 0), TRUE);
 
 
 
             renderer = gtk_cell_renderer_text_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Name", renderer, "text", COL_NAME, NULL);
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Name", renderer, "text", COL_NAME,"editable", COL_NAME_EDITABLE, NULL);
             g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
-            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
+//            g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_field_edited), self);
             gtk_tree_view_column_set_expand(gtk_tree_view_get_column(GTK_TREE_VIEW(self->_priv->tree), 1), TRUE);
 
             renderer = gtk_cell_renderer_toggle_new();
@@ -540,7 +585,12 @@ private guint fields_reordered_signal = 0;
     void
     reorder_apply(self)
     {
+        if(self->_priv->fields_reordered_signal)
+            g_signal_handler_block(self->_priv->schema,self->_priv->fields_reordered_signal);
         self_apply_order(self);
+        if(self->_priv->fields_reordered_signal)
+            g_signal_handler_unblock(self->_priv->schema,self->_priv->fields_reordered_signal);
+        self_reload_preview(self);
     }
 
     public
@@ -558,7 +608,33 @@ private guint fields_reordered_signal = 0;
             g_object_unref(self->_priv->xml);
             g_object_unref(self);
         }
-
+    public
+    void
+    add_expander(self)
+    {
+        stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_EXPANDER, "New Field",FALSE);
+        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_END_EXPANDER, "",FALSE);
+        stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+    }
+    public
+    void
+    add_vpadding(self)
+    {
+        stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_VPACKING, "",FALSE);
+        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_END_PACKING, "",FALSE);
+        stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+    }
+    public
+    void
+    add_hpadding(self)
+    {
+        stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_HPACKING, "",FALSE);
+        stuffkeeper_data_schema_add_field(self->_priv->schema, FIELD_TYPE_END_PACKING, "",FALSE);
+        stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+    }
     public
         void
         add_field(self)
@@ -591,7 +667,29 @@ private guint fields_reordered_signal = 0;
         if(gtk_tree_selection_get_selected(sel, &model, &iter))
         {
             gchar *id;
-            gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+            int type;
+            gtk_tree_model_get(model, &iter,COL_TYPE, &type, COL_ID, &id, -1);
+
+            if(type == FIELD_TYPE_EXPANDER || type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING)
+            {
+                int type_expect = (type == FIELD_TYPE_EXPANDER)? FIELD_TYPE_END_EXPANDER:FIELD_TYPE_END_PACKING;
+                do{
+                    int type2;
+                    gchar *id2;
+                    gtk_tree_model_get(model, &iter,COL_ID, &id2,COL_TYPE, &type2,  -1);
+                    if(type2 == type_expect) 
+                    {
+                        stuffkeeper_data_schema_remove_field(self->_priv->schema, id);
+                        stuffkeeper_data_schema_remove_field(self->_priv->schema, id2);
+                        g_free(id);
+                        g_free(id2);
+                        return;
+                    }
+
+                    g_free(id2);
+                }while(gtk_tree_model_iter_next(model, &iter));
+
+            }
             stuffkeeper_data_schema_remove_field(self->_priv->schema, id);
             g_free(id);
         }
@@ -639,6 +737,11 @@ private guint fields_reordered_signal = 0;
                             G_CALLBACK(self_schema_fields_reordered),
                             self);
         self_schema_changed(self, schema);
+        self->_priv->model_removed_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-deleted", G_CALLBACK(self_reload_preview_del), self);
+        self->_priv->model_added_signal =  g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-inserted", G_CALLBACK(self_reload_preview_ins), self);
+        self->_priv->model_changed_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-changed", G_CALLBACK(self_reload_preview_ins), self);
+        self_reload_preview(self); 
+        
     }
 
     override (G:Object)
@@ -659,6 +762,22 @@ private guint fields_reordered_signal = 0;
         }
 
 */
+        if(self->_priv->model_changed_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_changed_signal);
+            self->_priv->model_changed_signal =0;
+        }
+        if(self->_priv->model_added_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_added_signal);
+            self->_priv->model_added_signal =0;
+        }
+        if(self->_priv->model_removed_signal)
+        {
+            g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_removed_signal);
+            self->_priv->model_removed_signal =0;
+        }
+
 
         if(self->_priv->field_changed_signal)
         {
