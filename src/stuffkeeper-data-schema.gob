@@ -33,7 +33,7 @@ requires 2.0.10
         FIELD_TYPE_EXPANDER = 9,
         FIELD_TYPE_END_EXPANDER = 10,
         FIELD_TYPE_VPACKING = 11,
-        FIELD_TYPE_END_PACKING = 12,
+        FIELD_TYPE_END= 12,
         FIELD_TYPE_HPACKING = 13,
         FIELD_TYPE_NUM_FIELDS
     } FieldType;
@@ -51,9 +51,9 @@ requires 2.0.10
         "Link",         // FIELD_TYPE_LINK
         "Date & Time",  // FIELD_TYPE_DATE
         "Expander",     //FIELD_TYPE_EXPANDER
-        "End expander", //FIELD_TYPE_END_EXPANDER
+        "End", //FIELD_TYPE_END_EXPANDER
         "vertical packing", // FIELD_TYPE_VPACKING
-        "end packing", // FIELD_TYPE_END_PACKING
+        "End", // FIELD_TYPE_END_PACKING
         "horizontal packing", // FIELD_TYPE_VPACKING
 
     };
