@@ -28,6 +28,7 @@ extern GList *interface_list;
         COL_IN_TITLE,
         COL_NAME_EDITABLE,
         COL_TYPE_EDITABLE,
+        COL_TYPE_MODEL,
         NUM_ROWS
     }StoreFields;
 %}
@@ -35,7 +36,7 @@ extern GList *interface_list;
 class StuffKeeper:Edit:Schema from G:Object 
 {
     private StuffKeeper:Data:Schema *schema = {NULL};
-    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN)}  destroywith g_object_unref;
+    private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,GTK_TYPE_TREE_MODEL)}  destroywith g_object_unref;
 
     private GladeXML *xml;
     private GtkWidget *tree;
@@ -51,6 +52,11 @@ class StuffKeeper:Edit:Schema from G:Object
     private guint model_changed_signal = 0;
     private guint model_added_signal = 0;
     private guint model_removed_signal = 0;
+
+
+    private GtkTreeModel *model_fields = NULL;
+    private GtkTreeModel *model_packings = NULL;
+
 
     private
     void
@@ -101,7 +107,8 @@ class StuffKeeper:Edit:Schema from G:Object
                     if(type == FIELD_TYPE_END_EXPANDER ||  type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_END_PACKING)
                     {
                         editable = FALSE;
-                        type_editable = FALSE;
+                        if(type == FIELD_TYPE_END_EXPANDER || type == FIELD_TYPE_END_PACKING)
+                            type_editable = FALSE;
                     }
                     if (type == FIELD_TYPE_EXPANDER) type_editable = FALSE;
 
@@ -115,6 +122,7 @@ class StuffKeeper:Edit:Schema from G:Object
                             COL_NAME_EDITABLE, editable,
                             COL_IN_TITLE, in_title,
                             COL_TYPE_EDITABLE, type_editable,
+                            COL_TYPE_MODEL,(type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING)?self->_priv->model_packings:self->_priv->model_fields,
                             -1);
                     g_free(name);
                     return;
@@ -159,7 +167,8 @@ class StuffKeeper:Edit:Schema from G:Object
             if(type == FIELD_TYPE_END_EXPANDER ||  type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_END_PACKING)
             {
                 editable = FALSE;
-                type_editable = FALSE;
+                if(type == FIELD_TYPE_END_EXPANDER || type == FIELD_TYPE_END_PACKING)
+                    type_editable = FALSE;
             }
             if (type == FIELD_TYPE_EXPANDER) type_editable = FALSE;
 
@@ -171,6 +180,7 @@ class StuffKeeper:Edit:Schema from G:Object
                     COL_IN_TITLE, in_title,
                     COL_NAME_EDITABLE, editable,
                     COL_TYPE_EDITABLE, type_editable,
+                    COL_TYPE_MODEL,(type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING)?self->_priv->model_packings:self->_priv->model_fields,
                     -1);
             g_free(name);
         }
@@ -448,11 +458,13 @@ class StuffKeeper:Edit:Schema from G:Object
         StuffKeeper:Edit:Schema * 
         new(void)
         {
+            GtkTreeIter iter;
             int i,width,height;
             GtkCellRenderer *renderer;
             Self *self = GET_NEW;
             GError *error = NULL;
-            GtkListStore *store = gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
+            
+
             self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","edit_schema_dialog",NULL);
             if(self->_priv->xml == NULL)
             {
@@ -470,22 +482,27 @@ class StuffKeeper:Edit:Schema from G:Object
 
 
 
-
+            self->_priv->model_fields = (GtkTreeModel *)gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
             for(i=0; i <FIELD_TYPE_EXPANDER;i++)
             {
                 GtkTreeIter iter;
-                gtk_list_store_append(store,&iter);
-                gtk_list_store_set(store, &iter, 0, i, 1,FieldNames[i], -1); 
+                gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_fields),&iter);
+                gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_fields), &iter, 0, i, 1,FieldNames[i], -1); 
             }
 
             g_signal_connect_swapped(G_OBJECT(self->_priv->win), "style-set", G_CALLBACK(self_style_set), self);
-      
+
+            self->_priv->model_packings = (GtkTreeModel *)gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
+            gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_packings),&iter);
+            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_VPACKING,1,FieldNames[FIELD_TYPE_VPACKING], -1); 
+            gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_packings),&iter);
+            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_HPACKING,1,FieldNames[FIELD_TYPE_HPACKING], -1); 
 
 
             /* fill tree with columns */
             renderer = gtk_cell_renderer_combo_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, "editable", COL_TYPE_EDITABLE,NULL);
-            g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(store), NULL);
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, "editable", COL_TYPE_EDITABLE,"model",COL_TYPE_MODEL, NULL);
+            //g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(store), NULL);
             g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
 //            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
             g_signal_connect_swapped(G_OBJECT(renderer), "edited", G_CALLBACK(self_interface_type_edited), self);
@@ -578,7 +595,7 @@ class StuffKeeper:Edit:Schema from G:Object
                     i++;
                 }while(gtk_tree_model_iter_next(GTK_TREE_MODEL(self->_priv->store), &iter));
             }
-            stuffkeeper_data_schema_field_reorder(self->_priv->schema, retv);
+            stuffkeeper_data_schema_field_reorder(self->_priv->schema, (const char**)retv);
             g_strfreev(retv);
         }
     }
