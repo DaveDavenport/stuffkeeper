@@ -6,12 +6,20 @@ requires 2.0.10
 #include "stuffkeeper-data-label.h"
 %}
 
+%ph{
+#include "stuffkeeper-data-backend.h"
+%}
+
+
 class StuffKeeper:Data:Expander from Gtk:Expander
 {
     private StuffKeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_expander = {0};
+
+    /* lock signal */
+    private gulong signal_backend_locked = {0};
 
     private
     void
@@ -38,9 +46,17 @@ class StuffKeeper:Data:Expander from Gtk:Expander
         }
     }
 
+    private
+        void
+        backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+        {
+            gboolean locked = stuffkeeper_data_backend_get_locked(backend);
+            gtk_widget_set_sensitive(GTK_WIDGET(self), !locked);
+        }
+
     public
-    GtkWidget *
-    new(StuffKeeperDataItem *item, const gchar *field)
+        GtkWidget *
+        new(StuffKeeperDataItem *item, const gchar *field)
     {
         int new_value = 0;
         Self *obj = GET_NEW;
@@ -60,6 +76,11 @@ class StuffKeeper:Data:Expander from Gtk:Expander
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
         obj->_priv->changed_expander = g_signal_connect(G_OBJECT(obj), "notify::expanded", G_CALLBACK(self_expander_changed), NULL);
 
+        obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
+                                                                     "notify::locked", G_CALLBACK(self_backend_locked), obj);
+        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+
+
         return GTK_WIDGET(obj);
     }
 
@@ -68,6 +89,11 @@ class StuffKeeper:Data:Expander from Gtk:Expander
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
+            if(self->_priv->signal_backend_locked) {                                                                     
+                g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
+                self->_priv->signal_backend_locked = 0;
+            }
+
             if(self->_priv->changed_item_entry)
             {
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);

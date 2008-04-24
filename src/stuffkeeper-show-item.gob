@@ -199,9 +199,6 @@ class StuffKeeper:Show:Item from Gtk:VBox
                 self);
 
 
-
-
-
         /* update */
         self_field_changed(self, NULL, self->_priv->schema);
         return GTK_WIDGET(self);

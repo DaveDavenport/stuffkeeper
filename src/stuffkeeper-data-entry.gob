@@ -6,6 +6,10 @@
 #include "stuffkeeper-data-item.h"
 %}
 
+%ph{
+#include "stuffkeeper-data-backend.h"
+%}
+
 class StuffKeeper:Data:Entry from Gtk:Entry 
 {
     private StuffKeeperDataItem *item = {NULL};
@@ -18,6 +22,8 @@ class StuffKeeper:Data:Entry from Gtk:Entry
     private GdkColor base;
     private GdkColor text;
 
+    /* lock signal */
+    private gulong signal_backend_locked = {0};
 
     private
     gboolean  
@@ -93,8 +99,21 @@ class StuffKeeper:Data:Entry from Gtk:Entry
             self->_priv->text = (GTK_WIDGET(self)->style->text[GTK_STATE_NORMAL]);
         }
     }
-
-
+    private
+    void
+    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    {
+        gboolean locked = stuffkeeper_data_backend_get_locked(backend);
+        if(self->_priv->field == NULL) /* if it is an title */
+        {
+            if(stuffkeeper_data_item_has_generated_title(self->_priv->item))
+            {
+                gtk_editable_set_editable(GTK_EDITABLE(self), FALSE);
+                return;
+            }
+        }
+        gtk_editable_set_editable(GTK_EDITABLE(self), !locked);
+    }
     public
     GtkWidget *
     new(StuffKeeperDataItem *item, const gchar *field)
@@ -105,6 +124,8 @@ class StuffKeeper:Data:Entry from Gtk:Entry
         if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
+    
+    
 
 
         obj->_priv->base = (GTK_WIDGET(obj)->style->base[GTK_STATE_NORMAL]);
@@ -139,6 +160,10 @@ class StuffKeeper:Data:Entry from Gtk:Entry
             gtk_entry_set_text(GTK_ENTRY(obj), value);
             g_free(value);
         }
+        obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
+                                                                     "notify::locked", G_CALLBACK(self_backend_locked), obj);
+        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+
         /* this is destroyed when self is destroyed, so no need to disconnect myself */
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "changed", G_CALLBACK(self_changed), NULL);
         return GTK_WIDGET(obj);
@@ -149,6 +174,10 @@ class StuffKeeper:Data:Entry from Gtk:Entry
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
+            if(self->_priv->signal_backend_locked) {                                                                     
+                g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
+                self->_priv->signal_backend_locked = 0;
+            }
             if(self->_priv->changed_item_entry)
             {
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);

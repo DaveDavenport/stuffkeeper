@@ -40,6 +40,17 @@ class StuffKeeper:Data:Backend from G:Object
     /* SQLite handler */
     private sqlite3 *sqlHandle = {NULL};
     private gint transaction = {0};
+
+    /* locked */
+    private gboolean locked = {FALSE};
+    property BOOLEAN locked  
+            (nick = "Locked",
+            blurb = "Lock the database, all clients need to check this.",
+            default_value = FALSE,
+            export,
+            link);
+
+    
     /**
      * Signal 
      */

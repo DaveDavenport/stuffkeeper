@@ -114,6 +114,7 @@ class StuffKeeper:Interface from G:Object
     private gulong signal_search_changed = {0};
     private gulong signal_search_removed = {0};
 
+    private gulong signal_backend_locked = {0};
 
     private int item_sort_column = {3};
     private int item_sort_order = {GTK_SORT_DESCENDING};
@@ -455,6 +456,8 @@ class StuffKeeper:Interface from G:Object
         void 
         interface_item_add(self,GtkWidget *button)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
 
             GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
             /* check if there are schema's */
@@ -476,6 +479,8 @@ class StuffKeeper:Interface from G:Object
         void 
         interface_item_add_menu_button(self, GtkWidget *button)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
             StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
             if(schema)
             {
@@ -496,6 +501,9 @@ class StuffKeeper:Interface from G:Object
     public
         void interface_item_remove(self)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
+
             /** Setup a dialog that ask the user if he is sure */
             GtkWidget *tree = self->_priv->treeview2;//glade_xml_get_widget(xml, "treeview2");
             GtkWidget *dialog;
@@ -764,6 +772,9 @@ class StuffKeeper:Interface from G:Object
     void
     schema_edit_button_clicked(self, GtkWidget *button)
     {
+        gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+        if(locked){printf("**ERROR** should not be callable\n");return;}
+
         StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
         if(schema)
         {
@@ -863,6 +874,8 @@ class StuffKeeper:Interface from G:Object
      void
      add_tag(self, GtkMenuItem *item)
      {
+         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+         if(locked){printf("**ERROR** should not be callable\n");return;}
          g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_tag_added);
          StuffKeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdbg);
 
@@ -894,6 +907,8 @@ class StuffKeeper:Interface from G:Object
      void
      remove_tag(self, GtkMenuItem *item)
      {
+         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+         if(locked){printf("**ERROR** should not be callable\n");return;}
          GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
          GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
          GtkTreeIter iter;
@@ -916,6 +931,9 @@ class StuffKeeper:Interface from G:Object
      void
      add_type(self, GtkMenuItem *item)
      {
+         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+         if(locked){printf("**ERROR** should not be callable\n");return;}
+
          g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_schema_added);
          StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
          stuffkeeper_data_schema_set_title(schema, _("New Schema"));
@@ -946,6 +964,9 @@ class StuffKeeper:Interface from G:Object
      void
      remove_type(self, GtkMenuItem *item)
      {
+         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+         if(locked){printf("**ERROR** should not be callable\n");return;}
+
          GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
          GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
          GtkTreeIter iter;
@@ -968,6 +989,9 @@ class StuffKeeper:Interface from G:Object
      void
      edit_type(self, GtkMenuItem *item)
      {
+         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+         if(locked){printf("**ERROR** should not be callable\n");return;}
+
          GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
          GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
          GtkTreeIter iter;
@@ -1013,9 +1037,12 @@ class StuffKeeper:Interface from G:Object
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_interface_item_open), self);
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
-                menu_item = gtk_image_menu_item_new_from_stock(GTK_STOCK_REMOVE, NULL);
-                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_interface_item_remove), self);
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
+                {
+                    menu_item = gtk_image_menu_item_new_from_stock(GTK_STOCK_REMOVE, NULL);
+                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_interface_item_remove), self);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                }
 
 
                 menu_item = gtk_image_menu_item_new_with_label("Export");
@@ -1076,14 +1103,16 @@ class StuffKeeper:Interface from G:Object
                     gtk_tree_model_get(model, &iter, 4, &items, -1);
 
                     /* no items, then you can delete it*/
-                    if(items ==  0)
+                    if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
                     {
-                        menu_item = gtk_image_menu_item_new_with_label("Remove tag");
-                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_tag),self);
-                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
+                        if(items ==  0)
+                        {
+                            menu_item = gtk_image_menu_item_new_with_label("Remove tag");
+                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                                          gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                            g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_tag),self);
+                            gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                        }
                     }
                 }
 
@@ -1103,19 +1132,22 @@ class StuffKeeper:Interface from G:Object
                     gtk_tree_model_get(model, &iter, 4, &items, -1);
 
                     /* no items, then you can delete it*/
-                    if(items ==  0)
+                    if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
                     {
-                        menu_item = gtk_image_menu_item_new_with_label("Remove type");
+                        if(items ==  0)
+                        {
+                            menu_item = gtk_image_menu_item_new_with_label("Remove type");
+                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                                          gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                            g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_type),self);
+                            gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                        }
+                        menu_item = gtk_image_menu_item_new_with_label("Edit type");
                         gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_type),self);
+                                                      gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
+                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_type),self);
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                     }
-                    menu_item = gtk_image_menu_item_new_with_label("Edit type");
-                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                            gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
-                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_type),self);
-                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
                 }
 
@@ -1135,7 +1167,7 @@ class StuffKeeper:Interface from G:Object
                     gtk_tree_model_get(model, &iter, 0, &id,3, &search, -1);
 
                     /* no items, then you can delete it*/
-                    if(id >=  0)
+                    if(id >=  0 && !stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
                     {
 
                         menu_item = gtk_image_menu_item_new_with_label("Remove filter");
@@ -1331,8 +1363,8 @@ class StuffKeeper:Interface from G:Object
         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
         {
             StuffKeeperDataItemSearch *search;
-            GtkWidget *item = glade_xml_get_widget(self->_priv->xml, "menuitem_remove_search");
-            GtkWidget *item1 = glade_xml_get_widget(self->_priv->xml, "menuitem_edit_search");
+            GtkWidget *item = glade_xml_get_widget(self->_priv->xml, "menuitem_filter_remove");
+            GtkWidget *item1 = glade_xml_get_widget(self->_priv->xml, "menuitem_filter_edit");
             gint id;
             gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
 
@@ -1420,6 +1452,52 @@ class StuffKeeper:Interface from G:Object
         }
     }
 
+    private
+    void
+    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    {
+        GtkWidget *button = glade_xml_get_widget(self->_priv->xml, "toggle_locked");
+        gboolean value = gtk_toggle_button_get_active(button);
+        gboolean locked = stuffkeeper_data_backend_get_locked(backend);
+        printf("locked changed; %i %i\n",locked,value);
+
+        if(value != locked)
+        {
+            g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_backend_locked);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), locked);
+            g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_backend_locked);
+        }
+
+        /* change the interface */
+        if(locked)
+        {
+            g_object_set(G_OBJECT(self->_priv->treeview1_renderer), "editable", FALSE, NULL);
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "toolbar1"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_filter"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_type_new"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_type_import"));
+        } else {
+            g_object_set(G_OBJECT(self->_priv->treeview1_renderer), "editable", TRUE, NULL);
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "toolbar1"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_filter"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_type_new"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_type_import"));
+        }
+
+
+    }
+    public
+    void
+    backend_locked_toggled(self, GtkToggleButton *button)
+    {
+        gboolean value = gtk_toggle_button_get_active(button);
+        gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+        if(locked != value)
+        {
+            stuffkeeper_data_backend_set_locked(self->_priv->skdbg, value);
+        }
+    }
+
     /**
      * Initialize the main gui
      */
@@ -1437,7 +1515,8 @@ class StuffKeeper:Interface from G:Object
              * StuffKeeperDataBackend
              */
             self->_priv->skdbg = skdb;
-
+            /* locked signal */
+            self->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "notify::locked", G_CALLBACK(self_backend_locked), self);
 
 
             self->_priv->menu = gtk_menu_new();
@@ -1695,6 +1774,11 @@ class StuffKeeper:Interface from G:Object
 
             /* update label */
             self_filter_model_row_inserted(self, NULL, NULL, NULL);
+
+
+            /* update lock state */
+            self_backend_locked(self, NULL, self->_priv->skdbg);
+
             gtk_widget_show(self->_priv->win);
         }
 
@@ -1705,6 +1789,10 @@ class StuffKeeper:Interface from G:Object
             int value;
             Self *self = SELF(obj);
             debug_printf("** Finalize stuffkeeper interface\n");
+            if(self->_priv->signal_backend_locked) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_backend_locked);
+                self->_priv->signal_backend_locked = 0;
+            }
             if(self->_priv->signal_schema_added) { 
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_schema_added);
                 self->_priv->signal_schema_added = 0;
@@ -2092,6 +2180,8 @@ class StuffKeeper:Interface from G:Object
         void 
         new_search(self)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
             StuffKeeperDataItemSearch *search = stuffkeeper_data_backend_new_search(self->_priv->skdbg);
             stuffkeeper_data_item_search_edit_search_gui(search);
         }
@@ -2100,6 +2190,8 @@ class StuffKeeper:Interface from G:Object
         void
         remove_search(self)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
             GtkTreeIter iter;
             if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
             {
@@ -2118,6 +2210,8 @@ class StuffKeeper:Interface from G:Object
             void
         edit_search(self)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
             GtkTreeIter iter;
             if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
             {
@@ -2139,6 +2233,8 @@ class StuffKeeper:Interface from G:Object
         void
         remove_search_menu(self, GtkWidget *menu_item)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
             StuffKeeperDataItemSearch *search;
             search = g_object_get_data(G_OBJECT(menu_item), "search");
             if(search) 
@@ -2151,6 +2247,8 @@ class StuffKeeper:Interface from G:Object
         void
         edit_search_menu(self,GtkWidget *menu_item)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
             StuffKeeperDataItemSearch *search;
             search = g_object_get_data(G_OBJECT(menu_item), "search");
             if(search)
@@ -2254,6 +2352,9 @@ class StuffKeeper:Interface from G:Object
         void
         schema_new(self)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
+
             StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
             StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
             stuffkeeper_edit_schema_set_schema(skes, schema);
@@ -2263,6 +2364,9 @@ class StuffKeeper:Interface from G:Object
         void
         schema_import(self)
         {
+            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+            if(locked){printf("**ERROR** should not be callable\n");return;}
+
            GtkFileFilter *filter = NULL;
             GtkWidget *dialog = gtk_file_chooser_dialog_new("Import type", 
                     NULL, 

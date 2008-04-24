@@ -8,6 +8,7 @@ requires 2.0.10
 
 %ph{
 #include "debug.h"
+#include "stuffkeeper-data-backend.h"
 #define IMAGE_SIZE 250
 %}
 /* top of the file */
@@ -99,6 +100,8 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
     button_press_event(self, GdkEventButton *event, gpointer user_data)
     {
         debug_printf("button-press event\n");
+        if(stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)))
+            return;
         if(event->button == 1)
         {
             GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick an image", 
@@ -218,38 +221,43 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                 GtkWidget          *widget
                 )
         {
-            GtkWidget *dialog; 
-            gchar **url = gtk_selection_data_get_uris(data);
-            /* process url */
-            if(strncmp(url[0], "file://",7) == 0)
+            if(!stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)))
             {
-                gchar *stripped = g_filename_from_uri(url[0], NULL, NULL); 
-                if(stripped)
+                GtkWidget *dialog; 
+                gchar **url = gtk_selection_data_get_uris(data);
+                /* process url */
+                if(strncmp(url[0], "file://",7) == 0)
                 {
-                    GdkPixbufFormat *finfo = gdk_pixbuf_get_file_info(stripped, NULL, NULL);
-                    /* if the pixbuf loader can open it, copy it */
-                    if(finfo)
+                    gchar *stripped = g_filename_from_uri(url[0], NULL, NULL); 
+                    if(stripped)
                     {
-                        self_copy_path(self, &((url[0])[7]));
-                        g_strfreev(url);
+                        GdkPixbufFormat *finfo = gdk_pixbuf_get_file_info(stripped, NULL, NULL);
+                        /* if the pixbuf loader can open it, copy it */
+                        if(finfo)
+                        {
+                            self_copy_path(self, &((url[0])[7]));
+                            g_strfreev(url);
+                            g_free(stripped);
+                            gtk_drag_finish(context, TRUE, FALSE, time);
+                            return;
+                        }
                         g_free(stripped);
-                        gtk_drag_finish(context, TRUE, FALSE, time);
-                        return;
                     }
-                    g_free(stripped);
                 }
+                /* Failed to open, show a popup */
+                gtk_drag_finish(context, FALSE, FALSE, time);
+                dialog = gtk_message_dialog_new_with_markup(
+                                                            NULL, 
+                                                            GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                            GTK_MESSAGE_WARNING,
+                                                            GTK_BUTTONS_CLOSE,
+                                                            _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid local image."),url[0]);           
+                gtk_dialog_run(GTK_DIALOG(dialog));
+                gtk_widget_destroy(dialog);
+                /* free uris */
+                g_strfreev(url);
             }
-            /* Failed to open, show a popup */
-            gtk_drag_finish(context, TRUE, FALSE, time);
-            dialog = gtk_message_dialog_new_with_markup(
-                    NULL, 
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                    GTK_MESSAGE_WARNING,
-                    GTK_BUTTONS_CLOSE,
-                    _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid local image."),url[0]);           
-            gtk_dialog_run(GTK_DIALOG(dialog));
-            gtk_widget_destroy(dialog);
-            /* free uris */
-            g_strfreev(url);
+            else
+                gtk_drag_finish(context, FALSE, FALSE, time);
         }
 }

@@ -9,6 +9,10 @@ requires 2.0.10
 #include <math.h>
 %}
 
+%ph{
+#include "stuffkeeper-data-backend.h"
+%}
+
 class StuffKeeper:Data:TagList2 from Gtk:Event:Box
 {
     private StuffKeeperDataItem *item = {NULL};
@@ -24,15 +28,15 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
     private GtkWidget *add_button = {NULL};
     private GtkWidget *remove_button = {NULL};
 
-
-
-
-
+    /* lock signal */
+    private gulong signal_backend_locked = {0};
    
     private 
     void
     tag_button_press(self, GdkEventButton *event,GtkWidget *event_box)
     {
+        if(stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)))
+            return;
        if(event->button==3)
        {
             StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(event_box), "tag");
@@ -239,6 +243,20 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
         }
 
     }
+    private
+    void
+    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    {
+        gboolean locked = stuffkeeper_data_backend_get_locked(backend);
+        if(locked)
+        {
+            gtk_widget_hide(self->_priv->add_button);
+            gtk_widget_hide(self->_priv->remove_button);
+        }else{
+            gtk_widget_show(self->_priv->add_button);
+            gtk_widget_show(self->_priv->remove_button);
+        }
+    }
 
     public
     GtkWidget *
@@ -259,6 +277,8 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
         gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->add_button, FALSE, TRUE, 0);
 
         g_signal_connect_swapped(G_OBJECT(obj->_priv->add_button), "clicked", G_CALLBACK(self_add_button_clicked), obj);
+        gtk_widget_set_no_show_all(obj->_priv->add_button, TRUE);
+
 
         /* Remove button */
         obj->_priv->remove_button = gtk_button_new();
@@ -267,11 +287,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
         gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->remove_button, FALSE, TRUE, 0);
 
         g_signal_connect_swapped(G_OBJECT(obj->_priv->remove_button), "clicked", G_CALLBACK(self_remove_button_clicked), obj);
-
-
-
-
-
+        gtk_widget_set_no_show_all(obj->_priv->remove_button, TRUE);
 
         /* store item */
         obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item));
@@ -283,6 +299,10 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
 
         obj->_priv->uid_item_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->item), "item-tags-changed",G_CALLBACK(self_item_changed), obj);
 
+        obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
+                                                                     "notify::locked", G_CALLBACK(self_backend_locked), obj);
+        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+
         return GTK_WIDGET(obj);
     }
 
@@ -291,6 +311,10 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
+            if(self->_priv->signal_backend_locked) {                                                                     
+                g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
+                self->_priv->signal_backend_locked = 0;
+            }
             if(self->_priv->uid_item_changed)
             {
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->uid_item_changed);

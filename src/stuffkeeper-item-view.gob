@@ -14,16 +14,22 @@ class StuffKeeper:Item:View from Gtk:VBox
 {
     private StuffKeeperDataSchema *schema = {NULL};
     private StuffKeeperDataItem *item = {NULL};
+    private StuffKeeperDataBackend *skdb = {NULL};
 
     private 
     void
     schema_edit_button_clicked(self, GtkWidget *button)
     {
-        StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
-        if(schema)
+        if(stuffkeeper_data_backend_get_locked(self->_priv->skdb))
+        {
+            printf("** ERROR ** should not be called here\n");
+            return;
+        }
+
+        if(self->_priv->schema)
         {
             StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
-            stuffkeeper_edit_schema_set_schema(skes, schema);
+            stuffkeeper_edit_schema_set_schema(skes, self->_priv->schema);
         }
     }
 
@@ -63,6 +69,8 @@ class StuffKeeper:Item:View from Gtk:VBox
 
             /* Get the schema  */
             self->_priv->schema = stuffkeeper_data_item_get_schema(item);
+            /* Get backend */
+            self->_priv->skdb = stuffkeeper_data_item_get_backend(item);
             /* Get the item */
             self->_priv->item = item;
 
