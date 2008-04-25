@@ -1831,7 +1831,7 @@ class StuffKeeper:Interface from G:Object
             {
                 printf("type: %i\n", f->type);
                 GObject *new = g_object_new(f->type,NULL);
-                stuffkeeper_plugin_run(STUFFKEEPER_PLUGIN(new));
+                stuffkeeper_plugin_run(STUFFKEEPER_PLUGIN(new),self->_priv->skdbg);
             }
         }
         override (G:Object)

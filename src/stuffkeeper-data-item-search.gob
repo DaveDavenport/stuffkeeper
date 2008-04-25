@@ -5,9 +5,8 @@ requires 2.0.10
 #include <glib/gi18n.h>
 #include <sqlite3.h>
 #include <glib/gstdio.h>
-#include <glade/glade.h>
 #include <config.h>
-#include "debug.h"
+
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-schema.h"
@@ -44,6 +43,8 @@ typedef struct _SearchField
 
 %}
 %ph{
+#include <glade/glade.h>
+#include "debug.h"
 #include "stuffkeeper-data-backend.h"
     const char *SearchTypesNames[] = 
     {

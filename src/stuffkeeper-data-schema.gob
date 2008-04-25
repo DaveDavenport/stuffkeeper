@@ -4,15 +4,15 @@ requires 2.0.10
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
 #include <sqlite3.h>
-#include <libxml/tree.h>
-#include <libxml/parser.h>
-
 %}
 
 %ph{
 #include <stdio.h>
 #include "debug.h"
 #include <glib/gstdio.h>
+
+#include <libxml/tree.h>
+#include <libxml/parser.h>
 #include "stuffkeeper-data-backend.h"
 
 

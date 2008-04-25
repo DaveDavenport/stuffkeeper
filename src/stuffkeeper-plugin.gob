@@ -1,5 +1,8 @@
 requires 2.0.10
 
+%h{
+#include "stuffkeeper-data-backend.h"
+%}
 /**
  * Stuffkeeper plugin needs to implement the run function
  * And set plugin name.
@@ -13,7 +16,7 @@ class Stuffkeeper:Plugin from G:Object
 {
     virtual
     void
-    run(self)
+    run(self,StuffKeeperDataBackend *skdb)
     {
         printf("This function should be overrided by the plugin\n");
     }
