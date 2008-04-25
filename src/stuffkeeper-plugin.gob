@@ -5,11 +5,16 @@ requires 2.0.10
 %}
 /**
  * Stuffkeeper plugin needs to implement the run function
+ * a register_plugin function
  * And set plugin name.
  */
-
 %{
-
+    /*
+     * gchar *plugin_name = "Plugin name";
+     *
+     * * In case off Stuffkeeper:Plugin:Test:
+     * GType register_plugin() { return stuffkeeeper_plugin_test_get_type();}
+     */
 %}
 
 class Stuffkeeper:Plugin from G:Object
@@ -20,4 +25,5 @@ class Stuffkeeper:Plugin from G:Object
     {
         printf("This function should be overrided by the plugin\n");
     }
+
 }
