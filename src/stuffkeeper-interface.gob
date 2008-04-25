@@ -1459,12 +1459,20 @@ class StuffKeeper:Interface from G:Object
         GtkWidget *button = glade_xml_get_widget(self->_priv->xml, "toggle_locked");
         gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
-        printf("locked changed; %i %i\n",locked,value);
 
         if(value != locked)
         {
             g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_backend_locked);
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), locked);
+            g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_backend_locked);
+        }
+
+        button = glade_xml_get_widget(self->_priv->xml, "menuitem_view_locked");
+        value = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(button));
+        if(value != locked)
+        {
+            g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_backend_locked);
+            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(button), locked);
             g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_backend_locked);
         }
 
@@ -1485,6 +1493,17 @@ class StuffKeeper:Interface from G:Object
         }
 
 
+    }
+    public
+    void
+    menu_backend_locked_toggled(self, GtkCheckMenuItem *item)
+    {
+        gboolean value = gtk_check_menu_item_get_active(item);
+        gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+        if(locked != value)
+        {
+            stuffkeeper_data_backend_set_locked(self->_priv->skdbg, value);
+        }
     }
     public
     void
