@@ -1,6 +1,6 @@
 requires 2.0.10
 
-%ph{
+%h{
 #include <config.h>
 #include <glib.h>
 #include "stuffkeeper-plugin.h"
@@ -10,8 +10,10 @@ requires 2.0.10
 #include <gmodule.h>
 typedef struct _FS{
     const gchar *name;
-    GType type;
-    GModule *module;
+    GType       gtype;
+    GModule     *module;
+    GObject     *object;
+    PluginType  plugin_type;
 }FS;
 %}
 
@@ -39,6 +41,28 @@ class Stuffkeeper:Plugin:Manager from G:Object
         return g_list_copy(self->_priv->plugins);
     }
 
+    override (G:Object)
+    void
+    finalize(GObject *obj)
+    {
+        Self *self =SELF(obj);
+        if(self->_priv->plugins)
+        {
+            GList *node;
+            for(node = g_list_first(self->_priv->plugins);node;node = g_list_next(node))
+            {
+                FS *f = node->data;
+                g_object_unref(f->object);
+                g_module_close(f->module);
+                g_free(f);
+            }
+
+            self->_priv->plugins = NULL;
+        }
+
+
+    }
+
     public
     void
     load_plugin(self)
@@ -61,11 +85,20 @@ class Stuffkeeper:Plugin:Manager from G:Object
                         GetType gt;
                         if(g_module_symbol(module,"register_plugin",&gt))
                         {
+                            int *type;
                             FS *fs = g_malloc0(sizeof(*fs));
                             gchar **name;
-                            fs->type = gt();
+                            fs->gtype = gt();
                             fs->module = module;
-                            printf("loaded: %i\n", fs->type);
+                            printf("loaded: %i\n", fs->gtype);
+                            if(!g_module_symbol(module, "plugin_type", &(type)))
+                            {
+                                /* no valid name */
+                                fs->plugin_type = *type; 
+                            }
+                            else
+                                fs->plugin_type = PLUGIN_MENU;
+
                             if(!g_module_symbol(module, "plugin_name", &(name)))
                             {
                                 /* no valid name */
@@ -73,6 +106,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             }
                             else
                                 fs->name = *name;
+                            fs->object = g_object_new(fs->gtype, NULL);
                             self->_priv->plugins = g_list_prepend(self->_priv->plugins,fs);
                             printf("Plugin: %s succesfull loaded\n",fs->name);
                         }

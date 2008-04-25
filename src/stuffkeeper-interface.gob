@@ -1018,6 +1018,29 @@ class StuffKeeper:Interface from G:Object
 
         return FALSE;
     }
+    private
+    void
+    menu_plugin_called(self, GtkWidget *item)
+    {
+        FS *f = g_object_get_data(G_OBJECT(item), "plugin");
+        if(f)
+        {
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
+            GtkWidget *tree = self->_priv->treeview2;
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
+            GtkTreeIter iter;
+            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+            {
+                StuffKeeperDataItem *item;
+                gtk_tree_model_get(model, &iter, 2, &item, -1);
+                if(item)
+                {
+                    stuffkeeper_plugin_run_item(STUFFKEEPER_PLUGIN(f->object), item);
+                    return;
+                }
+            }
+        }
+    }
 
     public
     gboolean 
@@ -1033,6 +1056,7 @@ class StuffKeeper:Interface from G:Object
             {
                 GtkWidget *menu;                
                 GtkWidget *menu_item;
+                GList *node,*iter;
                 /* create menu */
                 menu = gtk_menu_new();
 
@@ -1054,6 +1078,20 @@ class StuffKeeper:Interface from G:Object
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                 /* popup the menu */
                 gtk_widget_show_all(menu);
+
+                node = stuffkeeper_plugin_manager_get_loaded_plugins(self->_priv->spm); 
+                if(node){
+                    for(iter = g_list_first(node);iter;iter = g_list_next(iter))
+                    {
+                        FS *f = iter->data;
+                        menu_item = gtk_image_menu_item_new_with_label(f->name);
+                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
+                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_menu_plugin_called), self);
+                        g_object_set_data(G_OBJECT(menu_item), "plugin", f);
+                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                    }
+                    g_list_free(node);
+                }
 
                 gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
                 return FALSE;
@@ -1809,10 +1847,13 @@ class StuffKeeper:Interface from G:Object
                 for(iter = node;iter;iter = g_list_next(iter))
                 {
                     FS *f = iter->data;
-                    GtkWidget *item = gtk_menu_item_new_with_label(f->name);
-                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-                    g_object_set_data(G_OBJECT(item), "plugin-id",f); 
-                    g_signal_connect_swapped(G_OBJECT(item), "activate", G_CALLBACK(self_tool_activate), self);
+                    if(f->plugin_type&PLUGIN_MENU)
+                    {
+                        GtkWidget *item = gtk_menu_item_new_with_label(f->name);
+                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+                        g_object_set_data(G_OBJECT(item), "plugin-id",f); 
+                        g_signal_connect_swapped(G_OBJECT(item), "activate", G_CALLBACK(self_tool_activate), self);
+                    }
                 }
                 gtk_widget_show_all(menu);
             }
@@ -1829,9 +1870,8 @@ class StuffKeeper:Interface from G:Object
             FS *f = g_object_get_data(G_OBJECT(item), "plugin-id");
             if(f)
             {
-                printf("type: %i\n", f->type);
-                GObject *new = g_object_new(f->type,NULL);
-                stuffkeeper_plugin_run(STUFFKEEPER_PLUGIN(new),self->_priv->skdbg);
+                printf("type: %i\n", f->gtype);
+                stuffkeeper_plugin_run_menu(STUFFKEEPER_PLUGIN(f->object),self->_priv->skdbg);
             }
         }
         override (G:Object)

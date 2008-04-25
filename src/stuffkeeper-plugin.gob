@@ -2,6 +2,12 @@ requires 2.0.10
 
 %h{
 #include "stuffkeeper-data-backend.h"
+typedef enum _PluginType {
+    PLUGIN_ITEM = 1,        /* this works on a single item */
+    PLUGIN_BACKGROUND = 2,  /* This gets called at startup */
+    PLUGIN_MENU = 4         /* Gets called from the menu */
+}PluginType;
+
 %}
 /**
  * Stuffkeeper plugin needs to implement the run function
@@ -15,15 +21,35 @@ requires 2.0.10
      * * In case off Stuffkeeper:Plugin:Test:
      * GType register_plugin() { return stuffkeeeper_plugin_test_get_type();}
      */
+
+    /*
+     * PluginType plugin_type = PLUGIN_ITEM|PLUGIN_MENU;
+     */
 %}
 
 class Stuffkeeper:Plugin from G:Object
 {
-    virtual
+    /* Called on a single item */
+    virtual 
     void
-    run(self,StuffKeeperDataBackend *skdb)
+    run_item(self, StuffKeeperDataItem *item)
     {
         printf("This function should be overrided by the plugin\n");
     }
 
+    /* called from the menu */
+    virtual
+    void
+    run_menu(self,StuffKeeperDataBackend *skdb)
+    {
+        printf("This function should be overrided by the plugin\n");
+    }
+
+    /* background */
+    virtual
+    void
+    run_background(self,StuffKeeperDataBackend *skdb)
+    {
+        printf("This function should be overrided by the plugin\n");
+    }
 }
