@@ -54,14 +54,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
         void
     backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
     {
-        gdouble value = gtk_range_get_value(GTK_RANGE(self));
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
-        if(!locked)
-        {
-            //gtk_range_set_range(GTK_RANGE(self), 0, 10);
-        }else{
-            //gtk_range_set_range(GTK_RANGE(self), value, value);
-        }
         gtk_widget_set_sensitive(GTK_WIDGET(self), !locked);
     }
 
@@ -94,7 +87,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
 
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
-        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+        self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
 
         return GTK_WIDGET(obj);
     }

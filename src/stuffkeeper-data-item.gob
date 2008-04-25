@@ -7,8 +7,8 @@ requires 2.0.10
 %}
 
 %ph{
-    #include "debug.h"
-    #include "stuffkeeper-data-backend.h"
+#include "debug.h"
+#include "stuffkeeper-data-backend.h"
 %}
 %h{
 #include <sqlite3.h>

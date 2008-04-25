@@ -1108,7 +1108,7 @@ class StuffKeeper:Data:Schema from G:Object
          get_backend(self)
          {
              printf("get backend\n");
-            return self->_priv->skdb;
+            return (GObject *)self->_priv->skdb;
          }
 
         public

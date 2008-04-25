@@ -75,7 +75,8 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "toggled", G_CALLBACK(self_changed), NULL);
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
-        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+        
+        self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
         return GTK_WIDGET(obj);
     }
 

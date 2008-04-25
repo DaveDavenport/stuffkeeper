@@ -100,7 +100,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
     button_press_event(self, GdkEventButton *event, gpointer user_data)
     {
         debug_printf("button-press event\n");
-        if(stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)))
+        if(stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             return;
         if(event->button == 1)
         {
@@ -221,7 +221,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
                 GtkWidget          *widget
                 )
         {
-            if(!stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)))
+            if(!stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             {
                 GtkWidget *dialog; 
                 gchar **url = gtk_selection_data_get_uris(data);

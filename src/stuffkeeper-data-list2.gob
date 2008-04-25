@@ -157,7 +157,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     void
     row_activate(self, GtkEntry *entry)
     {
-        if(stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)) == FALSE)
+        if(stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))) == FALSE)
         {
 
             FieldRow *fr = g_object_get_data(G_OBJECT(entry), "object");
@@ -418,7 +418,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
 
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
-        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+        self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
 
         return GTK_WIDGET(obj);
     }
@@ -467,7 +467,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
                 GtkWidget          *widget
                 )
         {
-            if(!stuffkeeper_data_backend_get_locked(stuffkeeper_data_item_get_backend(self->_priv->item)))
+            if(!stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             {
                 GtkWidget *dialog; 
                 gchar **url = gtk_selection_data_get_uris(data);

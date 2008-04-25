@@ -1457,7 +1457,7 @@ class StuffKeeper:Interface from G:Object
     backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
     {
         GtkWidget *button = glade_xml_get_widget(self->_priv->xml, "toggle_locked");
-        gboolean value = gtk_toggle_button_get_active(button);
+        gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
         printf("locked changed; %i %i\n",locked,value);
 

@@ -70,7 +70,7 @@ class StuffKeeper:Item:View from Gtk:VBox
             /* Get the schema  */
             self->_priv->schema = stuffkeeper_data_item_get_schema(item);
             /* Get backend */
-            self->_priv->skdb = stuffkeeper_data_item_get_backend(item);
+            self->_priv->skdb = (StuffKeeperDataBackend *)stuffkeeper_data_item_get_backend(item);
             /* Get the item */
             self->_priv->item = item;
 

@@ -50,8 +50,10 @@ class StuffKeeper:Data:Expander from Gtk:Expander
         void
         backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
         {
+            /* Don't lock expander, it does not gain anything 
             gboolean locked = stuffkeeper_data_backend_get_locked(backend);
             gtk_widget_set_sensitive(GTK_WIDGET(self), !locked);
+            */
         }
 
     public
@@ -78,7 +80,7 @@ class StuffKeeper:Data:Expander from Gtk:Expander
 
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
-        self_backend_locked(obj,NULL, stuffkeeper_data_item_get_backend(item));
+        self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
 
 
         return GTK_WIDGET(obj);
