@@ -127,6 +127,10 @@ src/Makefile
 po/Makefile.in
 po/Makefile
 glade/Makefile
+pixmaps/Makefile
+data/Makefile
+types/Makefile
+html/Makefile
 ])
 
 echo "Now type make to build"

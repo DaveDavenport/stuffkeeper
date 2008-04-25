@@ -1,9 +1,0 @@
-Copy convert to ~/.stuffkeeper
-
-start the new stuffkeeper (so that database.sqlite3 is created and in ~/.stuffkeeper)
-
-run ./convert > output.sql
-
-sqlite3 database.sqlite3 < output.sql
-
-start stuffkeeper. it should be there now.
