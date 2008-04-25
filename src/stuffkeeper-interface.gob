@@ -1090,26 +1090,27 @@ class StuffKeeper:Interface from G:Object
 
             if(type == LP_TYPE_TAG)
             {
-                /* Add tag */
-                menu_item = gtk_image_menu_item_new_with_label("New tag");
-                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                        gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
-                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_tag), self);
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-                if(gtk_tree_selection_get_selected(selection,&model, &iter))
-                {
-                    int items;
-                    /* Get the number of items */
-                    gtk_tree_model_get(model, &iter, 4, &items, -1);
 
-                    /* no items, then you can delete it*/
-                    if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
+                if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
+                {
+                    /* Add tag */
+                    menu_item = gtk_image_menu_item_new_with_label("New tag");
+                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                            gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_tag), self);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                    if(gtk_tree_selection_get_selected(selection,&model, &iter))
                     {
+                        int items;
+                        /* Get the number of items */
+                        gtk_tree_model_get(model, &iter, 4, &items, -1);
+
+                        /* no items, then you can delete it*/
                         if(items ==  0)
                         {
                             menu_item = gtk_image_menu_item_new_with_label("Remove tag");
                             gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                                          gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                                    gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
                             g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_tag),self);
                             gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                         }
@@ -1120,73 +1121,77 @@ class StuffKeeper:Interface from G:Object
             else if (type == LP_TYPE_SCHEMA) 
             {
                 /* Add item */
-                menu_item = gtk_image_menu_item_new_with_label("New type");
-                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                        gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
-                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_type), self);
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-                if(gtk_tree_selection_get_selected(selection,&model, &iter))
-                {
-                    int items;
-                    /* Get the number of items */
-                    gtk_tree_model_get(model, &iter, 4, &items, -1);
 
-                    /* no items, then you can delete it*/
-                    if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
+                if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
+                {
+                    menu_item = gtk_image_menu_item_new_with_label("New type");
+                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                            gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_type), self);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                    if(gtk_tree_selection_get_selected(selection,&model, &iter))
                     {
+                        int items;
+                        /* Get the number of items */
+                        gtk_tree_model_get(model, &iter, 4, &items, -1);
+
+                        /* no items, then you can delete it*/
                         if(items ==  0)
                         {
                             menu_item = gtk_image_menu_item_new_with_label("Remove type");
                             gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                                          gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                                    gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
                             g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_type),self);
                             gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                         }
                         menu_item = gtk_image_menu_item_new_with_label("Edit type");
                         gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                                      gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
+                                gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
                         g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_type),self);
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-                    }
 
+                    }
                 }
 
             } else if (type == LP_TYPE_SEARCH)
             {
-                /* Add item */
-                menu_item = gtk_image_menu_item_new_with_label("New filter");
-                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                        gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
-                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_new_search), self);
-                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-                if(gtk_tree_selection_get_selected(selection,&model, &iter))
+
+                if(!stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
                 {
-                    int id;
-                    StuffKeeperDataItemSearch *search;
-                    /* Get the number of items */
-                    gtk_tree_model_get(model, &iter, 0, &id,3, &search, -1);
-
-                    /* no items, then you can delete it*/
-                    if(id >=  0 && !stuffkeeper_data_backend_get_locked(self->_priv->skdbg))
+                    /* Add item */
+                    menu_item = gtk_image_menu_item_new_with_label("New filter");
+                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                            gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_new_search), self);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                    if(gtk_tree_selection_get_selected(selection,&model, &iter))
                     {
+                        int id;
+                        StuffKeeperDataItemSearch *search;
+                        /* Get the number of items */
+                        gtk_tree_model_get(model, &iter, 0, &id,3, &search, -1);
 
-                        menu_item = gtk_image_menu_item_new_with_label("Remove filter");
-                        g_object_set_data(G_OBJECT(menu_item), "search", search);
-                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_search_menu),self);
-                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                        /* no items, then you can delete it*/
+                        if(id >=  0)
+                        {
+
+                            menu_item = gtk_image_menu_item_new_with_label("Remove filter");
+                            g_object_set_data(G_OBJECT(menu_item), "search", search);
+                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                    gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+                            g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_search_menu),self);
+                            gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
 
-                        menu_item = gtk_image_menu_item_new_with_label("Edit filter");
-                        g_object_set_data(G_OBJECT(menu_item), "search", search);
-                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
-                                gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
-                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_search_menu),self);
-                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                            menu_item = gtk_image_menu_item_new_with_label("Edit filter");
+                            g_object_set_data(G_OBJECT(menu_item), "search", search);
+                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                                    gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
+                            g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_search_menu),self);
+                            gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                        }
                     }
                 }
-
             }
 
             /* popup the menu */
