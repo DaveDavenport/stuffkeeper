@@ -183,7 +183,6 @@ class StuffKeeper:Data:List2 from Gtk:VBox
     {
         gsize length =0;
         gchar **value;
-        printf("item changed\n");
         if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
         {
             g_list_foreach(self->_priv->list, (GFunc)self_free_row, self);
@@ -428,7 +427,6 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         dispose (G:Object *obj)
         {
             Self *self = SELF(obj);
-            printf("destroy: finalize\n");
             if(self->_priv->signal_backend_locked) {                                                                     
                 g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
                 self->_priv->signal_backend_locked = 0;

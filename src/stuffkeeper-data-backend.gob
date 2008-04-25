@@ -538,7 +538,9 @@ class StuffKeeper:Data:Backend from G:Object
          */
         if(self->_priv->sqlHandle)
         {
-            int retv = sqlite3_close(self->_priv->sqlHandle);
+            int retv = 0;
+            printf("%i Rows modified.\n", sqlite3_total_changes(self->_priv->sqlHandle));
+            retv = sqlite3_close(self->_priv->sqlHandle);
             if(retv != SQLITE_OK)
             {
                 debug_printf("The following error occured while trying to close the db: %s\n",
