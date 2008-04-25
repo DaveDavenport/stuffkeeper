@@ -18,3 +18,9 @@ stuffkeepericoninterndir= $(datadir)/stuffkeeper/icons/hicolor/16x16/actions
 stuffkeepericonintern_DATA =\
 							internet-mail.png\
 							internet-web-browser.png
+
+EXTRA_DIST=\
+		   $(stuffkeepericonintern_DATA)\
+		   $(stuffkeepericonscalable_DATA)\
+		   $(stuffkeepericon64_DATA)\
+		   $(stuffkeepericon16_DATA)

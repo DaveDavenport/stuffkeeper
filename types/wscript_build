@@ -1,7 +1,0 @@
-#! /usr/bin/env python
-# encoding: utf-8
-# Qball Cow, 2008
-
-install_files('PACKAGE_DATADIR', 'types', "Audio_CD.type")
-install_files('PACKAGE_DATADIR', 'types', 'Book.type')
-

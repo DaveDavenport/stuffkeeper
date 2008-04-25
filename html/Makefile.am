@@ -4,3 +4,4 @@ stuffkeepertemplates_DATA =\
 	index.template\
 	index-item.template
 
+EXTRA_DIST= $(stuffkeepertemplates_DATA)
