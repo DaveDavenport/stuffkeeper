@@ -10,5 +10,13 @@ build/default/src/stuffkeeper-interface.c
 build/default/src/stuffkeeper-item-view.c
 build/default/src/stuffkeeper-show-item.c
 build/default/src/stuffkeeper-data-list2.c
-waf-tools/gnu_dirs.py
-*.py
+build/default/src/stuffkeeper-data-image.c
+build/default/src/stuffkeeper-data-item.c
+src/stuffkeeper-data-image.c
+src/stuffkeeper-data-item-search.c
+src/stuffkeeper-data-item.c
+src/stuffkeeper-data-list2.c
+src/stuffkeeper-edit-schema.c
+src/stuffkeeper-interface.c
+src/stuffkeeper-item-view.c
+src/stuffkeeper-show-item.c
