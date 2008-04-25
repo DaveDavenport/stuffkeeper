@@ -2004,9 +2004,11 @@ class StuffKeeper:Interface from G:Object
             gtk_about_dialog_set_email_hook((GtkAboutDialogActivateLinkFunc)self_dialog_activate_email,self, NULL);
             /* Set config time defines */
             gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog), PROGRAM_NAME);
-            if(strlen(REVISION)>0)
+            if(strlen(revision)>0)
             {
-                gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), PROGRAM_VERSION"\nRevision: "REVISION);
+                gchar *str = g_strdup_printf("%s\n%s: %s", PROGRAM_VERSION, _("Revision"), revision);
+                gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog),str);
+                g_free(str);
             }
             else
             {

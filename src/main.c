@@ -112,9 +112,9 @@ int main ( int argc, char **argv )
     if(version)
     {
         printf("%s: %s\n", _("Version"), PROGRAM_VERSION);
-        if(strlen(REVISION)>0)
+        if(strlen(revision)>0)
         {
-            printf("%s: %s\n", _("Revision"), REVISION);
+            printf("%s: %s\n", _("Revision"), revision);
         }
         return EXIT_SUCCESS;
     }
