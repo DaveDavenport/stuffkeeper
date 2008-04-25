@@ -105,3 +105,56 @@ stuffkeeperinclude_HEADERS = \
 	stuffkeeper-data-item-search.h
 
 stuffkeeperincludedir =$(includedir)/stuffkeeper/
+
+EXTRA_DIST=\
+		   bacon-message-connection.h\
+		   egg-datetime.h\
+		   debug.h\
+		   misc.h\
+		   sexy-icon-entry.h\
+		   stuffkeeper-data-backend.h\
+		   stuffkeeper-data-schema.h\
+		   stuffkeeper-data-boolean.h\
+		   stuffkeeper-data-spinbutton.h\
+		   stuffkeeper-data-date.h\
+		   stuffkeeper-data-tag.h\
+		   stuffkeeper-data-entry.h\
+		   stuffkeeper-data-taglist2.h\
+		   stuffkeeper-data-expander.h\
+		   stuffkeeper-data-text.h\
+		   stuffkeeper-data-image.h\
+		   stuffkeeper-edit-schema.h\
+		   stuffkeeper-data-item-search.h\
+		   stuffkeeper-export-html.h\
+		   stuffkeeper-data-item.h\
+		   stuffkeeper-interface.h\
+		   stuffkeeper-data-label.h\
+		   stuffkeeper-item-view.h\
+		   stuffkeeper-data-link.h\
+		   stuffkeeper-item-window.h\
+		   stuffkeeper-data-list2.h\
+		   stuffkeeper-show-item.h\
+		   stuffkeeper-data-rating.h\
+		   stuffkeeper-data-backend-private.h\
+		   stuffkeeper-data-schema-private.h\
+		   stuffkeeper-data-boolean-private.h\
+		   stuffkeeper-data-spinbutton-private.h\
+		   stuffkeeper-data-date-private.h\
+		   stuffkeeper-data-tag-private.h\
+		   stuffkeeper-data-entry-private.h\
+		   stuffkeeper-data-taglist2-private.h\
+		   stuffkeeper-data-expander-private.h\
+		   stuffkeeper-data-text-private.h\
+		   stuffkeeper-data-image-private.h\
+		   stuffkeeper-edit-schema-private.h\
+		   stuffkeeper-data-item-search-private.h\
+		   stuffkeeper-export-html-private.h\
+		   stuffkeeper-data-item-private.h\
+		   stuffkeeper-interface-private.h\
+		   stuffkeeper-data-label-private.h\
+		   stuffkeeper-item-view-private.h\
+		   stuffkeeper-data-link-private.h\
+		   stuffkeeper-item-window-private.h\
+		   stuffkeeper-data-list2-private.h\
+		   stuffkeeper-show-item-private.h\
+		   stuffkeeper-data-rating-private.h

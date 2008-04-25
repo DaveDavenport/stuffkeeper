@@ -129,6 +129,7 @@ po/Makefile
 glade/Makefile
 pixmaps/Makefile
 data/Makefile
+data/stuffkeeper.pc
 types/Makefile
 html/Makefile
 ])

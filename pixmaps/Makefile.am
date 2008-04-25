@@ -23,4 +23,5 @@ EXTRA_DIST=\
 		   $(stuffkeepericonintern_DATA)\
 		   $(stuffkeepericonscalable_DATA)\
 		   $(stuffkeepericon64_DATA)\
+		   $(stuffkeepericon48_DATA)\
 		   $(stuffkeepericon16_DATA)
