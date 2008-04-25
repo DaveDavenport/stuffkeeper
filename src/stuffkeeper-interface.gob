@@ -2600,4 +2600,10 @@ class StuffKeeper:Interface from G:Object
             }
             g_free(path);
         }
+        public
+        void
+        present(self)
+        {
+            gtk_window_present(self->_priv->win);
+        }
 }
