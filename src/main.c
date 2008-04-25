@@ -13,6 +13,7 @@
 /* Include the database */
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-interface.h"
+#include "stuffkeeper-plugin-manager.h"
 #include "bacon-message-connection.h"
 
 GList *interface_list = NULL;
@@ -73,6 +74,7 @@ void interface_clear(StuffKeeperInterface *interface, gpointer data)
 
 int main ( int argc, char **argv )
 {
+    StuffkeeperPluginManager *spm;
     GError *error = NULL;
     GOptionContext *context;
     gboolean first_run = FALSE;
@@ -122,7 +124,10 @@ int main ( int argc, char **argv )
     gtk_icon_theme_append_search_path(gtk_icon_theme_get_default (),
                                    PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
 
-
+    /* */
+    spm = stuffkeeper_plugin_manager_new();
+    stuffkeeper_plugin_manager_load_plugin(spm);
+     
     /* Initialize the backend */
     skdb = stuffkeeper_data_backend_new();
     /* Check if creating the backend worked */
@@ -267,11 +272,15 @@ int main ( int argc, char **argv )
     /* cleanup  */
     g_object_unref(skdb);
 
+    /* clean spm */
+    g_object_unref(spm);
+
     /* Close the IPC bus */
     if(bacon_connection)
     {
         bacon_message_connection_free (bacon_connection);
     }
+
     /* Savin config */
     if(config_path)
     {

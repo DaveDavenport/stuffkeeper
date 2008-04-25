@@ -32,7 +32,9 @@ stuffkeeper_SOURCES=\
 	stuffkeeper-item-window.c\
 	stuffkeeper-data-list2.c\
 	stuffkeeper-show-item.c\
-	stuffkeeper-data-rating.c
+	stuffkeeper-data-rating.c\
+	stuffkeeper-plugin.c\
+	stuffkeeper-plugin-manager.c
 
 BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-backend.c\
@@ -57,7 +59,9 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-item-window.c\
 	stuffkeeper-data-list2.c\
 	stuffkeeper-show-item.c\
-	stuffkeeper-data-rating.c
+	stuffkeeper-data-rating.c\
+	stuffkeeper-plugin.c\
+	stuffkeeper-plugin-manager.c
 
 %.c %.h %-private.h: %.gob
 	@GOB2@ --no-touch-headers --always-private-header $<
@@ -102,6 +106,7 @@ stuffkeeperinclude_HEADERS = \
 	stuffkeeper-data-schema.h\
 	stuffkeeper-data-backend.h\
 	stuffkeeper-data-tag.h\
+	stuffkeeper-plugin.h\
 	stuffkeeper-data-item-search.h
 
 stuffkeeperincludedir =$(includedir)/stuffkeeper/
@@ -135,6 +140,8 @@ EXTRA_DIST=\
 		   stuffkeeper-data-list2.h\
 		   stuffkeeper-show-item.h\
 		   stuffkeeper-data-rating.h\
+		   stuffkeeper-plugin.h\
+		   stuffkeeper-plugin-manager.h\
 		   stuffkeeper-data-backend-private.h\
 		   stuffkeeper-data-schema-private.h\
 		   stuffkeeper-data-boolean-private.h\
@@ -157,7 +164,9 @@ EXTRA_DIST=\
 		   stuffkeeper-item-window-private.h\
 		   stuffkeeper-data-list2-private.h\
 		   stuffkeeper-show-item-private.h\
-		   stuffkeeper-data-rating-private.h
+		   stuffkeeper-data-rating-private.h\
+		   stuffkeeper-plugin-private.h\
+		   stuffkeeper-plugin-manager-private.h
 
 clean-local:
 	-rm stuffkeeper-*.h

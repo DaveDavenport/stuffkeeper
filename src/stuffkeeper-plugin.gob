@@ -1,0 +1,27 @@
+requires 2.0.10
+
+/**
+ * Stuffkeeper plugin needs to implement the run function
+ * And set plugin name.
+ */
+
+%{
+
+%}
+
+class Stuffkeeper:Plugin from G:Object
+{
+    public
+    void
+    run(self)
+    {
+        printf("This function should be overrided by the plugin\n");
+    }
+
+    public
+    gchar *
+    get_name(self)
+    {
+        return "Plugin name";
+    }
+}

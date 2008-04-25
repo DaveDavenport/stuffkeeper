@@ -1,0 +1,83 @@
+requires 2.0.10
+
+%ph{
+#include <config.h>
+#include <glib.h>
+#include <gmodule.h>
+#include "stuffkeeper-plugin.h"
+%}
+
+%{
+typedef struct _FS{
+    const gchar *name;
+    GType type;
+    GModule *module;
+}FS;
+
+typedef GType (*GetType)(void);
+
+%}
+
+class Stuffkeeper:Plugin:Manager from G:Object
+{
+    private GList *plugins = {NULL}; 
+
+
+    public
+    GObject *
+    new(void)
+    {
+        return GET_NEW;
+    }
+
+    public
+    void
+    load_plugin(self)
+    {
+        GDir *dir = g_dir_open(STUFFKEEPER_PLUGIN_DIR,0,NULL); 
+        if(dir)
+        {
+            gchar *filename;
+            printf("Loading plugin: %s\n", STUFFKEEPER_PLUGIN_DIR);
+            while((filename = g_dir_read_name(dir)) != NULL)
+            {
+                if(strncmp(&filename[strlen(filename)-strlen(G_MODULE_SUFFIX)], G_MODULE_SUFFIX,strlen(G_MODULE_SUFFIX)) == 0)
+                {
+                    gchar *path = g_build_path(G_DIR_SEPARATOR_S, STUFFKEEPER_PLUGIN_DIR, filename, NULL);
+                    GModule *module;
+                    printf("trying: %s\n", path);
+                    module = g_module_open(path, G_MODULE_BIND_LAZY);
+                    if(module)
+                    {
+                        GetType gt;
+                        if(g_module_symbol(module,"register_plugin",&gt))
+                        {
+                            FS *fs = g_malloc0(sizeof(*fs));
+                            gchar **name;
+                            fs->type = gt();
+                            fs->module = module;
+                            printf("loaded: %i\n", fs->type);
+                            if(!g_module_symbol(module, "plugin_name", &(name)))
+                            {
+                                /* no valid name */
+                                fs->name = "No plugin name";
+                            }
+                            else
+                                fs->name = *name;
+                            self->_priv->plugins = g_list_prepend(self->_priv->plugins,fs);
+                            printf("Plugin: %s succesfull loaded\n",fs->name);
+                        }
+                        else
+                        {
+                            printf("Failed: %s\n", g_module_error());
+                            g_module_close(module);
+                        }
+                    }
+                    g_free(path);
+                }
+            }
+            g_dir_close(dir);
+        }
+    }
+ 
+}
