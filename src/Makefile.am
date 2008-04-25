@@ -158,3 +158,8 @@ EXTRA_DIST=\
 		   stuffkeeper-data-list2-private.h\
 		   stuffkeeper-show-item-private.h\
 		   stuffkeeper-data-rating-private.h
+
+clean-local:
+	-rm stuffkeeper-*.h
+	-rm stuffkeeper-*.c revision.h
+	-rm Makefile.config

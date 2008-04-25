@@ -1,22 +1,26 @@
 # Process this file with autoconf to produce a configure script.
 
 # Generate version.
+m4_define([stuffkeeper_name],       "stuffkeeper")
+m4_define([stuffkeeper_website],    "http://stuffkeeper.org/")
+m4_define([stuffkeeper_bugtracker], "http://bugtracker.sarine.nl/")
+m4_define([stuffkeeper_email],      "qball@stuffkeeper.org");
 m4_define([stuffkeeper_major_version], [0])
 m4_define([stuffkeeper_minor_version], [9])
 m4_define([stuffkeeper_micro_version], [0])
+
+# generate needed values in f.e. header files
 m4_define([stuffkeeper_version], [stuffkeeper_major_version.stuffkeeper_minor_version.stuffkeeper_micro_version])
 
 AC_INIT(src)
+
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([stuffkeeper], [stuffkeeper_version],qball@sarine.nl)
+AM_INIT_AUTOMAKE([stuffkeeper], [stuffkeeper_version],stuffkeeper_email)
 
 
-m4_define([stuffkeeper_name], "stuffkeeper")
-AC_DEFINE(PROGRAM_NAME, stuffkeeper_name,["Program name"])
-m4_define([stuffkeeper_website], "http://stuffkeeper.org/")
-AC_DEFINE(PROGRAM_WEBSITE, stuffkeeper_website,["Program website "])
-m4_define([stuffkeeper_bugtracker], "http://bugtracker.sarine.nl/")
-AC_DEFINE(PROGRAM_BUGTRACKER, stuffkeeper_bugtracker,["Program bugtracker "])
+AC_DEFINE(PROGRAM_WEBSITE,      stuffkeeper_website,    ["Program website "])
+AC_DEFINE(PROGRAM_NAME,         stuffkeeper_name,       ["Program name"])
+AC_DEFINE(PROGRAM_BUGTRACKER,   stuffkeeper_bugtracker, ["Program bugtracker "])
 
 ##
 # Versioning
