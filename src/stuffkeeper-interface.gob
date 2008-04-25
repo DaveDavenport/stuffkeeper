@@ -1076,22 +1076,31 @@ class StuffKeeper:Interface from G:Object
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_export_html_item), self);
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-                /* popup the menu */
-                gtk_widget_show_all(menu);
+
 
                 node = stuffkeeper_plugin_manager_get_loaded_plugins(self->_priv->spm); 
-                if(node){
+                if(node)
+                {
+                    printf("Loading plugins list\n");
                     for(iter = g_list_first(node);iter;iter = g_list_next(iter))
                     {
                         FS *f = iter->data;
-                        menu_item = gtk_image_menu_item_new_with_label(f->name);
-                        gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
-                        g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_menu_plugin_called), self);
-                        g_object_set_data(G_OBJECT(menu_item), "plugin", f);
-                        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                        printf("plugin: %s:%i\n", f->name,f->plugin_type);
+                        if((f->plugin_type)&PLUGIN_ITEM)
+                        {
+                            menu_item = gtk_image_menu_item_new_with_label(f->name);
+                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item),
+                                    gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
+                            g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_menu_plugin_called), self);
+                            g_object_set_data(G_OBJECT(menu_item), "plugin", f);
+                            gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                        }
                     }
                     g_list_free(node);
                 }
+
+                /* popup the menu */
+                gtk_widget_show_all(menu);
 
                 gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, event->button, event->time);
                 return FALSE;

@@ -64,7 +64,7 @@ static void bacon_on_message_received(const char *message, gpointer data)
     }
 }
 
-void interface_clear(StuffKeeperInterface *interface, gpointer data)
+void interface_clear(GObject *interface, gpointer data)
 {
     g_object_unref(interface);
 }
@@ -75,6 +75,7 @@ void interface_clear(StuffKeeperInterface *interface, gpointer data)
 
 int main ( int argc, char **argv )
 {
+    GList *node,*iter;
     GError *error = NULL;
     GOptionContext *context;
     gboolean first_run = FALSE;
@@ -259,6 +260,22 @@ int main ( int argc, char **argv )
     {
         printf("Initial run of stuffkeeper\n");
         stuffkeeper_interface_first_run(ski);
+    }
+
+    /* initialize plugin */
+    node = stuffkeeper_plugin_manager_get_loaded_plugins(spm); 
+    if(node)
+    {
+        printf("Loading plugins list\n");
+        for(iter = g_list_first(node);iter;iter = g_list_next(iter))
+        {
+            FS *f = iter->data;
+            if((f->plugin_type)&PLUGIN_BACKGROUND)
+            {
+                stuffkeeper_plugin_run_background(STUFFKEEPER_PLUGIN(f->object), skdb);
+            }
+        }
+        g_list_free(node);
     }
 
     /* Start the main loop */

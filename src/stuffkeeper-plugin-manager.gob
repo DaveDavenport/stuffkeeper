@@ -94,10 +94,10 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             if(!g_module_symbol(module, "plugin_type", &(type)))
                             {
                                 /* no valid name */
-                                fs->plugin_type = *type; 
+                                fs->plugin_type = PLUGIN_MENU; 
                             }
                             else
-                                fs->plugin_type = PLUGIN_MENU;
+                                fs->plugin_type = *type;
 
                             if(!g_module_symbol(module, "plugin_name", &(name)))
                             {
