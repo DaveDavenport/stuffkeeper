@@ -218,6 +218,12 @@ int main ( int argc, char **argv )
         
     }
 
+    /* restore locked state */
+    if(g_key_file_get_boolean(config_file, "BACKEND", "locked", NULL))
+    {
+        stuffkeeper_data_backend_set_locked(skdb, TRUE);
+    }
+
     /* Create a main interface */
     ski= stuffkeeper_interface_new(config_file);
     interface_list = g_list_append(interface_list, ski);
@@ -256,6 +262,8 @@ int main ( int argc, char **argv )
     g_list_foreach(interface_list, (GFunc)interface_clear, NULL);
     g_list_free(interface_list);
 
+    /* save locked state */
+    g_key_file_set_boolean(config_file, "BACKEND", "locked", stuffkeeper_data_backend_get_locked(skdb));
     /* cleanup  */
     g_object_unref(skdb);
 
