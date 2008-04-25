@@ -1,0 +1,2246 @@
+commit 331b1653d03d328977257fe62e674666b10d7ab3
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 14:40:10 2008 +0200
+
+    Add more Makefile stuff
+
+commit 0cb8961a6bd2d0dfaedd907d060158aca03d2daa
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 14:39:52 2008 +0200
+
+    Fix images in autotools.
+
+commit 29f2b986bc88d2b5dbc63c7f9e98c4a7917a111d
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 14:23:52 2008 +0200
+
+    Remove 2 not-needed files.
+
+commit 1fa1dafb0defcb2678abe7b9565dc067e80f8811
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 14:22:24 2008 +0200
+
+    Update autotools stuff.
+
+commit 832c06469edab6c41719e7ace27d8b15c923437b
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 13:57:38 2008 +0200
+
+    oeps missing a file
+
+commit 7e9d87062a42869439b912b7efe3140590bb3853
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 13:55:39 2008 +0200
+
+    Playing around
+
+commit 782b4a5534ea2d2d4506c4730a1bcf52a7b5852d
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 12:37:08 2008 +0200
+
+    remove 2 printf's, and print another debug thingy out
+
+commit 6fde9f401b2fbf0f429a9004a40552268aa0f27e
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 12:23:17 2008 +0200
+
+    store/restore lock state between sessions
+
+commit 40412acf078206dc015b974dc973feda9ed6d50b
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 12:01:19 2008 +0200
+
+    Remove rasi hacky thing
+
+commit cfe64924750804543d6e48e37592579412935f30
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 11:52:52 2008 +0200
+
+    Fix right mouse menu under locked state
+
+commit cf417f9274c691996b7250845e48af776d8ff3a1
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 11:34:35 2008 +0200
+
+    Add ctrl-l keybinding and menu item to lock
+
+commit 4a8ebae5c533b9eb0c6f285bf36a9006ca46caff
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 11:15:47 2008 +0200
+
+    * Expander does not get locked.
+    * Fix compile warnings
+
+commit a8b03fdc417fc9ff876cfcfcb03690e55cec8705
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 24 17:50:39 2008 +0200
+
+    Put locking system in place
+
+commit 5facd160654f15fc95efe980fb1a47ab0d9ecb6f
+Author: Qball Cow <qball@sarine.nl>
+Date:   Wed Apr 23 23:31:36 2008 +0200
+
+    Fix compiling
+
+commit aeb5b65542ed2c515025b8273bd3d9123331e086
+Author: Qball Cow <qball@sarine.nl>
+Date:   Wed Apr 23 21:46:20 2008 +0200
+
+    Merging 2 end types, and allow switchign from expander to packing type
+
+commit 703d58377537502ebe6363bfc2bc84cd8a17e89c
+Author: Qball Cow <qball@sarine.nl>
+Date:   Wed Apr 23 21:16:18 2008 +0200
+
+    Allow changing of v to hsplit and back
+
+commit d4c2f7d88cee7da636f21b98f2c9546aec89fe48
+Author: Qball Cow <qball@sarine.nl>
+Date:   Tue Apr 22 15:57:12 2008 +0200
+
+    fix editing of text, and _ref warning on close via escape
+
+commit 717ce0854628f82956834c7c600341c9b1d28c0b
+Author: Qball Cow <qball@sarine.nl>
+Date:   Mon Apr 21 21:54:43 2008 +0200
+
+    edit schema updates
+
+commit ba1c265e654191ca270653f657441324e257d204
+Author: Qball Cow <qball@sarine.nl>
+Date:   Mon Apr 21 14:18:58 2008 +0200
+
+    First try at layout-preview
+
+commit a498ce13541b7c86966b6bc8312e04a4f53ea99f
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sun Apr 20 14:54:54 2008 +0200
+
+    Fix html export
+
+commit 327a6de2618f7db7359d751b1eaaa9dbbf950aac
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 22:51:44 2008 +0200
+
+    Cleanups
+
+commit 194d95cb4dfe78809d329aac224139d7cceee86a
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 22:33:47 2008 +0200
+
+    Add 3 pixel left/right border
+
+commit 8f8ae3a08d2e776d1ce1409f113b7018a12472f0
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 22:31:31 2008 +0200
+
+    add possible border around text view
+
+commit 1ef8e48d9a5bea4d1dede7a6d38421780ec97aca
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 21:05:29 2008 +0200
+
+    Remove printf's
+
+commit eea087625b7cb77d770cc83f20f27691899744da
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 20:14:33 2008 +0200
+
+    * Cleanup code.
+    * Update order, when changed.
+    * Save edit schema size
+
+commit 55db25897fab12ccfcb473f96dde0d5bb385c927
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 15:01:17 2008 +0200
+
+    Improve packing on data-list
+
+commit 40031a90ecf49395ff3ee65f9e9bf638d50bc47a
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 14:30:09 2008 +0200
+
+    H-packing always same column width
+
+commit e190f35b04c7797ff202f7853cf40e406a5795f3
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 13:01:15 2008 +0200
+
+    Small cleanup
+
+commit 062200209603084f31d7f438765e48dbaebcbec4
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 12:59:29 2008 +0200
+
+    Avoid unneeded updates
+
+commit cd3e153d3ee4ed5f55e801ab018e86a9b1d9500a
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 12:55:35 2008 +0200
+
+    Do reorder on apply/window close
+
+commit 4c293983108a83e59a2e5c96e82d98d4aba72f9f
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 19 11:32:43 2008 +0200
+
+    speed up editing schema a bit
+
+commit 317f95b01857a1fa81486b0d34e70b65b5375e74
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 18 22:52:18 2008 +0200
+
+    Cleanups
+
+commit abe5b2a5dab6a82aeb74c4e113671ce93127e72e
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 18 22:31:59 2008 +0200
+
+    Make it a bit more dummy proof
+
+commit ad86de02ec50946c777aa8dc71644bba43a59113
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 18 17:50:33 2008 +0200
+
+    Supersplit
+
+commit f54fc3178ec26cd8bba31ba77222fd03dce547f4
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 18 16:58:35 2008 +0200
+
+    Allow splits, and nested in expanders
+
+commit 3c3fcf3675397d4e6933b028c7bdeccfc2944140
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 18 12:37:19 2008 +0200
+
+    vsplit support
+
+commit 034375ed2bec390b22533734b0520bfe538a23cd
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Fri Apr 18 00:10:27 2008 +0200
+
+    remove dutch entry in book
+
+commit 6295c39e9b328c17d000279d509b5a798f77356c
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 17 23:59:41 2008 +0200
+
+    Propper initialization of gerror
+
+commit 1d7c736a3427bec191b476bfe9e4bab797e938f3
+Author: Qball Cow <qball@sarine.nl>
+Date:   Thu Apr 17 21:40:16 2008 +0200
+
+    Add a config option to re-enable frames around text-entries
+
+commit 075ef30413421c1dbc900683eb526903b1249c9f
+Author: Qball Cow <qball@sarine.nl>
+Date:   Thu Apr 17 17:10:47 2008 +0200
+
+    Make the edit-schema window wider.
+    Fix column sizing in edit-schema tree.
+
+commit 459c17ef893eee59c4fe3f50500998728167acde
+Author: Qball Cow <qball@sarine.nl>
+Date:   Thu Apr 17 16:44:10 2008 +0200
+
+    When first run, import the provided type files.
+    Added book.type and audio_cd.type
+
+commit 7fd891407f7f221f82b5210a7ea8761491bbf4b9
+Author: Qball Cow <qball@sarine.nl>
+Date:   Wed Apr 16 22:40:28 2008 +0200
+
+    Update web url, email and add rasi
+
+commit 1fe465b9000b79e91347a8036dd1eded700d4beb
+Author: Qball Cow <qball@sarine.nl>
+Date:   Mon Apr 14 22:05:32 2008 +0200
+
+    fix compile warnings
+
+commit cb2f1634c69fa258694c5661264f376455d55478
+Author: Qball Cow <qball@sarine.nl>
+Date:   Mon Apr 14 18:47:06 2008 +0200
+
+    Fix some signals
+
+commit d2c1c2fd034a8074f98cd80f785513443264b1db
+Author: Qball Cow <qball@sarine.nl>
+Date:   Mon Apr 14 12:40:32 2008 +0200
+
+    remove debug output that leaked memory
+
+commit 3c0444e44b16040b363b4bdbf3467e344f2a58c6
+Author: Qball Cow <qball@sarine.nl>
+Date:   Mon Apr 14 12:30:43 2008 +0200
+
+    In datalist2:
+    * putting rows in a separate vbox.
+    * Adding row with add row button also moves focus.
+
+commit 8bcc24d38b1abe55acce601697ed39356b0144b2
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sun Apr 13 14:39:31 2008 +0200
+
+    Fix forgotten schema signal on new item
+
+commit 20b4812da32fb434dae3ff37c03b3f5596dcfbfc
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sun Apr 13 11:21:31 2008 +0200
+
+    Correctly parse uri, and for the data list allow dnd and check if the file is valid utf8
+
+commit 8f1ad768d73b980dfb5b3f2b691315bbcbdbd2df
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sun Apr 13 10:52:00 2008 +0200
+
+    Allow drag-and-drop to set an image
+
+commit bb41e8296f61232d85b00785e65308585a117733
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 22:46:25 2008 +0200
+
+    move to gtk_insert_with_values, it is faster
+
+commit e50e3010165a431d748432cf2e5e42c7dce91728
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 22:37:19 2008 +0200
+
+    remove 2 printfs
+
+commit 75d2ef7bf0b06d29f30c37e4d20533b505c3509a
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 22:28:21 2008 +0200
+
+    * Fix a ItemFields -> ItemsFields type.
+    Force readding of indexes, let sqlite overwrite.
+
+commit 20ed70cdefceac7d83a06ab04e2583fd5adf72c1
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 22:23:13 2008 +0200
+
+    * Cache generated titles in db. This speeds up loading alot, as it does not have to calculate them.
+    * Cache if it has a generated item, runtime.
+    * Speedup the insert type.
+    * More.
+
+commit 1fb9126d08acbf95caade6629a86ca6a81690764
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 14:17:50 2008 +0200
+
+    tiny cleanup
+
+commit 78d4adbdabcc571003553b9259e08c2eb2804f51
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 12:05:01 2008 +0200
+
+    Don't allow editing of a generated title
+
+commit d363c6eb4df1ca2b143887817c56a19961faec8c
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:59:16 2008 +0200
+
+    if no generated title, use custom title
+
+commit 2dda9e86aadb90ebf6aa7446979b956d60dea765
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:51:42 2008 +0200
+
+    Make title nicer when it is an empty field.
+
+commit cd2a7cc3dcf05ea87493804f0c19c6325a6ef814
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:47:42 2008 +0200
+
+    Add 'in title' to import/export xml
+
+commit ae27f0256291bac3f1dd30f7014c7588cb1012be
+Merge: e2bce21... ca5a23f...
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:33:47 2008 +0200
+
+    Merge branch 'master' into generated-title
+
+commit ca5a23f0305dbcbb51ce598242041a0882cd96ed
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:33:24 2008 +0200
+
+    Hopefully fix for appending a row after the first (and only) row in datalist
+
+commit e2bce210d091a989be427d351db92185e1ab68d6
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:18:37 2008 +0200
+
+    some small fixes
+
+commit 5e2764d194a6e2d9e9b3ca9ea212be0ad09fd276
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 12 11:09:14 2008 +0200
+
+    Build title from fields
+
+commit aefd9d5bc3863c6c1e26bcbf62a08a6e98327894
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 11 23:46:34 2008 +0200
+
+    Fix some missing parent handlers
+
+commit 96c5b9f5cfcc63524a27739470885dd5b9e925c5
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 11 17:43:09 2008 +0200
+
+    Give a warning before restoring
+
+commit 22e263497ee1cd9695e22efae27aa247030e7732
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 11 17:05:07 2008 +0200
+
+    Free searches on close
+
+commit c5686be27228e2e6a21bb00641152d6e38c90921
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 11 16:40:56 2008 +0200
+
+    more memory leaks plugged
+
+commit 656d32937077c468bf42f41de4895c360042ec9a
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 11 15:40:36 2008 +0200
+
+    Fix 2 other small single time memory leaks
+
+commit eee218ae6bc1290c827ec37be716040562d6cdec
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 11 15:31:10 2008 +0200
+
+    Fix small memory leak happening every startup
+
+commit 42c6e282ab66bd3c8e6d4b10df6afd373365c65a
+Author: Qball Cow <qball@sarine.nl>
+Date:   Thu Apr 10 07:32:50 2008 +0200
+
+    Some gui updates
+
+commit a5dbfc727283e2595a6d05fd925dc6673219e4b8
+Author: Qball Cow <qball@QDesk.(none)>
+Date:   Thu Apr 10 03:41:45 2008 +0200
+
+    Fix stupid schema->type thing
+
+commit 0de0838a2007b18733b29b5b477b89bb18a0ef6a
+Author: Qball Cow <qball@QDesk.(none)>
+Date:   Thu Apr 10 03:27:50 2008 +0200
+
+    Some fixes
+
+commit 7632d7db146304eb7426c5cdaf4594f6dde0334c
+Author: Qball Cow <qball@QDesk.(none)>
+Date:   Thu Apr 10 02:59:56 2008 +0200
+
+    * Import/export of type.
+    * Fix bug adding a field.
+
+commit e1bfc5c2f9d22842c110c8c7701fc6872b34f5ea
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 20:03:38 2008 +0200
+
+    Adding a add button to data list
+
+commit 645d3b2de71b7f4e9dd31adff39f14502faf0672
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 16:41:29 2008 +0200
+
+    remove blue from link color, break themes
+
+commit 597ac55fdcc850c6253073610eb704981f355491
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 16:30:18 2008 +0200
+
+    Fix some colering
+
+commit f8097a3d67249c2284fc6ff2e39515b43774b561
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 13:51:12 2008 +0200
+
+    Hide from from spinbutton
+
+commit a233b89bd8eec1cdd9bdfa23e54cd33059bf2341
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 13:48:27 2008 +0200
+
+    Do fancy coloring in the list too
+
+commit 422a34ede5e46fd540077b495e9f1fe2a2159a76
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 13:29:27 2008 +0200
+
+    Fix focus by using g_idle_add on it
+
+commit f52b0bc9f1b8ca76700e87386e3301d1f0e070e8
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 13:10:29 2008 +0200
+
+    Fix up the data-list2 a bit
+
+commit 00d7aed5b9cdc106c191082587c1c164e0187081
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 8 12:47:10 2008 +0200
+
+    New data list
+
+commit 374429baf124e8c259ccf7a9697c5e6829d1f552
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Apr 7 22:50:40 2008 +0200
+
+    * Disable tree search in right hand treeview.
+    * CTRL-f moves focus to search entry
+
+commit 3b1e72932358e80b7bcf580152669c8ebfb514d2
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Apr 7 14:43:45 2008 +0200
+
+    Fix the export csv template
+
+commit b5ef21f91397060595d0033f4d1b699bf22c4f56
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Apr 6 13:36:02 2008 +0200
+
+    Hardy build hopefully
+
+commit 4d6c50186e98c4dc57a8cbd7e32272e392ebba1b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Apr 6 13:12:31 2008 +0200
+
+    Bumping to 0.09
+
+commit b6518e5c8b5824d96093e03f89a4bcce143f85db
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Apr 6 12:46:20 2008 +0200
+
+    Hardy build
+
+commit 1028d2fb1507a1a3749e6f67f3fb978e02e05d15
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sun Apr 6 12:20:32 2008 +0200
+
+    remove backup dir
+
+commit 8a41c55d69f62277cd3c851422e6bc61f6733d63
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sun Apr 6 12:20:16 2008 +0200
+
+    Add debian dir
+
+commit 7c4dbaf2c34ae3488457b88c902b74ec64e2beee
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Apr 6 01:11:17 2008 +0200
+
+    update
+
+commit 0faa682863b2e59424b15496f6f9a32923e04757
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Apr 6 00:53:55 2008 +0200
+
+    Wrong gpl.
+
+commit bbdd2608f7780f2aa6034ffdf09d1b292661000a
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Apr 6 00:52:59 2008 +0200
+
+    Add copying file with gpl-2
+
+commit 3e45bbbbc2067269b53c9733cb4f0628ef8f4af2
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 23:04:48 2008 +0200
+
+    Better ignore _EXPANDER in export
+
+commit 589ef347cb881d2c1990e69821aa137ed0921fdd
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 22:56:44 2008 +0200
+
+    Add end-expander type
+
+commit 6af47ebe10a60ed2f29db72f48faed888dba3253
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 22:39:20 2008 +0200
+
+    change item location
+
+commit a1d6d3479b64d022fad6808e9b43b35939690b07
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 21:10:09 2008 +0200
+
+    Expander not show up in export
+
+commit 6e20b7f73b6d7dc2b9bfa5b51c55f7f186728a10
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 21:03:17 2008 +0200
+
+    Add expander type
+
+commit 0849f5cdb616d3595cae60ad59ea47b86fc9ce7c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 17:05:49 2008 +0200
+
+    Disabling editing of title in the item list
+
+commit e3da186695ae7055bb5f310fd35ec877e6dbf6c7
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 15:35:50 2008 +0200
+
+    Fix some compile warnings
+
+commit 8eb69df6623334b68259c8fb51d1f12f589e337f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 15:27:55 2008 +0200
+
+    Update label
+
+commit 840e3b48da246fc1a0ab9304cfe450f15b5a7d51
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 14:49:09 2008 +0200
+
+    Small cleanup
+
+commit fecb3fae13f3098e5d2d60f84f3f9eae57b2d7a3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 14:48:02 2008 +0200
+
+    Add some extra sorting method, on modification time.
+
+commit 46c328b444ec3e92f644dbec680e8904f27c46ee
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 13:42:54 2008 +0200
+
+    Fix a small spacing issue
+
+commit d6e778b7582162834e19fb56eaf499d707cfedee
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 13:29:39 2008 +0200
+
+    When having a list of boolean values, then put 2 next to eachother
+
+commit 972fccc2f004b70e9bda2c53d35d42b1778b1300
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Apr 5 12:03:34 2008 +0200
+
+    Remove old csv export
+
+commit f99efd80e40c0ac9d542887a8eea4b174a12bf1b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Apr 4 20:11:39 2008 +0200
+
+    Use the right free function
+
+commit 2b0151603ce7f54ffa35c8c93309e5efd643c7a0
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Fri Apr 4 13:58:50 2008 +0200
+
+    Increasing startup speed by a factor 8 (for 1000 items), this by adding an  extra index on the Items(ItemId) table.
+
+commit 74a54120cc54d9c6c520198d701392997ba182c0
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 3 23:51:25 2008 +0200
+
+    updates
+
+commit 44d6a53fc19b63c3fced5a6e9f5a267901b55a91
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Apr 3 22:58:39 2008 +0200
+
+    Allow more advanced templates
+
+commit fee5cfb4383c7244f2fa2ef138d2b798b6d9f10e
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 3 14:14:06 2008 +0200
+
+    Text views don't accept tabs.
+
+commit e4995c5426a53b439bf7dedf7378ae8e281d64d9
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 3 14:06:39 2008 +0200
+
+    Make the scrolled-window in the item view follow focus of the childs.
+
+commit 22456888ffe350d472e41ab3fd1c9ce0f8db1a35
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 3 11:12:42 2008 +0200
+
+    * Use more enumerations to cleanup code.
+    * remove some pointless whitespace.
+
+commit 8ed8e0acf6b2d4684184a763c48ed7e9a658c2d1
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Apr 3 10:52:51 2008 +0200
+
+    * Add enumeration for left-pane treemodel columns.
+    * Some code cleanups.
+
+commit 07ad265918b34f4a921f547855dcc6d683638e5f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Apr 2 22:42:03 2008 +0200
+
+    Trying to fix something
+
+commit b22a2d71441579fc77956d7bc79a70c77b44b871
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Apr 2 22:25:33 2008 +0200
+
+    Allow changing of filter title
+
+commit e458b121dd5b19f64e1d5a751aaef738092be495
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Apr 2 21:42:37 2008 +0200
+
+    Update right mouse menu for filter
+
+commit 8b6b41487ab0402a6eba360e68dcc5cb8fdf0864
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Apr 2 21:19:47 2008 +0200
+
+    fix typo
+
+commit b95d6432151bd2e61e7787dec5fbbee9e3dff38f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Apr 2 21:09:20 2008 +0200
+
+    Show list of search things in left pane
+
+commit eb23e04e0ea5dd80e9b2ce91d8dbbf12c0e7c1ee
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Apr 2 18:40:33 2008 +0200
+
+    some info
+
+commit 54720d12544ad1fbe22633c569a132b419594443
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 1 15:08:17 2008 +0200
+
+    Add a small helper script
+
+commit 4c836cb46f0e6dda69c72231e8eb9b9d1d1f5239
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Apr 1 14:09:19 2008 +0200
+
+    Bump version to 0.08
+
+commit 7d37825b03ca2ec4297a67872c5d79390d0555de
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 21:58:11 2008 +0200
+
+    Show schema icons in add item menu, long live visual clues
+
+commit e9f1d3ab8fc8dbc962490dc485571a6189498c4e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 21:53:51 2008 +0200
+
+    Fix typo
+
+commit 221f2a34ff37eb79612f3003c72dd501627a5639
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 21:43:16 2008 +0200
+
+    Fix crashes caused by not setting error on NULL
+
+commit 3d1d36522172d3718c052bacbee7431121687891
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 21:31:30 2008 +0200
+
+    Allow changing sort order of item list
+
+commit 076362dbfe728f137d8ee99a74d28439cb0050ad
+Merge: 15f082c... f75da54...
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 17:38:36 2008 +0200
+
+    Merge branch 'fast-startup'
+
+commit 15f082c806a94255cb695796c6309d09e6e89879
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 17:38:19 2008 +0200
+
+    Cleanup
+
+commit 1d95ebec22e617d7f5a4c70e08512403deae223a
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 17:09:46 2008 +0200
+
+    Update the template parser for boolean type
+
+commit f75da546a283de27a4dc7f7dea2a51cf5ebdc8bb
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 15:52:23 2008 +0200
+
+    More speedups, reload should be almost 4 times faster now
+
+commit c0339d07a59ac816343e84a0cb12fba3a002fc5d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 31 15:34:07 2008 +0200
+
+    Re-set the icon
+
+commit 0edc37aef5fa0b79c56367cdcd80835be1e782c6
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Mar 31 13:05:40 2008 +0200
+
+    Speed up reload by setting fixed-height mode on treeview (speed up of 3-3.5)
+
+commit d980fc965ff1e42dc2935d38d7c798cb472324cf
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Mar 31 12:35:59 2008 +0200
+
+    Speeding up the initial show of the interface
+
+commit 4aff9f84dabf42058a10089c729bf6ea56a41710
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 20:56:15 2008 +0200
+
+    Add a --version option
+
+commit 00b9cecd9d0c27a0d1374090bf7dadc0b8f79e8f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 20:43:01 2008 +0200
+
+    More fancy updates
+
+commit d7d3199cee2abf5f81276d67520850fb6922c43e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 20:34:30 2008 +0200
+
+    See if I can make it rebuild correctly
+
+commit f9edd8242a8e6121bcba695ff0c9309bbb4ca3fa
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 20:25:04 2008 +0200
+
+    Testing possible revision inclusion
+
+commit dc12ef4f71713fcd7df765751a614663f2aa91fd
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 16:42:22 2008 +0200
+
+    Fix image not changing when changing the image. (caused by the sql field not changing). Reset by signaling a reset first.
+    Export html: true/false for boolean values instead of 0,1,<empty>.
+
+commit 669177647ced2bcd162ddcd918f58d8e23f688ab
+Merge: 703cd52... 20e8c7f...
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 16:12:22 2008 +0200
+
+    Merge branch 'master' of git:stuffkeeper
+
+commit 703cd52f83011ad7637b7921d47327d940cafe3a
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 30 16:11:44 2008 +0200
+
+    * Fix ordering by propperly casting the "text" column to a integer
+    * Find the new order number not by examining the last item in the ordered list, but using
+      sql.   SELECT MAX(CAST(value AS INTEGER))+1 etc.
+
+commit 20e8c7f67ea2388b08f0af04aa1be191afaac3d2
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sun Mar 30 00:37:54 2008 +0100
+
+    Only show progressbar during actual export.
+
+commit b6b07d0b9bac374d6e80573df656c75170ae6746
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sun Mar 30 00:30:55 2008 +0100
+
+    * Allow item:tags in the output.
+    * Adjust templates
+
+commit 5cb6299f51daf2cdd74d0241ba50d893964abcfc
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 23:43:41 2008 +0100
+
+    cleanup
+
+commit bb3f012d9958db86f9e94cf50556b252e15a5b79
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 23:28:12 2008 +0100
+
+    * Sort taglist and schemas by alphabet
+
+commit 3fbbd47d81c5f7502a56465842b4271554219de3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 23:04:00 2008 +0100
+
+    Sort on title
+
+commit 16141bcadf2c2751052375685df5e63f60e3c1b3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 20:31:16 2008 +0100
+
+    Add some stuff
+
+commit 2a116d38a0cddb99bb95251f1b0a5b4b826a0fb0
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 20:27:51 2008 +0100
+
+    When adding an item, select the new item
+
+commit 3cf97ea477aa5842bba921e11b1249404ab41af7
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 20:19:02 2008 +0100
+
+    Fix potfile
+
+commit e117fd4bfe96e323d379b98f994f61805886ffc0
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 16:47:49 2008 +0100
+
+    bump to 0.07
+
+commit 956038fb289c5ac6036a78309868c2365b3e1aac
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 16:26:30 2008 +0100
+
+    remove a stray printf
+
+commit 31f5feeb12014135501ddebad4e8a14343bc34d8
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 16:24:07 2008 +0100
+
+    remove a stray printf
+
+commit 67455bd942eac58a4c27f405fe98fceeb2a0fb2d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 15:37:41 2008 +0100
+
+    Improve the html output template. Now even more flexible.
+    Added support for:
+    * schema name
+    * schema id
+
+commit 6c2c9b16aeed9d11276ac413fdb68aa783dcae2d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 14:09:37 2008 +0100
+
+    fix compile warning
+
+commit 872e9f40b420149aeae068a21f9b5429b98df2f3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 29 13:50:29 2008 +0100
+
+    Add an import to the list data type
+
+commit bd89fff44e7ca04ee09402d268e994fab377e67d
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sat Mar 29 01:41:29 2008 +0100
+
+    small update to indent html template
+
+commit 206109b9db20d48b4cb014689db103a8a7a6d6df
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sat Mar 29 01:35:30 2008 +0100
+
+    * Fix html export missing character after a newline in a field.
+    * Add exporting of complete db, adding [b ..] for that.
+    * Add only export filtered list.
+
+commit 88bf7bb4325cb4590b13ed6a0a8a1feff336c2b9
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 23:46:32 2008 +0100
+
+    No more double click to select checkbox
+
+commit 2dcb74a611480bdcbc8f764a28dc9a4a40b6cb7d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 22:46:07 2008 +0100
+
+    Directly edit a added search
+
+commit 8c89812bb51c3e510aac5b8f545dea5d96c04ccb
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 16:22:29 2008 +0100
+
+    Add a bugtracker link
+
+commit d7b7cc831d55f01ca0e0d8e1fc62c8c007269d31
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 15:54:59 2008 +0100
+
+    When adding a tag/schema directly highlight it and edit it
+
+commit 9bdb7bb6c6a52bfbcf69b214ff9994427addcfff
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 15:23:23 2008 +0100
+
+    Block scrolling on integer and rating
+
+commit bf48656a9b35bd3b0af93da0d3a75b2e256a971c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 14:38:00 2008 +0100
+
+    Fixing some more stuff
+
+commit 3f6460f7b9b5c20b1f71e512e8843c0dab72cf96
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 14:32:35 2008 +0100
+
+    Fixing bug #0000020
+
+commit 3591b3272ecebc45f62a98eed6894e21b57b94e8
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 14:26:32 2008 +0100
+
+    fix small issue.
+
+commit ffa3c966284db1af3fdf044b4158871c18c2f58e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 14:26:19 2008 +0100
+
+    fix small issue
+
+commit 815c7e248bc75642ecee088f7c9ae12abfc259b9
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 14:10:24 2008 +0100
+
+    Fix bug 000016
+
+commit 98b12a6583751fd18a168b26050366a4f9c6184d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 14:05:22 2008 +0100
+
+    Fix bug 000015
+    
+    If the last row is empty and edit is cancelled, remove it
+
+commit 1dc16525abdcc178a4df2d81d8242989471b66fd
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 12:40:29 2008 +0100
+
+    Fix mouse-click when editing
+
+commit 7007633124a3330326f906467aeb4082ec1a3cc4
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 11:59:15 2008 +0100
+
+    Auto-edit next line in list
+
+commit ceed91f65cafa9f711f911da5fda760d8ee935cc
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 10:48:59 2008 +0100
+
+    Trying something to make rasi a happy camper
+
+commit 0233f713814f2c84937faa96852ba808e7c52d1d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 10:18:02 2008 +0100
+
+    Small button update
+
+commit 5b3e702e3391306bf45d4054e2c73a85e5436917
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 09:55:53 2008 +0100
+
+    Explicitely wrap the text view
+
+commit 19333d4044a9526776c46fbdb26ea642be9beb7d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 28 09:43:34 2008 +0100
+
+    Fix some alignment
+
+commit cc511cf07a7606a24357a4d35a3e815b7a1dee8f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 27 23:18:34 2008 +0100
+
+    Pushing some gui updates
+
+commit 91dca1b41e371b45c08a895475cb9eb0bc3530ba
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 27 16:54:55 2008 +0100
+
+    Speed up the searching of values, by moving it to sqlite
+
+commit 84571c56bc78dfdfd11717d8a2d09a2952fc22c1
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 27 16:32:44 2008 +0100
+
+    Add search editing
+
+commit 109bcd7d44ce7e1d6bf18bef88c368334d76e073
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 27 12:10:22 2008 +0100
+
+    Cleanup html export code a little
+
+commit f1d08624924cec1d7674b6044fe95f2b8b2e17b3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 26 22:28:06 2008 +0100
+
+    Fixing some more stuff
+
+commit 90ceddb233867b8389d082ff4db915c8de7cdb5b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 25 22:56:54 2008 +0100
+
+    Allow adding new searches and removing them.. missing is editing them
+
+commit cc7183efc24456bcfae5e10e99044149465be0ea
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 25 21:44:35 2008 +0100
+
+    Fix some stuff
+
+commit c1f18522e7c36f30f38ae3c4ca8a7c3e531614b6
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 25 21:26:50 2008 +0100
+
+    More pushing
+
+commit a32a368d8daf5c58a638d2ea5cac862ec69472b7
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 25 20:46:01 2008 +0100
+
+    fix some stuff
+
+commit 0455202dfbdf5a184c7430cfb5aaf9c77349d978
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 25 19:58:19 2008 +0100
+
+    Add missing indexes
+
+commit 1372e7098cebbe4d142e2a47231a9985493c1010
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 25 18:01:50 2008 +0100
+
+    initial support for some stuff
+
+commit 88c80296aea959ca3b12b3abd10e0a88b6463970
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 25 00:37:35 2008 +0100
+
+    fix small typo
+
+commit 00d2fd96689babe8876d37e40305ea18bd8c5faf
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 25 00:33:04 2008 +0100
+
+    * Allow escaping of character in the template using:  \
+    * Add some css.
+    * Support item id, for f.e. anchors.
+
+commit 33550a84f241cca93508faec016818e072b28998
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 23:15:53 2008 +0100
+
+    update html output, no fully html'ed
+
+commit f11e69885b6f17d335e967e3c559c203a8b6ce75
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 18:25:03 2008 +0100
+
+    improve output
+
+commit 1d251f7e3134a000c0af452592efe0c8c547e9bf
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 18:05:54 2008 +0100
+
+    Export of html now using template.  Needs work.
+
+commit b6d3288494aeb46b82d14ba991ead0b7781deaff
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 13:45:10 2008 +0100
+
+    Allow hiding of the item pane
+
+commit d152c354957dc8256e810fec0cdf292e9be0d1ab
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 13:11:20 2008 +0100
+
+    blub
+
+commit 526f2ffc9311e21dc77a3fad09e43233fcdc3d90
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 13:07:08 2008 +0100
+
+    Remove old taglist.
+
+commit ebb458afd3c21c3784bef571069cac770d30312f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 12:59:00 2008 +0100
+
+    Fix csv export to correctly escape, and fix compile error
+
+commit 633c79a40ca2d3138fb9b69377d6bba8b6f9fe48
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 24 12:36:58 2008 +0100
+
+    Add export to csv-file support.
+
+commit 86ea55e39c90c074c4b7d0ddfb1eb4672d524791
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 23 22:33:02 2008 +0100
+
+    ui cleanup
+
+commit 12379f868cb9f65104adc0a6fcc4773d8303b487
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 23 17:37:34 2008 +0100
+
+    Mark some strings for translation
+
+commit f3904ce9f87cf9c4f843b83669dc42e3170d09fa
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 23 17:36:25 2008 +0100
+
+    Cleanup and fix compiler warnings
+
+commit d45b305bd07932b837a84a2965c259713a221ab7
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 23 17:33:44 2008 +0100
+
+    * Move duplicate code from stuffkeeper-interface and stuffkeeper-item-window into one "wrapper" stuffkeeper-item-view. This cleansup stuffkeeper-interface alot.
+    * Make the header stick, and scroll content.
+    * Fix more coloring issues.
+    * Show a text in the lower right pane when nothing is selected.
+
+commit 4f6ee2b111b080922cd41e759e42e451306753d4
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 23 16:45:47 2008 +0100
+
+    New tag list widget and better tracking of current theme
+
+commit 6c56e953879e1635729844825c787af0c20cd0b8
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 22 17:53:34 2008 +0100
+
+    Cleanup the item window a bit
+
+commit 2746852a97ca900728aafafe236dc89068250e20
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 22 17:18:36 2008 +0100
+
+    Make the modification time update instantly
+
+commit 9013bc39625d180ea0e1c3f04e6b9451ec032f38
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 22 16:59:11 2008 +0100
+
+    Sort the tag list in the view
+
+commit e5c419b2d6293fecb89b6cc7ea1031bf6318409e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 22 13:51:40 2008 +0100
+
+    Add scalable icon.
+
+commit 5baa4a914b6e8c5a66f7506794e99a7837de0dc2
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 20 16:43:52 2008 +0100
+
+    Cleanups in stuffkeeper-interface.gob
+
+commit d99ea11060e49d3d5d2ac5f3b21c6e320548a9f6
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 20 16:35:08 2008 +0100
+
+    small cleanup
+
+commit 461f89701341760597789a77a1fe19c8067c9421
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 20 16:31:52 2008 +0100
+
+    * When multiple types is selected in type-view, show items belonging in the selected fields.
+    * Move export_* functions to submenu
+    * Add a complete db html export
+
+commit 30ce14cb77c0fbc8216831164b07185d46ddf256
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 20 14:53:11 2008 +0100
+
+    Bump glib dependency to the right version
+
+commit a305b134702844930a90644fc407442c4a56869b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 20:42:15 2008 +0100
+
+    Bump version
+
+commit 6b71e356dae9dda86010e07d2416cf84b02beebf
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 20:26:39 2008 +0100
+
+    Fix compile warning
+
+commit 6418f31e8574a945bfb0e2fe71fb3e8c0cb1cb59
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 20:18:29 2008 +0100
+
+    improving url detector
+
+commit 5c01966cd833fd95c1c18b7d7e54912abc84bc2e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 19:57:47 2008 +0100
+
+    Remove printf
+
+commit 0af2e9bd46b4cb87921dc91f1df84b50570f5c51
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 17:56:30 2008 +0100
+
+    Add export source files
+
+commit e1f6c05e9c9dc6128c411a70383c5fad8d19933c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 17:48:39 2008 +0100
+
+    Add some testing export function
+
+commit 3b40c8536159e5b00651927af81023a99d57785d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 16:15:32 2008 +0100
+
+    Add the posibility to edit schema in the item view(s)
+
+commit 497bdb745786cc76e609607142d8723d5cf540ec
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 14:53:34 2008 +0100
+
+    Add multiple sizes of the application icon
+
+commit 7f8390f90662f2abfd01d6278c0d4102e1fe53d0
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 13:11:24 2008 +0100
+
+    Fix some warnings when changing theme
+
+commit 0f35be53f69a0faf917fae2b4eef7718ae2d2d65
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 12:46:57 2008 +0100
+
+    Color the background yellow when the item is being edited, but not saved
+
+commit eac7fe493673febf7e26eb37584295166b3efeb2
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 11:18:29 2008 +0100
+
+    (dirty) Fix small rendering error for borderless sexy-icon-entry
+
+commit 0d95cf434710f3fdae4c5497de55edb8806012ac
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Wed Mar 19 01:13:00 2008 +0100
+
+    fix sexyiconentry a tat
+
+commit a20715dac73c82b9034367a72bdabbae4a1dc509
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Mar 19 00:16:48 2008 +0100
+
+    Hack for weirdness in sexy-icon-entry
+
+commit 315043ca6a5021e92effdaf01bae12414405fd8c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 18 23:28:38 2008 +0100
+
+    giving up on icon_name stuff
+
+commit 55eb597fe9bb9940866eba1548179c1c2d9a9037
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 18 22:38:07 2008 +0100
+
+    Adding detecting of e-mail to link field
+
+commit 3f7f39b42fc7db5f692c588bf91b0609238cef2a
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 18 18:18:10 2008 +0100
+
+    Add open website menu item.
+    Add ctrl-n as keybinding to new window.
+
+commit d7c38bdc8ac284d6800f602465a97a3201af9aa8
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 18 18:06:21 2008 +0100
+
+    Add open e-mail function.
+    Make sure possible translators show up in the about dialog.
+    Cleanup compile warning.
+
+commit 6ce91659d51de6d379dda81080e6a7a45cc2cb93
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 18 17:47:54 2008 +0100
+
+    remove temp file
+
+commit 8fa8811214dfd316170c11624e6fb99041078c1f
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 18 17:47:31 2008 +0100
+
+    Add generic url open function and make data-link & about dialog use this
+
+commit 312761eddd2a8959ad884e7db9724e9edd251e7b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 17 12:25:54 2008 +0100
+
+    Update icon cache
+
+commit bf43a74e538916955a5c3e7dadf3fbb66f0f8aeb
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 17 12:20:26 2008 +0100
+
+    Add program icon
+
+commit dcade8d77a7cef4ae1fbe83621490bf3303e107c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 16 21:17:14 2008 +0100
+
+    Be somewhat lazy with updates, this saves unneeded writes to the db
+
+commit 141b2254f599cc6e263f5cb7c9309aa74acae620
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 16 17:34:16 2008 +0100
+
+    Hand edit fix menu separators
+
+commit c30839ce01b2a3ae5acd2d3bc13a3d7a77366eef
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 23:04:13 2008 +0100
+
+    Make the search box have a small timeout between keystroke and search, this removes a large number of not needed searches
+
+commit 171a27cf35f32ef6a63e9014621fe851009a9497
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 21:33:59 2008 +0100
+
+    Remove printf and compile warning
+
+commit a5e7aab02f30c9fb12d099042ebd435a95bad016
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 21:18:33 2008 +0100
+
+    Bump version
+
+commit 842b71af07fb60926c1b15f678560cfbffeb56c7
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 20:59:43 2008 +0100
+
+    Saving vpane position
+
+commit e29351737bce8bd456e62faf365874fe6eb15f0d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 20:54:04 2008 +0100
+
+    remove more printfs
+
+commit 6a2dc5bbcc35abcd650d61598e0104fb8578c846
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 20:49:01 2008 +0100
+
+    Cleanup some printf's
+
+commit 8a35fa55209a1f553c759ebeb61e86338a254eba
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 20:27:26 2008 +0100
+
+    Add the right convert file
+
+commit 0373ce662c426f97db0b56042d4617f463c06bba
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 20:25:22 2008 +0100
+
+    Add convrt tool
+
+commit 1f605b89933c11141d6543e439f894b9c041ae01
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 19:07:57 2008 +0100
+
+    Finish move to sqlite
+
+commit a4b8c4ce42834acd8e3d538401c004325029b63b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 16:02:15 2008 +0100
+
+    Move the data-schema to sqlite.
+
+commit fb030f36e26b11b2289d511bebfac2aa919cabca
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 15 12:40:36 2008 +0100
+
+    Initiale adding of sqlite backend:
+    * Open and close the db, also reload the db. And create some tables.
+    * StuffKeeperDataTag now uses the sqlite db
+
+commit 1561188a3e274a9b2160d688a9924c6bdeb982f0
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sat Mar 15 00:31:44 2008 +0100
+
+    little doc
+
+commit d754149187d958a2067cc74716859e2d06b263fe
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 23:38:37 2008 +0100
+
+    Don't destroy the window on close, do it on finalizing the underlying object
+
+commit 156385870d3c96072a4ead2b104f2c11cc1132af
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 22:16:17 2008 +0100
+
+    Fix a small issue caused by glade-3
+
+commit d06a68f719eeec5a1ec83b073492efddbc15ef3f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 21:57:39 2008 +0100
+
+    Support reloading and fix up restoring a bit
+
+commit 96b6d5f29fa9d5ddf61e531f4838a5731b92db8d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 21:35:38 2008 +0100
+
+    A crappy restore function
+
+commit 2d6fa79201dcdfd117cbc836611586a3df76de1b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 20:26:40 2008 +0100
+
+    Add backup option.  some code cleanups
+
+commit ebe2a065a9dff24cb898e69cc21c03bf8886da8c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 18:59:45 2008 +0100
+
+    Never set pane smaller then 50
+
+commit 5ba3660879bf9eb7f413e3d9b304be8fb8e5942c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 16:49:44 2008 +0100
+
+    Small gui fix
+
+commit 85402a9b376e4f76031f54f67ad859257ebf5d44
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 15:52:11 2008 +0100
+
+    More gui changes
+
+commit a4f36720aaba1f2ce75dec8f183fb67a68cccda8
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 14:54:26 2008 +0100
+
+    Some gui cleanups
+
+commit 447c541c65a141b45a711f28d6bab56a9b5a2c92
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 14:52:19 2008 +0100
+
+    Update glade file
+
+commit 91116ebd61ec4023aca741e406e5bb433847fe72
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Mar 14 14:35:25 2008 +0100
+
+    Change printf's to debug printfs that only print out when compiled with debug flag.
+
+commit 8f11636629c6f705a3efa20d90ab816205d850d0
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 13 22:10:15 2008 +0100
+
+    Fix missing /
+
+commit c9cffafe4355fe7f625d45696ad6f23f0829f152
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 13 22:03:45 2008 +0100
+
+    Fix compile warning and add some stuff
+
+commit c24cd3f91753839075cde18ef505de3f49a577e3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 13 21:21:11 2008 +0100
+
+    Don't use gmpc's icon
+
+commit aaf5f3ae932f7c7a4cbdf96c3a38066c554e29fd
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Mar 13 21:20:35 2008 +0100
+
+    Add desktop file, no idea if it works
+
+commit 464ba8d0c734604f1a6fa8a49deddde3d4a68db8
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 11 23:18:52 2008 +0100
+
+    Store pane position, window size and position
+
+commit 1899a383b22d7507ab7ce0f7e63666e11c317447
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Mar 11 22:09:52 2008 +0100
+
+    * Adding Config file loading/saving
+    * Fix Rasi bug.
+
+commit c876235b3cd45206760dfa0f02aef07874b8c50a
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 10 21:53:03 2008 +0100
+
+    sync
+
+commit 046d7514f421badbfa1f2bff74ea9cdd130157ad
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 10 20:16:59 2008 +0100
+
+    cleanup a few compile warnings and color links blue
+
+commit db32ee1e509f5ae67613c9ec7341018fad120871
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 10 17:07:46 2008 +0100
+
+    Add hyperlink and Add Date/Time option
+
+commit 6c51d3d2a3aec175d5c68c9ccb194ede62ca1770
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 9 23:42:23 2008 +0100
+
+    Fixing stuff
+
+commit 49b594bbc66c39f65c1b60397011794e1407b624
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 8 21:05:28 2008 +0100
+
+    * Allow editing of icons.
+    * Update the icons in the list.
+
+commit 5b0d1aa0878bd83e1e45b3f7a9685afbeab94fff
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 8 20:33:03 2008 +0100
+
+    * Adding the icon to the type edit window
+    * Change type to schema
+
+commit 20e177c5a3b7313056b1b9db934c49414b8d12ad
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Mar 4 17:03:44 2008 +0100
+
+    Right mouse menu right list
+
+commit fe3965ddece869e73fd876a3764179b7ac257d50
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 3 22:42:31 2008 +0100
+
+    small change
+
+commit 58a5dac7fe6444b891103ce7ac2747eee84053fe
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 3 20:15:23 2008 +0100
+
+    Make search case insensitive
+
+commit 2beee7bdca45cd1120d3b1c4fd5a58be1badcbfd
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 3 17:05:54 2008 +0100
+
+    Add initial support for icons
+
+commit adc4c5dadc7c1f2bd4825e9c8141a8c305b4db37
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Mar 3 09:41:00 2008 +0100
+
+    Add a progressbar for compilation.
+    do DEBUG=1 ./configure to go back to no-progressbar
+
+commit 0efce12309d6e1a5be92d9f2af1f50ba27b9ef58
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 2 20:21:29 2008 +0100
+
+    Cleanup compilation warnings
+
+commit 86e3fda4b0676c0e53c12532ca7a379790bdc78c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 2 20:12:34 2008 +0100
+
+    cleanups
+
+commit c241f8771a3d1eb4a15ed453418decb85e343e7f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 2 20:04:28 2008 +0100
+
+    Add sexy icon entry as search box
+
+commit 74ad2b5be818a522a9e9e9d9c953835726f36fe5
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 2 18:33:54 2008 +0100
+
+    cleanup data-entry
+
+commit 24ae8822ee6c88a8b148d21b2cd955589e99c084
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Mar 2 18:22:40 2008 +0100
+
+    Add spelling check on the text entries, if available
+
+commit 1e2fe634f3f18b68c1cc2066b704f758555368dd
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 1 22:08:36 2008 +0100
+
+    Add parameter parsing, and the posibility to open an alternative location
+
+commit ac90d0c42529ab80f9b658703156620c9f1c9077
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Mar 1 18:31:42 2008 +0100
+
+    Implement right mouse menu on left pane, and remove the buttons at the bottom
+
+commit c72df495c8f4a08f26b4ac58e29ced573c53fe83
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Feb 28 23:13:00 2008 +0100
+
+    Some first steps in right mouse menu
+
+commit aad57fc3a5d98fd5e0ac873c205df4ec22522565
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 25 22:18:09 2008 +0100
+
+    Store Item modification time, and safe it.
+
+commit 1eae6dbc7395ec586f2f1f6333126a547aa7e348
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Feb 24 20:10:14 2008 +0100
+
+    update interface a little less
+
+commit a166342cb0dc7e75c654cc2da89503db6dfa5cda
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Feb 24 20:05:48 2008 +0100
+
+    Trying updating interface
+
+commit fe39a5fd7e0dc825a9a88941dedd60b5b4083b9c
+Merge: 3349cc3... d60d1c1...
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Feb 21 22:53:28 2008 +0100
+
+    Merge branch 'master' of git:stuffkeeper
+
+commit 3349cc35a6993a748bc8707b233262210c6414b1
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Feb 21 22:52:58 2008 +0100
+
+    Sorting on creation date
+
+commit d60d1c1c078168e853952407d53b88f2f9b15217
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Feb 17 16:51:25 2008 +0100
+
+    If tags are selected, pre-select them when adding new items.
+
+commit 452aeed4d1f945ef24194d77ad3db75b311d75e4
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Feb 17 16:06:55 2008 +0100
+
+    Increase item window a little
+
+commit c0bbc39a9cf4851e856efae895b2a5e96dc2692f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 16 22:49:31 2008 +0100
+
+    Remove old glade file
+
+commit 089f0be1531d573f07e2acc95e6f3caaf2949687
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 16 22:48:13 2008 +0100
+
+    Move glade file from src/ to glade/
+
+commit 0d9b1ec25aca783247e4eecc842f75885ee9319d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 16 21:22:44 2008 +0100
+
+    Fix signal blocking on wrong widget
+
+commit cd487d5c63b4bbe180c888e96917c718210144ca
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 16 20:40:05 2008 +0100
+
+    Don't occupy full 150x150 pixels when there is no image.. just GTK_STOCK_SIZE_DIALOG.
+
+commit c2fb23044d44fd7e04586e4f13654ad342493c7c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Feb 15 18:14:36 2008 +0100
+
+    Fix crash in multiple windows
+
+commit 2c70cdda863f1d9162e212ef12cc9e60999b101c
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Fri Feb 15 12:29:23 2008 +0100
+
+    * StuffKeeperDataSchema
+    Add order field to schema-fields.
+    Add function to get a field's position.
+    Add function to swap to fields positions.
+    Add conversion code from old schema to new schema.
+    Update remove and new field code.
+    * StuffKeeperEditSchema
+    Support moving fields up and down
+    * StuffKeeperInterface
+    Sort tag and schema list on items.
+
+commit 8001f519547c5d9f5d7e7b274de54d57d6657dab
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 11 21:46:18 2008 +0100
+
+    Add a little item counter
+
+commit 19dce37b20f688ce919598e2a98a2b816ef5f18d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 11 21:11:35 2008 +0100
+
+    Resize image to 250
+
+commit 5cc31f45e5c19d395b5498e2b5990e27c3b11406
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 11 21:03:24 2008 +0100
+
+    Store image in ~/.stuffkeeper/images/
+
+commit 91b5aedfdeeccf6d195c1211a820f2af62a801a5
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Feb 10 22:06:08 2008 +0100
+
+    Add initial support for image file.
+
+commit 4d6a4c1bfa636e76a9d9326dcf3f8a31e15ec9af
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Feb 6 22:16:56 2008 +0100
+
+    Don't add compiled python
+
+commit 1a28f832be7d89f268a6846462cf3b4f19a510b4
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Feb 6 22:16:31 2008 +0100
+
+    Add missing waf-tools
+
+commit 7f5c2c65a654966f934d0a3dbac3f0ea0eb9f376
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Feb 6 22:12:42 2008 +0100
+
+    Fixing more waf building stuff
+
+commit 366dd952d3838863a6f50dbd3757908a01d5dc37
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Feb 6 21:56:45 2008 +0100
+
+    Adding waf build system
+
+commit 575283add433d5b90e2135d5fff55f599d5a75e0
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Feb 6 21:01:31 2008 +0100
+
+    Transmit what field changed, so I can update more efficient
+
+commit a8fbd050cbc86c23b061379bca9e3d3eacd1eec6
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Feb 6 13:44:03 2008 +0100
+
+    If there is an instance allready running, make it create a new main-window.
+
+commit e5e861cb01e183c5619ebb384081b1078529e99e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Feb 5 23:37:11 2008 +0100
+
+    Print out a message when quitting.
+
+commit 9750896fdfa05cf76a3f5e2d5ae3932bbbc1c8e7
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Feb 5 23:34:14 2008 +0100
+
+    Add some bacon code
+
+commit 75cbb7161dcb681eaee86b18427b422355f96e2b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Feb 5 16:13:02 2008 +0100
+
+    Implement auto-saving for tags, schema's and items. 30s timeout.
+    Fix deleting of schema field.
+
+commit de2f9e2be2f1751d45d92c91aad7f87e8892c8ef
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Feb 5 14:31:13 2008 +0100
+
+    change build system a little
+
+commit 92412c420b8cd21cbfa1b81fd6cad1df5372c6d6
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Feb 5 12:09:13 2008 +0100
+
+    Fix glade problems with gob2 with a workaround
+
+commit 45dbdc49011cb72b8334bace9852626d304a17ab
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 4 23:51:15 2008 +0100
+
+    changing fixing fields
+
+commit 3777b261e102f5375d153476e2867e3c685eede5
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 4 21:57:30 2008 +0100
+
+    Fixing some stuff
+
+commit d3b908c4029b8afa497e3715988a94b838d09e66
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Feb 4 20:40:30 2008 +0100
+
+    * Added message dialog for deleting item.
+    * Added Text-field item.
+
+commit d06c6845b58c4f50fdf13a8abb4f6e85349e2d0d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 23:21:42 2008 +0100
+
+    comments
+
+commit 5e515ddf5b2cbb7323eec49cd4f778b59d94e2bb
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 23:20:15 2008 +0100
+
+    Add search support
+
+commit 1cf13d0a011064e2766278f0a8711ce80cf9898e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 22:24:02 2008 +0100
+
+    Check for gob2 before compiling
+
+commit ea2775880f70a5a1b9a44e4300323beef464c3e6
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 22:19:03 2008 +0100
+
+    updates
+
+commit f949c24a87117166a9d235bd714f9e03710132ee
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 21:39:58 2008 +0100
+
+    Update todo entry
+
+commit d462b0a66abbb4696c647215761ccc0ad5eb81d6
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 21:20:22 2008 +0100
+
+    Adding a popup window
+
+commit 245095535c578cda1f7b88b17461f7001e5daf63
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 18:29:52 2008 +0100
+
+    Allow changing the type a field is, instantly
+
+commit 8e16ede8f5349ae552cebf2595eb689130cc493b
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 16:05:38 2008 +0100
+
+    fix compile warnings
+
+commit 3b9f53d30df90766af5323bf4710f34c5ad87984
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 16:03:05 2008 +0100
+
+    Add support for list
+
+commit bba097af460f57471fe0f259384f94d596d19465
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 11:25:48 2008 +0100
+
+    Allow adding of different type of items
+
+commit 388accf76d5a3a4ffff719f2bea868d596c06493
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sat Feb 2 00:56:10 2008 +0100
+
+    fix small things, add ui-element for add-menu
+
+commit be195159fb3ec0c8743cbb5e3a102cd3d2355e0c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 00:18:25 2008 +0100
+
+    Remove header file
+
+commit d200bf631cd1daf0158c31c46e09985ff06f3246
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Feb 2 00:03:56 2008 +0100
+
+    Somehow stuffkeeper
+
+commit 9b78762948c5161b23f4081749df2e361ab3fec0
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Feb 1 22:14:52 2008 +0100
+
+    return widget instead of GTK_TABLE
+
+commit fae76a76783f2b76d30ad755cbae0f1ba7ba09b9
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Feb 1 22:13:04 2008 +0100
+
+    Fix schema
+
+commit 46eff5861a6c2000cb0c793c9643edb4a2f92e04
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Feb 1 20:53:59 2008 +0100
+
+    Finish most of the schema-editing stuff
+
+commit a85cfd94e16622e2909ad73fd74e7ba51d600949
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Fri Feb 1 16:38:08 2008 +0100
+
+    Fix more schema editing
+
+commit d465d5637aea54e88b994c2eb6903ece5d376d3d
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Fri Feb 1 14:43:27 2008 +0100
+
+    add missing gob file
+
+commit b1f4eecde04edd6cfee0b7ad9a5a80bbb72ea03c
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Fri Feb 1 14:05:29 2008 +0100
+
+    remove whitespace
+
+commit 135795a5e77794fec085c4335d732703e3f47a39
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Fri Feb 1 12:44:38 2008 +0100
+
+    Adding more schema editing stuff
+
+commit 3333f3798af99c1a6ae239dab4bfa886c0f0dbcb
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Thu Jan 31 17:19:52 2008 +0100
+
+    Allow adding of schema's
+
+commit 20c04b38549f59648ba4de817d0d5f3d79a8de72
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Jan 31 14:56:57 2008 +0100
+
+    gui cleanup
+
+commit 82778952efb65fcbd34ae89f96f427a46925ab18
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Jan 31 14:20:19 2008 +0100
+
+    fix value
+
+commit 24316c39c46bd60a0d14f147e9c3df7ad1c7f390
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Jan 31 13:58:19 2008 +0100
+
+    Fix multiple window handling
+
+commit 2864400512856dad067b761ac9abb008b0c91f06
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Jan 31 01:23:46 2008 +0100
+
+    follow theme
+
+commit afb11c93e2fe98471592e3cfc808e8fd461b19d4
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Jan 31 00:47:16 2008 +0100
+
+    fix layout
+
+commit 34b3773f0e43a575ab73ca1baaee6e8f3c11dce7
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Thu Jan 31 00:46:26 2008 +0100
+
+    Support selecting by tag or by type
+
+commit 9f7204360fdb632463330dd4d190b16fabcd8117
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 22:45:10 2008 +0100
+
+    remove old interface
+
+commit 5451b1debf2a02b61d8c5ca6fe87b8b6feb781b9
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 22:37:09 2008 +0100
+
+    Remove old interface
+
+commit 8ef1836a4190eb594910fd2a35091b5d851646e3
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 22:36:23 2008 +0100
+
+    Add objectified interface
+
+commit 752afb9de3f0832fdd8468678278ebf2e4408c8c
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 19:11:47 2008 +0100
+
+    Only save when changed
+
+commit e446012422da12a75c436f9ed6fc017b347f0494
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 18:44:14 2008 +0100
+
+    Support the "rating" type
+
+commit 476ec94812ba6349629a27ffa7eb38ec4e1dfa8a
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 18:08:06 2008 +0100
+
+    Fix filtering by tags, to how it was intended
+
+commit 44f95a69afee62003fb9b8f689153647f6c95094
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 18:02:35 2008 +0100
+
+    Add boolean value, and fix up the tag tree a little
+
+commit 93ddec0b24892de6e37f440d9e8ddac146b0aa51
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 17:16:16 2008 +0100
+
+    Add taglist to main interface, and allow entries to be clickable
+
+commit 4b4781242dcf01dee8bb1aad570819c3d9351177
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 16:08:09 2008 +0100
+
+    Add a label that follows tag/schema
+
+commit 242175f0ad783269b762dc0e15d665cddff393ad
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Wed Jan 30 15:38:03 2008 +0100
+
+    Add StuffKeeper:Data:SpinButton widget. Add integer format to schema/item and put fields in a table, for better alignment
+
+commit 0962a9c44c58a9fcb14b7af28dc4874831e9b633
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Tue Jan 29 16:41:01 2008 +0100
+
+    Fix some stuff with schema's
+
+commit b48fd49adc4816b12dc383f300e9b50515c71471
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Jan 29 14:54:29 2008 +0100
+
+    compile against gmodule
+
+commit 90330e08a04842fcaf7284d3de520091b27edacb
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Jan 29 08:28:02 2008 +0100
+
+    Add schema loading to item. Update build system
+
+commit 91ff6a5f0c17af9194bf46176fd895ce68ac8cbd
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Tue Jan 29 08:05:41 2008 +0100
+
+    Add the schema support in the backend
+
+commit 3f4ee77dccfcd25f765bc240d8fd2b87c36bf405
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 22:28:49 2008 +0100
+
+    remove warnings when removeing an item. This fixes race condition deleting the item object, and signal handlers
+
+commit a1e29cec7df5876a51f0b4dbbdb424c277ba9bfe
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 22:24:28 2008 +0100
+
+    Fixing some more stuff
+
+commit 2adc658b560741979f370431db23b53c885c54c5
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 21:56:51 2008 +0100
+
+    Update comment
+
+commit d58517225d9c7de26f5190ab01e38183c2cc7266
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 21:49:30 2008 +0100
+
+    Remove another fixed path
+
+commit 2f0ffa742715677cf1702cfcbb896c40d64c859d
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 21:45:56 2008 +0100
+
+    Putting some more code in place
+
+commit f9bbddf19c2b0b65a00b67bfe4217863aa1cab35
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 20:21:39 2008 +0100
+
+    Fixing a few small bugs when not correctly adding id to hashtable on insertion of tag
+
+commit 9e013d100279e07ce9500af18cf5b079603c7952
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 19:54:52 2008 +0100
+
+    Improve the tag handling, now delete empty tags
+
+commit 7309566ed0722b8227eb3a1e9e5f8ec8f1041041
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Mon Jan 28 16:46:16 2008 +0100
+
+    filter on selected tags
+
+commit 303a54a5ca4099367005f3144ad5249875ee4fbd
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Jan 28 09:49:38 2008 +0100
+
+    test mail hook
+
+commit 6dc4bf70fd8f34a3a57d4b8ae28d291489fdbaa0
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Jan 28 00:23:44 2008 +0100
+
+    remove build files
+
+commit 67f1ef03bb48081cfbd453c96a6e28e0d2c047fe
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Mon Jan 28 00:23:31 2008 +0100
+
+    update build stuff
+
+commit 81b74d5b26c737b4c44a78f2a199f8621ea1870d
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sun Jan 27 23:57:18 2008 +0100
+
+    fix crasher
+
+commit 5956daaa6481aa1415f4556d4bb00f54bc306251
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Jan 27 23:48:56 2008 +0100
+
+    Add some initial taggging stuff
+
+commit f437e7d6b6439c1dbad48b3f16a6c8f33504df4a
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sun Jan 27 18:05:48 2008 +0100
+
+    Remove filling of left pane, and add some skeleton code
+
+commit d455588e7094e86907071ea322fc6bfbb4b8755a
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Jan 27 17:10:15 2008 +0100
+
+    Make the data-item a GKeyFile, and implement storing and deleting of items
+
+commit 8ad78d66b53efb99eb8c3148e21f8afba6cf071f
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Jan 27 00:26:36 2008 +0100
+
+    Small change
+
+commit e5dbd3cbbd85ebdff12c10b713aae3d2c5bff24e
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sun Jan 27 00:14:31 2008 +0100
+
+    Preparing some more stuff
+
+commit a4913ae4da2a49e5162119f544302d4a0b886c51
+Author: Qball Cow <Qball@Sarine.nl>
+Date:   Sat Jan 26 23:53:20 2008 +0100
+
+    Initial import
