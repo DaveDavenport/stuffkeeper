@@ -34,6 +34,7 @@ GKeyFile *config_file = NULL;
 
 static gchar *db_path = NULL;
 static gboolean version = FALSE;
+static StuffkeeperPluginManager *spm;
 
 static GOptionEntry entries[] = 
 {
@@ -57,7 +58,7 @@ static void bacon_on_message_received(const char *message, gpointer data)
         {
             StuffKeeperInterface *ski= stuffkeeper_interface_new(config_file);
             interface_list = g_list_append(interface_list, ski);
-            stuffkeeper_interface_initialize_interface(ski,skdb);
+            stuffkeeper_interface_initialize_interface(ski,skdb,spm);
             debug_printf("IPC: Requested new window\n");
         }
     }
@@ -74,7 +75,6 @@ void interface_clear(StuffKeeperInterface *interface, gpointer data)
 
 int main ( int argc, char **argv )
 {
-    StuffkeeperPluginManager *spm;
     GError *error = NULL;
     GOptionContext *context;
     gboolean first_run = FALSE;
@@ -244,7 +244,7 @@ int main ( int argc, char **argv )
     timersub(&stop, &start, &diff);
     printf("time elapsed until backend load: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
     
-    stuffkeeper_interface_initialize_interface(ski,skdb);
+    stuffkeeper_interface_initialize_interface(ski,skdb,spm);
 
     /* path */
     g_free(path);

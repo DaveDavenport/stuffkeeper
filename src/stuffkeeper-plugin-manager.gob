@@ -3,17 +3,19 @@ requires 2.0.10
 %ph{
 #include <config.h>
 #include <glib.h>
-#include <gmodule.h>
 #include "stuffkeeper-plugin.h"
 %}
 
-%{
+%h{
+#include <gmodule.h>
 typedef struct _FS{
     const gchar *name;
     GType type;
     GModule *module;
 }FS;
+%}
 
+%{
 typedef GType (*GetType)(void);
 
 %}
@@ -28,6 +30,13 @@ class Stuffkeeper:Plugin:Manager from G:Object
     new(void)
     {
         return GET_NEW;
+    }
+
+    public
+    GList *
+    get_loaded_plugins(self)
+    {
+        return g_list_copy(self->_priv->plugins);
     }
 
     public

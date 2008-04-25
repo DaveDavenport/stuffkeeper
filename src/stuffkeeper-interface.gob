@@ -22,6 +22,8 @@ requires 2.0.10
 #include "stuffkeeper-export-html.h"
 
 #include "stuffkeeper-item-view.h"
+#include "stuffkeeper-plugin-manager.h"
+#include "stuffkeeper-plugin.h"
 
 extern GList *interface_list;
 %}
@@ -92,6 +94,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *show_item_pane_menu_item;
 
     private StuffKeeperDataBackend *skdbg = {NULL};
+    private StuffkeeperPluginManager *spm = {NULL};
     /**
      * Fix so the signals are correctly destroy
      */
@@ -653,7 +656,7 @@ class StuffKeeper:Interface from G:Object
         Self *ski;
         ski= stuffkeeper_interface_new(self->_priv->config_file);
         interface_list = g_list_append(interface_list, ski);
-        stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg);
+        stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg,self->_priv->spm);
     }
 
     /**
@@ -1520,7 +1523,7 @@ class StuffKeeper:Interface from G:Object
      */
     public
         void 
-        initialize_interface(self, StuffKeeperDataBackend *skdb)
+        initialize_interface(self, StuffKeeperDataBackend *skdb,StuffkeeperPluginManager *spm)
         {
             GError *error = NULL;
             gint value = 0, sort_order;
@@ -1532,6 +1535,7 @@ class StuffKeeper:Interface from G:Object
              * StuffKeeperDataBackend
              */
             self->_priv->skdbg = skdb;
+            self->_priv->spm = spm;
             /* locked signal */
             self->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "notify::locked", G_CALLBACK(self_backend_locked), self);
 
@@ -1796,9 +1800,40 @@ class StuffKeeper:Interface from G:Object
             /* update lock state */
             self_backend_locked(self, NULL, self->_priv->skdbg);
 
+
+            node = stuffkeeper_plugin_manager_get_loaded_plugins(spm); 
+            if(node){
+                GtkWidget *parent = glade_xml_get_widget(self->_priv->xml, "menuitem_tools");
+                GtkWidget *menu = gtk_menu_new();
+                gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), menu);
+                for(iter = node;iter;iter = g_list_next(iter))
+                {
+                    FS *f = iter->data;
+                    GtkWidget *item = gtk_menu_item_new_with_label(f->name);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+                    g_object_set_data(G_OBJECT(item), "plugin-id",f); 
+                    g_signal_connect_swapped(G_OBJECT(item), "activate", G_CALLBACK(self_tool_activate), self);
+                }
+                gtk_widget_show_all(menu);
+            }
+            if(node)
+                g_list_free(node);
+
+
             gtk_widget_show(self->_priv->win);
         }
-
+        private
+        void
+        tool_activate(self,GtkWidget *item)
+        {
+            FS *f = g_object_get_data(G_OBJECT(item), "plugin-id");
+            if(f)
+            {
+                printf("type: %i\n", f->type);
+                GObject *new = g_object_new(f->type,NULL);
+                stuffkeeper_plugin_run(STUFFKEEPER_PLUGIN(new));
+            }
+        }
         override (G:Object)
         void
         finalize(G:Object *obj)
