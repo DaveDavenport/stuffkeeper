@@ -11,17 +11,10 @@ requires 2.0.10
 
 class Stuffkeeper:Plugin from G:Object
 {
-    public
+    virtual
     void
     run(self)
     {
         printf("This function should be overrided by the plugin\n");
-    }
-
-    public
-    gchar *
-    get_name(self)
-    {
-        return "Plugin name";
     }
 }
