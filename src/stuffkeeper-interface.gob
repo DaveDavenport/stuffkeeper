@@ -1,6 +1,13 @@
 requires 2.0.10
 
 %h{
+#include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-schema.h"
+#include "stuffkeeper-data-tag.h"
+#include "stuffkeeper-data-item-search.h"
+%}
+
+%ph{
 /* Include gtk */
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
@@ -14,13 +21,12 @@ requires 2.0.10
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
-#include "stuffkeeper-data-schema.h"
-#include "stuffkeeper-data-item-search.h"
+#include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
 #include "stuffkeeper-export-html.h"
-
+#include "stuffkeeper-item-window.h"
 #include "stuffkeeper-item-view.h"
 #include "stuffkeeper-plugin-manager.h"
 #include "stuffkeeper-plugin.h"
@@ -629,10 +635,10 @@ class StuffKeeper:Interface from G:Object
      * Quit the program
      */
     public
-        void quit_program(void)
-        {
-            gtk_main_quit();
-        }
+    void quit_program(void)
+    {
+        gtk_main_quit();
+    }
 
     public 
     gboolean 
@@ -1570,7 +1576,7 @@ class StuffKeeper:Interface from G:Object
      */
     public
         void 
-        initialize_interface(self, StuffKeeperDataBackend *skdb,StuffkeeperPluginManager *spm)
+        initialize_interface(self, StuffKeeperDataBackend *skdb,GObject *spm)
         {
             GError *error = NULL;
             gint value = 0, sort_order;
@@ -1582,7 +1588,7 @@ class StuffKeeper:Interface from G:Object
              * StuffKeeperDataBackend
              */
             self->_priv->skdbg = skdb;
-            self->_priv->spm = spm;
+            self->_priv->spm = STUFFKEEPER_PLUGIN_MANAGER(spm);
             /* locked signal */
             self->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "notify::locked", G_CALLBACK(self_backend_locked), self);
 

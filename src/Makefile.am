@@ -107,6 +107,7 @@ stuffkeeperinclude_HEADERS = \
 	stuffkeeper-data-backend.h\
 	stuffkeeper-data-tag.h\
 	stuffkeeper-plugin.h\
+	stuffkeeper-interface.h\
 	stuffkeeper-data-item-search.h
 
 stuffkeeperincludedir =$(includedir)/stuffkeeper/
