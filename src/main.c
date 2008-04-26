@@ -6,7 +6,8 @@
 #include <string.h>
 #include <sys/time.h>
 #include <time.h>
-
+#include <locale.h> /* For setlocale */
+#include <config.h>
 #include "debug.h"
 #include "revision.h"
 
@@ -101,7 +102,15 @@ int main ( int argc, char **argv )
     g_option_context_parse (context, &argc, &argv, &error);
     g_option_context_free(context);
 
+#ifdef ENABLE_NLS
+	bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+	textdomain(GETTEXT_PACKAGE);
+	setlocale(LC_ALL, "");
+    printf("Set locale\n");
+#endif
 
+	g_set_prgname("stuffkeeper");
     gtk_set_locale();
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))

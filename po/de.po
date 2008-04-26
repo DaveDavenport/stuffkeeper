@@ -1,0 +1,663 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Stuffkeeper git\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-04-26 15:17+0200\n"
+"PO-Revision-Date: 2008-04-26 14:52+0100\n"
+"Last-Translator: Rasmus Steinke <rasi13@gmx.de>\n"
+"Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: e en er\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../data/stuffkeeper.desktop.in.h:1
+msgid "Another way to catalog stuff "
+msgstr ""
+
+#: ../data/stuffkeeper.desktop.in.h:2 ../glade/stuffkeeper.glade.h:44
+msgid "StuffKeeper"
+msgstr ""
+
+#: ../glade/stuffkeeper.glade.h:1
+msgid "#"
+msgstr ""
+
+#: ../glade/stuffkeeper.glade.h:2
+msgid ".tar.gz"
+msgstr ""
+
+#: ../glade/stuffkeeper.glade.h:3
+msgid "<b>Complete DB</b>"
+msgstr "<b>Komplette Datenbank</b>"
+
+#: ../glade/stuffkeeper.glade.h:4
+msgid "<b>Directory:</b>"
+msgstr "<b>Verzeichnis.</b>"
+
+#: ../glade/stuffkeeper.glade.h:5
+msgid "<b>Directory</b>"
+msgstr "<b>Directory</b>"
+
+#: ../glade/stuffkeeper.glade.h:6
+msgid "<b>Filename</b>"
+msgstr "<b>Dateiname</b>"
+
+#: ../glade/stuffkeeper.glade.h:7
+msgid "<b>Include header</b>"
+msgstr "<b>Inklusive Header</b>"
+
+#: ../glade/stuffkeeper.glade.h:8
+msgid "<b>Name:</b>"
+msgstr "<b>Name:</b>"
+
+#: ../glade/stuffkeeper.glade.h:9
+msgid "<b>Only visible</b>"
+msgstr "<b>Nur Sichtbares</b>"
+
+#: ../glade/stuffkeeper.glade.h:10
+msgid "<b>Schema:</b>"
+msgstr ""
+
+#: ../glade/stuffkeeper.glade.h:11
+msgid "<b>Template</b>"
+msgstr "<b>Vorlage</b>"
+
+#: ../glade/stuffkeeper.glade.h:12
+msgid "<b>Title</b>"
+msgstr "<b>Titel</b>"
+
+#: ../glade/stuffkeeper.glade.h:13
+msgid "<b>Type icon:</b>"
+msgstr "<b>Typ icon:</b>"
+
+#: ../glade/stuffkeeper.glade.h:14
+msgid "<b>Type</b>"
+msgstr "<b>Typ</b>"
+
+#: ../glade/stuffkeeper.glade.h:15
+msgid "<span size='large' weight='bold'>Export type</span>"
+msgstr "<span size='large' weight='bold'>Typ exportieren</span>"
+
+#: ../glade/stuffkeeper.glade.h:16
+msgid "<span size='x-large' weight='bold'>Edit filter</span>"
+msgstr "<span size='x-large' weight='bold'>Filter bearbeiten</span>"
+
+#: ../glade/stuffkeeper.glade.h:17
+msgid "<span size='x-large' weight='bold'>Export to CSV</span>"
+msgstr "<span size='x-large' weight='bold'>CSV exportieren</span>"
+
+#: ../glade/stuffkeeper.glade.h:18
+msgid "<span size='x-large' weight='bold'>Export</span>"
+msgstr "<span size='x-large' weight='bold'>Exportieren</span>"
+
+#: ../glade/stuffkeeper.glade.h:19
+msgid "<span size='x-large'><b>Edit Type</b></span>"
+msgstr "<span size='x-large'><b>Typ bearbeiten</b></span>"
+
+#: ../glade/stuffkeeper.glade.h:20
+msgid "Add Expander"
+msgstr "Expander hinzufügen"
+
+#: ../glade/stuffkeeper.glade.h:21
+msgid "Add Item"
+msgstr "Eintrag hinzufügen"
+
+#: ../glade/stuffkeeper.glade.h:22
+msgid "Add h-padding"
+msgstr "Horizontale Trennung hinzufügen"
+
+#: ../glade/stuffkeeper.glade.h:23
+msgid "Add v-padding"
+msgstr "Vertikale Trennung hinzufügen"
+
+#: ../glade/stuffkeeper.glade.h:24
+msgid "Backup"
+msgstr "Sicherung"
+
+#: ../glade/stuffkeeper.glade.h:25
+msgid "Bug tracker"
+msgstr "Bug tracker"
+
+#: ../glade/stuffkeeper.glade.h:26
+msgid "Close"
+msgstr "Schließen"
+
+#: ../glade/stuffkeeper.glade.h:27
+msgid "Edit Type"
+msgstr "Typ bearbeiten"
+
+#: ../glade/stuffkeeper.glade.h:28
+msgid "Edit search"
+msgstr "Suche bearbeiten"
+
+#: ../glade/stuffkeeper.glade.h:29
+msgid "Export"
+msgstr "Exportieren"
+
+#: ../glade/stuffkeeper.glade.h:30
+msgid "Export to CSV"
+msgstr "CSV Exportieren"
+
+#: ../glade/stuffkeeper.glade.h:31
+msgid "Filename:"
+msgstr "Dateiname:"
+
+#: ../glade/stuffkeeper.glade.h:32
+msgid "Help"
+msgstr "Hilfe"
+
+#: ../glade/stuffkeeper.glade.h:33
+msgid "Hold shift, to drag a field to its new position."
+msgstr "Halten Sie Shift, um ein Feld an eine neue Position zu schieben."
+
+#: ../glade/stuffkeeper.glade.h:34
+msgid "Items:"
+msgstr "Einträge"
+
+#: ../glade/stuffkeeper.glade.h:35
+msgid "Location:"
+msgstr "Ort:"
+
+#: ../glade/stuffkeeper.glade.h:36
+msgid "New Window"
+msgstr "Neues Fenster"
+
+#: ../glade/stuffkeeper.glade.h:37
+msgid "Reload"
+msgstr "Neu laden"
+
+#: ../glade/stuffkeeper.glade.h:38
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+#: ../glade/stuffkeeper.glade.h:39
+msgid "Select directory"
+msgstr "Verzeichnis auswählen"
+
+#: ../glade/stuffkeeper.glade.h:40
+msgid "Show item pane"
+msgstr "Zeige Details"
+
+#: ../glade/stuffkeeper.glade.h:41
+msgid "Sort Ascending"
+msgstr "Aufsteigend sortieren"
+
+#: ../glade/stuffkeeper.glade.h:42
+msgid "Sort Descending"
+msgstr "Absteigend sortieren"
+
+#: ../glade/stuffkeeper.glade.h:43
+msgid "Sort item list"
+msgstr "Einträge sortieren"
+
+#: ../glade/stuffkeeper.glade.h:45
+msgid ""
+"Tags\n"
+"Types\n"
+"Filters"
+msgstr ""
+"Tags\n"
+"Typen\n"
+"Filter"
+
+#: ../glade/stuffkeeper.glade.h:48
+msgid "Visit Website"
+msgstr "Webseite besuchen"
+
+#: ../glade/stuffkeeper.glade.h:49
+msgid "_Export"
+msgstr "_Export"
+
+#: ../glade/stuffkeeper.glade.h:50
+msgid "_File"
+msgstr "_Datei"
+
+#: ../glade/stuffkeeper.glade.h:51
+msgid "_Filter"
+msgstr "_Filter"
+
+#: ../glade/stuffkeeper.glade.h:52
+msgid "_Import"
+msgstr "_Import"
+
+#: ../glade/stuffkeeper.glade.h:53
+msgid "_Lock editing"
+msgstr "_Editieren An/Aus"
+
+#: ../glade/stuffkeeper.glade.h:54
+msgid "_New"
+msgstr "_Neu"
+
+#: ../glade/stuffkeeper.glade.h:55
+msgid "_Tools"
+msgstr "_Tools"
+
+#: ../glade/stuffkeeper.glade.h:56
+msgid "_Type"
+msgstr "_Typ"
+
+#: ../glade/stuffkeeper.glade.h:57
+msgid "_View"
+msgstr "_Ansicht"
+
+#: ../glade/stuffkeeper.glade.h:58
+msgid "by creation time"
+msgstr "Nach Datum (Erstellung)"
+
+#: ../glade/stuffkeeper.glade.h:59
+msgid "by modification time"
+msgstr "Nach Datum (letzte Modifikation)"
+
+#: ../glade/stuffkeeper.glade.h:60
+msgid "by title"
+msgstr "Nach Titel"
+
+#: ../glade/stuffkeeper.glade.h:61
+msgid "by type"
+msgstr "Nach Typ"
+
+#: ../glade/stuffkeeper.glade.h:62
+msgid "database.csv"
+msgstr "database.csv"
+
+#: ../glade/stuffkeeper.glade.h:63
+msgid "database.html"
+msgstr "database.html"
+
+#: ../glade/stuffkeeper.glade.h:64
+msgid "gtk-add"
+msgstr "Hinzufügen"
+
+#: ../glade/stuffkeeper.glade.h:65
+msgid "gtk-apply"
+msgstr "Anwenden"
+
+#: ../glade/stuffkeeper.glade.h:66
+msgid "gtk-cancel"
+msgstr "Abbrechen"
+
+#: ../glade/stuffkeeper.glade.h:67
+msgid "gtk-remove"
+msgstr "Entfernen"
+
+#: ../glade/stuffkeeper.glade.h:68
+msgid "gtk-save"
+msgstr "Speichern"
+
+#: ../src/egg-datetime.c:313
+msgid "Display flags"
+msgstr ""
+
+#: ../src/egg-datetime.c:314
+msgid "Displayed date and/or time properties"
+msgstr ""
+
+#: ../src/egg-datetime.c:319
+msgid "Lazy mode"
+msgstr ""
+
+#: ../src/egg-datetime.c:320
+msgid "Lazy mode doesn't normalize entered date and time values"
+msgstr ""
+
+#: ../src/egg-datetime.c:325
+msgid "Year"
+msgstr ""
+
+#: ../src/egg-datetime.c:326
+msgid "Displayed year"
+msgstr ""
+
+#: ../src/egg-datetime.c:331
+msgid "Month"
+msgstr ""
+
+#: ../src/egg-datetime.c:332
+msgid "Displayed month"
+msgstr ""
+
+#: ../src/egg-datetime.c:337
+msgid "Day"
+msgstr ""
+
+#: ../src/egg-datetime.c:338
+msgid "Displayed day of month"
+msgstr ""
+
+#: ../src/egg-datetime.c:343
+msgid "Hour"
+msgstr ""
+
+#: ../src/egg-datetime.c:344
+msgid "Displayed hour"
+msgstr ""
+
+#: ../src/egg-datetime.c:349
+msgid "Minute"
+msgstr ""
+
+#: ../src/egg-datetime.c:350
+msgid "Displayed minute"
+msgstr ""
+
+#: ../src/egg-datetime.c:355
+msgid "Second"
+msgstr ""
+
+#: ../src/egg-datetime.c:356
+msgid "Displayed second"
+msgstr ""
+
+#: ../src/egg-datetime.c:361
+msgid "Lower limit year"
+msgstr ""
+
+#: ../src/egg-datetime.c:362
+msgid "Year part of the lower date limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:367
+msgid "Upper limit year"
+msgstr ""
+
+#: ../src/egg-datetime.c:368
+msgid "Year part of the upper date limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:373
+msgid "Lower limit month"
+msgstr ""
+
+#: ../src/egg-datetime.c:374
+msgid "Month part of the lower date limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:379
+msgid "Upper limit month"
+msgstr ""
+
+#: ../src/egg-datetime.c:380
+msgid "Month part of the upper date limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:385
+msgid "Lower limit day"
+msgstr ""
+
+#: ../src/egg-datetime.c:386
+msgid "Day of month part of the lower date limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:391
+msgid "Upper limit day"
+msgstr ""
+
+#: ../src/egg-datetime.c:392
+msgid "Day of month part of the upper date limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:397
+msgid "Lower limit hour"
+msgstr ""
+
+#: ../src/egg-datetime.c:398
+msgid "Hour part of the lower time limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:403
+msgid "Upper limit hour"
+msgstr ""
+
+#: ../src/egg-datetime.c:404
+msgid "Hour part of the upper time limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:409
+msgid "Lower limit minute"
+msgstr ""
+
+#: ../src/egg-datetime.c:410
+msgid "Minute part of the lower time limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:415
+msgid "Upper limit minute"
+msgstr ""
+
+#: ../src/egg-datetime.c:416
+msgid "Minute part of the upper time limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:421
+msgid "Lower limit second"
+msgstr ""
+
+#: ../src/egg-datetime.c:422
+msgid "Second part of the lower time limit"
+msgstr ""
+
+#: ../src/egg-datetime.c:427
+msgid "Upper limit second"
+msgstr ""
+
+#: ../src/egg-datetime.c:428
+msgid "Second part of the upper time limit"
+msgstr ""
+
+#. Translate to calendar:week_start:1 if you want Monday to be the
+#. * first day of the week; otherwise translate to calendar:week_start:0.
+#. * Do *not* translate it to anything else, if it isn't calendar:week_start:1
+#. * or calendar:week_start:0 it will not work.
+#.
+#: ../src/egg-datetime.c:470
+msgid "calendar:week_start:0"
+msgstr ""
+
+#: ../src/egg-datetime.c:492
+msgid "Date"
+msgstr ""
+
+#: ../src/egg-datetime.c:492
+msgid "Enter the date directly"
+msgstr ""
+
+#: ../src/egg-datetime.c:499
+msgid "Select Date"
+msgstr ""
+
+#: ../src/egg-datetime.c:499
+msgid "Select the date from a calendar"
+msgstr ""
+
+#: ../src/egg-datetime.c:517 ../src/egg-datetime.c:2192
+msgid "Time"
+msgstr ""
+
+#: ../src/egg-datetime.c:517
+msgid "Enter the time directly"
+msgstr ""
+
+#: ../src/egg-datetime.c:524
+msgid "Select Time"
+msgstr ""
+
+#: ../src/egg-datetime.c:524
+msgid "Select the time from a list"
+msgstr ""
+
+#. Translators: set this to anything else if you want to use a
+#. * 24 hour clock.
+#.
+#: ../src/egg-datetime.c:791
+msgid "24hr: no"
+msgstr ""
+
+#: ../src/egg-datetime.c:795 ../src/egg-datetime.c:1253
+#: ../src/egg-datetime.c:1257
+msgid "AM"
+msgstr ""
+
+#: ../src/egg-datetime.c:797 ../src/egg-datetime.c:1254
+#: ../src/egg-datetime.c:1261
+msgid "PM"
+msgstr ""
+
+#. Translators: This is hh:mm:ss AM/PM.
+#: ../src/egg-datetime.c:805
+#, c-format
+msgid "%02d:%02d:%02d %s"
+msgstr ""
+
+#. Translators: This is hh:mm AM/PM.
+#: ../src/egg-datetime.c:808
+#, c-format
+msgid "%02d:%02d %s"
+msgstr ""
+
+#. Translators: This is hh:mm:ss.
+#: ../src/egg-datetime.c:812
+#, c-format
+msgid "%02d:%02d:%02d"
+msgstr ""
+
+#. Translators: This is hh:mm.
+#: ../src/egg-datetime.c:815
+#, c-format
+msgid "%02d:%02d"
+msgstr ""
+
+#. TODO: should handle other display modes as well...
+#. Translators: This is YYYY-MM-DD
+#: ../src/egg-datetime.c:1169
+#, c-format
+msgid "%04d-%02d-%02d"
+msgstr ""
+
+#. Translators: This is hh:mm:ss.
+#: ../src/egg-datetime.c:1234
+#, c-format
+msgid "%u:%u:%u"
+msgstr ""
+
+#: ../src/stuffkeeper-data-image.gob:254
+#, c-format
+msgid ""
+"Failed to open:\n"
+"<i>'%s'</i>.\n"
+"Make sure it is a valid local image."
+msgstr ""
+"Konnte nicht öffnen::\n"
+"<i>'%s'</i>.\n"
+"Stellen Sie sicher, dass es sich um eine Bilddatei handelt."
+
+#: ../src/stuffkeeper-data-item.gob:595 ../src/stuffkeeper-data-item.gob:602
+msgid "N/A"
+msgstr "N/A"
+
+#: ../src/stuffkeeper-data-item.gob:644
+msgid "Failed to get title"
+msgstr "Konnte Titel nicht finden."
+
+#: ../src/stuffkeeper-data-list2.gob:255
+msgid "Open"
+msgstr "Öffnen"
+
+#. *
+#. * Buttons
+#.
+#. import
+#: ../src/stuffkeeper-data-list2.gob:393
+msgid "Import"
+msgstr "Importieren"
+
+#: ../src/stuffkeeper-data-list2.gob:526
+#, c-format
+msgid ""
+"Failed to open:\n"
+"<i>'%s'</i>.\n"
+"Make sure it is a valid local text file."
+msgstr ""
+"Konnte:\n"
+"<i>'%s'</i>.\n"
+" nicht öffnenStellen Sie sicher, dass es ein gültiges Text File ist."
+
+#: ../src/stuffkeeper-edit-schema.gob:75
+msgid "Edit type"
+msgstr "Typ editieren"
+
+#: ../src/stuffkeeper-edit-schema.gob:293
+msgid "Pick an icon"
+msgstr "Wählen Sie ein Icon aus"
+
+#: ../src/stuffkeeper-interface.gob:891
+msgid "New Tag"
+msgstr "Neuer Tag"
+
+#: ../src/stuffkeeper-interface.gob:948
+msgid "New Schema"
+msgstr "Neues Schema"
+
+#: ../src/stuffkeeper-interface.gob:2099 ../src/main.c:129
+msgid "Revision"
+msgstr "Revision"
+
+#: ../src/stuffkeeper-interface.gob:2111
+msgid "GNU General Public License"
+msgstr "GNU General Public License"
+
+#: ../src/stuffkeeper-interface.gob:2120
+msgid "translator-credits"
+msgstr "Übersetzungs Credits"
+
+#: ../src/stuffkeeper-interface.gob:2183
+msgid ""
+"Restoring from a backup will destroy the current database.\n"
+"Use with care."
+msgstr ""
+"Eine Sicherung wieder einzuspielen, wird die momentane Datenbank "
+"zerstören. \n"
+"Benutzen Sie diese Funktion mit Vorsicht."
+
+#: ../src/stuffkeeper-show-item.gob:137
+msgid "<b>Tags</b>"
+msgstr "<b>Tags</b>"
+
+#: ../src/stuffkeeper-data-item-search.gob:757
+msgid "New Search"
+msgstr "Neue Suche"
+
+#: ../src/stuffkeeper-item-view.gob:91
+msgid "<b>Title:</b>"
+msgstr "<b>Titel:</b>"
+
+#: ../src/stuffkeeper-item-view.gob:101
+msgid "<b>Type:</b>"
+msgstr "<b>Typ:</b>"
+
+#: ../src/stuffkeeper-item-view.gob:137
+msgid "Created"
+msgstr "Erstellt"
+
+#: ../src/stuffkeeper-item-view.gob:147
+msgid "Modified"
+msgstr "Geändert"
+
+#: ../src/main.c:126
+msgid "Version"
+msgstr "Version"
+
+#~ msgid "gtk-about"
+#~ msgstr "Über"
+
+#~ msgid "gtk-close"
+#~ msgstr "Schließen"
+
+#~ msgid "gtk-edit"
+#~ msgstr "Bearbeiten"
+
+#~ msgid "gtk-new"
+#~ msgstr "Neu"
