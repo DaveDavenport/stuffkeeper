@@ -33,7 +33,7 @@
                           <widget class="GtkImage" id="menu-item-image1">
                             <property name="stock">gtk-new</property>
                             <property name="icon_size">1</property>
-                        </widget>
+                          </widget>
                         </child>
                       </widget>
                     </child>
@@ -146,15 +146,6 @@
                   <widget class="GtkMenu" id="menu4">
                     <property name="visible">True</property>
                     <child>
-                      <widget class="GtkCheckMenuItem" id="show_item_pane_menu_item">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Show item pane</property>
-                        <property name="use_underline">True</property>
-                        <property name="active">True</property>
-                        <signal name="toggled" handler="item_pane_checkbox"/>
-                      </widget>
-                    </child>
-                    <child>
                       <widget class="GtkMenuItem" id="menuitem18">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Sort item list</property>
@@ -232,6 +223,16 @@
                       </widget>
                     </child>
                     <child>
+                      <widget class="GtkCheckMenuItem" id="show_item_pane_menu_item">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Show item pane</property>
+                        <property name="use_underline">True</property>
+                        <property name="active">True</property>
+                        <signal name="toggled" handler="item_pane_checkbox"/>
+                        <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkCheckMenuItem" id="menuitem_view_locked">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_Lock editing</property>
@@ -262,7 +263,7 @@
                           <widget class="GtkImage" id="menu-item-image12">
                             <property name="stock">gtk-new</property>
                             <property name="icon_size">1</property>
-                        </widget>
+                          </widget>
                         </child>
                       </widget>
                     </child>
@@ -307,7 +308,7 @@
                             <property name="visible">True</property>
                             <property name="stock">gtk-new</property>
                             <property name="icon_size">1</property>
-                        </widget>
+                          </widget>
                         </child>
                       </widget>
                     </child>

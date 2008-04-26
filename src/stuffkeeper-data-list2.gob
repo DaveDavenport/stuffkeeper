@@ -113,6 +113,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         gtk_box_pack_start(GTK_BOX(fr->hbox), fr->remove_but, FALSE, TRUE, 0);
         g_object_set_data(G_OBJECT(fr->remove_but), "object", fr);
         g_signal_connect_swapped(G_OBJECT(fr->remove_but), "clicked", G_CALLBACK(self_row_removed), self);
+        gtk_widget_show(fr->remove_but);
 
         /* add button */
         fr->add_but = gtk_button_new();
@@ -122,7 +123,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
         gtk_box_pack_start(GTK_BOX(fr->hbox), fr->add_but, FALSE, TRUE, 0);
         g_object_set_data(G_OBJECT(fr->add_but), "object", fr);
         g_signal_connect_swapped(G_OBJECT(fr->add_but), "clicked", G_CALLBACK(self_row_activate), self);
-
+        gtk_widget_show(fr->add_but);
 
 
         
