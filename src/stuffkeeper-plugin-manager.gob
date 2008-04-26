@@ -28,7 +28,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
 
 
     public
-    GObject *
+    StuffkeeperPluginManager *
     new(void)
     {
         return GET_NEW;

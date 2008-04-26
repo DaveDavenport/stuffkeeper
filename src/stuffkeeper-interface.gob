@@ -662,7 +662,7 @@ class StuffKeeper:Interface from G:Object
         Self *ski;
         ski= stuffkeeper_interface_new(self->_priv->config_file);
         interface_list = g_list_append(interface_list, ski);
-        stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg,self->_priv->spm);
+        stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg,G_OBJECT(self->_priv->spm));
     }
 
     /**
@@ -1854,7 +1854,7 @@ class StuffKeeper:Interface from G:Object
             self_backend_locked(self, NULL, self->_priv->skdbg);
 
 
-            node = stuffkeeper_plugin_manager_get_loaded_plugins(spm); 
+            node = stuffkeeper_plugin_manager_get_loaded_plugins(STUFFKEEPER_PLUGIN_MANAGER(spm)); 
             if(node){
                 GtkWidget *parent = glade_xml_get_widget(self->_priv->xml, "menuitem_tools");
                 GtkWidget *menu = gtk_menu_new();
@@ -2604,6 +2604,6 @@ class StuffKeeper:Interface from G:Object
         void
         present(self)
         {
-            gtk_window_present(self->_priv->win);
+            gtk_window_present(GTK_WINDOW(self->_priv->win));
         }
 }

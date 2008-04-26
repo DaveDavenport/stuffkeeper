@@ -59,7 +59,7 @@ static void bacon_on_message_received(const char *message, gpointer data)
         {
             StuffKeeperInterface *ski= stuffkeeper_interface_new(config_file);
             interface_list = g_list_append(interface_list, ski);
-            stuffkeeper_interface_initialize_interface(ski,skdb,spm);
+            stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
             debug_printf("IPC: Requested new window\n");
         }
     }
@@ -134,8 +134,9 @@ int main ( int argc, char **argv )
     gtk_icon_theme_append_search_path(gtk_icon_theme_get_default (),
                                    PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
 
-    /* */
+    /* Create the plugin manager */
     spm = stuffkeeper_plugin_manager_new();
+    /* load the plugins */
     stuffkeeper_plugin_manager_load_plugin(spm);
      
     /* Initialize the backend */
@@ -254,7 +255,7 @@ int main ( int argc, char **argv )
     timersub(&stop, &start, &diff);
     printf("time elapsed until backend load: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
     
-    stuffkeeper_interface_initialize_interface(ski,skdb,spm);
+    stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
 
     /* path */
     g_free(path);
