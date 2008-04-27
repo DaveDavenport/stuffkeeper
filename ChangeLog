@@ -1,3 +1,142 @@
+commit e571fe288e4ee02e89b072a8b40427d80618ddb2
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 22:45:40 2008 +0200
+
+    Fix showing off add/remove button and move menu items around
+
+commit ac2b0ff051a95679e155e04067ab249b61d7b191
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 16:52:09 2008 +0200
+
+    Fix compile warnings
+
+commit 11cf6e93822db692ef12e1c22ddccef21873c5ca
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 15:48:58 2008 +0200
+
+    Fix new filter menu
+
+commit 4bce54b2a04c15ebb234386535428892aa504796
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 15:41:39 2008 +0200
+
+    Mark another string translatable
+
+commit a4c92194a643c44e5e6ba0cd71134847e65e2bc0
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 15:18:37 2008 +0200
+
+    Add and fix German translation
+
+commit 7ed9af6b7d060c94252afbf9c88d9857471f2844
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 11:07:50 2008 +0200
+
+    Make the lock icon smaller
+
+commit bdd5ed50701ca9ee219841f915e458304af5799b
+Author: Qball Cow <Qball@sarine.nl>
+Date:   Sat Apr 26 01:56:21 2008 +0200
+
+    fix image location
+
+commit 3abf964b9476a9c98d41594656f92c5f94a0bda5
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 01:14:55 2008 +0200
+
+    Add present function to interface
+
+commit bede4541753614bb5df8234302a06ee9a7b89d75
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 01:03:10 2008 +0200
+
+    Export interface header
+
+commit 0aac9ee9f9e17e424efdd55f443869fcc88d1851
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 00:43:41 2008 +0200
+
+    More plugin updates
+
+commit 92f505e540d3cece8e2543e92331b854fa3915ba
+Author: Qball Cow <qball@sarine.nl>
+Date:   Sat Apr 26 00:05:47 2008 +0200
+
+    Updating plugin system
+
+commit 0cee66aa9e4f36838538644109b3ecaa2b76245c
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 23:06:46 2008 +0200
+
+    updates
+
+commit f88d07a59908e381b07fb35277900b80cac01f9c
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 18:45:24 2008 +0200
+
+    Updates
+
+commit 4987d925e46d6a4bb2f02d6cace4a874417c4366
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 18:33:23 2008 +0200
+
+    Fix headers
+
+commit 0ed3a2ad27b9ae7fb3a4458e4d455cee2532276e
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 18:15:04 2008 +0200
+
+    Make run a virtual function
+
+commit 44c6e6d7f58f5e554f6e101f1fa25f42151c7917
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 17:55:36 2008 +0200
+
+    More stuff
+
+commit 5b3789d636b11bd111944236a4612b6dd30c2781
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 17:28:16 2008 +0200
+
+    Fixing stuff.
+    Adding first plugin crap.
+
+commit aa38b5d0085086162147bf2592e3a89ed068ad63
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 16:05:33 2008 +0200
+
+    Cleanup some more stuff
+
+commit 220ae26d4dc13566b4f73a627db5e7ccf61796dc
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 15:28:41 2008 +0200
+
+    Adding .pc.in file
+
+commit 32b5ff8c76e33b6ffe17eba52dfb6986b9c4e531
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 15:07:38 2008 +0200
+
+    Version
+
+commit 5d87ab2c22534e3e42b7168e0783ed5c38a07ff5
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 15:07:05 2008 +0200
+
+    More updates, an stuffkeeper.pc
+
+commit aff45d9745313bd0617e5070fe4dfc4d7ec1e20c
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 14:50:19 2008 +0200
+
+    Fix naming and remove files
+
+commit f3c813c1ee34b5db337ae69f20a096f2c9401604
+Author: Qball Cow <qball@sarine.nl>
+Date:   Fri Apr 25 14:44:47 2008 +0200
+
+    Add changelogs, make dist likes that
+
 commit 331b1653d03d328977257fe62e674666b10d7ab3
 Author: Qball Cow <qball@sarine.nl>
 Date:   Fri Apr 25 14:40:10 2008 +0200

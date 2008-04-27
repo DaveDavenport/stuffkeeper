@@ -91,7 +91,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             fs->gtype = gt();
                             fs->module = module;
                             printf("loaded: %i\n", fs->gtype);
-                            if(!g_module_symbol(module, "plugin_type", &(type)))
+                            if(!g_module_symbol(fs->module, "plugin_type", &(type)))
                             {
                                 /* no valid name */
                                 fs->plugin_type = PLUGIN_MENU; 
@@ -99,7 +99,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             else
                                 fs->plugin_type = *type;
 
-                            if(!g_module_symbol(module, "plugin_name", &(name)))
+                            if(!g_module_symbol(fs->module, "plugin_name", &(name)))
                             {
                                 /* no valid name */
                                 fs->name = "No plugin name";

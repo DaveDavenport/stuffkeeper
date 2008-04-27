@@ -6,7 +6,7 @@ m4_define([stuffkeeper_website],    "http://stuffkeeper.org/")
 m4_define([stuffkeeper_bugtracker], "http://bugtracker.sarine.nl/")
 m4_define([stuffkeeper_email],      "qball@stuffkeeper.org");
 m4_define([stuffkeeper_major_version], [0])
-m4_define([stuffkeeper_minor_version], [9])
+m4_define([stuffkeeper_minor_version], [10])
 m4_define([stuffkeeper_micro_version], [0])
 
 # generate needed values in f.e. header files
