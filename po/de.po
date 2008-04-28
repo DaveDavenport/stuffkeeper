@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stuffkeeper git\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-26 15:17+0200\n"
+"POT-Creation-Date: 2008-04-28 15:16+0200\n"
 "PO-Revision-Date: 2008-04-26 14:52+0100\n"
 "Last-Translator: Rasmus Steinke <rasi13@gmx.de>\n"
 "Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
@@ -134,7 +134,7 @@ msgstr "Typ bearbeiten"
 msgid "Edit search"
 msgstr "Suche bearbeiten"
 
-#: ../glade/stuffkeeper.glade.h:29
+#: ../glade/stuffkeeper.glade.h:29 ../src/stuffkeeper-interface.gob:1082
 msgid "Export"
 msgstr "Exportieren"
 
@@ -562,7 +562,7 @@ msgstr "N/A"
 msgid "Failed to get title"
 msgstr "Konnte Titel nicht finden."
 
-#: ../src/stuffkeeper-data-list2.gob:255
+#: ../src/stuffkeeper-data-list2.gob:256
 msgid "Open"
 msgstr "Öffnen"
 
@@ -570,11 +570,11 @@ msgstr "Öffnen"
 #. * Buttons
 #.
 #. import
-#: ../src/stuffkeeper-data-list2.gob:393
+#: ../src/stuffkeeper-data-list2.gob:394
 msgid "Import"
 msgstr "Importieren"
 
-#: ../src/stuffkeeper-data-list2.gob:526
+#: ../src/stuffkeeper-data-list2.gob:527
 #, c-format
 msgid ""
 "Failed to open:\n"
@@ -585,7 +585,7 @@ msgstr ""
 "<i>'%s'</i>.\n"
 " nicht öffnenStellen Sie sicher, dass es ein gültiges Text File ist."
 
-#: ../src/stuffkeeper-edit-schema.gob:75
+#: ../src/stuffkeeper-edit-schema.gob:75 ../src/stuffkeeper-interface.gob:1200
 msgid "Edit type"
 msgstr "Typ editieren"
 
@@ -593,27 +593,81 @@ msgstr "Typ editieren"
 msgid "Pick an icon"
 msgstr "Wählen Sie ein Icon aus"
 
-#: ../src/stuffkeeper-interface.gob:891
+#. This belongs to the parent, so if the user closes the parent, close it
+#. It is a warning, it _should_ be modal.
+#. It is a warning message.
+#. yes/no question
+#: ../src/stuffkeeper-interface.gob:532
+msgid ""
+"Deleting an entry cannot be undone.\n"
+"Are you sure you want to continue?"
+msgstr ""
+
+#: ../src/stuffkeeper-interface.gob:861
+msgid ""
+"<b>No item to preview, select an item from the item list to preview it</b>"
+msgstr ""
+
+#: ../src/stuffkeeper-interface.gob:892
 msgid "New Tag"
 msgstr "Neuer Tag"
 
-#: ../src/stuffkeeper-interface.gob:948
+#: ../src/stuffkeeper-interface.gob:949
 msgid "New Schema"
 msgstr "Neues Schema"
 
-#: ../src/stuffkeeper-interface.gob:2099 ../src/main.c:129
+#. Add tag
+#: ../src/stuffkeeper-interface.gob:1155
+#, fuzzy
+msgid "New tag"
+msgstr "Neuer Tag"
+
+#: ../src/stuffkeeper-interface.gob:1169
+msgid "Remove tag"
+msgstr ""
+
+#. Add item
+#: ../src/stuffkeeper-interface.gob:1180
+#, fuzzy
+msgid "New type"
+msgstr "Nach Typ"
+
+#: ../src/stuffkeeper-interface.gob:1194
+msgid "Remove type"
+msgstr ""
+
+#. Add item
+#: ../src/stuffkeeper-interface.gob:1211
+#, fuzzy
+msgid "New filter"
+msgstr "Neue Suche"
+
+#: ../src/stuffkeeper-interface.gob:1227
+msgid "Remove filter"
+msgstr ""
+
+#: ../src/stuffkeeper-interface.gob:1235
+#, fuzzy
+msgid "Edit filter"
+msgstr "Typ editieren"
+
+#: ../src/stuffkeeper-interface.gob:2098 ../src/main.c:129
 msgid "Revision"
 msgstr "Revision"
 
-#: ../src/stuffkeeper-interface.gob:2111
+#: ../src/stuffkeeper-interface.gob:2108
+msgid "Copyright 2008 Qball Cow"
+msgstr ""
+
+#: ../src/stuffkeeper-interface.gob:2110
 msgid "GNU General Public License"
 msgstr "GNU General Public License"
 
-#: ../src/stuffkeeper-interface.gob:2120
+#: ../src/stuffkeeper-interface.gob:2119
 msgid "translator-credits"
 msgstr "Übersetzungs Credits"
 
-#: ../src/stuffkeeper-interface.gob:2183
+#: ../src/stuffkeeper-interface.gob:2182
 msgid ""
 "Restoring from a backup will destroy the current database.\n"
 "Use with care."
@@ -621,6 +675,19 @@ msgstr ""
 "Eine Sicherung wieder einzuspielen, wird die momentane Datenbank "
 "zerstören. \n"
 "Benutzen Sie diese Funktion mit Vorsicht."
+
+#: ../src/stuffkeeper-interface.gob:2479
+#, fuzzy
+msgid "Import type"
+msgstr "Importieren"
+
+#: ../src/stuffkeeper-interface.gob:2486
+#, fuzzy
+msgid "Types files"
+msgstr ""
+"Tags\n"
+"Typen\n"
+"Filter"
 
 #: ../src/stuffkeeper-show-item.gob:137
 msgid "<b>Tags</b>"

@@ -117,7 +117,7 @@ class Stuffkeeper:Interface from G:Object
     private gulong signal_item_changed = {0};
     private gulong signal_item_removed = {0};
 
-    /* search */
+    /* search/filter */
     private gulong search_timeout = {0};
     private gulong signal_search_added = {0};
     private gulong signal_search_changed = {0};
@@ -127,7 +127,9 @@ class Stuffkeeper:Interface from G:Object
 
     private int item_sort_column = {3};
     private int item_sort_order = {GTK_SORT_DESCENDING};
+
     /**
+    * Changes in the GtkTreeModelFilter wrapper, updating the total item label.
      */
     private
     void
@@ -527,7 +529,7 @@ class Stuffkeeper:Interface from G:Object
                         GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
                         GTK_MESSAGE_WARNING, // It is a warning message.
                         GTK_BUTTONS_YES_NO, // yes/no question
-                        "Deleting an entry cannot be undone.\nAre you sure you want to continue?");
+                        _("Deleting an entry cannot be undone.\nAre you sure you want to continue?"));
                 switch(gtk_dialog_run(GTK_DIALOG(dialog)))
                 {
                     case GTK_RESPONSE_YES:
@@ -856,7 +858,7 @@ class Stuffkeeper:Interface from G:Object
 
                 gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
                 g_signal_connect(G_OBJECT(event), "style-set", G_CALLBACK(self_interface_background_changed), event);
-                gtk_label_set_markup(GTK_LABEL(label), "<b>No item to preview, select an item from the item list to preview it</b>");
+                gtk_label_set_markup(GTK_LABEL(label), _("<b>No item to preview, select an item from the item list to preview it</b>"));
 
                 gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
 
@@ -864,7 +866,6 @@ class Stuffkeeper:Interface from G:Object
                  gtk_box_pack_start(GTK_BOX(hbox),ali, TRUE, TRUE, 0);               
                 gtk_box_pack_start(GTK_BOX(hbox),label, TRUE, TRUE, 0);
 
-                //gtk_container_add(GTK_CONTAINER(frame),label);
                 gtk_container_add(GTK_CONTAINER(frame),hbox);
                 gtk_container_add(GTK_CONTAINER(event),frame);
                 gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), event);
@@ -1078,7 +1079,7 @@ class Stuffkeeper:Interface from G:Object
                 }
 
 
-                menu_item = gtk_image_menu_item_new_with_label("Export");
+                menu_item = gtk_image_menu_item_new_with_label(_("Export"));
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_export_html_item), self);
                 gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
@@ -1087,11 +1088,9 @@ class Stuffkeeper:Interface from G:Object
                 node = stuffkeeper_plugin_manager_get_loaded_plugins(self->_priv->spm); 
                 if(node)
                 {
-                    printf("Loading plugins list\n");
                     for(iter = g_list_first(node);iter;iter = g_list_next(iter))
                     {
                         FS *f = iter->data;
-                        printf("plugin: %s:%i\n", f->name,f->plugin_type);
                         if((f->plugin_type)&PLUGIN_ITEM)
                         {
                             menu_item = gtk_image_menu_item_new_with_label(f->name);
@@ -1153,7 +1152,7 @@ class Stuffkeeper:Interface from G:Object
             if(type == LP_TYPE_TAG)
             {
                 /* Add tag */
-                menu_item = gtk_image_menu_item_new_with_label("New tag");
+                menu_item = gtk_image_menu_item_new_with_label(_("New tag"));
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                         gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_tag), self);
@@ -1167,7 +1166,7 @@ class Stuffkeeper:Interface from G:Object
                     /* no items, then you can delete it*/
                     if(items ==  0)
                     {
-                        menu_item = gtk_image_menu_item_new_with_label("Remove tag");
+                        menu_item = gtk_image_menu_item_new_with_label(_("Remove tag"));
                         gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                                 gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
                         g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_tag),self);
@@ -1178,7 +1177,7 @@ class Stuffkeeper:Interface from G:Object
             else if (type == LP_TYPE_SCHEMA) 
             {
                 /* Add item */
-                menu_item = gtk_image_menu_item_new_with_label("New type");
+                menu_item = gtk_image_menu_item_new_with_label(_("New type"));
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                         gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_type), self);
@@ -1192,13 +1191,13 @@ class Stuffkeeper:Interface from G:Object
                     /* no items, then you can delete it*/
                     if(items ==  0)
                     {
-                        menu_item = gtk_image_menu_item_new_with_label("Remove type");
+                        menu_item = gtk_image_menu_item_new_with_label(_("Remove type"));
                         gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                                 gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
                         g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_remove_type),self);
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                     }
-                    menu_item = gtk_image_menu_item_new_with_label("Edit type");
+                    menu_item = gtk_image_menu_item_new_with_label(_("Edit type"));
                     gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                             gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
                     g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_type),self);
@@ -1209,7 +1208,7 @@ class Stuffkeeper:Interface from G:Object
             } else if (type == LP_TYPE_SEARCH)
             {
                 /* Add item */
-                menu_item = gtk_image_menu_item_new_with_label("New filter");
+                menu_item = gtk_image_menu_item_new_with_label(_("New filter"));
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                         gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
                 g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_new_search), self);
@@ -1225,7 +1224,7 @@ class Stuffkeeper:Interface from G:Object
                     if(id >=  0)
                     {
 
-                        menu_item = gtk_image_menu_item_new_with_label("Remove filter");
+                        menu_item = gtk_image_menu_item_new_with_label(_("Remove filter"));
                         g_object_set_data(G_OBJECT(menu_item), "search", search);
                         gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                                 gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
@@ -1233,7 +1232,7 @@ class Stuffkeeper:Interface from G:Object
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
 
-                        menu_item = gtk_image_menu_item_new_with_label("Edit filter");
+                        menu_item = gtk_image_menu_item_new_with_label(_("Edit filter"));
                         g_object_set_data(G_OBJECT(menu_item), "search", search);
                         gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
                                 gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU));
@@ -1496,7 +1495,6 @@ class Stuffkeeper:Interface from G:Object
         StuffkeeperDataItem *item;
         StuffkeeperDataSchema *schema;
         GdkPixbuf *pb;
-//        printf("get pixbuf\n");
         gtk_tree_model_get(model, iter, 2, &item, -1); 
         schema = stuffkeeper_data_item_get_schema(item);
         if(schema)
@@ -1885,10 +1883,10 @@ class Stuffkeeper:Interface from G:Object
             FS *f = g_object_get_data(G_OBJECT(item), "plugin-id");
             if(f)
             {
-                printf("type: %i\n", f->gtype);
                 stuffkeeper_plugin_run_menu(STUFFKEEPER_PLUGIN(f->object),self->_priv->skdbg);
             }
         }
+
         override (G:Object)
         void
         finalize(G:Object *obj)
@@ -2007,6 +2005,7 @@ class Stuffkeeper:Interface from G:Object
                 }                                                          
             }
         }
+
         public 
         void
         item_row_activated(self, GtkTreePath *path, GtkTreeViewColumn *column, GtkTreeView *view)
@@ -2477,14 +2476,14 @@ class Stuffkeeper:Interface from G:Object
             if(locked){printf("**ERROR** should not be callable\n");return;}
 
            GtkFileFilter *filter = NULL;
-            GtkWidget *dialog = gtk_file_chooser_dialog_new("Import type", 
+            GtkWidget *dialog = gtk_file_chooser_dialog_new(_("Import type"), 
                     NULL, 
                     GTK_FILE_CHOOSER_ACTION_OPEN,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                     GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
                     NULL);
             filter = gtk_file_filter_new();
-            gtk_file_filter_set_name(filter, "Types files");
+            gtk_file_filter_set_name(filter, _("Types files"));
             gtk_file_filter_add_pattern(filter, "*.type");
             gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
 
