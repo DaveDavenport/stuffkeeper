@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 #include "stuffkeeper-data-backend.h"
 typedef enum _PluginType {
+    PLUGIN_NONE = 0,
     PLUGIN_ITEM = 1,        /* this works on a single item */
     PLUGIN_BACKGROUND = 2,  /* This gets called at startup */
     PLUGIN_MENU = 4         /* Gets called from the menu */
@@ -29,6 +30,19 @@ typedef enum _PluginType {
 
 class Stuffkeeper:Plugin from G:Object
 {
+    virtual
+    PluginType
+    get_plugin_type(self)
+    {
+        return PLUGIN_NONE;
+    }
+
+    virtual
+    const gchar *
+    get_name(self)
+    {
+        return "Stuffkeeper:Plugin:get_name() not implemented";
+    }
     /* Called on a single item */
     virtual 
     void

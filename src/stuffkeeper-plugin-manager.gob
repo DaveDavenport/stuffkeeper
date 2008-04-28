@@ -70,7 +70,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
         GDir *dir = g_dir_open(STUFFKEEPER_PLUGIN_DIR,0,NULL); 
         if(dir)
         {
-            gchar *filename;
+            const gchar *filename;
             printf("Loading plugin: %s\n", STUFFKEEPER_PLUGIN_DIR);
             while((filename = g_dir_read_name(dir)) != NULL)
             {
@@ -82,31 +82,20 @@ class Stuffkeeper:Plugin:Manager from G:Object
                     module = g_module_open(path, G_MODULE_BIND_LAZY);
                     if(module)
                     {
-                        GetType gt;
-                        if(g_module_symbol(module,"register_plugin",&gt))
+                        gpointer function;
+                        if(g_module_symbol(module,"register_plugin",&(function)))
                         {
-                            int *type;
+                            GetType gt = function;
                             FS *fs = g_malloc0(sizeof(*fs));
-                            gchar **name;
                             fs->gtype = gt();
                             fs->module = module;
                             printf("loaded: %i\n", fs->gtype);
-                            if(!g_module_symbol(fs->module, "plugin_type", &(type)))
-                            {
-                                /* no valid name */
-                                fs->plugin_type = PLUGIN_MENU; 
-                            }
-                            else
-                                fs->plugin_type = *type;
-
-                            if(!g_module_symbol(fs->module, "plugin_name", &(name)))
-                            {
-                                /* no valid name */
-                                fs->name = "No plugin name";
-                            }
-                            else
-                                fs->name = *name;
                             fs->object = g_object_new(fs->gtype, NULL);
+                            /* get type */
+                            fs->plugin_type = stuffkeeper_plugin_get_plugin_type(STUFFKEEPER_PLUGIN(fs->object));
+                            /* get name */
+                            fs->name= stuffkeeper_plugin_get_name(STUFFKEEPER_PLUGIN(fs->object));
+                            /* add to list */
                             self->_priv->plugins = g_list_prepend(self->_priv->plugins,fs);
                             printf("Plugin: %s succesfull loaded\n",fs->name);
                         }

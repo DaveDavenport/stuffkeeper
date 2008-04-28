@@ -140,7 +140,6 @@ class StuffKeeper:Data:Text from Gtk:Scrolled:Window
         gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(obj), GTK_POLICY_AUTOMATIC,GTK_POLICY_NEVER);
         if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
         {
-            printf("blaat\n");
             gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(obj),GTK_SHADOW_NONE);
         }else {
             gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(obj),GTK_SHADOW_ETCHED_IN);
