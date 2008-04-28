@@ -102,27 +102,27 @@ class StuffKeeper:Interface from G:Object
     private StuffKeeperDataBackend *skdbg = {NULL};
     private StuffkeeperPluginManager *spm = {NULL};
     /**
-     * Fix so the signals are correctly destroy
+     * Signals 
      */
+    /* schema */
     private gulong signal_schema_added = {0};
     private gulong signal_schema_changed = {0};
     private gulong signal_schema_removed = {0};
-
+    /* tag */
     private gulong signal_tag_added = {0};
     private gulong signal_tag_changed = {0};
     private gulong signal_tag_removed = {0};
-
+    /* item */
     private gulong signal_item_added = {0};
     private gulong signal_item_changed = {0};
     private gulong signal_item_removed = {0};
-    
+
+    /* search */
     private gulong search_timeout = {0};
-
-
     private gulong signal_search_added = {0};
     private gulong signal_search_changed = {0};
     private gulong signal_search_removed = {0};
-
+    /* backend */
     private gulong signal_backend_locked = {0};
 
     private int item_sort_column = {3};
