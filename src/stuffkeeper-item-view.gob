@@ -10,11 +10,11 @@ requires 2.0.10
 #include "stuffkeeper-edit-schema.h"
 %}
 
-class StuffKeeper:Item:View from Gtk:VBox
+class Stuffkeeper:Item:View from Gtk:VBox
 {
-    private StuffKeeperDataSchema *schema = {NULL};
-    private StuffKeeperDataItem *item = {NULL};
-    private StuffKeeperDataBackend *skdb = {NULL};
+    private StuffkeeperDataSchema *schema = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
 
     private 
     void
@@ -28,7 +28,7 @@ class StuffKeeper:Item:View from Gtk:VBox
 
         if(self->_priv->schema)
         {
-            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            StuffkeeperEditSchema *skes = stuffkeeper_edit_schema_new();
             stuffkeeper_edit_schema_set_schema(skes, self->_priv->schema);
         }
     }
@@ -63,14 +63,14 @@ class StuffKeeper:Item:View from Gtk:VBox
      */
     public
         Gtk:Widget * 
-        new(StuffKeeper:Data:Item *item)
+        new(Stuffkeeper:Data:Item *item)
         {
             Self *self = GET_NEW;
 
             /* Get the schema  */
             self->_priv->schema = stuffkeeper_data_item_get_schema(item);
             /* Get backend */
-            self->_priv->skdb = (StuffKeeperDataBackend *)stuffkeeper_data_item_get_backend(item);
+            self->_priv->skdb = (StuffkeeperDataBackend *)stuffkeeper_data_item_get_backend(item);
             /* Get the item */
             self->_priv->item = item;
 

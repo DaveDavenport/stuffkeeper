@@ -7,9 +7,9 @@ requires 2.0.10
 %ph{
 #include "stuffkeeper-data-backend.h"
 %}
-class StuffKeeper:Data:Rating from Gtk:HScale
+class Stuffkeeper:Data:Rating from Gtk:HScale
 {
-    private StuffKeeperDataItem *item = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_spin_value = {0};
@@ -27,7 +27,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
 
     public
     void
-    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffkeeperDataItem *item)
     {
         if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
         {
@@ -52,7 +52,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
 
     private
         void
-    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
         gtk_widget_set_sensitive(GTK_WIDGET(self), !locked);
@@ -60,7 +60,7 @@ class StuffKeeper:Data:Rating from Gtk:HScale
 
     public
     GtkWidget *
-    new(StuffKeeperDataItem *item, const gchar *field)
+    new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
         int value; 

@@ -32,9 +32,9 @@ static GtkTargetEntry data_list_drag_target[] =
 
 
 
-class StuffKeeper:Data:List2 from Gtk:VBox
+class Stuffkeeper:Data:List2 from Gtk:VBox
 {
-    private StuffKeeperDataItem *item = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private GtkWidget *sw;
@@ -180,7 +180,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
 
     public
     void
-    item_changed(self,const gchar *field, StuffKeeper:Data:Item *item)
+    item_changed(self,const gchar *field, Stuffkeeper:Data:Item *item)
     {
         gsize length =0;
         gchar **value;
@@ -323,7 +323,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
 
     private
     void
-    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
         GList *node;
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
@@ -358,7 +358,7 @@ class StuffKeeper:Data:List2 from Gtk:VBox
 
     public
     GtkWidget *
-    new(StuffKeeperDataItem *item,const gchar *field)
+    new(StuffkeeperDataItem *item,const gchar *field)
     {
         Self *obj = GET_NEW;
         GtkWidget *hbox = gtk_hbox_new(FALSE,6);

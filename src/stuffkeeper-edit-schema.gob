@@ -33,9 +33,9 @@ extern GList *interface_list;
     }StoreFields;
 %}
 
-class StuffKeeper:Edit:Schema from G:Object 
+class Stuffkeeper:Edit:Schema from G:Object 
 {
-    private StuffKeeper:Data:Schema *schema = {NULL};
+    private Stuffkeeper:Data:Schema *schema = {NULL};
     private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,GTK_TYPE_TREE_MODEL)}  destroywith g_object_unref;
 
     private GladeXML *xml;
@@ -60,7 +60,7 @@ class StuffKeeper:Edit:Schema from G:Object
 
     private
     void
-    schema_changed(self, StuffKeeperDataSchema *schema)
+    schema_changed(self, StuffkeeperDataSchema *schema)
     {
         GtkWidget *label = glade_xml_get_widget(self->_priv->xml, "title_label");
         GtkWidget *image = glade_xml_get_widget(self->_priv->xml, "type_image");
@@ -86,7 +86,7 @@ class StuffKeeper:Edit:Schema from G:Object
 
     private
     void
-    schema_field_changed(self, const gchar *field, StuffKeeperDataSchema *schema)
+    schema_field_changed(self, const gchar *field, StuffkeeperDataSchema *schema)
     {
         GtkTreeIter iter;
 
@@ -132,7 +132,7 @@ class StuffKeeper:Edit:Schema from G:Object
     }
     private
     void
-    schema_field_removed(self, const gchar *removed_id, StuffKeeper:Data:Schema *schema)
+    schema_field_removed(self, const gchar *removed_id, Stuffkeeper:Data:Schema *schema)
     {
         GtkTreeIter iter;
         
@@ -154,7 +154,7 @@ class StuffKeeper:Edit:Schema from G:Object
 
     private
         void
-        schema_field_added(self, const gchar *id, StuffKeeperDataSchema *schema)
+        schema_field_added(self, const gchar *id, StuffkeeperDataSchema *schema)
         {
 
             GtkTreeIter iter;
@@ -186,7 +186,7 @@ class StuffKeeper:Edit:Schema from G:Object
         }
         private
         void
-        schema_fields_reordered(self, StuffKeeperDataSchema *schema)
+        schema_fields_reordered(self, StuffkeeperDataSchema *schema)
         {
             gsize length;
             int i =0;
@@ -455,7 +455,7 @@ class StuffKeeper:Edit:Schema from G:Object
 
     /** Create the interface */
     public
-        StuffKeeper:Edit:Schema * 
+        Stuffkeeper:Edit:Schema * 
         new(void)
         {
             GtkTreeIter iter;
@@ -716,7 +716,7 @@ class StuffKeeper:Edit:Schema from G:Object
     
     public
     void
-    set_schema(self, StuffKeeper:Data:Schema *schema)
+    set_schema(self, Stuffkeeper:Data:Schema *schema)
     {
         if(self->_priv->schema != NULL)
         {

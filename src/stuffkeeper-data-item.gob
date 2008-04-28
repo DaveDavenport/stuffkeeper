@@ -39,13 +39,13 @@ requires 2.0.10
 
 
 
-class StuffKeeper:Data:Item from G:Object 
+class Stuffkeeper:Data:Item from G:Object 
 {
     private gboolean changed = {FALSE};
-    private StuffKeeperDataBackend *skdb = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
     private GList *tags = {NULL} destroywith g_list_free;
 
-    private StuffKeeperDataSchema *schema = {NULL};
+    private StuffkeeperDataSchema *schema = {NULL};
 
     private guint schema_field_removed = {0};
     private guint schema_field_changed = {0};
@@ -145,10 +145,10 @@ class StuffKeeper:Data:Item from G:Object
         self->_priv->id = 0;
     }
 
-    /* Create new StuffKeeperDataBackend */
+    /* Create new StuffkeeperDataBackend */
     public 
-        StuffKeeperDataItem *
-        new (G:Object *skdb, sqlite3 *sqlHandle,StuffKeeperDataSchema *schema)
+        StuffkeeperDataItem *
+        new (G:Object *skdb, sqlite3 *sqlHandle,StuffkeeperDataSchema *schema)
         {
 
             Self *obj = GET_NEW;
@@ -241,7 +241,7 @@ class StuffKeeper:Data:Item from G:Object
         }
 
     public
-        StuffKeeperDataItem *
+        StuffkeeperDataItem *
         open_from_id (G:Object *skdb, sqlite3 *sqlHandle,gint id,gint schemaid)
         {
             char *query;
@@ -269,7 +269,7 @@ class StuffKeeper:Data:Item from G:Object
                 while((r = sqlite3_step(stmt)) == SQLITE_ROW)
                 {
                     int tagid = sqlite3_column_int(stmt, 0); 
-                    StuffKeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tagid);
+                    StuffkeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tagid);
                     debug_printf("adding tagid: %i\n", tagid);
                     obj->_priv->tags = g_list_prepend(obj->_priv->tags, tag);
                     stuffkeeper_data_tag_add_item(tag, G_OBJECT(obj));
@@ -319,7 +319,7 @@ class StuffKeeper:Data:Item from G:Object
      */
     private 
     void
-    item_schema_field_removed(self, const char *id, StuffKeeperDataSchema *schema)
+    item_schema_field_removed(self, const char *id, StuffkeeperDataSchema *schema)
     {
         int result;
         char *error,*query;
@@ -338,7 +338,7 @@ class StuffKeeper:Data:Item from G:Object
     }
     private 
     void
-    item_schema_field_changed(self, const char *id, StuffKeeperDataSchema *schema)
+    item_schema_field_changed(self, const char *id, StuffkeeperDataSchema *schema)
     {
         /* update title */
         self_title_cache_refresh(self);
@@ -931,7 +931,7 @@ class StuffKeeper:Data:Item from G:Object
      */
     public
         gboolean
-        has_tag(self, const StuffKeeperDataTag *tag)
+        has_tag(self, const StuffkeeperDataTag *tag)
         {
             GList *node = g_list_find(self->_priv->tags, tag);
 
@@ -939,7 +939,7 @@ class StuffKeeper:Data:Item from G:Object
         }
     public
         void
-        add_tag(self, StuffKeeperDataTag *tag)
+        add_tag(self, StuffkeeperDataTag *tag)
         {
             self->_priv->tags = g_list_append(self->_priv->tags, tag);
             self_items_add_field_integer(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
@@ -949,7 +949,7 @@ class StuffKeeper:Data:Item from G:Object
         }
     public
         void
-        remove_tag(self, StuffKeeperDataTag *tag)
+        remove_tag(self, StuffkeeperDataTag *tag)
         {
             self->_priv->tags = g_list_remove(self->_priv->tags, tag);
             self_items_remove_field_integer(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
@@ -965,7 +965,7 @@ class StuffKeeper:Data:Item from G:Object
     }
     /* Schema */
     public
-        StuffKeeperDataSchema *
+        StuffkeeperDataSchema *
         get_schema(self)
         {
             return self->_priv->schema;

@@ -10,9 +10,9 @@ requires 2.0.10
 #include "stuffkeeper-data-backend.h"
 %}
 
-class StuffKeeper:Data:Date from Egg:DateTime 
+class Stuffkeeper:Data:Date from Egg:DateTime 
 {
-    private StuffKeeperDataItem *item = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_date = {0};
@@ -35,7 +35,7 @@ class StuffKeeper:Data:Date from Egg:DateTime
 
     public
     void
-    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffkeeperDataItem *item)
     {
         time_t old_value =0;
         time_t value = 0; 
@@ -62,14 +62,14 @@ class StuffKeeper:Data:Date from Egg:DateTime
     }
     private
         void
-    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
         gtk_widget_set_sensitive(GTK_WIDGET(self), !locked);
     }
     public
     GtkWidget *
-    new(StuffKeeperDataItem *item, const gchar *field)
+    new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
         time_t value = 0; 

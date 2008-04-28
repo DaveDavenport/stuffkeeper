@@ -19,7 +19,7 @@ requires 2.0.10
 
 %}
 
-class StuffKeeper:Data:Tag from G:Object 
+class Stuffkeeper:Data:Tag from G:Object 
 {
     private GList *items = {NULL} destroywith g_list_free;
     private sqlite3 *sqlHandle = {NULL};
@@ -41,7 +41,7 @@ class StuffKeeper:Data:Tag from G:Object
      * Constructors
      */
     public
-    StuffKeeperDataTag *
+    StuffkeeperDataTag *
     open_from_id(sqlite3 *sqlHandle, gint id)
     {
         Self *obj = GET_NEW;
@@ -50,7 +50,7 @@ class StuffKeeper:Data:Tag from G:Object
         return obj;
     }
     public
-        StuffKeeperDataTag*
+        StuffkeeperDataTag*
         new(sqlite3 *sqlHandle)
         {
             Self *obj = GET_NEW;
@@ -76,7 +76,7 @@ class StuffKeeper:Data:Tag from G:Object
             return obj;
         }
     public
-    StuffKeeperDataTag*
+    StuffkeeperDataTag*
     new_with_id(sqlite3 *sqlHandle, gint id)
     {
         Self *obj = GET_NEW;

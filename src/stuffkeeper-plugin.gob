@@ -46,7 +46,7 @@ class Stuffkeeper:Plugin from G:Object
     /* Called on a single item */
     virtual 
     void
-    run_item(self, StuffKeeperDataItem *item)
+    run_item(self, StuffkeeperDataItem *item)
     {
         printf("This function should be overrided by the plugin\n");
     }
@@ -54,7 +54,7 @@ class Stuffkeeper:Plugin from G:Object
     /* called from the menu */
     virtual
     void
-    run_menu(self,StuffKeeperDataBackend *skdb)
+    run_menu(self,StuffkeeperDataBackend *skdb)
     {
         printf("This function should be overrided by the plugin\n");
     }
@@ -62,7 +62,7 @@ class Stuffkeeper:Plugin from G:Object
     /* background */
     virtual
     void
-    run_background(self,StuffKeeperDataBackend *skdb)
+    run_background(self,StuffkeeperDataBackend *skdb)
     {
         printf("This function should be overrided by the plugin\n");
     }

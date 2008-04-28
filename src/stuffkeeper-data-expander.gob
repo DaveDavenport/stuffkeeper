@@ -11,9 +11,9 @@ requires 2.0.10
 %}
 
 
-class StuffKeeper:Data:Expander from Gtk:Expander
+class Stuffkeeper:Data:Expander from Gtk:Expander
 {
-    private StuffKeeperDataItem *item = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_expander = {0};
@@ -31,7 +31,7 @@ class StuffKeeper:Data:Expander from Gtk:Expander
 
     private
     void
-    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffkeeperDataItem *item)
     {
         if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
         {
@@ -48,7 +48,7 @@ class StuffKeeper:Data:Expander from Gtk:Expander
 
     private
         void
-        backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+        backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
         {
             /* Don't lock expander, it does not gain anything 
             gboolean locked = stuffkeeper_data_backend_get_locked(backend);
@@ -58,11 +58,11 @@ class StuffKeeper:Data:Expander from Gtk:Expander
 
     public
         GtkWidget *
-        new(StuffKeeperDataItem *item, const gchar *field)
+        new(StuffkeeperDataItem *item, const gchar *field)
     {
         int new_value = 0;
         Self *obj = GET_NEW;
-        StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
+        StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
         GtkWidget *label = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(schema),field); 
         gtk_expander_set_label_widget(GTK_EXPANDER(obj), label);
         /* store item */

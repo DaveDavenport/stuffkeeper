@@ -27,14 +27,14 @@ ESCAPE_NONE
 
 %}
 
-class StuffKeeper:Export:HTML from G:Object
+class Stuffkeeper:Export:HTML from G:Object
 {
     private GladeXML *xml;
-    private StuffKeeperInterface  *interface = {NULL};
+    private StuffkeeperInterface  *interface = {NULL};
     /* Parser values */
-    private StuffKeeperDataBackend *skdb = {NULL};
-    private StuffKeeperDataItem *cur_item = {NULL};
-    private StuffKeeperDataSchema *cur_schema = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
+    private StuffkeeperDataItem *cur_item = {NULL};
+    private StuffkeeperDataSchema *cur_schema = {NULL};
     private gchar *cur_field = {NULL};
     private gchar *image_path = {NULL};
     private EscapeType etype = {ESCAPE_HTML};
@@ -80,7 +80,7 @@ class StuffKeeper:Export:HTML from G:Object
 
     public
         G:Object *
-    new_schema(G:Object *interface, StuffKeeperDataBackend *skdb,GtkListStore *store)
+    new_schema(G:Object *interface, StuffkeeperDataBackend *skdb,GtkListStore *store)
     {
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
@@ -133,7 +133,7 @@ class StuffKeeper:Export:HTML from G:Object
 
     public
     G:Object *
-    new(G:Object *interface, StuffKeeperDataBackend *skdb,StuffKeeper:Data:Item  *item)
+    new(G:Object *interface, StuffkeeperDataBackend *skdb,Stuffkeeper:Data:Item  *item)
     {
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
@@ -201,7 +201,7 @@ class StuffKeeper:Export:HTML from G:Object
                         gchar *directory = gtk_file_chooser_get_filename(
                                     GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml,"file_chooser_button1")));
                         gchar *template = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->_priv->fc_template));
-                        StuffKeeperDataSchema *schema = NULL;
+                        StuffkeeperDataSchema *schema = NULL;
 
                         if(have_schema && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->_priv->chk_cdb)))
                         {
@@ -427,7 +427,7 @@ class StuffKeeper:Export:HTML from G:Object
 
                 for(node = list;node && found ;node = g_list_next(node))
                 {
-                    StuffKeeperDataTag *tag = node->data;
+                    StuffkeeperDataTag *tag = node->data;
                     gchar *title = stuffkeeper_data_tag_get_title(tag);
                     found = self_printout(self,&buffer[10],title,fp_out);
                     if(title)
@@ -442,7 +442,7 @@ class StuffKeeper:Export:HTML from G:Object
         {
             if(strncmp(buffer,"field",5 ) == 0)
             {
-                StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
+                StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                 FieldType type = stuffkeeper_data_schema_get_field_type(schema, self->_priv->cur_field); 
                 int item_type = 0; 
                 int i;
@@ -455,7 +455,7 @@ class StuffKeeper:Export:HTML from G:Object
                     /** */
                     if(strncasecmp(&buffer[6],"name", 4) == 0)
                     {
-                        StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
+                        StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                         gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
                         self_printout(self,&buffer[10],temp,fp_out);
                         if(temp)
@@ -617,7 +617,7 @@ class StuffKeeper:Export:HTML from G:Object
                     int i;
                     for(i=0;i<length;i++)
                     {
-                        StuffKeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
+                        StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                         FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]); 
                         if(type < FIELD_TYPE_EXPANDER)
                         {

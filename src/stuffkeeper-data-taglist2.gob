@@ -13,10 +13,10 @@ requires 2.0.10
 #include "stuffkeeper-data-backend.h"
 %}
 
-class StuffKeeper:Data:TagList2 from Gtk:Event:Box
+class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
 {
-    private StuffKeeperDataItem *item = {NULL};
-    private StuffKeeperDataBackend *skdb = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
 
     private gulong uid_item_changed = {0};
     private gulong uid_tag_added = {0};
@@ -39,7 +39,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
             return;
        if(event->button==3)
        {
-            StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(event_box), "tag");
+            StuffkeeperDataTag *tag = g_object_get_data(G_OBJECT(event_box), "tag");
             if(tag)
             {
                 stuffkeeper_data_item_remove_tag(self->_priv->item, tag);
@@ -69,7 +69,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
         {
             for(iter = g_list_first(tags);iter;iter = g_list_next(iter))
             {
-                StuffKeeperDataTag *tag = iter->data;
+                StuffkeeperDataTag *tag = iter->data;
                 GtkWidget *event_box = gtk_event_box_new();
                 GtkWidget *label = stuffkeeper_data_label_new_tag(tag);
                 gtk_container_add(GTK_CONTAINER(event_box), label);
@@ -97,7 +97,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
 
     private 
     void
-    item_changed(self, StuffKeeperDataItem *item)
+    item_changed(self, StuffkeeperDataItem *item)
     {
         self_reload_list(self);
     }
@@ -119,7 +119,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
      */
     private 
         int 
-    tag_sort_func(StuffKeeperDataTag *ta, StuffKeeperDataTag *tb)
+    tag_sort_func(StuffkeeperDataTag *ta, StuffkeeperDataTag *tb)
     {
         int retv = 0;
         
@@ -149,7 +149,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
     void
     remove_tag(self, GtkMenuItem *item)
     {
-        StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(item), "tag");
+        StuffkeeperDataTag *tag = g_object_get_data(G_OBJECT(item), "tag");
         if(tag)
         {
             /* if the item does not allready have the tag, add it */
@@ -171,7 +171,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
             GtkWidget*menu = gtk_menu_new();
             for(iter = g_list_first(list); iter; iter = g_list_next(iter))
             {
-                StuffKeeperDataTag *tag = STUFFKEEPER_DATA_TAG(iter->data);
+                StuffkeeperDataTag *tag = STUFFKEEPER_DATA_TAG(iter->data);
                 gchar *title = stuffkeeper_data_tag_get_title(tag);
                 GtkWidget *item = gtk_menu_item_new_with_label(title);
                 /* add to menu */
@@ -198,7 +198,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
     void
     add_tag(self, GtkMenuItem *item)
     {
-        StuffKeeperDataTag *tag = g_object_get_data(G_OBJECT(item), "tag");
+        StuffkeeperDataTag *tag = g_object_get_data(G_OBJECT(item), "tag");
         if(tag)
         {
             /* if the item does not allready have the tag, add it */
@@ -220,7 +220,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
             GtkWidget*menu = gtk_menu_new();
             for(iter = g_list_first(list); iter; iter = g_list_next(iter))
             {
-                StuffKeeperDataTag *tag = STUFFKEEPER_DATA_TAG(iter->data);
+                StuffkeeperDataTag *tag = STUFFKEEPER_DATA_TAG(iter->data);
                 /* only add it to the menu if the item does not have the tag allready */
                 if(!stuffkeeper_data_item_has_tag(self->_priv->item, tag))
                 {
@@ -245,7 +245,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
     }
     private
     void
-    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
         if(locked)
@@ -260,7 +260,7 @@ class StuffKeeper:Data:TagList2 from Gtk:Event:Box
 
     public
     GtkWidget *
-    new(StuffKeeperDataItem *item)
+    new(StuffkeeperDataItem *item)
     {
         Self *obj = GET_NEW;
         gtk_event_box_set_visible_window(GTK_EVENT_BOX(obj), FALSE);

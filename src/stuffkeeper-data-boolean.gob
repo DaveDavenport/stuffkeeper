@@ -9,9 +9,9 @@ requires 2.0.10
 %}
 
 
-class StuffKeeper:Data:Boolean from Gtk:Check:Button
+class Stuffkeeper:Data:Boolean from Gtk:Check:Button
 {
-    private StuffKeeperDataItem *item = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_entry = {0};
@@ -29,7 +29,7 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
 
     public
     void
-    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffkeeperDataItem *item)
     {
         const gboolean old_value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self));
         gboolean value;
@@ -46,7 +46,7 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
     }
     private
         void
-    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
         gtk_widget_set_sensitive(GTK_WIDGET(self), !locked);
@@ -56,7 +56,7 @@ class StuffKeeper:Data:Boolean from Gtk:Check:Button
 
     public
     GtkWidget *
-    new(StuffKeeperDataItem *item, const gchar *field)
+    new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
         gboolean value =FALSE;

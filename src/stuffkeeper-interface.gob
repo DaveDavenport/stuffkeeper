@@ -63,7 +63,7 @@ extern GList *interface_list;
     }LPType;
 %}
 
-class StuffKeeper:Interface from G:Object 
+class Stuffkeeper:Interface from G:Object 
 {
     private GtkTreeModel *model_tags = {NULL};
     private GtkTreeModel *model_items= {NULL};
@@ -99,7 +99,7 @@ class StuffKeeper:Interface from G:Object
     private GtkWidget *item_view_container;
     private GtkWidget *show_item_pane_menu_item;
 
-    private StuffKeeperDataBackend *skdbg = {NULL};
+    private StuffkeeperDataBackend *skdbg = {NULL};
     private StuffkeeperPluginManager *spm = {NULL};
     /**
      * Signals 
@@ -153,7 +153,7 @@ class StuffKeeper:Interface from G:Object
      */
     private 
     void
-    search_changed(self, const SearchField *field, StuffKeeperDataItemSearch *search)
+    search_changed(self, const SearchField *field, StuffkeeperDataItemSearch *search)
     {
         if(!field)
         {
@@ -181,7 +181,7 @@ class StuffKeeper:Interface from G:Object
 
     private
     void
-    search_added(self, StuffKeeperDataItemSearch *search,  StuffKeeperDataBackend *skdb)
+    search_added(self, StuffkeeperDataItemSearch *search,  StuffkeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
         gchar *title = stuffkeeper_data_item_search_get_title(search);
@@ -195,7 +195,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
         void 
-    search_removed(self, gint id, StuffKeeperDataBackend *skdb)
+    search_removed(self, gint id, StuffkeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_searches);
@@ -220,7 +220,7 @@ class StuffKeeper:Interface from G:Object
      */
     private
     void 
-    schema_added(self, StuffKeeperDataSchema *schema,StuffKeeperDataBackend *skdb )
+    schema_added(self, StuffkeeperDataSchema *schema,StuffkeeperDataBackend *skdb )
     {
         GtkTreeIter iter;
         gchar *title = stuffkeeper_data_schema_get_title(schema);
@@ -235,7 +235,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
     void 
-    schema_changed(self, StuffKeeperDataSchema *schema, StuffKeeperDataBackend *skdb)
+    schema_changed(self, StuffkeeperDataSchema *schema, StuffkeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_schemas);
@@ -259,7 +259,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
     void 
-    schema_removed(self, gint id, StuffKeeperDataBackend *skdb)
+    schema_removed(self, gint id, StuffkeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_schemas);
@@ -284,7 +284,7 @@ class StuffKeeper:Interface from G:Object
      */
     private
     void 
-    tag_added(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
+    tag_added(StuffkeeperDataBackend *skdb, StuffkeeperDataTag *tag, GtkTreeModel *store)
     {
         GtkTreeIter iter;
         gchar *title = stuffkeeper_data_tag_get_title(tag);
@@ -298,7 +298,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
     void 
-    tag_changed(StuffKeeperDataBackend *skdb, StuffKeeperDataTag *tag, GtkTreeModel *store)
+    tag_changed(StuffkeeperDataBackend *skdb, StuffkeeperDataTag *tag, GtkTreeModel *store)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(store);
@@ -323,7 +323,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
     void 
-    tag_removed(StuffKeeperDataBackend *skdb, gint id, GtkListStore *store)
+    tag_removed(StuffkeeperDataBackend *skdb, gint id, GtkListStore *store)
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(store);
@@ -347,7 +347,7 @@ class StuffKeeper:Interface from G:Object
      */
     private
     void
-    item_removed(StuffKeeperDataBackend *skdb, gint id,StuffKeeperInterface *self) 
+    item_removed(StuffkeeperDataBackend *skdb, gint id,StuffkeeperInterface *self) 
     {
         GtkTreeIter iter;
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
@@ -368,7 +368,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
     void
-    item_added(StuffKeeperDataBackend *skdb, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
+    item_added(StuffkeeperDataBackend *skdb, StuffkeeperDataItem *item, StuffkeeperInterface *self) 
     {
         GtkTreeIter iter;
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
@@ -387,7 +387,7 @@ class StuffKeeper:Interface from G:Object
     }
     private
     void
-    item_changed(StuffKeeperDataBackend *skdb, const gchar *field, StuffKeeperDataItem *item, StuffKeeperInterface *self) 
+    item_changed(StuffkeeperDataBackend *skdb, const gchar *field, StuffkeeperDataItem *item, StuffkeeperInterface *self) 
     {
         GtkTreeIter iter;
         GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
@@ -413,17 +413,17 @@ class StuffKeeper:Interface from G:Object
 
     private
     void
-    add_item(self, StuffKeeperDataSchema *schema)
+    add_item(self, StuffkeeperDataSchema *schema)
     {
         /* If the user add's an item, add it ourself, and don't listen to the signal */
         g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_item_added);
         GtkTreeIter iter;
-        StuffKeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
+        StuffkeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
         stuffkeeper_data_item_set_title(item,"New Item");
         if(gtk_tree_model_get_iter_first(self->_priv->model_tags, &iter))
         {
             do{
-                StuffKeeperDataTag *tag = NULL;
+                StuffkeeperDataTag *tag = NULL;
                 gboolean enabled;
                 gtk_tree_model_get(GTK_TREE_MODEL(self->_priv->model_tags), &iter,2, &enabled, 3,&tag, -1); 
                 if(enabled)
@@ -472,7 +472,7 @@ class StuffKeeper:Interface from G:Object
             /* check if there are schema's */
             if(list)
             {
-                StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+                StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
                 /* if there is no schema, get the first*/
                 if(schema  == NULL || !STUFFKEEPER_IS_DATA_SCHEMA(schema))
                 {
@@ -490,7 +490,7 @@ class StuffKeeper:Interface from G:Object
         {
             gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
             if(locked){printf("**ERROR** should not be callable\n");return;}
-            StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+            StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
             if(schema)
             {
                 self_add_item(self, schema);
@@ -594,7 +594,7 @@ class StuffKeeper:Interface from G:Object
             if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
                 gint id;
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gtk_tree_model_get(model, &iter ,0,&id, -1);
                 item = stuffkeeper_data_backend_get_item(self->_priv->skdbg, id);
                 if(item)
@@ -670,9 +670,9 @@ class StuffKeeper:Interface from G:Object
      */
     public
         gboolean 
-        interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, StuffKeeperInterface *self) 
+        interface_visible_func(GtkTreeModel *model, GtkTreeIter *iter, StuffkeeperInterface *self) 
         {
-            StuffKeeperDataItem *item;
+            StuffkeeperDataItem *item;
             /* Get the item */
             gtk_tree_model_get(model, iter, 2,&item, -1);
 
@@ -684,7 +684,7 @@ class StuffKeeper:Interface from G:Object
         }
     public
     gboolean
-    item_is_visible(self, StuffKeeperDataItem *item)
+    item_is_visible(self, StuffkeeperDataItem *item)
     {
         int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->search_entry));
@@ -736,7 +736,7 @@ class StuffKeeper:Interface from G:Object
          */
         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
         {
-            StuffKeeperDataItemSearch *search;
+            StuffkeeperDataItemSearch *search;
             gtk_tree_model_get(self->_priv->model_searches, &iter, LP_ITEM, &search, -1);
             if(search)
             {
@@ -784,10 +784,10 @@ class StuffKeeper:Interface from G:Object
         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
         if(locked){printf("**ERROR** should not be callable\n");return;}
 
-        StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+        StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
         if(schema)
         {
-            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            StuffkeeperEditSchema *skes = stuffkeeper_edit_schema_new();
             stuffkeeper_edit_schema_set_schema(skes, schema);
         }
     }
@@ -837,7 +837,7 @@ class StuffKeeper:Interface from G:Object
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             if(gtk_tree_selection_get_selected(selection, &model, &iter))
             {
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
@@ -886,7 +886,7 @@ class StuffKeeper:Interface from G:Object
          gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
          if(locked){printf("**ERROR** should not be callable\n");return;}
          g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_tag_added);
-         StuffKeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdbg);
+         StuffkeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdbg);
 
          stuffkeeper_data_tag_set_title(tag, _("New Tag"));
          if(tag)
@@ -944,7 +944,7 @@ class StuffKeeper:Interface from G:Object
          if(locked){printf("**ERROR** should not be callable\n");return;}
 
          g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_schema_added);
-         StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
+         StuffkeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
          stuffkeeper_data_schema_set_title(schema, _("New Schema"));
          if(schema)
          {
@@ -1006,11 +1006,11 @@ class StuffKeeper:Interface from G:Object
          GtkTreeIter iter;
          if(gtk_tree_selection_get_selected(selection,&model, &iter))
          {
-             StuffKeeperDataSchema *schema;
+             StuffkeeperDataSchema *schema;
              gtk_tree_model_get(model, &iter, 3, &schema, -1);
              if(schema)
              {
-                 StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+                 StuffkeeperEditSchema *skes = stuffkeeper_edit_schema_new();
                  stuffkeeper_edit_schema_set_schema(skes, schema);
              }
          }
@@ -1037,7 +1037,7 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter iter;
             if(gtk_tree_selection_get_selected(selection, &model, &iter))
             {
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
@@ -1217,7 +1217,7 @@ class StuffKeeper:Interface from G:Object
                 if(gtk_tree_selection_get_selected(selection,&model, &iter))
                 {
                     int id;
-                    StuffKeeperDataItemSearch *search;
+                    StuffkeeperDataItemSearch *search;
                     /* Get the number of items */
                     gtk_tree_model_get(model, &iter, 0, &id,3, &search, -1);
 
@@ -1255,7 +1255,7 @@ class StuffKeeper:Interface from G:Object
 
 
     public
-        StuffKeeperInterface * 
+        StuffkeeperInterface * 
         new(GKeyFile *config_file)
         {
             GtkAccelGroup *agroup = NULL;
@@ -1416,7 +1416,7 @@ class StuffKeeper:Interface from G:Object
         GtkTreeIter iter, node;
         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
         {
-            StuffKeeperDataItemSearch *search;
+            StuffkeeperDataItemSearch *search;
             GtkWidget *item = glade_xml_get_widget(self->_priv->xml, "menuitem_filter_remove");
             GtkWidget *item1 = glade_xml_get_widget(self->_priv->xml, "menuitem_filter_edit");
             gint id;
@@ -1460,7 +1460,7 @@ class StuffKeeper:Interface from G:Object
             do{
                 gchar *title = NULL;
                 GtkWidget *m =NULL;
-                StuffKeeperDataSchema *schema = NULL;
+                StuffkeeperDataSchema *schema = NULL;
                 gtk_tree_model_get(self->_priv->model_schemas, &iter, 1, &title,3,&schema, -1);
                 m=gtk_image_menu_item_new_with_label((title==NULL)?"n/a":title);
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(m), 
@@ -1493,8 +1493,8 @@ class StuffKeeper:Interface from G:Object
     void
     get_pixbuf(GtkTreeViewColumn *column, GtkCellRenderer *renderer, GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
     {
-        StuffKeeperDataItem *item;
-        StuffKeeperDataSchema *schema;
+        StuffkeeperDataItem *item;
+        StuffkeeperDataSchema *schema;
         GdkPixbuf *pb;
 //        printf("get pixbuf\n");
         gtk_tree_model_get(model, iter, 2, &item, -1); 
@@ -1508,7 +1508,7 @@ class StuffKeeper:Interface from G:Object
 
     private
     void
-    backend_locked(self, GParamSpec *arg1, StuffKeeperDataBackend *backend)
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
         GtkWidget *button = glade_xml_get_widget(self->_priv->xml, "toggle_locked");
         gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
@@ -1576,7 +1576,7 @@ class StuffKeeper:Interface from G:Object
      */
     public
         void 
-        initialize_interface(self, StuffKeeperDataBackend *skdb,GObject *spm)
+        initialize_interface(self, StuffkeeperDataBackend *skdb,GObject *spm)
         {
             GError *error = NULL;
             gint value = 0, sort_order;
@@ -1585,7 +1585,7 @@ class StuffKeeper:Interface from G:Object
             GtkCellRenderer *renderer;
             GtkTreeSelection *sel;
             /**
-             * StuffKeeperDataBackend
+             * StuffkeeperDataBackend
              */
             self->_priv->skdbg = skdb;
             self->_priv->spm = STUFFKEEPER_PLUGIN_MANAGER(spm);
@@ -1999,7 +1999,7 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter iter;
             if(gtk_tree_selection_get_selected(selection,&model, &iter))
             {
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
@@ -2017,7 +2017,7 @@ class StuffKeeper:Interface from G:Object
             debug_printf("item row activated\n");
             if(gtk_tree_model_get_iter(model,&iter, path)) 
             {
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
@@ -2032,7 +2032,7 @@ class StuffKeeper:Interface from G:Object
          */
         public
         void 
-        popup_item(self, StuffKeeper:Data:Item *item)
+        popup_item(self, Stuffkeeper:Data:Item *item)
         {
             stuffkeeper_item_window_new(self->_priv->skdbg, item,self->_priv->config_file);
 
@@ -2272,7 +2272,7 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter iter;
             if(gtk_tree_selection_get_selected(selection, &model, &iter))
             {
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
@@ -2291,7 +2291,7 @@ class StuffKeeper:Interface from G:Object
         {
             gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
             if(locked){printf("**ERROR** should not be callable\n");return;}
-            StuffKeeperDataItemSearch *search = stuffkeeper_data_backend_new_search(self->_priv->skdbg);
+            StuffkeeperDataItemSearch *search = stuffkeeper_data_backend_new_search(self->_priv->skdbg);
             stuffkeeper_data_item_search_edit_search_gui(search);
         }
 
@@ -2304,7 +2304,7 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter iter;
             if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
             {
-                StuffKeeperDataItemSearch *search;
+                StuffkeeperDataItemSearch *search;
                 gint id;
                 gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
                 if(search && id != -1)
@@ -2324,7 +2324,7 @@ class StuffKeeper:Interface from G:Object
             GtkTreeIter iter;
             if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
             {
-                StuffKeeperDataItemSearch *search;
+                StuffkeeperDataItemSearch *search;
                 gint id;
                 gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
                 if(search && id != -1)
@@ -2344,7 +2344,7 @@ class StuffKeeper:Interface from G:Object
         {
             gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
             if(locked){printf("**ERROR** should not be callable\n");return;}
-            StuffKeeperDataItemSearch *search;
+            StuffkeeperDataItemSearch *search;
             search = g_object_get_data(G_OBJECT(menu_item), "search");
             if(search) 
             {
@@ -2358,7 +2358,7 @@ class StuffKeeper:Interface from G:Object
         {
             gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
             if(locked){printf("**ERROR** should not be callable\n");return;}
-            StuffKeeperDataItemSearch *search;
+            StuffkeeperDataItemSearch *search;
             search = g_object_get_data(G_OBJECT(menu_item), "search");
             if(search)
             {
@@ -2464,8 +2464,8 @@ class StuffKeeper:Interface from G:Object
             gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
             if(locked){printf("**ERROR** should not be callable\n");return;}
 
-            StuffKeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
-            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            StuffkeeperDataSchema *schema = stuffkeeper_data_backend_new_schema(self->_priv->skdbg);
+            StuffkeeperEditSchema *skes = stuffkeeper_edit_schema_new();
             stuffkeeper_edit_schema_set_schema(skes, schema);
         }
 
@@ -2550,7 +2550,7 @@ class StuffKeeper:Interface from G:Object
                         {
                             gchar *path = NULL;
                             gchar *filename = g_strdup_printf("%s.type", file);
-                            StuffKeeperDataSchema *schema = NULL;
+                            StuffkeeperDataSchema *schema = NULL;
                             /* get model schema */
                             gtk_tree_model_get(self->_priv->model_schemas, &iter,3, &schema, -1); 
                             /* build path */

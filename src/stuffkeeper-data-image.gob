@@ -21,9 +21,9 @@ static GtkTargetEntry data_image_drag_target[] =
 	{ "text/uri-list", 0, 3}
 };
 %}
-class StuffKeeper:Data:Image from Gtk:Event:Box
+class Stuffkeeper:Data:Image from Gtk:Event:Box
 {
-    private StuffKeeperDataItem *item = {NULL};
+    private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
     private gulong changed_item_entry = {0};
     private gulong changed_entry = {0};
@@ -37,7 +37,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
 
     public
     void
-    item_changed(self,const gchar *field, StuffKeeperDataItem *item)
+    item_changed(self,const gchar *field, StuffkeeperDataItem *item)
     {
         int set = FALSE;
         if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
@@ -139,7 +139,7 @@ class StuffKeeper:Data:Image from Gtk:Event:Box
 
     public
     GtkWidget *
-    new(StuffKeeperDataItem *item, const gchar *field)
+    new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
         GtkWidget *alignment = gtk_alignment_new(0, 0, 0,0);

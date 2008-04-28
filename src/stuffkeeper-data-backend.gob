@@ -17,7 +17,7 @@
 %}
 
 
-class StuffKeeper:Data:Backend from G:Object 
+class Stuffkeeper:Data:Backend from G:Object 
 {
     /**
      * Private values 
@@ -59,7 +59,7 @@ class StuffKeeper:Data:Backend from G:Object
     private
     signal last NONE (STRING,POINTER)
     void
-    search_changed(self,const SearchField *field, StuffKeeperDataItemSearch *search)
+    search_changed(self,const SearchField *field, StuffkeeperDataItemSearch *search)
     {
     }
 
@@ -67,7 +67,7 @@ class StuffKeeper:Data:Backend from G:Object
     private
     signal last NONE (POINTER)
     void
-    search_added(self, StuffKeeperDataItemSearch *search)
+    search_added(self, StuffkeeperDataItemSearch *search)
     {
         g_signal_connect_swapped(G_OBJECT(search), "search-changed", G_CALLBACK(self_search_changed), self);
     }
@@ -86,14 +86,14 @@ class StuffKeeper:Data:Backend from G:Object
     private
     signal last NONE (STRING,POINTER)
     void
-    item_changed(self, const gchar *field,StuffKeeperDataItem *item)
+    item_changed(self, const gchar *field,StuffkeeperDataItem *item)
     {
     }
 
     private
     signal last NONE (POINTER)
     void
-    item_added(self, StuffKeeperDataItem *item)
+    item_added(self, StuffkeeperDataItem *item)
     {
         g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), self);
 
@@ -110,14 +110,14 @@ class StuffKeeper:Data:Backend from G:Object
     private
     signal last NONE (POINTER)
     void
-    schema_changed(self, StuffKeeperDataSchema *schema)
+    schema_changed(self, StuffkeeperDataSchema *schema)
     {
     }
 
     private
     signal last NONE (POINTER)
     void
-    schema_added(self, StuffKeeperDataSchema *schema)
+    schema_added(self, StuffkeeperDataSchema *schema)
     {
         g_signal_connect_swapped(G_OBJECT(schema), "schema-changed", G_CALLBACK(self_schema_changed), self);
     }
@@ -131,11 +131,11 @@ class StuffKeeper:Data:Backend from G:Object
      * searches
      */
     public
-    StuffKeeperDataItemSearch *
+    StuffkeeperDataItemSearch *
     new_search(self)
     {
         gint *ide;
-        StuffKeeperDataItemSearch *search = stuffkeeper_data_item_search_new(G_OBJECT(self),self->_priv->sqlHandle);
+        StuffkeeperDataItemSearch *search = stuffkeeper_data_item_search_new(G_OBJECT(self),self->_priv->sqlHandle);
         /* We have a valid id now, so add it */
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -148,7 +148,7 @@ class StuffKeeper:Data:Backend from G:Object
     void
     remove_search(self, gint id)
     {
-        StuffKeeperDataItemSearch *search = self_get_search(self, id);
+        StuffkeeperDataItemSearch *search = self_get_search(self, id);
         if(!search) return;
 
         self_search_removed(self,id);
@@ -180,10 +180,10 @@ class StuffKeeper:Data:Backend from G:Object
 
 
     public 
-    StuffKeeperDataItemSearch *
+    StuffkeeperDataItemSearch *
     get_search(self, gint id)
     {
-        StuffKeeperDataItemSearch *item;
+        StuffkeeperDataItemSearch *item;
         item = g_hash_table_lookup(self->_priv->searches, &id);
         return item;
     }
@@ -207,20 +207,20 @@ class StuffKeeper:Data:Backend from G:Object
 
 
     public 
-    StuffKeeperDataItem *
+    StuffkeeperDataItem *
     get_item(self, gint id)
     {
-        StuffKeeperDataItem *item;
+        StuffkeeperDataItem *item;
         item = g_hash_table_lookup(self->_priv->items, &id);
         return item;
     }
 
     public 
-    StuffKeeperDataItem *
-    new_item(self,StuffKeeperDataSchema *schema)
+    StuffkeeperDataItem *
+    new_item(self,StuffkeeperDataSchema *schema)
     {
         gint *id;
-        StuffKeeperDataItem *item;
+        StuffkeeperDataItem *item;
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "items", NULL);
         /* create a new item */
         item = stuffkeeper_data_item_new(G_OBJECT(self),self->_priv->sqlHandle,schema);
@@ -239,7 +239,7 @@ class StuffKeeper:Data:Backend from G:Object
     void
     remove_item(self, gint id)
     {
-        StuffKeeperDataItem *item = g_hash_table_lookup(self->_priv->items, &id);
+        StuffkeeperDataItem *item = g_hash_table_lookup(self->_priv->items, &id);
         self_item_removed(self, id);
         if(item)
         {
@@ -355,7 +355,7 @@ class StuffKeeper:Data:Backend from G:Object
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);
-                StuffKeeperDataSchema *schema;
+                StuffkeeperDataSchema *schema;
                 gint *id;
                 /* create a new item */
                 schema = stuffkeeper_data_schema_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
@@ -387,10 +387,10 @@ class StuffKeeper:Data:Backend from G:Object
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);
-                StuffKeeperDataItemSearch *search;
+                StuffkeeperDataItemSearch *search;
                 gint *id;
                 /* create a new item */
-                search = (StuffKeeperDataItemSearch *) stuffkeeper_data_item_search_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
+                search = (StuffkeeperDataItemSearch *) stuffkeeper_data_item_search_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -420,7 +420,7 @@ class StuffKeeper:Data:Backend from G:Object
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 gint oid = sqlite3_column_int(stmt, 0);
-                StuffKeeperDataTag *tag;
+                StuffkeeperDataTag *tag;
                 gint *id;
                 /* create a new item */
                 tag = stuffkeeper_data_tag_open_from_id(self->_priv->sqlHandle, oid);
@@ -458,7 +458,7 @@ class StuffKeeper:Data:Backend from G:Object
             {
                 gint oid = sqlite3_column_int(stmt, 0);
                 int schemaid = sqlite3_column_int(stmt, 1);
-                StuffKeeperDataItem *item;
+                StuffkeeperDataItem *item;
                 gint *id;
                 /* create a new item */
                 item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid,schemaid);
@@ -483,19 +483,19 @@ class StuffKeeper:Data:Backend from G:Object
      */
     private
     void
-    iterate_remove_schema(gint *key, StuffKeeperDataSchema *schema, Self *self) 
+    iterate_remove_schema(gint *key, StuffkeeperDataSchema *schema, Self *self) 
     {
         self_schema_removed(self, *key);
     }
     private
     void
-    iterate_remove_item(gint *key, StuffKeeperDataItem *item, Self *self )
+    iterate_remove_item(gint *key, StuffkeeperDataItem *item, Self *self )
     {
         self_item_removed(self, *key);
     }
     private
     void
-    iterate_remove_tag(gint *key, StuffKeeperDataTag *tag, Self *self)
+    iterate_remove_tag(gint *key, StuffkeeperDataTag *tag, Self *self)
     {
         self_tag_removed(self, *key);
     }
@@ -554,11 +554,11 @@ class StuffKeeper:Data:Backend from G:Object
 
 
     /**
-     * Create new StuffKeeperDataBackend 
+     * Create new StuffkeeperDataBackend 
      * destroy with g_object_unref();
      */
     public 
-    StuffKeeperDataBackend *
+    StuffkeeperDataBackend *
     new (void)
     {
         Self *self = GET_NEW;
@@ -573,14 +573,14 @@ class StuffKeeper:Data:Backend from G:Object
     private
     signal last NONE (POINTER)
     void
-    tag_changed(self, StuffKeeperDataTag *tag)
+    tag_changed(self, StuffkeeperDataTag *tag)
     {
     }
 
     private
     signal last NONE (POINTER)
         void
-        tag_added(self, StuffKeeperDataTag *tag)
+        tag_added(self, StuffkeeperDataTag *tag)
         {
 
             g_signal_connect_swapped(G_OBJECT(tag), "tag-changed", G_CALLBACK(self_tag_changed), self);
@@ -597,11 +597,11 @@ class StuffKeeper:Data:Backend from G:Object
      * Schema's
      */
     public
-    StuffKeeperDataSchema*
+    StuffkeeperDataSchema*
     get_schema(self, const int id)
     {
         gint *ide;
-        StuffKeeperDataSchema *schema;
+        StuffkeeperDataSchema *schema;
         /* Look for existing tag */
         schema = g_hash_table_lookup(self->_priv->schemas, &id);
         if(schema)
@@ -626,13 +626,13 @@ class StuffKeeper:Data:Backend from G:Object
             return g_hash_table_get_values(self->_priv->schemas);
         }
     public
-    StuffKeeperDataSchema *
+    StuffkeeperDataSchema *
     load_from_xml(self, const char *path)
     {
         gint *ide;
         gint id; 
 
-        StuffKeeperDataSchema *schema = stuffkeeper_data_schema_load_from_xml(G_OBJECT(self), self->_priv->sqlHandle, path);
+        StuffkeeperDataSchema *schema = stuffkeeper_data_schema_load_from_xml(G_OBJECT(self), self->_priv->sqlHandle, path);
         if(schema == NULL)
         {
             return NULL;
@@ -647,12 +647,12 @@ class StuffKeeper:Data:Backend from G:Object
         return schema;
     }
     public
-        StuffKeeperDataSchema *
+        StuffkeeperDataSchema *
         new_schema(self)
     {
         gint *ide;
         gint id; 
-        StuffKeeperDataSchema *schema;
+        StuffkeeperDataSchema *schema;
 
 
         /* No schema, lets make one. */
@@ -670,7 +670,7 @@ class StuffKeeper:Data:Backend from G:Object
         void
         remove_schema(self, gint id)
         {
-            StuffKeeperDataSchema *schema = self_get_schema(self, id);
+            StuffkeeperDataSchema *schema = self_get_schema(self, id);
             if(!schema) return;
             if(stuffkeeper_data_schema_num_items(schema) >0)
             {
@@ -698,11 +698,11 @@ class StuffKeeper:Data:Backend from G:Object
      * Existing tag if it allready exists
      */
     public
-    StuffKeeperDataTag *
+    StuffkeeperDataTag *
     add_tag(self, const int id)
     {
         gint *ide;
-        StuffKeeperDataTag *tag;
+        StuffkeeperDataTag *tag;
         /* Look for existing tag */
         tag = g_hash_table_lookup(self->_priv->tags, &id);
         if(tag)
@@ -723,20 +723,20 @@ class StuffKeeper:Data:Backend from G:Object
     }
 
     public
-        StuffKeeperDataTag *
+        StuffkeeperDataTag *
     get_tag(self, const int id)
     {
-        StuffKeeperDataTag *tag;
+        StuffkeeperDataTag *tag;
         /* Look for existing tag */
         tag = g_hash_table_lookup(self->_priv->tags, &id);
         return tag;
     }
     public
-    StuffKeeperDataTag *
+    StuffkeeperDataTag *
     new_tag(self)
     {
         gint *ide;
-        StuffKeeperDataTag *tag = stuffkeeper_data_tag_new(self->_priv->sqlHandle);
+        StuffkeeperDataTag *tag = stuffkeeper_data_tag_new(self->_priv->sqlHandle);
         /* We have a valid id now, so add it */
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -757,7 +757,7 @@ class StuffKeeper:Data:Backend from G:Object
     void
     remove_tag(self, gint id)
     {
-        StuffKeeperDataTag *tag = self_get_tag(self, id);
+        StuffkeeperDataTag *tag = self_get_tag(self, id);
         if(!tag) return;
         if(stuffkeeper_data_tag_num_items(tag) >0)
         {

@@ -65,11 +65,11 @@ typedef struct _SearchField
 
 %}
 
-class StuffKeeper:Data:Item:Search from G:Object 
+class Stuffkeeper:Data:Item:Search from G:Object 
 {
     private int is_dummy = {FALSE};
     private int id = {-1};
-    private StuffKeeperDataBackend *skdb = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
     private sqlite3 *sqlHandle = {NULL};
 
     private GladeXML *xml = {NULL};
@@ -200,9 +200,9 @@ class StuffKeeper:Data:Item:Search from G:Object
         self->_priv->sqlHandle = sqlHandle;
         return G_OBJECT(self);
     }
-    /* Create new StuffKeeperDataBackend */
+    /* Create new StuffkeeperDataBackend */
     public 
-        StuffKeeperDataItemSearch *
+        StuffkeeperDataItemSearch *
         new (G:Object *skdb, sqlite3 *sqlHandle)
         {
 
@@ -256,7 +256,7 @@ class StuffKeeper:Data:Item:Search from G:Object
 
     public
     int 
-    match(self, StuffKeeperDataItem *item)
+    match(self, StuffkeeperDataItem *item)
     {
         GList *node,*list = NULL;
         int found = TRUE;

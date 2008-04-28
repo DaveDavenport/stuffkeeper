@@ -9,7 +9,7 @@ requires 2.0.10
 %}
 
 
-class StuffKeeper:Data:Label from Gtk:Label
+class Stuffkeeper:Data:Label from Gtk:Label
 {
     private GObject *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
@@ -18,7 +18,7 @@ class StuffKeeper:Data:Label from Gtk:Label
 
     private
     void
-    field_item_changed(self,const gchar *id, StuffKeeper:Data:Schema *schema)
+    field_item_changed(self,const gchar *id, Stuffkeeper:Data:Schema *schema)
     {
         gchar *value;
         value = stuffkeeper_data_schema_get_field_name(STUFFKEEPER_DATA_SCHEMA(self->_priv->item),self->_priv->field);
@@ -87,7 +87,7 @@ class StuffKeeper:Data:Label from Gtk:Label
      */
     public
     GtkWidget *
-    new_tag(StuffKeeperDataTag *tag)
+    new_tag(StuffkeeperDataTag *tag)
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
@@ -113,7 +113,7 @@ class StuffKeeper:Data:Label from Gtk:Label
      */
     public
     GtkWidget *
-    new_schema(StuffKeeperDataSchema *schema)
+    new_schema(StuffkeeperDataSchema *schema)
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
@@ -140,7 +140,7 @@ class StuffKeeper:Data:Label from Gtk:Label
      */
     public
     GtkWidget *
-    new_schema_field(StuffKeeperDataSchema *schema,const gchar *field)
+    new_schema_field(StuffkeeperDataSchema *schema,const gchar *field)
     {
         Self *obj = GET_NEW;
         gchar *value =NULL;
@@ -173,7 +173,7 @@ class StuffKeeper:Data:Label from Gtk:Label
      */
     public
     GtkWidget *
-    new_modifcation_time_item(StuffKeeperDataItem *item)
+    new_modifcation_time_item(StuffkeeperDataItem *item)
     {
         Self *obj = GET_NEW;
         gtk_misc_set_alignment(GTK_MISC(obj), 0, 0.5);

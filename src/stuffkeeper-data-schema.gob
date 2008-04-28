@@ -78,11 +78,11 @@ requires 2.0.10
 
     }DbSchemaFieldType;
 %}
-class StuffKeeper:Data:Schema from G:Object 
+class Stuffkeeper:Data:Schema from G:Object 
 {
     /* Image matching */
     private GdkPixbuf *pb = {NULL} destroywith g_object_unref;
-    private StuffKeeperDataBackend *skdb = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
 
 
     private GList *items = {NULL} destroywith g_list_free;
@@ -156,7 +156,7 @@ class StuffKeeper:Data:Schema from G:Object
      */
 
    public
-       StuffKeeperDataSchema *
+       StuffkeeperDataSchema *
         open_from_id (GObject *skdb, sqlite3 *sqlHandle, gint id) 
         {
             Self *obj = GET_NEW;
@@ -167,7 +167,7 @@ class StuffKeeper:Data:Schema from G:Object
         }
 
     public
-        StuffKeeperDataSchema*
+        StuffkeeperDataSchema*
         new(GObject *skdb,sqlite3 *sqlHandle)
         {
             Self *obj = GET_NEW;
@@ -243,7 +243,7 @@ class StuffKeeper:Data:Schema from G:Object
             return obj;
         }
    public
-        StuffKeeperDataSchema*
+        StuffkeeperDataSchema*
         new_with_id(GObject *skdb,sqlite3 *sqlHandle,gint id)
         {
             Self *obj = GET_NEW;
@@ -925,7 +925,7 @@ class StuffKeeper:Data:Schema from G:Object
                  */
                 for(;node;node = g_list_next(node))
                 {
-                    StuffKeeperDataItem *item = node->data;
+                    StuffkeeperDataItem *item = node->data;
                     stuffkeeper_data_item_item_changed(item, NULL);
                 }
 
@@ -975,7 +975,7 @@ class StuffKeeper:Data:Schema from G:Object
          * Saving and loading 
          */
          public
-         StuffKeeperDataSchema *
+         StuffkeeperDataSchema *
          load_from_xml(GObject *skdb, sqlite3 *sqlHandle, const char *path)
          {
              Self *self;
@@ -1052,7 +1052,7 @@ class StuffKeeper:Data:Schema from G:Object
                  return FALSE;
              }
              /* create root node */
-             root = xmlNewDocNode (doc, NULL, (xmlChar *) "StuffKeeperSchema", NULL);
+             root = xmlNewDocNode (doc, NULL, (xmlChar *) "StuffkeeperSchema", NULL);
              /* Set root node */
              xmlDocSetRootElement(doc, root);
 

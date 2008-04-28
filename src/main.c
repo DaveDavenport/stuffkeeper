@@ -51,13 +51,13 @@ static GOptionEntry entries[] =
  */
 static void bacon_on_message_received(const char *message, gpointer data)
 {
-    StuffKeeperDataBackend *skdb = STUFFKEEPER_DATA_BACKEND(data);
+    StuffkeeperDataBackend *skdb = STUFFKEEPER_DATA_BACKEND(data);
     debug_printf("IPC: got '%s'\n", (message)?message:"(null)");
     if(message)
     {
         if(strcmp(message, "New Window") == 0)
         {
-            StuffKeeperInterface *ski= stuffkeeper_interface_new(config_file);
+            StuffkeeperInterface *ski= stuffkeeper_interface_new(config_file);
             interface_list = g_list_append(interface_list, ski);
             stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
             debug_printf("IPC: Requested new window\n");
@@ -80,7 +80,7 @@ int main ( int argc, char **argv )
     GError *error = NULL;
     GOptionContext *context;
     gboolean first_run = FALSE;
-    StuffKeeperInterface  *ski;
+    StuffkeeperInterface  *ski;
 
     struct timeval start, stop;
     struct timeval diff;
@@ -89,14 +89,14 @@ int main ( int argc, char **argv )
     gchar *path;
     gchar *config_path;
     /* pointer holding the backend */
-    StuffKeeperDataBackend *skdb = NULL;
+    StuffkeeperDataBackend *skdb = NULL;
 
     /* set application name */
     g_set_application_name("stuffkeeper");
     gtk_window_set_default_icon_name("stuffkeeper");
 
     /* Parse command line options */
-    context = g_option_context_new ("- StuffKeeper");
+    context = g_option_context_new ("- Stuffkeeper");
     g_option_context_add_main_entries (context, entries, "stuffkeeper");
     g_option_context_add_group (context, gtk_get_option_group (TRUE));
     g_option_context_parse (context, &argc, &argv, &error);

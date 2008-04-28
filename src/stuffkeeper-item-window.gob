@@ -11,11 +11,11 @@ requires 2.0.10
     #include "stuffkeeper-item-view.h"
 %}
 
-class StuffKeeper:Item:Window from Gtk:Dialog
+class Stuffkeeper:Item:Window from Gtk:Dialog
 {
     private guint signal_item_removed = {0};
-    private StuffKeeperDataItem *item = {NULL};
-    private StuffKeeperDataBackend *skdb= {NULL};
+    private StuffkeeperDataItem *item = {NULL};
+    private StuffkeeperDataBackend *skdb= {NULL};
     private GKeyFile *config_file = {NULL};
     private 
     void
@@ -45,7 +45,7 @@ class StuffKeeper:Item:Window from Gtk:Dialog
 
     private
     void
-    item_removed(self, gint id, StuffKeeperDataBackend *skdb)
+    item_removed(self, gint id, StuffkeeperDataBackend *skdb)
     {
         gint gid = stuffkeeper_data_item_get_id(self->_priv->item);
         debug_printf("%i-%i\n", gid, id);
@@ -76,10 +76,10 @@ class StuffKeeper:Item:Window from Gtk:Dialog
     void
     schema_edit_button_clicked(self, GtkWidget *button)
     {
-        StuffKeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+        StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
         if(schema)
         {
-            StuffKeeperEditSchema *skes = stuffkeeper_edit_schema_new();
+            StuffkeeperEditSchema *skes = stuffkeeper_edit_schema_new();
             stuffkeeper_edit_schema_set_schema(skes, schema);
         }
     }
@@ -88,7 +88,7 @@ class StuffKeeper:Item:Window from Gtk:Dialog
      */
     public
         void 
-        new (StuffKeeper:Data:Backend *skdb, StuffKeeper:Data:Item *item, GKeyFile *config_file)
+        new (Stuffkeeper:Data:Backend *skdb, Stuffkeeper:Data:Item *item, GKeyFile *config_file)
         {                                                                                                                                            
             Self *self = GET_NEW;
             GError *error = NULL;
