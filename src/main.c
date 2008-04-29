@@ -18,14 +18,8 @@
 #include "bacon-message-connection.h"
 
 
-
+/* List of active interface objects */
 GList *interface_list = NULL;
-
-/**
- * Interprocess communication. Used to make sure
- * only one instance is running
- */
-BaconMessageConnection *bacon_connection = NULL;
 
 /**
  * Config system
@@ -68,21 +62,26 @@ int main ( int argc, char **argv )
 {
     GList                       *node;
     GList                       *iter;
-    GError                      *error          = NULL;
-    gchar                       *path           = NULL;
-    gchar                       *config_path    = NULL;
+    GError                      *error                  = NULL;
+    gchar                       *path                   = NULL;
+    gchar                       *config_path            = NULL;
+    /**
+     * Interprocess communication. Used to make sure
+     * only one instance is running
+     */
+    BaconMessageConnection      *bacon_connection       = NULL;
 
     /* pointer holding the backend */
-    StuffkeeperDataBackend      *skdb           = NULL;
-    StuffkeeperInterface        *ski            = NULL;
-    StuffkeeperPluginManager    *spm            = NULL;
+    StuffkeeperDataBackend      *skdb                   = NULL;
+    StuffkeeperInterface        *ski                    = NULL;
+    StuffkeeperPluginManager    *spm                    = NULL;
     /**
      * Command line parsing stuff 
      */
     GOptionContext              *context;
-    gchar                       *db_path        = NULL;
-    gboolean                    version         = FALSE;
-    gboolean                    first_run       = FALSE;
+    gchar                       *db_path                = NULL;
+    gboolean                    version                 = FALSE;
+    gboolean                    first_run               = FALSE;
 
     GOptionEntry entries[] = 
     {

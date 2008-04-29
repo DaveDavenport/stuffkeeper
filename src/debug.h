@@ -1,6 +1,8 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
-/** Internal function, do no use */
+
+#ifdef DEBUG
+/** Internal function, do no use. Use debug_printf, see below. */
 void debug_printf_real(const char *file,const int line,const char *function, const char *format,...);
 /** 
  * @param dp The debug level the message is at.
@@ -8,6 +10,12 @@ void debug_printf_real(const char *file,const int line,const char *function, con
  * @param ARGS arguments for format
  */
 #define debug_printf(format, ARGS...) debug_printf_real(__FILE__,__LINE__,__FUNCTION__,format,##ARGS)
+#else
+/* no debug, just do nothing, don't try to do a function call, causing stack calls and all */
+#define debug_printf(a,ARGS...) ;
+
+#endif
+
 
 /* Tic Tac system */
 #define TIMER_SUB(start,stop,diff)  diff.tv_usec = stop.tv_usec - start.tv_usec;\

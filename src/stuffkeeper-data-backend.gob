@@ -1040,7 +1040,7 @@ class Stuffkeeper:Data:Backend from G:Object
                 self->_priv->transaction++;
                 return;
             }
-            printf("begin transaction\n");
+            debug_printf("begin transaction\n");
             sqlite3_exec(self->_priv->sqlHandle, "BEGIN TRANSACTION", NULL, NULL, NULL);
             self->_priv->transaction++;
         }
@@ -1052,7 +1052,7 @@ class Stuffkeeper:Data:Backend from G:Object
             self->_priv->transaction--;
             if(self->_priv->transaction)
                 return;
-            printf("end transaction\n");
+            debug_printf("end transaction\n");
             sqlite3_exec(self->_priv->sqlHandle, "END TRANSACTION", NULL, NULL, NULL);
         }
 }

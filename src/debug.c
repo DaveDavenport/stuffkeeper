@@ -3,6 +3,9 @@
 #include <stdarg.h>
 #include <time.h>
 #include "debug.h"
+
+#ifdef DEBUG
+
 #define RED "\x1b[31;01m"
 #define DARKRED "\x1b[31;06m"
 #define RESET "\x1b[0m"
@@ -12,7 +15,7 @@
 
 void debug_printf_real(const char *file, const int line, const char *function, const char *format, ...)
 {
-#ifdef DEBUG
+
     FILE *out = stdout;
     va_list arglist;
 
@@ -25,5 +28,6 @@ void debug_printf_real(const char *file, const int line, const char *function, c
     }
     fflush(out);
     va_end(arglist);
-#endif
+
 }
+#endif // DEBUG
