@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stuffkeeper git\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-04-28 15:16+0200\n"
+"POT-Creation-Date: 2008-04-29 12:40+0200\n"
 "PO-Revision-Date: 2008-04-26 14:52+0100\n"
 "Last-Translator: Rasmus Steinke <rasi13@gmx.de>\n"
 "Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
@@ -651,7 +651,7 @@ msgstr ""
 msgid "Edit filter"
 msgstr "Typ editieren"
 
-#: ../src/stuffkeeper-interface.gob:2098 ../src/main.c:129
+#: ../src/stuffkeeper-interface.gob:2098 ../src/main.c:138
 msgid "Revision"
 msgstr "Revision"
 
@@ -713,9 +713,17 @@ msgstr "Erstellt"
 msgid "Modified"
 msgstr "Geändert"
 
-#: ../src/main.c:126
+#: ../src/main.c:88
+msgid "Path to the database"
+msgstr ""
+
+#: ../src/main.c:89 ../src/main.c:135
 msgid "Version"
 msgstr "Version"
+
+#: ../src/main.c:90
+msgid "Act like it is the first time stuffkeeper is ran"
+msgstr ""
 
 #~ msgid "gtk-about"
 #~ msgstr "Über"

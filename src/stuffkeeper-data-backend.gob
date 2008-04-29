@@ -299,9 +299,8 @@ class Stuffkeeper:Data:Backend from G:Object
         sqlite3_stmt *stmt;
         const char *tail;
         int r;
-        struct timeval start, stop;
-        struct timeval diff;
-        gettimeofday(&start, NULL);
+
+        INIT_TIC_TAC();
 
         /* check if there is allready data active */
         if(self->_priv->path)
@@ -336,10 +335,7 @@ class Stuffkeeper:Data:Backend from G:Object
         }
         g_free(path);
 
-        gettimeofday(&stop, NULL);
-        timersub(&stop, &start, &diff);
-        printf("time elapsed open & check db: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
-        start = stop;
+        TOC("time elapsed open & check db");
         /**
          * Read Schemas 
          */
@@ -368,10 +364,7 @@ class Stuffkeeper:Data:Backend from G:Object
             }
         }
         sqlite3_finalize(stmt);
-        gettimeofday(&stop, NULL);
-        timersub(&stop, &start, &diff);
-        printf("time elapsed open schemas: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
-        start = stop;
+        TOC("time elapsed open schemas");
 
         /**
          * Read Searches 
@@ -401,10 +394,7 @@ class Stuffkeeper:Data:Backend from G:Object
         }
         sqlite3_finalize(stmt);
 
-        gettimeofday(&stop, NULL);
-        timersub(&stop, &start, &diff);
-        printf("time elapsed open searches: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
-        start = stop;
+        TOC("time elapsed open searches");
 
         /**
          * Read tags 
@@ -434,12 +424,7 @@ class Stuffkeeper:Data:Backend from G:Object
         }
         sqlite3_finalize(stmt);
 
-        gettimeofday(&stop, NULL);
-        timersub(&stop, &start, &diff);
-        printf("time elapsed open tags: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
-        start = stop;
-
-
+        TOC("time elapsed open tags");
 
         /** 
          * Items
@@ -472,10 +457,7 @@ class Stuffkeeper:Data:Backend from G:Object
         }
         sqlite3_finalize(stmt);
 
-        gettimeofday(&stop, NULL);
-        timersub(&stop, &start, &diff);
-        printf("time elapsed open items: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
-        start = stop;
+        TOC("time elapsed open items");
     }
     
     /**

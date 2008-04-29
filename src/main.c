@@ -17,6 +17,8 @@
 #include "stuffkeeper-plugin-manager.h"
 #include "bacon-message-connection.h"
 
+
+
 GList *interface_list = NULL;
 
 /**
@@ -29,38 +31,26 @@ BaconMessageConnection *bacon_connection = NULL;
  * Config system
  */
 GKeyFile *config_file = NULL;
-/**
- * Command line parsing stuff 
- */
-
-static gchar *db_path = NULL;
-static gboolean version = FALSE;
-static StuffkeeperPluginManager *spm;
-
-static GOptionEntry entries[] = 
-{
-  { "db-path", 'd', 0, G_OPTION_ARG_STRING, &db_path, "Path to the database", "Path" },
-  { "version", 'v', 0, G_OPTION_ARG_NONE,   &version, "Version",                NULL},
-  { NULL }
-};
-
-
 
 /**
  * Handle ipc messages
  */
 static void bacon_on_message_received(const char *message, gpointer data)
 {
-    StuffkeeperDataBackend *skdb = STUFFKEEPER_DATA_BACKEND(data);
     debug_printf("IPC: got '%s'\n", (message)?message:"(null)");
     if(message)
     {
         if(strcmp(message, "New Window") == 0)
         {
-            StuffkeeperInterface *ski= stuffkeeper_interface_new(config_file);
-            interface_list = g_list_append(interface_list, ski);
-            stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
-            debug_printf("IPC: Requested new window\n");
+            /* Get open window */
+            GList *node = g_list_first(interface_list);
+            if(node)
+            {
+                StuffkeeperInterface *ski=  node->data;
+                /* tell the open window to create new one */
+                stuffkeeper_interface_new_window(ski);
+                debug_printf("IPC: Requested new window\n");
+            }
         }
     }
 }
@@ -76,24 +66,49 @@ void interface_clear(GObject *interface, gpointer data)
 
 int main ( int argc, char **argv )
 {
-    GList *node,*iter;
-    GError *error = NULL;
-    GOptionContext *context;
-    gboolean first_run = FALSE;
-    StuffkeeperInterface  *ski;
+    GList                       *node;
+    GList                       *iter;
+    GError                      *error          = NULL;
+    gchar                       *path           = NULL;
+    gchar                       *config_path    = NULL;
 
-    struct timeval start, stop;
-    struct timeval diff;
-    gettimeofday(&start, NULL);
-    /* string used the path*/
-    gchar *path;
-    gchar *config_path;
     /* pointer holding the backend */
-    StuffkeeperDataBackend *skdb = NULL;
+    StuffkeeperDataBackend      *skdb           = NULL;
+    StuffkeeperInterface        *ski            = NULL;
+    StuffkeeperPluginManager    *spm            = NULL;
+    /**
+     * Command line parsing stuff 
+     */
+    GOptionContext              *context;
+    gchar                       *db_path        = NULL;
+    gboolean                    version         = FALSE;
+    gboolean                    first_run       = FALSE;
+
+    GOptionEntry entries[] = 
+    {
+        { "db-path", 'd', 0, G_OPTION_ARG_STRING, &db_path,     _("Path to the database"),                                 "Path" },
+        { "version", 'v', 0, G_OPTION_ARG_NONE,   &version,     _("Version"),                                              NULL},
+        { "firstrun",'f', 0, G_OPTION_ARG_NONE,   &first_run,   _("Act like it is the first time stuffkeeper is ran"),     NULL},
+        { NULL }
+    };
+
+    /* setup tic-tac system */
+    INIT_TIC_TAC();
 
     /* set application name */
+    g_set_prgname("stuffkeeper");
     g_set_application_name("stuffkeeper");
     gtk_window_set_default_icon_name("stuffkeeper");
+
+    /* Set  up locales */
+#ifdef ENABLE_NLS
+    bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
+    setlocale(LC_ALL, "");
+    printf("Set locale\n");
+#endif
+    gtk_set_locale();
 
     /* Parse command line options */
     context = g_option_context_new ("- Stuffkeeper");
@@ -102,16 +117,6 @@ int main ( int argc, char **argv )
     g_option_context_parse (context, &argc, &argv, &error);
     g_option_context_free(context);
 
-#ifdef ENABLE_NLS
-	bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
-	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-	textdomain(GETTEXT_PACKAGE);
-	setlocale(LC_ALL, "");
-    printf("Set locale\n");
-#endif
-
-	g_set_prgname("stuffkeeper");
-    gtk_set_locale();
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))
     {
@@ -163,7 +168,7 @@ int main ( int argc, char **argv )
             /* Close the connection */
             bacon_message_connection_free (bacon_connection);
             /* Returning */
-            debug_printf("There is allready an instance running. quitting\n");
+            debug_printf(_("There is allready an instance running. quitting."));
             g_object_unref(skdb); 
             exit(EXIT_SUCCESS);
         }
@@ -183,7 +188,7 @@ int main ( int argc, char **argv )
     }
 
 
-      /**
+    /**
      * Do filesystem checking 
      */
 
@@ -191,8 +196,6 @@ int main ( int argc, char **argv )
     if(db_path != NULL)
     {
         path = g_build_path(G_DIR_SEPARATOR_S, db_path, NULL);
-        debug_printf("Testing path: %s\n", path);
-
     }
     else
     {
@@ -243,17 +246,13 @@ int main ( int argc, char **argv )
     /* Create a main interface */
     ski= stuffkeeper_interface_new(config_file);
     interface_list = g_list_append(interface_list, ski);
-    gettimeofday(&stop, NULL);
-    timersub(&stop, &start, &diff);
-    printf("time elapsed until creating gui: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+
+    TAC("Time elapsed until creating gui");
 
     /* This tells the backend to populate itself */
     stuffkeeper_data_backend_load(skdb,path);
-    
 
-    gettimeofday(&stop, NULL);
-    timersub(&stop, &start, &diff);
-    printf("time elapsed until backend load: %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));    
+    TAC("time elapsed until backend load");
     
     stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
 
@@ -261,9 +260,7 @@ int main ( int argc, char **argv )
     g_free(path);
 
 
-    gettimeofday(&stop, NULL);
-    timersub(&stop, &start, &diff);
-    printf("time elapsed until gtk_main(): %lu s, %lu us\n",(unsigned long)( diff.tv_sec),(unsigned long)( diff.tv_usec));
+    TAC("time elapsed until gtk_main()");
 
 
     if(first_run)
