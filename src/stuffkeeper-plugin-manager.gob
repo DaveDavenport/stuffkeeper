@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 #include <config.h>
 #include <glib.h>
+#include "debug.h"
 #include "stuffkeeper-plugin.h"
 %}
 
@@ -25,7 +26,6 @@ typedef GType (*GetType)(void);
 class Stuffkeeper:Plugin:Manager from G:Object
 {
     private GList *plugins = {NULL}; 
-
 
     public
     StuffkeeperPluginManager *
@@ -71,14 +71,14 @@ class Stuffkeeper:Plugin:Manager from G:Object
         if(dir)
         {
             const gchar *filename;
-            printf("Loading plugin: %s\n", STUFFKEEPER_PLUGIN_DIR);
+            debug_printf("Loading plugin: %s\n", STUFFKEEPER_PLUGIN_DIR);
             while((filename = g_dir_read_name(dir)) != NULL)
             {
                 if(strncmp(&filename[strlen(filename)-strlen(G_MODULE_SUFFIX)], G_MODULE_SUFFIX,strlen(G_MODULE_SUFFIX)) == 0)
                 {
                     gchar *path = g_build_path(G_DIR_SEPARATOR_S, STUFFKEEPER_PLUGIN_DIR, filename, NULL);
                     GModule *module;
-                    printf("trying: %s\n", path);
+                    debug_printf("trying: %s\n", path);
                     module = g_module_open(path, G_MODULE_BIND_LAZY);
                     if(module)
                     {
@@ -89,19 +89,26 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             FS *fs = g_malloc0(sizeof(*fs));
                             fs->gtype = gt();
                             fs->module = module;
-                            printf("loaded: %i\n", fs->gtype);
+                            debug_printf("loaded: %i\n", fs->gtype);
                             fs->object = g_object_new(fs->gtype, NULL);
-                            /* get type */
-                            fs->plugin_type = stuffkeeper_plugin_get_plugin_type(STUFFKEEPER_PLUGIN(fs->object));
-                            /* get name */
-                            fs->name= stuffkeeper_plugin_get_name(STUFFKEEPER_PLUGIN(fs->object));
-                            /* add to list */
-                            self->_priv->plugins = g_list_prepend(self->_priv->plugins,fs);
-                            printf("Plugin: %s succesfull loaded\n",fs->name);
+                            if(fs->object)
+                            {
+                                /* get type */
+                                fs->plugin_type = stuffkeeper_plugin_get_plugin_type(STUFFKEEPER_PLUGIN(fs->object));
+                                /* get name */
+                                fs->name= stuffkeeper_plugin_get_name(STUFFKEEPER_PLUGIN(fs->object));
+                                /* add to list */
+                                self->_priv->plugins = g_list_prepend(self->_priv->plugins,fs);
+                                debug_printf("Plugin: %s succesfull loaded\n",fs->name);
+                            }else {
+                                /* unload module */
+                                g_module_close(fs->module);
+                                g_free(fs);
+                            }
                         }
                         else
                         {
-                            printf("Failed: %s\n", g_module_error());
+                            debug_printf("Failed: %s\n", g_module_error());
                             g_module_close(module);
                         }
                     }
