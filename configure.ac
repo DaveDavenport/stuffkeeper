@@ -1,10 +1,13 @@
 # Process this file with autoconf to produce a configure script.
 
-# Generate version.
+##
+# Set some static information used throughout the program.
+##
 m4_define([stuffkeeper_name],       "stuffkeeper")
 m4_define([stuffkeeper_website],    "http://stuffkeeper.org/")
 m4_define([stuffkeeper_bugtracker], "http://bugtracker.sarine.nl/")
 m4_define([stuffkeeper_email],      "qball@stuffkeeper.org");
+# Version
 m4_define([stuffkeeper_major_version], [0])
 m4_define([stuffkeeper_minor_version], [10])
 m4_define([stuffkeeper_micro_version], [0])
@@ -15,8 +18,7 @@ m4_define([stuffkeeper_version], [stuffkeeper_major_version.stuffkeeper_minor_ve
 AC_INIT(src)
 
 AM_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE([stuffkeeper], [stuffkeeper_version],stuffkeeper_email)
-
+AM_INIT_AUTOMAKE([stuffkeeper], [stuffkeeper_version],  stuffkeeper_email)
 
 AC_DEFINE(PROGRAM_WEBSITE,      stuffkeeper_website,    ["Program website "])
 AC_DEFINE(PROGRAM_NAME,         stuffkeeper_name,       ["Program name"])
@@ -29,6 +31,7 @@ AC_DEFINE(PROGRAM_BUGTRACKER,   stuffkeeper_bugtracker, ["Program bugtracker "])
 STUFFKEEPER_MAJOR_VERSION=stuffkeeper_major_version
 STUFFKEEPER_MINOR_VERSION=stuffkeeper_minor_version
 STUFFKEEPER_MICRO_VERSION=stuffkeeper_micro_version
+
 AC_DEFINE(STUFFKEEPER_MAJOR_VERSION, stuffkeeper_major_version, ["Major version of stuffkeeper"])
 AC_DEFINE(STUFFKEEPER_MINOR_VERSION, stuffkeeper_minor_version, ["Minor version of stuffkeeper"])
 AC_DEFINE(STUFFKEEPER_MICRO_VERSION, stuffkeeper_micro_version, ["Micro version of stuffkeeper"])
@@ -176,3 +179,12 @@ html/Makefile
 ])
 
 echo "Now type make to build"
+if test x${enable_timing} = xyes; 
+then
+    echo "Timing output enabled";
+fi
+if test x${enable_debug} = xyes; 
+then
+    echo "Debug output enabled";
+fi
+
