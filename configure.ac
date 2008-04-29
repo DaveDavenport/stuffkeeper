@@ -42,6 +42,40 @@ AC_PROG_INTLTOOL([0.21])
 AC_PROG_LIBTOOL
 AC_PROG_CC
 
+##
+# Parse extra command line options
+##
+
+# Debug output 
+AC_ARG_ENABLE(debug, 
+              [ --enable-debug           Print extra debug output.], 
+              [ if test "x$enableval" = "xyes"; then 
+                    enable_debug=yes 
+                else 
+                    enable_debug=no 
+                fi],enable_debug=no)
+
+if test x${enable_debug} = xyes; 
+then
+    AC_DEFINE(DEBUG, 1, [Enable debug output])
+fi
+
+# Timing output
+AC_ARG_ENABLE(timing, 
+              [ --enable-timing Print timing debug output.], 
+              [ if test "x$enableval" = "xyes"; then 
+                    enable_timing=yes 
+                else 
+                    enable_timing=no 
+                fi],enable_timing=no)
+
+if test x${enable_timing} = xyes; 
+then
+    AC_DEFINE(DEBUG_TIMING, 1, [Enable timing output])
+fi
+
+
+
 # Checks for libraries.
 
 # Checks for header files.

@@ -1,5 +1,6 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
+#include <config.h>
 
 #ifdef DEBUG
 /** Internal function, do no use. Use debug_printf, see below. */
@@ -14,9 +15,9 @@ void debug_printf_real(const char *file,const int line,const char *function, con
 /* no debug, just do nothing, don't try to do a function call, causing stack calls and all */
 #define debug_printf(a,ARGS...) ;
 
-#endif
+#endif // DEBUG
 
-
+#ifdef DEBUG_TIMING
 /* Tic Tac system */
 #define TIMER_SUB(start,stop,diff)  diff.tv_usec = stop.tv_usec - start.tv_usec;\
         diff.tv_sec = stop.tv_sec - start.tv_sec;\
@@ -35,4 +36,14 @@ void debug_printf_real(const char *file,const int line,const char *function, con
 #define TOC(a) TAC(a);\
     start123 = stop123;
 
-#endif
+#else // DEBUG_TIMING
+
+
+#define INIT_TIC_TAC() ;
+#define TAC(a) ;
+#define TOC(a) ;
+
+#endif // DEBUG_TIMING
+
+
+#endif // __DEBUG_H__
