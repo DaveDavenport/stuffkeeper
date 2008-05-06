@@ -2,9 +2,13 @@
     <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
         <title>
-            StuffKeeper - {title} 
+            StuffKeeper - {title}
         </title>
-        <style  TYPE="text/css"> 
+        <style  TYPE="text/css">
+        body \{
+            background: white;
+            color: black;
+            \}
         #heading \{
             background: #99ccFF;
             font-size: 4em;

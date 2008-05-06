@@ -5,6 +5,10 @@
             StuffKeeper {item:title - %} 
         </title>
         <style  TYPE="text/css"> 
+        body \{
+            background: white;
+            color: black;
+            \}
         #heading \{
             background: #99ccFF;
             font-size: 4em;
