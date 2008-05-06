@@ -354,7 +354,7 @@ class Stuffkeeper:Data:Backend from G:Object
                 StuffkeeperDataSchema *schema;
                 gint *id;
                 /* create a new item */
-                schema = stuffkeeper_data_schema_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid);
+                schema = stuffkeeper_data_schema_open_from_id(G_OBJECT(self), oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -591,7 +591,7 @@ class Stuffkeeper:Data:Backend from G:Object
             return schema;
         }
         /* No tag, lets make one. */
-        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),self->_priv->sqlHandle,id);
+        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),id);
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -638,7 +638,7 @@ class Stuffkeeper:Data:Backend from G:Object
 
 
         /* No schema, lets make one. */
-        schema = stuffkeeper_data_schema_new(G_OBJECT(self),self->_priv->sqlHandle);
+        schema = stuffkeeper_data_schema_new(G_OBJECT(self));
         id = stuffkeeper_data_schema_get_id(schema);
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));

@@ -157,18 +157,18 @@ class Stuffkeeper:Data:Schema from G:Object
 
    public
        StuffkeeperDataSchema *
-        open_from_id (GObject *skdb, sqlite3 *sqlHandle, gint id) 
+        open_from_id (GObject *skdb, gint id) 
         {
             Self *obj = GET_NEW;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             obj->_priv->id = id;
-            obj->_priv->sqlHandle = sqlHandle;
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
             return obj;
         }
 
     public
         StuffkeeperDataSchema*
-        new(GObject *skdb,sqlite3 *sqlHandle)
+        new(GObject *skdb)
         {
             Self *obj = GET_NEW;
             int result = 0;
@@ -177,7 +177,7 @@ class Stuffkeeper:Data:Schema from G:Object
 
 
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
-            obj->_priv->sqlHandle = sqlHandle;
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
             /**
              * Insert the first item in the list
              */
@@ -244,7 +244,7 @@ class Stuffkeeper:Data:Schema from G:Object
         }
    public
         StuffkeeperDataSchema*
-        new_with_id(GObject *skdb,sqlite3 *sqlHandle,gint id)
+        new_with_id(GObject *skdb,gint id)
         {
             Self *obj = GET_NEW;
             int result = 0;
@@ -254,7 +254,7 @@ class Stuffkeeper:Data:Schema from G:Object
 
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             obj->_priv->id = id;
-            obj->_priv->sqlHandle = sqlHandle;
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
 
             query = sqlite3_mprintf
                 ("INSERT INTO 'Schemas' ('SchemaId','type','value')"
@@ -990,7 +990,7 @@ class Stuffkeeper:Data:Schema from G:Object
              }
              printf("set transaction, can cause large amount of updates\n");
              stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(skdb));
-             self = self_new(skdb,sqlHandle);
+             self = self_new(skdb);
              root =  xmlDocGetRootElement(doc);
              if(root)
              {
