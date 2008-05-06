@@ -6,11 +6,11 @@
 
 #ifdef DEBUG
 
-#define RED "\x1b[31;01m"
-#define DARKRED "\x1b[31;06m"
-#define RESET "\x1b[0m"
-#define GREEN "\x1b[32;06m"
-#define YELLOW "\x1b[33;06m"
+#define RED         "\x1b[31;01m"
+#define DARKRED     "\x1b[31;06m"
+#define RESET       "\x1b[0m"
+#define GREEN       "\x1b[32;06m"
+#define YELLOW      "\x1b[33;06m"
 
 
 void debug_printf_real(const char *file, const int line, const char *function, const char *format, ...)

@@ -2,8 +2,6 @@ requires 2.0.10
 
 %ph{
 #include <glib/gstdio.h>
-/* Save a changed item after 30 seconds */
-#define SAVE_TIMEOUT 30000 
 %}
 
 %ph{
@@ -146,9 +144,9 @@ class Stuffkeeper:Data:Item from G:Object
     }
 
     /* Create new StuffkeeperDataBackend */
-    public 
+    public
         StuffkeeperDataItem *
-        new (G:Object *skdb, sqlite3 *sqlHandle,StuffkeeperDataSchema *schema)
+        new (G:Object *skdb, StuffkeeperDataSchema *schema)
         {
 
             Self *obj = GET_NEW;
@@ -156,7 +154,7 @@ class Stuffkeeper:Data:Item from G:Object
             char *error = NULL;
             char *query  = NULL;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
-            obj->_priv->sqlHandle = sqlHandle;
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
             /**
              * Insert the first item in the list
              */
@@ -227,14 +225,6 @@ class Stuffkeeper:Data:Item from G:Object
             obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
                     G_CALLBACK(self_item_schema_field_changed), obj);
 
-
-
-
-
-
-
-
-
             stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
 
             return obj;
@@ -242,7 +232,7 @@ class Stuffkeeper:Data:Item from G:Object
 
     public
         StuffkeeperDataItem *
-        open_from_id (G:Object *skdb, sqlite3 *sqlHandle,gint id,gint schemaid)
+        open_from_id (G:Object *skdb, gint id,gint schemaid)
         {
             char *query;
             const char *tail;
@@ -251,7 +241,7 @@ class Stuffkeeper:Data:Item from G:Object
             Self *obj = GET_NEW;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
             obj->_priv->id = id;
-            obj->_priv->sqlHandle = sqlHandle;
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
 
             /* Load the tags */
 

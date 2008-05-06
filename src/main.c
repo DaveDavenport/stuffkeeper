@@ -49,6 +49,9 @@ static void bacon_on_message_received(const char *message, gpointer data)
     }
 }
 
+/**
+ * Function destroy objects
+ */
 void interface_clear(GObject *interface, gpointer data)
 {
     g_object_unref(interface);
@@ -124,6 +127,10 @@ int main ( int argc, char **argv )
         /* return a failure */
         return EXIT_FAILURE;
     }
+
+    /**
+     * Printout the version
+     */
     if(version)
     {
         printf("%s: %s\n", _("Version"), PROGRAM_VERSION);
@@ -134,6 +141,9 @@ int main ( int argc, char **argv )
         return EXIT_SUCCESS;
     }
 
+    /**
+     * Add icon theme directory
+     */
     gtk_icon_theme_append_search_path(gtk_icon_theme_get_default (),
                                    PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
 
@@ -275,6 +285,8 @@ int main ( int argc, char **argv )
         for(iter = g_list_first(node);iter;iter = g_list_next(iter))
         {
             FS *f = iter->data;
+
+            /* Background plugins are run now, they are not allowed to block */
             if((f->plugin_type)&PLUGIN_BACKGROUND)
             {
                 stuffkeeper_plugin_run_background(STUFFKEEPER_PLUGIN(f->object), skdb);
@@ -286,6 +298,7 @@ int main ( int argc, char **argv )
     /* Start the main loop */
     gtk_main();
 
+    /* close open interfaces */
     g_list_foreach(interface_list, (GFunc)interface_clear, NULL);
     g_list_free(interface_list);
 

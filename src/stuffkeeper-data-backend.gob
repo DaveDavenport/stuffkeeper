@@ -223,7 +223,7 @@ class Stuffkeeper:Data:Backend from G:Object
         StuffkeeperDataItem *item;
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "items", NULL);
         /* create a new item */
-        item = stuffkeeper_data_item_new(G_OBJECT(self),self->_priv->sqlHandle,schema);
+        item = stuffkeeper_data_item_new(G_OBJECT(self),schema);
         g_free(path);
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
@@ -446,7 +446,7 @@ class Stuffkeeper:Data:Backend from G:Object
                 StuffkeeperDataItem *item;
                 gint *id;
                 /* create a new item */
-                item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),self->_priv->sqlHandle, oid,schemaid);
+                item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),oid,schemaid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -1055,4 +1055,12 @@ class Stuffkeeper:Data:Backend from G:Object
             debug_printf("end transaction\n");
             sqlite3_exec(self->_priv->sqlHandle, "END TRANSACTION", NULL, NULL, NULL);
         }
+
+    /* Return the sqlite3 handle */
+    public
+    sqlite3 *
+    get_handle(self)
+    {
+        return self->_priv->sqlHandle;
+    }
 }

@@ -14,7 +14,7 @@ requires 2.0.10
 #include <glib/gi18n.h>
 #include <glade/glade.h>
 #include "sexy-icon-entry.h"
-#include "config.h"
+#include <config.h>
 #include "debug.h"
 #include "misc.h"
 
@@ -22,12 +22,10 @@ requires 2.0.10
 
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-edit-schema.h"
-#include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-window.h"
 #include "stuffkeeper-export-html.h"
 #include "stuffkeeper-item-window.h"
-#include "stuffkeeper-item-view.h"
 #include "stuffkeeper-plugin-manager.h"
 #include "stuffkeeper-plugin.h"
 
@@ -65,39 +63,37 @@ extern GList *interface_list;
 
 class Stuffkeeper:Interface from G:Object 
 {
-    private GtkTreeModel *model_tags = {NULL};
-    private GtkTreeModel *model_items= {NULL};
-    private GtkTreeModel *model_schemas = {NULL};
+    private GtkTreeModel        *model_tags         = {NULL};
+    private GtkTreeModel        *model_items        = {NULL};
+    private GtkTreeModel        *model_schemas      = {NULL};
     /* search items */
-    private GtkTreeModel *model_searches = {NULL};
-
-    private GtkTreeModel *model_items_filter = {NULL};
-    private GKeyFile *config_file = {NULL};
+    private GtkTreeModel        *model_searches     = {NULL};
+    private GtkTreeModel        *model_items_filter = {NULL};
+    private GKeyFile            *config_file        = {NULL};
 
     /* Menu */
-    private GtkWidget *menu = {NULL};
+    private GtkWidget           *menu               = {NULL};
     /**
      * Treeview 1 & 2
      */
-     private GladeXML *xml;
-     private GtkWidget *win;
-    private GtkWidget *LeftPaneCB ;
-    private GtkWidget *treeview1 ;
-    private GtkWidget *treeview2 ;
-    private GtkCellRenderer *treeview1_renderer = {NULL};
-    private GtkCellRenderer *renderer_toggle = {NULL};
-    private GtkWidget *item_vbox ;
+    private GladeXML            *xml;
+    private GtkWidget           *win;
+    private GtkWidget           *LeftPaneCB;
+    private GtkWidget           *treeview1;
+    private GtkWidget           *treeview2;
+    private GtkCellRenderer     *treeview1_renderer = {NULL};
+    private GtkCellRenderer     *renderer_toggle = {NULL};
     
-    private GtkWidget *LeftPane_edit ;
-    private GtkWidget *AddMenuButton ;
-    private GtkWidget *search_entry ;
-    private GtkWidget *hpaned1;
-    private GtkWidget *vpaned1;
-    private GtkWidget *item_label;
-    private GtkWidget *cb_search;
+    private GtkWidget           *LeftPane_edit ;
+    private GtkWidget           *AddMenuButton ;
+    private GtkWidget           *search_entry ;
+    private GtkWidget           *hpaned1;
+    private GtkWidget           *vpaned1;
+    private GtkWidget           *item_label;
+    private GtkWidget           *cb_search;
 
-    private GtkWidget *item_view_container;
-    private GtkWidget *show_item_pane_menu_item;
+    private GtkWidget           *item_view_container;
+    private GtkWidget           *show_item_pane_menu_item;
 
     private StuffkeeperDataBackend *skdbg = {NULL};
     private StuffkeeperPluginManager *spm = {NULL};
@@ -195,8 +191,9 @@ class Stuffkeeper:Interface from G:Object
                 -1);
         g_free(title);
     }
+
     private
-        void 
+    void 
     search_removed(self, gint id, StuffkeeperDataBackend *skdb)
     {
         GtkTreeIter iter;
@@ -440,9 +437,7 @@ class Stuffkeeper:Interface from G:Object
             GtkTreeIter iter;
             GtkTreePath *path = NULL;
             GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
-/*            gtk_list_store_append(GTK_LIST_STORE(store), &iter);*/
             gchar *title = stuffkeeper_data_item_get_title(item);
-/*            gtk_list_store_set(GTK_LIST_STORE(store), &iter, */
 
             gtk_list_store_insert_with_values(GTK_LIST_STORE(store), &iter,-1,
                     0, stuffkeeper_data_item_get_id(item),
@@ -501,9 +496,6 @@ class Stuffkeeper:Interface from G:Object
             }
 
         }
-
-
-
 
 
     /**
@@ -1277,7 +1269,6 @@ class Stuffkeeper:Interface from G:Object
             self->_priv->LeftPaneCB  = glade_xml_get_widget(self->_priv->xml, "LeftPaneCB");
             self->_priv->treeview1 = glade_xml_get_widget(self->_priv->xml, "treeview1");
             self->_priv->treeview2 = glade_xml_get_widget(self->_priv->xml, "treeview2");
-            self->_priv->item_vbox = glade_xml_get_widget(self->_priv->xml, "item_vbox");
 
             self->_priv->LeftPane_edit = glade_xml_get_widget(self->_priv->xml, "LeftPane_edit");
             self->_priv->AddMenuButton = glade_xml_get_widget(self->_priv->xml, "AddMenuButton");
