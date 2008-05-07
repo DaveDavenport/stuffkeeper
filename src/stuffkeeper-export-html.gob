@@ -48,6 +48,8 @@ class Stuffkeeper:Export:HTML from G:Object
     private GtkWidget  *button_export = {NULL};
     private GtkWidget *progress_bar = {NULL};
 
+    private GtkFileFilter *ffilter = {gtk_file_filter_new()};
+
     private
     void
     itteration(self, int done, int total)
@@ -82,6 +84,7 @@ class Stuffkeeper:Export:HTML from G:Object
         G:Object *
     new_schema(G:Object *interface, StuffkeeperDataBackend *skdb,GtkListStore *store)
     {
+        
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
         GtkWidget *wid;
@@ -96,9 +99,17 @@ class Stuffkeeper:Export:HTML from G:Object
         self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
         dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
 
+       
+        
+
 
         self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE_FULL);
+
+        gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
+        gtk_file_filter_set_name(GTK_FILE_FILTER(self->_priv->ffilter), _("Export templates"));
+        gtk_file_chooser_add_filter(self->_priv->fc_template, self->_priv->ffilter);
+
         /* header */
         self->_priv->button_export = glade_xml_get_widget(self->_priv->xml, "button_export2");
         self->_priv->progress_bar = glade_xml_get_widget(self->_priv->xml, "progress_bar");
@@ -148,6 +159,9 @@ class Stuffkeeper:Export:HTML from G:Object
         /* file chooser */
         self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE);
+        gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
+        gtk_file_filter_set_name(GTK_FILE_FILTER(self->_priv->ffilter), _("Export templates"));
+        gtk_file_chooser_add_filter(self->_priv->fc_template, self->_priv->ffilter);
 
         /* */
         self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");

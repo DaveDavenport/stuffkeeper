@@ -1,4 +1,5 @@
 [encoding: UTF-8]
+
 # Data files
 data/stuffkeeper.desktop.in
 
@@ -6,7 +7,8 @@ data/stuffkeeper.desktop.in
 glade/stuffkeeper.glade
 
 # Source files
-src/egg-datetime.c
+
+# Gob files
 src/stuffkeeper-data-backend.gob
 src/stuffkeeper-data-boolean.gob
 src/stuffkeeper-data-date.gob
@@ -29,7 +31,12 @@ src/stuffkeeper-show-item.gob
 src/stuffkeeper-data-item-search.gob
 src/stuffkeeper-item-view.gob
 src/stuffkeeper-export-html.gob
-src/bacon-message-connection.c
-src/egg-datetime.c
+
+#common files
 src/main.c
+
+# 3rd party files
 src/sexy-icon-entry.c
+src/egg-datetime.c
+src/bacon-message-connection.c
+
