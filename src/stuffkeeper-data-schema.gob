@@ -742,7 +742,6 @@ class Stuffkeeper:Data:Schema from G:Object
         {
             self->_priv->generated_title = -1;
 
-            printf("set transaction, can cause large amount of updates\n");
             stuffkeeper_data_backend_begin_transaction(self->_priv->skdb);
             self_schema_field_changed(self,id);
             stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
@@ -855,7 +854,6 @@ class Stuffkeeper:Data:Schema from G:Object
         }
 
         /* Mark it for saving */
-        printf("set transaction, can cause large amount of updates\n");
         stuffkeeper_data_backend_begin_transaction(self->_priv->skdb);
         self_schema_field_removed(self, id);
         stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
