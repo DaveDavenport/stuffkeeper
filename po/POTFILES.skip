@@ -7,3 +7,4 @@ src/stuffkeeper-interface.c
 src/stuffkeeper-item-view.c
 src/stuffkeeper-show-item.c
 src/stuffkeeper-export-html.c
+src/stuffkeeper-data-schema-private.h

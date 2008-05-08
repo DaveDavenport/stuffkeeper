@@ -118,7 +118,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                     gtk_list_store_set(self->_priv->store, &iter, 
                             COL_NAME, name,
                             COL_TYPE, type,
-                            COL_TYPE_NAME, FieldNames[type],
+                            COL_TYPE_NAME, _(FieldNames[type]),
                             COL_NAME_EDITABLE, editable,
                             COL_IN_TITLE, in_title,
                             COL_TYPE_EDITABLE, type_editable,
@@ -176,7 +176,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                     COL_ID, id, 
                     COL_TYPE, type ,
                     COL_NAME, name,
-                    COL_TYPE_NAME, FieldNames[type],
+                    COL_TYPE_NAME, _(FieldNames[type]),
                     COL_IN_TITLE, in_title,
                     COL_NAME_EDITABLE, editable,
                     COL_TYPE_EDITABLE, type_editable,
@@ -240,7 +240,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                 int type;
                 gchar *id = NULL;
                 gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
-                for(type=0;strcmp(new_text,FieldNames[type]) && type < FIELD_TYPE_NUM_FIELDS;type++);
+                for(type=0;strcmp(new_text,_(FieldNames[type])) && type < FIELD_TYPE_NUM_FIELDS;type++);
                 /* somehow type is not found default to string */
                 if(type == FIELD_TYPE_NUM_FIELDS) type = FIELD_TYPE_STRING; 
                 stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
@@ -425,11 +425,15 @@ class Stuffkeeper:Edit:Schema from G:Object
                 }
                 else
                 {
+                    gchar *markup = g_markup_printf_escaped("<b>%s:</b> %s", _(FieldNames[type]), name);
                     GtkWidget *event = gtk_event_box_new(); 
                     GtkWidget *label = gtk_label_new(name);
                     gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
                     gtk_misc_set_padding(GTK_MISC(label), 6,6);
                     gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
+                    gtk_widget_set_tooltip_markup(GTK_WIDGET(label), markup);
+                    g_free(markup);
+
                     color.red   = ((depth%3) == 0)?65535:256*128;
                     color.blue  = ((depth%3) == 1)?65535:256*128;
                     color.green = ((depth%3) == 2)?65535:256*128;
@@ -487,18 +491,18 @@ class Stuffkeeper:Edit:Schema from G:Object
             {
                 GtkTreeIter iter;
                 gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_fields),&iter);
-                gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_fields), &iter, 0, i, 1,FieldNames[i], -1); 
+                gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_fields), &iter, 0, i, 1,_(FieldNames[i]), -1); 
             }
 
             g_signal_connect_swapped(G_OBJECT(self->_priv->win), "style-set", G_CALLBACK(self_style_set), self);
 
             self->_priv->model_packings = (GtkTreeModel *)gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
             gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_packings),&iter);
-            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_VPACKING,1,FieldNames[FIELD_TYPE_VPACKING], -1); 
+            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_VPACKING,1,_(FieldNames[FIELD_TYPE_VPACKING]), -1); 
             gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_packings),&iter);
-            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_HPACKING,1,FieldNames[FIELD_TYPE_HPACKING], -1); 
+            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_HPACKING,1,_(FieldNames[FIELD_TYPE_HPACKING]), -1); 
             gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_packings),&iter);
-            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_EXPANDER,1,FieldNames[FIELD_TYPE_EXPANDER], -1); 
+            gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_EXPANDER,1,_(FieldNames[FIELD_TYPE_EXPANDER]), -1); 
 
             /* fill tree with columns */
             renderer = gtk_cell_renderer_combo_new();

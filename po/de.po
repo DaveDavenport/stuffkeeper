@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stuffkeeper git\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-07 13:16+0200\n"
+"POT-Creation-Date: 2008-05-09 00:21+0200\n"
 "PO-Revision-Date: 2008-04-26 14:52+0100\n"
 "Last-Translator: Rasmus Steinke <rasi13@gmx.de>\n"
 "Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
@@ -59,100 +59,103 @@ msgid "<b>Only visible</b>"
 msgstr "<b>Nur Sichtbares</b>"
 
 #: ../glade/stuffkeeper.glade.h:10
+#, fuzzy
+msgid "<b>Packing:</b>"
+msgstr "<b>Tags</b>"
+
+#: ../glade/stuffkeeper.glade.h:11
 msgid "<b>Schema:</b>"
 msgstr ""
 
-#: ../glade/stuffkeeper.glade.h:11
+#: ../glade/stuffkeeper.glade.h:12
 msgid "<b>Template</b>"
 msgstr "<b>Vorlage</b>"
 
-#: ../glade/stuffkeeper.glade.h:12
+#: ../glade/stuffkeeper.glade.h:13
 msgid "<b>Title</b>"
 msgstr "<b>Titel</b>"
 
-#: ../glade/stuffkeeper.glade.h:13
+#: ../glade/stuffkeeper.glade.h:14
 msgid "<b>Type icon:</b>"
 msgstr "<b>Typ icon:</b>"
 
-#: ../glade/stuffkeeper.glade.h:14
+#: ../glade/stuffkeeper.glade.h:15
 msgid "<b>Type</b>"
 msgstr "<b>Typ</b>"
 
-#: ../glade/stuffkeeper.glade.h:15
+#: ../glade/stuffkeeper.glade.h:16
 msgid "<span size='large' weight='bold'>Export type</span>"
 msgstr "<span size='large' weight='bold'>Typ exportieren</span>"
 
-#: ../glade/stuffkeeper.glade.h:16
+#: ../glade/stuffkeeper.glade.h:17
 msgid "<span size='x-large' weight='bold'>Edit filter</span>"
 msgstr "<span size='x-large' weight='bold'>Filter bearbeiten</span>"
 
-#: ../glade/stuffkeeper.glade.h:17
+#: ../glade/stuffkeeper.glade.h:18
 msgid "<span size='x-large' weight='bold'>Export to CSV</span>"
 msgstr "<span size='x-large' weight='bold'>CSV exportieren</span>"
 
-#: ../glade/stuffkeeper.glade.h:18
+#: ../glade/stuffkeeper.glade.h:19
 msgid "<span size='x-large' weight='bold'>Export</span>"
 msgstr "<span size='x-large' weight='bold'>Exportieren</span>"
 
-#: ../glade/stuffkeeper.glade.h:19
+#: ../glade/stuffkeeper.glade.h:20
 msgid "<span size='x-large'><b>Edit Type</b></span>"
 msgstr "<span size='x-large'><b>Typ bearbeiten</b></span>"
-
-#: ../glade/stuffkeeper.glade.h:20
-msgid "Add Expander"
-msgstr "Expander hinzufügen"
 
 #: ../glade/stuffkeeper.glade.h:21
 msgid "Add Item"
 msgstr "Eintrag hinzufügen"
 
 #: ../glade/stuffkeeper.glade.h:22
-msgid "Add h-padding"
-msgstr "Horizontale Trennung hinzufügen"
-
-#: ../glade/stuffkeeper.glade.h:23
-msgid "Add v-padding"
-msgstr "Vertikale Trennung hinzufügen"
-
-#: ../glade/stuffkeeper.glade.h:24
 msgid "Backup"
 msgstr "Sicherung"
 
-#: ../glade/stuffkeeper.glade.h:25
+#: ../glade/stuffkeeper.glade.h:23
 msgid "Bug tracker"
 msgstr "Bug tracker"
 
-#: ../glade/stuffkeeper.glade.h:26
+#: ../glade/stuffkeeper.glade.h:24
 msgid "Close"
 msgstr "Schließen"
 
-#: ../glade/stuffkeeper.glade.h:27
+#: ../glade/stuffkeeper.glade.h:25
 msgid "Edit Type"
 msgstr "Typ bearbeiten"
 
-#: ../glade/stuffkeeper.glade.h:28
+#: ../glade/stuffkeeper.glade.h:26
 msgid "Edit search"
 msgstr "Suche bearbeiten"
 
-#: ../glade/stuffkeeper.glade.h:29 ../src/stuffkeeper-interface.gob:1074
+#. FIELD_TYPE_EXPANDER
+#: ../glade/stuffkeeper.glade.h:27 ../src/stuffkeeper-data-schema.gob:63
+#, fuzzy
+msgid "Expander"
+msgstr "Expander hinzufügen"
+
+#: ../glade/stuffkeeper.glade.h:28 ../src/stuffkeeper-interface.gob:1074
 msgid "Export"
 msgstr "Exportieren"
 
-#: ../glade/stuffkeeper.glade.h:30
+#: ../glade/stuffkeeper.glade.h:29
 msgid "Export to CSV"
 msgstr "CSV Exportieren"
 
-#: ../glade/stuffkeeper.glade.h:31
+#: ../glade/stuffkeeper.glade.h:30
 msgid "Filename:"
 msgstr "Dateiname:"
 
-#: ../glade/stuffkeeper.glade.h:32
+#: ../glade/stuffkeeper.glade.h:31
 msgid "Help"
 msgstr "Hilfe"
 
-#: ../glade/stuffkeeper.glade.h:33
+#: ../glade/stuffkeeper.glade.h:32
 msgid "Hold shift, to drag a field to its new position."
 msgstr "Halten Sie Shift, um ein Feld an eine neue Position zu schieben."
+
+#: ../glade/stuffkeeper.glade.h:33
+msgid "Horizontal"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:34
 msgid "Items:"
@@ -205,86 +208,90 @@ msgstr ""
 "Filter"
 
 #: ../glade/stuffkeeper.glade.h:48
+msgid "Vertical"
+msgstr ""
+
+#: ../glade/stuffkeeper.glade.h:49
 msgid "Visit Website"
 msgstr "Webseite besuchen"
 
-#: ../glade/stuffkeeper.glade.h:49
+#: ../glade/stuffkeeper.glade.h:50
 msgid "_Export"
 msgstr "_Export"
 
-#: ../glade/stuffkeeper.glade.h:50
+#: ../glade/stuffkeeper.glade.h:51
 msgid "_File"
 msgstr "_Datei"
 
-#: ../glade/stuffkeeper.glade.h:51
+#: ../glade/stuffkeeper.glade.h:52
 msgid "_Filter"
 msgstr "_Filter"
 
-#: ../glade/stuffkeeper.glade.h:52
+#: ../glade/stuffkeeper.glade.h:53
 msgid "_Import"
 msgstr "_Import"
 
-#: ../glade/stuffkeeper.glade.h:53
+#: ../glade/stuffkeeper.glade.h:54
 msgid "_Lock editing"
 msgstr "_Editieren An/Aus"
 
-#: ../glade/stuffkeeper.glade.h:54
+#: ../glade/stuffkeeper.glade.h:55
 msgid "_New"
 msgstr "_Neu"
 
-#: ../glade/stuffkeeper.glade.h:55
+#: ../glade/stuffkeeper.glade.h:56
 msgid "_Tools"
 msgstr "_Tools"
 
-#: ../glade/stuffkeeper.glade.h:56
+#: ../glade/stuffkeeper.glade.h:57
 msgid "_Type"
 msgstr "_Typ"
 
-#: ../glade/stuffkeeper.glade.h:57
+#: ../glade/stuffkeeper.glade.h:58
 msgid "_View"
 msgstr "_Ansicht"
 
-#: ../glade/stuffkeeper.glade.h:58
+#: ../glade/stuffkeeper.glade.h:59
 msgid "by creation time"
 msgstr "Nach Datum (Erstellung)"
 
-#: ../glade/stuffkeeper.glade.h:59
+#: ../glade/stuffkeeper.glade.h:60
 msgid "by modification time"
 msgstr "Nach Datum (letzte Modifikation)"
 
-#: ../glade/stuffkeeper.glade.h:60
+#: ../glade/stuffkeeper.glade.h:61
 msgid "by title"
 msgstr "Nach Titel"
 
-#: ../glade/stuffkeeper.glade.h:61
+#: ../glade/stuffkeeper.glade.h:62
 msgid "by type"
 msgstr "Nach Typ"
 
-#: ../glade/stuffkeeper.glade.h:62
+#: ../glade/stuffkeeper.glade.h:63
 msgid "database.csv"
 msgstr "database.csv"
 
-#: ../glade/stuffkeeper.glade.h:63
+#: ../glade/stuffkeeper.glade.h:64
 msgid "database.html"
 msgstr "database.html"
 
-#: ../glade/stuffkeeper.glade.h:64
+#: ../glade/stuffkeeper.glade.h:65
 msgid "gtk-add"
 msgstr "Hinzufügen"
 
-#: ../glade/stuffkeeper.glade.h:65
+#: ../glade/stuffkeeper.glade.h:66
 msgid "gtk-apply"
 msgstr "Anwenden"
 
-#: ../glade/stuffkeeper.glade.h:66
+#: ../glade/stuffkeeper.glade.h:67
 msgid "gtk-cancel"
 msgstr "Abbrechen"
 
-#: ../glade/stuffkeeper.glade.h:67
+#: ../glade/stuffkeeper.glade.h:68
 msgid "gtk-remove"
 msgstr "Entfernen"
 
-#: ../glade/stuffkeeper.glade.h:68
+#: ../glade/stuffkeeper.glade.h:69
 msgid "gtk-save"
 msgstr "Speichern"
 
@@ -329,6 +336,67 @@ msgstr ""
 "Konnte:\n"
 "<i>'%s'</i>.\n"
 " nicht öffnenStellen Sie sicher, dass es ein gültiges Text File ist."
+
+#. FIELD_TYPE_STRING
+#: ../src/stuffkeeper-data-schema.gob:45
+msgid "String"
+msgstr ""
+
+#. FIELD_TYPE_INTEGER
+#: ../src/stuffkeeper-data-schema.gob:47
+msgid "Integer"
+msgstr ""
+
+#. FIELD_TYPE_BOOLEAN
+#: ../src/stuffkeeper-data-schema.gob:49
+msgid "Boolean"
+msgstr ""
+
+#. FIELD_TYPE_RATING
+#: ../src/stuffkeeper-data-schema.gob:51
+msgid "Slider"
+msgstr ""
+
+#. FIELD_TYPE_LIST
+#: ../src/stuffkeeper-data-schema.gob:53
+msgid "List"
+msgstr ""
+
+#. FIELD_TYPE_TEXT
+#: ../src/stuffkeeper-data-schema.gob:55
+msgid "Text"
+msgstr ""
+
+#. FIELD_TYPE_IMAGE
+#: ../src/stuffkeeper-data-schema.gob:57
+msgid "Image"
+msgstr ""
+
+#. FIELD_TYPE_LINK
+#: ../src/stuffkeeper-data-schema.gob:59
+msgid "Link"
+msgstr ""
+
+#. FIELD_TYPE_DATE
+#: ../src/stuffkeeper-data-schema.gob:61
+msgid "Date & Time"
+msgstr ""
+
+#. FIELD_TYPE_END_EXPANDER
+#. FIELD_TYPE_END_PACKING
+#: ../src/stuffkeeper-data-schema.gob:65 ../src/stuffkeeper-data-schema.gob:69
+msgid "End"
+msgstr ""
+
+#. FIELD_TYPE_VPACKING
+#: ../src/stuffkeeper-data-schema.gob:67
+msgid "vertical packing"
+msgstr ""
+
+#. FIELD_TYPE_VPACKING
+#: ../src/stuffkeeper-data-schema.gob:71
+msgid "horizontal packing"
+msgstr ""
 
 #: ../src/stuffkeeper-edit-schema.gob:75 ../src/stuffkeeper-interface.gob:1192
 msgid "Edit type"
@@ -735,6 +803,12 @@ msgstr ""
 #, c-format
 msgid "%u:%u:%u"
 msgstr ""
+
+#~ msgid "Add h-padding"
+#~ msgstr "Horizontale Trennung hinzufügen"
+
+#~ msgid "Add v-padding"
+#~ msgstr "Vertikale Trennung hinzufügen"
 
 #~ msgid "gtk-about"
 #~ msgstr "Über"

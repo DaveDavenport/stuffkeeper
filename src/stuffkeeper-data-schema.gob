@@ -41,21 +41,34 @@ requires 2.0.10
 %}
 %ph{
         char *FieldNames[FIELD_TYPE_NUM_FIELDS] = {
-        "String",       // FIELD_TYPE_STRING
-        "Integer",      // FIELD_TYPE_INTEGER
-        "Boolean",      // FIELD_TYPE_BOOLEAN
-        "Slider",       // FIELD_TYPE_RATING
-        "List",         // FIELD_TYPE_LIST
-        "Text",         // FIELD_TYPE_TEXT
-        "Image",        // FIELD_TYPE_IMAGE
-        "Link",         // FIELD_TYPE_LINK
-        "Date & Time",  // FIELD_TYPE_DATE
-        "Expander",     //FIELD_TYPE_EXPANDER
-        "End", //FIELD_TYPE_END_EXPANDER
-        "vertical packing", // FIELD_TYPE_VPACKING
-        "End", // FIELD_TYPE_END_PACKING
-        "horizontal packing", // FIELD_TYPE_VPACKING
-
+            // FIELD_TYPE_STRING
+            N_("String"),   
+            // FIELD_TYPE_INTEGER
+            N_("Integer"),
+            // FIELD_TYPE_BOOLEAN
+            N_("Boolean"),
+            // FIELD_TYPE_RATING
+            N_("Slider"), 
+            // FIELD_TYPE_LIST
+            N_("List"),  
+            // FIELD_TYPE_TEXT
+            N_("Text"),
+            // FIELD_TYPE_IMAGE
+            N_("Image"), 
+            // FIELD_TYPE_LINK
+            N_("Link"),
+            // FIELD_TYPE_DATE
+            N_("Date & Time"),  
+            //FIELD_TYPE_EXPANDER
+            N_("Expander"),
+            //FIELD_TYPE_END_EXPANDER
+            N_("End"),
+            // FIELD_TYPE_VPACKING
+            N_("vertical packing"), 
+            // FIELD_TYPE_END_PACKING
+            N_("End"),              
+            // FIELD_TYPE_VPACKING
+            N_("horizontal packing") 
     };
 
     typedef struct _a { char *id; int pos; }a;
