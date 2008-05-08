@@ -834,6 +834,7 @@ Filters</property>
                             <property name="receives_default">True</property>
                             <property name="label" translatable="yes">gtk-apply</property>
                             <property name="use_stock">True</property>
+                            <property name="xalign">0</property>
                             <property name="response_id">0</property>
                             <signal name="clicked" handler="reorder_apply"/>
                           </widget>
@@ -842,16 +843,29 @@ Filters</property>
                           </packing>
                         </child>
                         <child>
+                          <widget class="GtkLabel" id="label17">
+                            <property name="visible">True</property>
+                            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">&lt;b&gt;Packing:&lt;/b&gt;</property>
+                            <property name="use_markup">True</property>
+                          </widget>
+                          <packing>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                        <child>
                           <widget class="GtkButton" id="button5">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="label" translatable="yes">Add Expander</property>
+                            <property name="label" translatable="yes">Expander</property>
+                            <property name="xalign">0</property>
                             <property name="response_id">0</property>
                             <signal name="clicked" handler="add_expander"/>
                           </widget>
                           <packing>
-                            <property name="position">3</property>
+                            <property name="position">4</property>
                           </packing>
                         </child>
                         <child>
@@ -859,12 +873,13 @@ Filters</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="label" translatable="yes">Add v-padding</property>
+                            <property name="label" translatable="yes">Vertical</property>
+                            <property name="xalign">0</property>
                             <property name="response_id">0</property>
                             <signal name="clicked" handler="add_vpadding"/>
                           </widget>
                           <packing>
-                            <property name="position">4</property>
+                            <property name="position">5</property>
                           </packing>
                         </child>
                         <child>
@@ -872,12 +887,13 @@ Filters</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="label" translatable="yes">Add h-padding</property>
+                            <property name="label" translatable="yes">Horizontal</property>
+                            <property name="xalign">0</property>
                             <property name="response_id">0</property>
                             <signal name="clicked" handler="add_hpadding"/>
                           </widget>
                           <packing>
-                            <property name="position">5</property>
+                            <property name="position">6</property>
                           </packing>
                         </child>
                       </widget>
@@ -1204,8 +1220,8 @@ Filters</property>
                     <child>
                       <widget class="GtkFileChooserButton" id="file_chooser_button">
                         <property name="visible">True</property>
-                        <property name="do_overwrite_confirmation">True</property>
                         <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                        <property name="do_overwrite_confirmation">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
@@ -1478,8 +1494,8 @@ Filters</property>
                     <child>
                       <widget class="GtkFileChooserButton" id="file_chooser_button1">
                         <property name="visible">True</property>
-                        <property name="do_overwrite_confirmation">True</property>
                         <property name="action">GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER</property>
+                        <property name="do_overwrite_confirmation">True</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
