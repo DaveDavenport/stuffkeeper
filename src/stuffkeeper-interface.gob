@@ -2517,7 +2517,7 @@ class Stuffkeeper:Interface from G:Object
 
             /* entry */
             entry = glade_xml_get_widget(xml, "entry_name");
-            g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(self_entry_changed), glade_xml_get_widget(xml, "save_button"));
+            g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(self_entry_changed), glade_xml_get_widget(xml, "save_button1"));
             cb_schema = glade_xml_get_widget(xml, "cb_schema");
 
             gtk_combo_box_set_model(GTK_COMBO_BOX(cb_schema), GTK_TREE_MODEL(self->_priv->model_schemas));

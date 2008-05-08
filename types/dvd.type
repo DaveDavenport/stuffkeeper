@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<StuffkeeperSchema>
+  <title>DVD</title>
+  <fields>
+    <row type="0" in_title="1">Title</row>
+    <row type="13" in_title="0"></row>
+    <row type="11" in_title="0"></row>
+    <row type="1" in_title="0">Year</row>
+    <row type="1" in_title="0">Runtime</row>
+    <row type="0" in_title="0">Producer</row>
+    <row type="0" in_title="0">Genre</row>
+    <row type="13" in_title="0"></row>
+    <row type="2" in_title="0">Import</row>
+    <row type="2" in_title="0">Original</row>
+    <row type="2" in_title="0">Series</row>
+    <row type="12" in_title="0"></row>
+    <row type="3" in_title="0">Rating</row>
+    <row type="12" in_title="0"></row>
+    <row type="6" in_title="0">Poster</row>
+    <row type="12" in_title="0"></row>
+    <row type="4" in_title="0">Cast</row>
+  </fields>
+</StuffkeeperSchema>
