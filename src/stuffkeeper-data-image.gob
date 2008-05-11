@@ -8,6 +8,7 @@ requires 2.0.10
 
 %ph{
 #include "debug.h"
+#include "misc.h"    
 #include "stuffkeeper-data-backend.h"
 #define IMAGE_SIZE 250
 %}
@@ -55,6 +56,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                         debug_printf("Trying to load: %s %p\n", fpath,pb);
                         if(pb)
                         {
+                            screenshot_add_border(&pb);
+                            screenshot_add_shadow(&pb); 
                             gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
                             g_object_unref(pb);
                             set = TRUE;
@@ -176,6 +179,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                     GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
                     if(pb)
                     {
+                        screenshot_add_border(&pb);
+                        screenshot_add_shadow(&pb); 
                         gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
                         g_object_unref(pb);
                     }

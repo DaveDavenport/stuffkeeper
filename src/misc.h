@@ -38,4 +38,9 @@ typedef enum _UrlType {
  */
 UrlType url_type(const char *uri);
 
+
+
+void screenshot_add_shadow (GdkPixbuf **src);
+void screenshot_add_border (GdkPixbuf **src);
+
 #endif
