@@ -1569,6 +1569,10 @@ egg_datetime_get_as_time_t (EggDateTime *edt, time_t *t)
 	tm.tm_sec  = second;
 
 	*t = mktime (&tm);
+    /* hack to fix daytime saving issue */
+    localtime_r(t, &tm);
+    *t -= 60*60*tm.tm_isdst;
+
 
 	if (*t < 0) {
 		*t = -1;
