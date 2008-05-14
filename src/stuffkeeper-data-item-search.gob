@@ -192,12 +192,12 @@ class Stuffkeeper:Data:Item:Search from G:Object
 
     public
     GObject *
-    open_from_id(G:Object *skdb, sqlite3 *sqlHandle,gint id)
+    open_from_id(G:Object *skdb, gint id)
     {
         Self *self = GET_NEW;
         self->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
         self->_priv->id = id;
-        self->_priv->sqlHandle = sqlHandle;
+        self->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(self->_priv->skdb);
         return G_OBJECT(self);
     }
     /* Create new StuffkeeperDataBackend */

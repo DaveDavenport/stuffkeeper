@@ -987,7 +987,7 @@ class Stuffkeeper:Data:Schema from G:Object
          */
          public
          StuffkeeperDataSchema *
-         load_from_xml(GObject *skdb, sqlite3 *sqlHandle, const char *path)
+         load_from_xml(GObject *skdb, const char *path)
          {
              Self *self;
              xmlDocPtr doc;

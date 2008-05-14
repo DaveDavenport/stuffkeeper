@@ -108,7 +108,7 @@ class Stuffkeeper:Export:HTML from G:Object
 
         gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
         gtk_file_filter_set_name(GTK_FILE_FILTER(self->_priv->ffilter), _("Export templates"));
-        gtk_file_chooser_add_filter(self->_priv->fc_template, self->_priv->ffilter);
+        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(self->_priv->fc_template), self->_priv->ffilter);
 
         /* header */
         self->_priv->button_export = glade_xml_get_widget(self->_priv->xml, "button_export2");
@@ -161,7 +161,7 @@ class Stuffkeeper:Export:HTML from G:Object
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE);
         gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
         gtk_file_filter_set_name(GTK_FILE_FILTER(self->_priv->ffilter), _("Export templates"));
-        gtk_file_chooser_add_filter(self->_priv->fc_template, self->_priv->ffilter);
+        gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(self->_priv->fc_template), self->_priv->ffilter);
 
         /* */
         self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");

@@ -1,18 +1,16 @@
 requires 2.0.10
 
-%h{
-#include <sqlite3.h>
-%}
 %{
-
 #include "stuffkeeper-data-item.h"
 %}
 
 %ph{
 #include <glib/gstdio.h>
 #include <stdio.h>
-
+#include <sqlite3.h>
+#include "stuffkeeper-data-backend.h"
 #include "debug.h"
+
 
 #define KEYFILE_GENERAL "general"
 #define SAVE_TIMEOUT 30000
@@ -23,6 +21,7 @@ class Stuffkeeper:Data:Tag from G:Object
 {
     private GList *items = {NULL} destroywith g_list_free;
     private sqlite3 *sqlHandle = {NULL};
+    private StuffkeeperDataBackend *skdb = {NULL};
     private gint id = {0};
 
     /**
@@ -42,24 +41,24 @@ class Stuffkeeper:Data:Tag from G:Object
      */
     public
     StuffkeeperDataTag *
-    open_from_id(sqlite3 *sqlHandle, gint id)
+    open_from_id(GObject *skdb, gint id)
     {
         Self *obj = GET_NEW;
         obj->_priv->id = id;
-        obj->_priv->sqlHandle = sqlHandle;
+	obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+	obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
         return obj;
     }
     public
         StuffkeeperDataTag*
-        new(sqlite3 *sqlHandle)
+        new(GObject *skdb)
         {
             Self *obj = GET_NEW;
             int result = 0;
             char *error = NULL;
             char *query  = NULL;
-
-
-            obj->_priv->sqlHandle = sqlHandle;
+	    obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+	    obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
 
             query = sqlite3_mprintf
                 ("INSERT INTO 'Tags' ('mtime','name')"
@@ -75,17 +74,18 @@ class Stuffkeeper:Data:Tag from G:Object
 
             return obj;
         }
+
     public
     StuffkeeperDataTag*
-    new_with_id(sqlite3 *sqlHandle, gint id)
+    new_with_id(GObject *skdb, gint id)
     {
         Self *obj = GET_NEW;
         int result = 0;
         char *error = NULL;
         char *query  = NULL;
 
-
-        obj->_priv->sqlHandle = sqlHandle;
+	obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
+	obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);;
 
         query = sqlite3_mprintf
             ("INSERT INTO 'Tags' ('id','mtime','name')"
