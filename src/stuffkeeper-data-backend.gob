@@ -271,6 +271,16 @@ class Stuffkeeper:Data:Backend from G:Object
             g_hash_table_foreach(self->_priv->schemas, (GHFunc)self_iterate_remove_schema, self);
             g_hash_table_remove_all(self->_priv->schemas);
         }
+	if(self->_priv->searches)
+	{
+            g_hash_table_foreach(self->_priv->searches, (GHFunc)self_iterate_remove_search, self);
+            g_hash_table_remove_all(self->_priv->searches);
+        }
+
+
+
+
+
         /* close the open db */
         if(self->_priv->sqlHandle)
         {
@@ -480,6 +490,12 @@ class Stuffkeeper:Data:Backend from G:Object
     iterate_remove_tag(gint *key, StuffkeeperDataTag *tag, Self *self)
     {
         self_tag_removed(self, *key);
+    }
+    private
+    void
+    iterate_remove_search(gint *key, StuffkeeperDataItemSearch *search, Self *self)
+    {
+        self_search_removed(self, *key);
     }
 
 
