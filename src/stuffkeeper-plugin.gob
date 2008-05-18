@@ -15,14 +15,14 @@ typedef enum _PluginType {
  * a register_plugin function
  * And set plugin name.
  */
-%{
+%h{
     /*
      * gchar *plugin_name = "Plugin name";
      *
      * * In case off Stuffkeeper:Plugin:Test:
      * GType register_plugin() { return stuffkeeeper_plugin_test_get_type();}
      */
-
+    GType register_plugin();
     /*
      * PluginType plugin_type = PLUGIN_ITEM|PLUGIN_MENU;
      */
