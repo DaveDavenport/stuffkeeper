@@ -44,4 +44,6 @@ void screenshot_add_shadow (GdkPixbuf **src);
 void screenshot_add_border (GdkPixbuf **src);
 
 void file_chooser_enable_image_preview(GtkWidget *fc, int size);
+GdkPixbuf * gdk_pixbuf_new_from_file_at_max_size(const char *uri, int size);
+
 #endif

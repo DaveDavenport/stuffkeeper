@@ -283,6 +283,10 @@ static void __update_preview_widget (GtkWidget *fc, GtkWidget *image)
 			gtk_image_set_from_pixbuf(GTK_IMAGE(image), pb);
 			gtk_file_chooser_set_preview_widget_active (fc, TRUE);
 		}
+        else
+        {
+			gtk_file_chooser_set_preview_widget_active (fc, FALSE);
+        }
 		g_free(uri);
 	}
 }

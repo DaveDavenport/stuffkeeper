@@ -52,7 +52,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                     gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
                     if(fpath)
                     {
-                        GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
+                        GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, IMAGE_SIZE);
+                        //gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
                         debug_printf("Trying to load: %s %p\n", fpath,pb);
                         if(pb)
                         {
@@ -83,7 +84,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
             gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
 
             debug_printf("From '%s' --> '%s'\n", original_path, fpath);
-            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
+            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(original_path, IMAGE_SIZE);
+//            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
             debug_printf("%p\n",pb);
             gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
             g_object_unref(pb);
@@ -114,7 +116,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                         GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
                         NULL);
-		file_chooser_enable_image_preview(dialog,250); 
+		file_chooser_enable_image_preview(dialog,IMAGE_SIZE); 
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
                 case GTK_RESPONSE_NO:
@@ -177,7 +179,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                 gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
                 if(fpath)
                 {
-                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
+                    //GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
+                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, IMAGE_SIZE);
                     if(pb)
                     {
                         screenshot_add_border(&pb);
