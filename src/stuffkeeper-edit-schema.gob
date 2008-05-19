@@ -297,6 +297,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                     GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
                     NULL);
+	    file_chooser_enable_image_preview(dialog,16);	
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
                 case GTK_RESPONSE_NO:
@@ -315,10 +316,6 @@ class Stuffkeeper:Edit:Schema from G:Object
                     break;
             }
             gtk_widget_destroy(dialog);
-
-
-
-
         }
         debug_printf("clicked\n");
         return FALSE;

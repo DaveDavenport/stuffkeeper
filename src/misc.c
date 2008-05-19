@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
 #include "misc.h"
 #ifndef __USE_BSD
 #define __USE_BSD
@@ -254,3 +255,44 @@ void screenshot_add_border (GdkPixbuf **src)
         }
     }
 }
+GdkPixbuf * gdk_pixbuf_new_from_file_at_max_size(const char *uri, int size)
+{
+	GdkPixbuf *pb = NULL;
+	gint width=0, height=0;
+	if(gdk_pixbuf_get_file_info(uri, &width, &height))
+	{
+		if(width > size || height > size)
+			pb = gdk_pixbuf_new_from_file_at_scale(uri, size,size,TRUE,NULL);
+		else
+			pb = gdk_pixbuf_new_from_file(uri, NULL);
+	}
+	return pb;
+}
+
+static void __update_preview_widget (GtkWidget *fc, GtkWidget *image)
+{
+	char *uri = gtk_file_chooser_get_preview_filename(fc);
+	if(uri)
+	{
+		GdkPixbuf *pb = NULL;
+		gpointer data = g_object_get_data(G_OBJECT(fc), "size");
+		int size = (data != NULL)? GPOINTER_TO_INT(data):16;
+		pb = gdk_pixbuf_new_from_file_at_max_size(uri,size); 
+		if(pb)
+		{
+			gtk_image_set_from_pixbuf(GTK_IMAGE(image), pb);
+			gtk_file_chooser_set_preview_widget_active (fc, TRUE);
+		}
+		g_free(uri);
+	}
+}
+
+void file_chooser_enable_image_preview(GtkWidget *fc, int size)
+{
+	GtkWidget *image = gtk_image_new();
+	gtk_file_chooser_set_use_preview_label(GTK_FILE_CHOOSER(fc), FALSE);
+	gtk_file_chooser_set_preview_widget(GTK_FILE_CHOOSER(fc), image);
+	g_object_set_data(G_OBJECT(fc), "size", GINT_TO_POINTER(size));
+	g_signal_connect(G_OBJECT(fc), "update-preview", G_CALLBACK(__update_preview_widget), image);
+}
+

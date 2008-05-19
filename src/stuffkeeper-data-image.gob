@@ -114,6 +114,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                         GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
                         NULL);
+		file_chooser_enable_image_preview(dialog,250); 
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
                 case GTK_RESPONSE_NO:

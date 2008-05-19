@@ -43,4 +43,5 @@ UrlType url_type(const char *uri);
 void screenshot_add_shadow (GdkPixbuf **src);
 void screenshot_add_border (GdkPixbuf **src);
 
+void file_chooser_enable_image_preview(GtkWidget *fc, int size);
 #endif
