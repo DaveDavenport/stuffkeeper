@@ -2,14 +2,12 @@ requires 2.0.10
 
 %ph{
 #include <glib/gstdio.h>
-%}
-
-%ph{
+#include <sqlite3.h>
 #include "debug.h"
 #include "stuffkeeper-data-backend.h"
 %}
 %h{
-#include <sqlite3.h>
+
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-schema.h"
 

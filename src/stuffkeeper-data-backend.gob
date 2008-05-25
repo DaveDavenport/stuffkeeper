@@ -135,7 +135,7 @@ class Stuffkeeper:Data:Backend from G:Object
     new_search(self)
     {
         gint *ide;
-        StuffkeeperDataItemSearch *search = stuffkeeper_data_item_search_new(G_OBJECT(self),self->_priv->sqlHandle);
+        StuffkeeperDataItemSearch *search = stuffkeeper_data_item_search_new(G_OBJECT(self));
         /* We have a valid id now, so add it */
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -1074,7 +1074,7 @@ class Stuffkeeper:Data:Backend from G:Object
 
     /* Return the sqlite3 handle */
     public
-    sqlite3 *
+    void *
     get_handle(self)
     {
         return self->_priv->sqlHandle;

@@ -1,11 +1,13 @@
 requires 2.0.10
 
+%ph{
+#include <sqlite3.h>
+%}
 %h{
 #include <glib.h>
 #include <glib/gi18n.h>
-#include <sqlite3.h>
+
 #include <glib/gstdio.h>
-#include <config.h>
 
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item.h"
@@ -44,6 +46,7 @@ typedef struct _SearchField
 %}
 %ph{
 #include <glade/glade.h>
+#include <config.h>
 #include "debug.h"
 #include "stuffkeeper-data-backend.h"
     const char *SearchTypesNames[] = 
@@ -203,7 +206,7 @@ class Stuffkeeper:Data:Item:Search from G:Object
     /* Create new StuffkeeperDataBackend */
     public 
         StuffkeeperDataItemSearch *
-        new (G:Object *skdb, sqlite3 *sqlHandle)
+        new (G:Object *skdb)
         {
 
             Self *obj = GET_NEW;
@@ -211,7 +214,7 @@ class Stuffkeeper:Data:Item:Search from G:Object
             char *error = NULL;
             char *query  = NULL;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
-            obj->_priv->sqlHandle = sqlHandle;
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(skdb);
             /**
              * Insert the first item in the list
              */

@@ -3,11 +3,12 @@ requires 2.0.10
 %h{
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
-#include <sqlite3.h>
+
 %}
 
 %ph{
 #include <stdio.h>
+#include <sqlite3.h>
 #include "debug.h"
 #include <glib/gstdio.h>
 
