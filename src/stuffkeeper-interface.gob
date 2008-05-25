@@ -1021,8 +1021,8 @@ class Stuffkeeper:Interface from G:Object
     void
     menu_plugin_called(self, GtkWidget *item)
     {
-        FS *f = g_object_get_data(G_OBJECT(item), "plugin");
-        if(f)
+        StuffkeeperPlugin *plugin = g_object_get_data(G_OBJECT(item), "plugin");
+        if(plugin)
         {
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkWidget *tree = self->_priv->treeview2;
@@ -1034,7 +1034,7 @@ class Stuffkeeper:Interface from G:Object
                 gtk_tree_model_get(model, &iter, 2, &item, -1);
                 if(item)
                 {
-                    stuffkeeper_plugin_run_item(STUFFKEEPER_PLUGIN(f->object), item);
+                    stuffkeeper_plugin_run_item(STUFFKEEPER_PLUGIN(plugin), item);
                     return;
                 }
             }
@@ -1082,13 +1082,13 @@ class Stuffkeeper:Interface from G:Object
                 {
                     for(iter = g_list_first(node);iter;iter = g_list_next(iter))
                     {
-                        FS *f = iter->data;
-                        if((f->plugin_type)&PLUGIN_ITEM)
+                        StuffkeeperPlugin *plugin = iter->data; 
+                        if(stuffkeeper_plugin_get_plugin_type(plugin)&PLUGIN_ITEM)
                         {
                             gint width = 16, height=16;
-                            GdkPixbuf *pb = stuffkeeper_plugin_get_icon(f->object);
+                            GdkPixbuf *pb = stuffkeeper_plugin_get_icon(plugin);
 
-                            menu_item = gtk_image_menu_item_new_with_label(f->name);
+                            menu_item = gtk_image_menu_item_new_with_label(stuffkeeper_plugin_get_name(plugin));
                             if(pb)
                             {
                                 GdkPixbuf *scale = gdk_pixbuf_scale_simple(pb,width, height, GDK_INTERP_BILINEAR);
@@ -1097,7 +1097,7 @@ class Stuffkeeper:Interface from G:Object
                             }
 
                             g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_menu_plugin_called), self);
-                            g_object_set_data(G_OBJECT(menu_item), "plugin", f);
+                            g_object_set_data(G_OBJECT(menu_item), "plugin", plugin);
                             gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                         }
                     }
@@ -1857,12 +1857,12 @@ class Stuffkeeper:Interface from G:Object
                 gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), menu);
                 for(iter = node;iter;iter = g_list_next(iter))
                 {
-                    FS *f = iter->data;
-                    if(f->plugin_type&PLUGIN_MENU)
+                    StuffkeeperPlugin *plugin = iter->data; 
+                    if(stuffkeeper_plugin_get_plugin_type(plugin)&PLUGIN_MENU)
                     {
                         gint width = 16, height=16;
-                        GtkWidget *item = gtk_image_menu_item_new_with_label(f->name);
-                        GdkPixbuf *pb = stuffkeeper_plugin_get_icon(f->object);
+                        GtkWidget *item = gtk_image_menu_item_new_with_label(stuffkeeper_plugin_get_name(plugin));
+                        GdkPixbuf *pb = stuffkeeper_plugin_get_icon(plugin);
 
                         gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &width, &height);
                         if(pb)
@@ -1873,7 +1873,7 @@ class Stuffkeeper:Interface from G:Object
                             g_object_unref(scale);
                         }
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-                        g_object_set_data(G_OBJECT(item), "plugin-id",f); 
+                        g_object_set_data(G_OBJECT(item), "plugin",plugin); 
                         g_signal_connect_swapped(G_OBJECT(item), "activate", G_CALLBACK(self_tool_activate), self);
                     }
                 }
@@ -1889,10 +1889,10 @@ class Stuffkeeper:Interface from G:Object
         void
         tool_activate(self,GtkWidget *item)
         {
-            FS *f = g_object_get_data(G_OBJECT(item), "plugin-id");
-            if(f)
+            StuffkeeperPlugin *plugin = g_object_get_data(G_OBJECT(item), "plugin");
+            if(plugin)
             {
-                stuffkeeper_plugin_run_menu(STUFFKEEPER_PLUGIN(f->object),self->_priv->skdbg);
+                stuffkeeper_plugin_run_menu(STUFFKEEPER_PLUGIN(plugin),self->_priv->skdbg);
             }
         }
 

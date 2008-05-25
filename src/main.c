@@ -284,12 +284,11 @@ int main ( int argc, char **argv )
         printf("Loading plugins list\n");
         for(iter = g_list_first(node);iter;iter = g_list_next(iter))
         {
-            FS *f = iter->data;
-
+            StuffkeeperPlugin *plugin = iter->data;
             /* Background plugins are run now, they are not allowed to block */
-            if((f->plugin_type)&PLUGIN_BACKGROUND)
+            if(stuffkeeper_plugin_get_plugin_type(plugin)&PLUGIN_BACKGROUND)
             {
-                stuffkeeper_plugin_run_background(STUFFKEEPER_PLUGIN(f->object), skdb);
+                stuffkeeper_plugin_run_background(STUFFKEEPER_PLUGIN(plugin), skdb);
             }
         }
         g_list_free(node);

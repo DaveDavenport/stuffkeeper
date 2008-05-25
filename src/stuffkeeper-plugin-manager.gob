@@ -7,7 +7,7 @@ requires 2.0.10
 #include "stuffkeeper-plugin.h"
 %}
 
-%h{
+%ph{
 #include <gmodule.h>
 typedef struct _FS{
     const gchar *name;
@@ -38,7 +38,14 @@ class Stuffkeeper:Plugin:Manager from G:Object
     GList *
     get_loaded_plugins(self)
     {
-        return g_list_copy(self->_priv->plugins);
+        GList *list = NULL;
+        GList *iter;
+        for(iter = g_list_first(self->_priv->plugins);iter;iter =g_list_next(iter))
+        {
+            FS *f = iter->data;
+            list = g_list_append(list, f->object);
+        }
+        return list; 
     }
 
     override (G:Object)
