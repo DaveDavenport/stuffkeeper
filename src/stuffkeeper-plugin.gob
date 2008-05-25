@@ -66,4 +66,12 @@ class Stuffkeeper:Plugin from G:Object
     {
         printf("This function should be overrided by the plugin\n");
     }
+
+    /* The icon that should be used for the plugin, for now used in the menu's */
+    virtual
+    GdkPixbuf *
+    get_icon(self)
+    {
+        return NULL;
+    }
 }

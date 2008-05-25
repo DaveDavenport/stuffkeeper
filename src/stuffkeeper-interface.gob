@@ -1085,9 +1085,17 @@ class Stuffkeeper:Interface from G:Object
                         FS *f = iter->data;
                         if((f->plugin_type)&PLUGIN_ITEM)
                         {
+                            gint width = 16, height=16;
+                            GdkPixbuf *pb = stuffkeeper_plugin_get_icon(f->object);
+
                             menu_item = gtk_image_menu_item_new_with_label(f->name);
-                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item),
-                                    gtk_image_new_from_stock(GTK_STOCK_SAVE, GTK_ICON_SIZE_MENU));
+                            if(pb)
+                            {
+                                GdkPixbuf *scale = gdk_pixbuf_scale_simple(pb,width, height, GDK_INTERP_BILINEAR);
+                                gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item),gtk_image_new_from_pixbuf(scale));
+                                g_object_unref(scale);
+                            }
+
                             g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_menu_plugin_called), self);
                             g_object_set_data(G_OBJECT(menu_item), "plugin", f);
                             gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
@@ -1852,7 +1860,18 @@ class Stuffkeeper:Interface from G:Object
                     FS *f = iter->data;
                     if(f->plugin_type&PLUGIN_MENU)
                     {
-                        GtkWidget *item = gtk_menu_item_new_with_label(f->name);
+                        gint width = 16, height=16;
+                        GtkWidget *item = gtk_image_menu_item_new_with_label(f->name);
+                        GdkPixbuf *pb = stuffkeeper_plugin_get_icon(f->object);
+
+                        gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &width, &height);
+                        if(pb)
+                        {
+
+                            GdkPixbuf *scale = gdk_pixbuf_scale_simple(pb,width, height, GDK_INTERP_BILINEAR);
+                            gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),gtk_image_new_from_pixbuf(scale));
+                            g_object_unref(scale);
+                        }
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
                         g_object_set_data(G_OBJECT(item), "plugin-id",f); 
                         g_signal_connect_swapped(G_OBJECT(item), "activate", G_CALLBACK(self_tool_activate), self);
