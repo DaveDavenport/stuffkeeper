@@ -86,7 +86,8 @@ LIBS= \
 	@gtk_LIBS@\
 	@gmodule_LIBS@\
 	@libglade_LIBS@\
-	@sqlite3_LIBS@
+	@sqlite3_LIBS@\
+	@gio_LIBS@
 
 
 AM_LDFLAGS = \
@@ -99,6 +100,7 @@ AM_CFLAGS = @CFLAGS@\
 	@gmodule_CFLAGS@\
 	@libglade_CFLAGS@\
 	@sqlite3_CFLAGS@\
+	@gio_CFLAGS@\
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\"
 
 stuffkeeperinclude_HEADERS = \

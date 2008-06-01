@@ -8,6 +8,8 @@
 #include <time.h>
 #include <locale.h> /* For setlocale */
 #include <config.h>
+#include <gio/gio.h>
+
 #include "debug.h"
 #include "revision.h"
 
@@ -151,7 +153,6 @@ int main ( int argc, char **argv )
     spm = stuffkeeper_plugin_manager_new();
     /* load the plugins */
     stuffkeeper_plugin_manager_load_plugin(spm);
-     
     /* Initialize the backend */
     skdb = stuffkeeper_data_backend_new();
     /* Check if creating the backend worked */
@@ -164,8 +165,7 @@ int main ( int argc, char **argv )
 
     /* Setup the interprocess communication. this does not work in win32! */ 
     bacon_connection = bacon_message_connection_new("stuffkeeper");
-    if(bacon_connection) 
-    {
+    if(bacon_connection) {
         /* Check if we are the only instance, this can be checked by looking if we are the server */
         if (!bacon_message_connection_get_is_server (bacon_connection)) 
         {
@@ -185,9 +185,7 @@ int main ( int argc, char **argv )
         bacon_message_connection_set_callback (bacon_connection,
                 bacon_on_message_received,
                 skdb);
-    }
-    else
-    {
+    } else {
         /* print an error and quit */
         debug_printf("Failed to setup IPC, quitting\n");
         g_object_unref(skdb); 
@@ -201,12 +199,9 @@ int main ( int argc, char **argv )
      */
 
     /* build the directory where data is stored */
-    if(db_path != NULL)
-    {
+    if(db_path != NULL) {
         path = g_build_path(G_DIR_SEPARATOR_S, db_path, NULL);
-    }
-    else
-    {
+    } else {
         path = g_build_path(G_DIR_SEPARATOR_S, g_get_home_dir(), ".stuffkeeper", NULL);
     }
 
@@ -323,24 +318,27 @@ int main ( int argc, char **argv )
         GError *error = NULL;
 
         content = g_key_file_to_data(config_file, &length, &error);
-        if(content)
-        {
+        if(content) {
             GError *error2 = NULL;
-            if(!g_file_set_contents(config_path, content, length, &error2))
+            /* Create file */
+            GFile *file = g_file_new_for_path(config_path);
+            /* replace file and make backup */
+            if(!g_file_replace_contents(file, content, length, NULL, TRUE, G_FILE_COPY_OVERWRITE,NULL,NULL, &error2))
             {
                 debug_printf("Failed to save file '%s': %s\n", config_path, error2->message);
                 g_error_free(error2);
             }
+
+            g_object_unref(file);
             g_free(content);
-        }
-        else
-        {
+        } else {
             if(error)
             {
                 debug_printf("Failed to serialize config file: %s\n", error->message);
                 g_error_free(error);
             }
         }
+
         /* Free config path */
         g_free(config_path);
     }

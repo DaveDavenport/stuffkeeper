@@ -125,6 +125,10 @@ PKG_CHECK_MODULES([sqlite3], sqlite3)
 AC_SUBST(sqlite3_LIBS)
 AC_SUBST(sqlite3_CFLAGS)
 
+# libgio
+PKG_CHECK_MODULES([gio], gio-2.0)
+AC_SUBST(gio_LIBS)
+AC_SUBST(gio_CFLAGS)
 
 # installation paths
 AC_MSG_CHECKING(prefix)

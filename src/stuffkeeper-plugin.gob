@@ -23,13 +23,13 @@ typedef enum _PluginType {
      * GType register_plugin() { return stuffkeeeper_plugin_test_get_type();}
      */
     GType register_plugin();
-    /*
-     * PluginType plugin_type = PLUGIN_ITEM|PLUGIN_MENU;
-     */
 %}
 
 class Stuffkeeper:Plugin from G:Object
 {
+    /**
+     * Return the type of the plugin 
+     */
     virtual
     PluginType
     get_plugin_type(self)

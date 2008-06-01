@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <gio/gio.h>
 #include "misc.h"
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item.h"
@@ -26,7 +27,9 @@ requires 2.0.10
 %{
 static GtkTargetEntry data_list_drag_target[] = 
 {
-	{ "text/uri-list", 0, 0}
+	{ "text/uri-list", 0, 0},
+    { "_NETSCAPE_URL", 0,4},
+    { "x-url/http", 0,5}
 };
 %}
 
@@ -282,10 +285,6 @@ class Stuffkeeper:Data:List2 from Gtk:VBox
                                 {
                                     if(splitted[i][0] != '\0')
                                     {
-                                        /*
-                                           gtk_list_store_append(GTK_LIST_STORE(self->_priv->store), &iter);
-                                           gtk_list_store_set(GTK_LIST_STORE(self->_priv->store), &iter,0,splitted[i],-1);
-                                           */
                                         self_new_row(self, splitted[i], -1);
                                     }
                                 }
@@ -411,7 +410,7 @@ class Stuffkeeper:Data:List2 from Gtk:VBox
 
         gtk_drag_dest_set(GTK_WIDGET(obj),
                 GTK_DEST_DEFAULT_ALL,
-                data_list_drag_target, 1,
+                data_list_drag_target, 3,
                 GDK_ACTION_COPY|GDK_ACTION_LINK|GDK_ACTION_DEFAULT|GDK_ACTION_MOVE);
         g_signal_connect_swapped (G_OBJECT (obj),"drag-data-received",
                 GTK_SIGNAL_FUNC (self_drag_data_recieved),obj);
@@ -469,66 +468,64 @@ class Stuffkeeper:Data:List2 from Gtk:VBox
             if(!stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             {
                 GtkWidget *dialog; 
-                gchar **url = gtk_selection_data_get_uris(data);
-            /* process url */
-            printf("url: %s\n", url[0]);
-            if(strncmp(url[0], "file://",7) == 0)
-            {
-                gchar *stripped = g_filename_from_uri(url[0], NULL, NULL); 
-                if(stripped)
-                {
-                    printf("stripped: %s\n", stripped);//&((url[0])[7]);
-                    if(g_file_test(stripped , G_FILE_TEST_EXISTS))
-                    {
-                        GError *error = NULL;
-                        gchar *content = NULL;
-                        gsize size=0;
-                        g_file_get_contents(stripped, &content, &size, &error);
-                        if(!error)
-                        {
-                            if(g_utf8_validate(content, size, NULL))
-                            {
-                                gchar **splitted = g_strsplit(content, "\n", 0);
-                                int i=0;
 
-                                for(i=0;splitted && splitted[i];i++)
-                                {
-                                    if(splitted[i][0] != '\0')
-                                    {
-                                        self_new_row(self, splitted[i], -1);
-                                    }
-                                }
-                                g_strfreev(splitted);
-                                self_save_changes(self);
-                            }
-                        }else{
-                            printf("Failed to load file: '%s' because of '%s'\n", stripped, error->message);
-                            g_error_free(error);
-                            error = NULL;
-                        }
-                        if(content)
-                            g_free(content);
+                gchar **url = NULL;
+                GFile *file = NULL;
 
-                        g_strfreev(url);
-                        g_free(stripped);
-                        gtk_drag_finish(context, TRUE, FALSE, time);
-                        return;
-                    }
-                    g_free(stripped);
+                if(info == 4){
+                    /* if it is from netscape do manual parsing */
+                    url = g_uri_list_extract_uris((char *)data->data);
+                } else {
+                    url =  gtk_selection_data_get_uris(data);   
                 }
-            }
-            /* Failed to open, show a popup */
-            gtk_drag_finish(context, TRUE, FALSE, time);
-            dialog = gtk_message_dialog_new_with_markup(
-                    NULL, 
-                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                    GTK_MESSAGE_WARNING,
-                    GTK_BUTTONS_CLOSE,
-                    _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid local text file."),url[0]);           
-            gtk_dialog_run(GTK_DIALOG(dialog));
-            gtk_widget_destroy(dialog);
-            /* free uris */
-            g_strfreev(url);
+
+                if(url == NULL)
+                    return;
+                printf("%s\n", url[0]);
+                file = g_file_new_for_uri(url[0]);
+
+                if(g_file_query_exists(file,NULL))
+                {
+                    gchar *content;
+                    gsize length;
+
+                    if(g_file_load_contents(file, NULL, &content, &length, NULL, NULL))
+                    {
+                        if(g_utf8_validate(content, length, NULL))
+                        {
+                            gchar **splitted = g_strsplit(content, "\n", 0);
+                            int i=0;
+
+                            for(i=0;splitted && splitted[i];i++)
+                            {
+                                if(splitted[i][0] != '\0')
+                                {
+                                    self_new_row(self, splitted[i], -1);
+                                }
+                            }
+                            g_strfreev(splitted);
+                            self_save_changes(self);
+                            gtk_drag_finish(context, TRUE, FALSE, time);
+                            return;
+                        }
+                        g_object_unref(file);
+                    }
+                }
+                g_object_unref(file);
+
+
+                /* Failed to open, show a popup */
+                gtk_drag_finish(context, TRUE, FALSE, time);
+                dialog = gtk_message_dialog_new_with_markup(
+                        NULL, 
+                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_CLOSE,
+                        _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid text file."),url[0]);           
+                gtk_dialog_run(GTK_DIALOG(dialog));
+                gtk_widget_destroy(dialog);
+                /* free uris */
+                g_strfreev(url);
             }
             else
                 gtk_drag_finish(context, FALSE, FALSE, time);

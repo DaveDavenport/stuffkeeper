@@ -2,6 +2,7 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
+#include <gio/gio.h>
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-backend.h"
 %}
@@ -19,7 +20,9 @@ static GtkTargetEntry data_image_drag_target[] =
     { "image/jpeg", 0, 0 },
     { "image/png",  0, 1 },
     { "image/gif",  0, 2 },
-	{ "text/uri-list", 0, 3}
+	{ "text/uri-list", 0, 3},
+    { "_NETSCAPE_URL", 0,4},
+    { "x-url/http", 0,5}
 };
 %}
 class Stuffkeeper:Data:Image from Gtk:Event:Box
@@ -196,7 +199,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 
         gtk_drag_dest_set(GTK_WIDGET(obj),
                 GTK_DEST_DEFAULT_ALL,
-                data_image_drag_target, 4,
+                data_image_drag_target, 6,
                 GDK_ACTION_COPY|GDK_ACTION_LINK|GDK_ACTION_DEFAULT|GDK_ACTION_MOVE);
         g_signal_connect_swapped (G_OBJECT (obj),"drag-data-received",
                 GTK_SIGNAL_FUNC (self_drag_data_recieved),obj);
@@ -233,34 +236,55 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
             if(!stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             {
                 GtkWidget *dialog; 
-                gchar **url = gtk_selection_data_get_uris(data);
-                /* process url */
-                if(strncmp(url[0], "file://",7) == 0)
-                {
-                    gchar *stripped = g_filename_from_uri(url[0], NULL, NULL); 
-                    if(stripped)
-                    {
-                        GdkPixbufFormat *finfo = gdk_pixbuf_get_file_info(stripped, NULL, NULL);
-                        /* if the pixbuf loader can open it, copy it */
-                        if(finfo)
-                        {
-                            self_copy_path(self, &((url[0])[7]));
-                            g_strfreev(url);
-                            g_free(stripped);
-                            gtk_drag_finish(context, TRUE, FALSE, time);
-                            return;
-                        }
-                        g_free(stripped);
-                    }
+                gchar **url = NULL;
+                GFile *file = NULL;
+                
+                if(info == 4){
+                    /* if it is from netscape do manual parsing */
+                    url = g_uri_list_extract_uris((char *)data->data);
+                } else {
+                    url =  gtk_selection_data_get_uris(data);   
                 }
+
+                if(url == NULL)
+                    return;
+                printf("%s\n", url[0]);
+                file = g_file_new_for_uri(url[0]);
+                
+                if(g_file_query_exists(file,NULL))
+                {
+                    const gchar *path = stuffkeeper_data_backend_get_path(
+                            STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+                    gchar *tmp_path = g_build_path(G_DIR_SEPARATOR_S, path, "temp",NULL);
+                    GFile *dest = g_file_new_for_path(tmp_path);
+                    printf("%s\n", tmp_path);
+
+                    if(g_file_copy(file, dest, G_FILE_COPY_OVERWRITE,NULL, NULL, NULL, NULL))
+                    {
+
+                            self_copy_path(self,tmp_path);
+                            g_file_delete(dest,NULL,NULL);
+                            gtk_drag_finish(context, FALSE, FALSE, time);
+                            g_object_unref(dest);
+                            g_object_unref(file);
+                            g_free(tmp_path);
+                            return;
+                    }
+                    g_object_unref(dest);
+                    g_free(tmp_path);
+                }
+                g_object_unref(file);
+                
+
                 /* Failed to open, show a popup */
                 gtk_drag_finish(context, FALSE, FALSE, time);
                 dialog = gtk_message_dialog_new_with_markup(
-                                                            NULL, 
-                                                            GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                            GTK_MESSAGE_WARNING,
-                                                            GTK_BUTTONS_CLOSE,
-                                                            _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid local image."),url[0]);           
+                        NULL, 
+                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_CLOSE,
+                        _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid local image."),url[0]);           
+
                 gtk_dialog_run(GTK_DIALOG(dialog));
                 gtk_widget_destroy(dialog);
                 /* free uris */
