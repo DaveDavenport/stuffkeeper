@@ -18,6 +18,9 @@
         body \{
             margin: 0;
         \}
+        pre \{
+            white-space: normal;
+        \}
         #content\{
             margin: 1em;
         \}
