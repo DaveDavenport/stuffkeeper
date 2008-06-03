@@ -263,8 +263,9 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 	}
     private 
     void
-    copy_done(GFile *file, GAsyncResult *res, gpointer data)
+    copy_done(GObject *file_data, GAsyncResult *res, gpointer data)
 	{
+		GFile *file = G_FILE(file_data);
 		gpointer s = g_object_get_data(G_OBJECT(file), "im");	
 		if(s == NULL)
 		{
@@ -285,10 +286,15 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 
 		if(g_file_copy_finish(file, res, NULL))
 		{
+			GFile *temp;
 			const gchar *path = stuffkeeper_data_backend_get_path(
 					STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
 			gchar *tmp_path = g_build_path(G_DIR_SEPARATOR_S, path, "temp",NULL);
 			self_copy_path(self,tmp_path);
+			/* delete the temp file */
+			temp = g_file_new_for_path(tmp_path);
+			g_file_delete(temp,NULL,NULL);
+			g_object_unref(temp);
 			g_free(tmp_path);
 			printf("copy done\n");
 		}
@@ -343,7 +349,6 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
         {
             if(!stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             {
-                GtkWidget *dialog; 
                 gchar **url = NULL;
                 
                 if(info == 4){
