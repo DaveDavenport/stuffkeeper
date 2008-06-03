@@ -130,6 +130,9 @@ PKG_CHECK_MODULES([gio], gio-2.0)
 AC_SUBST(gio_LIBS)
 AC_SUBST(gio_CFLAGS)
 
+PKG_CHECK_MODULES([gthread], gthread-2.0)
+AC_SUBST(gthread_LIBS)
+AC_SUBST(gthread_CFLAGS)
 # installation paths
 AC_MSG_CHECKING(prefix)
 

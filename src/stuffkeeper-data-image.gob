@@ -32,6 +32,10 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
     private gulong changed_item_entry = {0};
     private gulong changed_entry = {0};
     private GtkWidget *image = {NULL};
+    private GtkWidget *ali = {NULL};
+	/* File variables for file-transfer */
+	private GCancellable * can = {NULL};
+    private GFile *file = {NULL};
 
     public
     void
@@ -83,23 +87,41 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
         const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
         if(path)
         {
-            gchar *id = g_strdup_printf("%i-%s.jpg", stuffkeeper_data_item_get_id(self->_priv->item), self->_priv->field);
-            gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
+			if(gdk_pixbuf_get_file_info(original_path, NULL,NULL))
+			{
+				gchar *id = g_strdup_printf("%i-%s.jpg", stuffkeeper_data_item_get_id(self->_priv->item), self->_priv->field);
+				gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
 
-            debug_printf("From '%s' --> '%s'\n", original_path, fpath);
-            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(original_path, IMAGE_SIZE);
-//            GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(original_path, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
-            debug_printf("%p\n",pb);
-            gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
-            g_object_unref(pb);
+				debug_printf("From '%s' --> '%s'\n", original_path, fpath);
+				GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(original_path, IMAGE_SIZE);
+				debug_printf("%p\n",pb);
+				gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
+				g_object_unref(pb);
 
-            /* store it */
-            /* clear it first, because else it does not get signald, because the value does not change */
-            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
-            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,id);
+				/* store it */
+				/* clear it first, because else it does not get signald, because the value does not change */
+				stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
+				stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,id);
 
-            g_free(fpath);
-            g_free(id);
+				g_free(fpath);
+				g_free(id);
+			}
+			else
+			{
+				GtkWidget *dialog;
+				/* set empty image */
+				
+				dialog = gtk_message_dialog_new_with_markup(
+						NULL, 
+                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_WARNING,
+                        GTK_BUTTONS_CLOSE,
+                        _("The choosen file is not a image format supported by gtk."));
+
+                gtk_dialog_run(GTK_DIALOG(dialog));
+                gtk_widget_destroy(dialog);
+				stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
+			}
         }
 
     }
@@ -151,9 +173,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
     new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
-        GtkWidget *alignment = gtk_alignment_new(0, 0, 0,0);
         gchar *value =NULL;
-
+        obj->_priv->ali= gtk_alignment_new(0, 0, 0,0);
         gtk_event_box_set_visible_window(GTK_EVENT_BOX(obj), FALSE);
 
         obj->_priv->image = gtk_image_new();
@@ -161,8 +182,8 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 
         
         /* add it to myself */
-        gtk_container_add(GTK_CONTAINER(alignment), obj->_priv->image);
-        gtk_container_add(GTK_CONTAINER(obj),alignment);
+        gtk_container_add(GTK_CONTAINER(obj->_priv->ali), obj->_priv->image);
+        gtk_container_add(GTK_CONTAINER(obj),obj->_priv->ali);
 
         /* store item */
         obj->_priv->item = item; 
@@ -208,19 +229,106 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "button-press-event", G_CALLBACK(self_button_press_event), NULL);
         return GTK_WIDGET(obj);
     }
-
     override (G:Object)
-        void
-        finalize (G:Object *obj)
+    void
+    dispose (G:Object *obj)
+    {
+        Self *self = SELF(obj);
+        if(self->_priv->file)
         {
-            Self *self = SELF(obj);
-            if(self->_priv->changed_item_entry)
-            {
-                g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
-                self->_priv->changed_item_entry = 0;
-            }
-            PARENT_HANDLER(obj);
+		/* remove reference to self from file, then it knows it should ignore it results.*/
+		g_object_set_data(G_OBJECT(self->_priv->file), "im", NULL);
+		/* TODO: cancel the file transfer, if possible */
+		if(self->_priv->can)
+		{
+			g_cancellable_cancel(self->_priv->can);
+			self->_priv->can = NULL;
+		}
         }
+
+        PARENT_HANDLER(obj);
+    }
+    override (G:Object)
+    void
+    finalize (G:Object *obj)
+	{
+		Self *self = SELF(obj);
+
+		if(self->_priv->changed_item_entry)
+		{
+			g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+			self->_priv->changed_item_entry = 0;
+		}
+		PARENT_HANDLER(obj);
+	}
+    private 
+    void
+    copy_done(GFile *file, GAsyncResult *res, gpointer data)
+	{
+		gpointer s = g_object_get_data(G_OBJECT(file), "im");	
+		if(s == NULL)
+		{
+			g_file_copy_finish(file, res, NULL);
+			g_object_unref(file);
+			/* free cancel thing */
+			return;
+		}
+		Self *self = SELF(s);
+
+		gtk_widget_destroy(gtk_bin_get_child(GTK_BIN(self->_priv->ali)));
+		self->_priv->image = gtk_image_new();
+        gtk_image_set_from_stock(GTK_IMAGE(self->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
+
+		gtk_container_add(GTK_CONTAINER(self->_priv->ali), self->_priv->image);
+		gtk_widget_show_all(GTK_WIDGET(self));
+
+
+		if(g_file_copy_finish(file, res, NULL))
+		{
+			const gchar *path = stuffkeeper_data_backend_get_path(
+					STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+			gchar *tmp_path = g_build_path(G_DIR_SEPARATOR_S, path, "temp",NULL);
+			self_copy_path(self,tmp_path);
+			g_free(tmp_path);
+			printf("copy done\n");
+		}
+		else 
+		{
+			printf("copy failed\n");
+			self_item_changed(self, self->_priv->field, self->_priv->item);
+		}
+		g_object_unref(file);
+		self->_priv->file = NULL;
+		self->_priv->can = NULL;
+	}
+    private 
+    void
+    copy_progress(goffset cnb, goffset tnb, gpointer data)
+	{
+		GFile *file = data;
+		gpointer s = g_object_get_data(G_OBJECT(file), "im");	
+		if(!s)
+		{
+			return;
+		}
+		Self *self = SELF(s);
+		if(tnb)
+			gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(self->_priv->image), (cnb)/(float)tnb);
+		else
+			gtk_progress_bar_pulse(GTK_PROGRESS_BAR(self->_priv->image));
+	}
+	private
+	void
+	cancel_transfer(self, GtkWidget *button)
+	{
+		/* cancel the transfer */
+		if(self->_priv->file && self->_priv->can)
+		{
+			g_cancellable_cancel(self->_priv->can);
+		}
+	}
+
+
     private 
         void 
         drag_data_recieved (self,
@@ -237,7 +345,6 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
             {
                 GtkWidget *dialog; 
                 gchar **url = NULL;
-                GFile *file = NULL;
                 
                 if(info == 4){
                     /* if it is from netscape do manual parsing */
@@ -245,48 +352,51 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                 } else {
                     url =  gtk_selection_data_get_uris(data);   
                 }
-
+                if(self->_priv->file)
+                    return ;
                 if(url == NULL)
                     return;
                 printf("%s\n", url[0]);
-                file = g_file_new_for_uri(url[0]);
-                
-                if(g_file_query_exists(file,NULL))
-                {
-                    const gchar *path = stuffkeeper_data_backend_get_path(
-                            STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
-                    gchar *tmp_path = g_build_path(G_DIR_SEPARATOR_S, path, "temp",NULL);
-                    GFile *dest = g_file_new_for_path(tmp_path);
-                    printf("%s\n", tmp_path);
 
-                    if(g_file_copy(file, dest, G_FILE_COPY_OVERWRITE,NULL, NULL, NULL, NULL))
-                    {
-
-                            self_copy_path(self,tmp_path);
-                            g_file_delete(dest,NULL,NULL);
-                            gtk_drag_finish(context, FALSE, FALSE, time);
-                            g_object_unref(dest);
-                            g_object_unref(file);
-                            g_free(tmp_path);
-                            return;
-                    }
-                    g_object_unref(dest);
-                    g_free(tmp_path);
-                }
-                g_object_unref(file);
+                self->_priv->file = g_file_new_for_uri(url[0]);
                 
+				{
+					GtkWidget *vbox, *button;
+					const gchar *path = stuffkeeper_data_backend_get_path(
+							STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+					gchar *tmp_path = g_build_path(G_DIR_SEPARATOR_S, path, "temp",NULL);
+					GFile *dest = g_file_new_for_path(tmp_path);
+					printf("%s\n", tmp_path);
+
+					g_object_set_data(G_OBJECT(self->_priv->file), "im", self);
+					gtk_widget_destroy(self->_priv->image);
+
+					vbox = gtk_hbox_new(FALSE, 6);
+					self->_priv->image = gtk_progress_bar_new();
+					gtk_box_pack_start(GTK_BOX(vbox), self->_priv->image, TRUE, TRUE, 0);
+					button = gtk_button_new_from_stock(GTK_STOCK_CANCEL);
+					gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+					g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_cancel_transfer), self);
+
+					gtk_container_add(GTK_CONTAINER(self->_priv->ali),vbox);
+					gtk_widget_show_all(GTK_WIDGET(self));
+
+					self->_priv->can = g_cancellable_new();
+					g_file_copy_async(self->_priv->file, dest,
+							G_FILE_COPY_OVERWRITE, G_PRIORITY_DEFAULT,
+							self->_priv->can, self_copy_progress,
+							self->_priv->file,
+							self_copy_done,
+							NULL); 
+					g_object_unref(self->_priv->can);
+					g_object_unref(dest);
+					g_free(tmp_path);
+				}
+
 
                 /* Failed to open, show a popup */
                 gtk_drag_finish(context, FALSE, FALSE, time);
-                dialog = gtk_message_dialog_new_with_markup(
-                        NULL, 
-                        GTK_DIALOG_DESTROY_WITH_PARENT,
-                        GTK_MESSAGE_WARNING,
-                        GTK_BUTTONS_CLOSE,
-                        _("Failed to open:\n<i>'%s'</i>.\nMake sure it is a valid local image."),url[0]);           
 
-                gtk_dialog_run(GTK_DIALOG(dialog));
-                gtk_widget_destroy(dialog);
                 /* free uris */
                 g_strfreev(url);
             }

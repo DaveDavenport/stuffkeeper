@@ -87,6 +87,7 @@ LIBS= \
 	@gmodule_LIBS@\
 	@libglade_LIBS@\
 	@sqlite3_LIBS@\
+	@gthread_LIBS@\
 	@gio_LIBS@
 
 
@@ -100,6 +101,7 @@ AM_CFLAGS = @CFLAGS@\
 	@gmodule_CFLAGS@\
 	@libglade_CFLAGS@\
 	@sqlite3_CFLAGS@\
+	@gthread_CFLAGS@\
 	@gio_CFLAGS@\
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\"
 
