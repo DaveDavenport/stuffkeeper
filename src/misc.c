@@ -271,21 +271,18 @@ GdkPixbuf * gdk_pixbuf_new_from_file_at_max_size(const char *uri, int size)
 
 static void __update_preview_widget (GtkWidget *fc, GtkWidget *image)
 {
-	char *uri = gtk_file_chooser_get_preview_filename(fc);
+	char *uri = gtk_file_chooser_get_preview_filename(GTK_FILE_CHOOSER(fc));
 	if(uri)
 	{
 		GdkPixbuf *pb = NULL;
 		gpointer data = g_object_get_data(G_OBJECT(fc), "size");
 		int size = (data != NULL)? GPOINTER_TO_INT(data):16;
 		pb = gdk_pixbuf_new_from_file_at_max_size(uri,size); 
-		if(pb)
-		{
+		if(pb) {
 			gtk_image_set_from_pixbuf(GTK_IMAGE(image), pb);
-			gtk_file_chooser_set_preview_widget_active (fc, TRUE);
-		}
-        else
-        {
-			gtk_file_chooser_set_preview_widget_active (fc, FALSE);
+			gtk_file_chooser_set_preview_widget_active (GTK_FILE_CHOOSER(fc), TRUE);
+		} else {
+			gtk_file_chooser_set_preview_widget_active (GTK_FILE_CHOOSER(fc), FALSE);
         }
 		g_free(uri);
 	}

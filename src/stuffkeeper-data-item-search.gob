@@ -214,7 +214,7 @@ class Stuffkeeper:Data:Item:Search from G:Object
             char *error = NULL;
             char *query  = NULL;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
-            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(skdb);
+            obj->_priv->sqlHandle = stuffkeeper_data_backend_get_handle(obj->_priv->skdb);
             /**
              * Insert the first item in the list
              */

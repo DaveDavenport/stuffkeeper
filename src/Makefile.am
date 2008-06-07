@@ -65,7 +65,6 @@ BUILT_SOURCES= revisiont.h\
 
 %.c %.h %-private.h: %.gob
 	@GOB2@ --no-touch-headers --always-private-header $<
-	@touch $@
 
 revisiont.h:
 	@if test '$(REVISION)' != '$(CONF_VERSION)'; then\
