@@ -35,15 +35,9 @@ typedef enum
 	EGG_DATETIME_DISPLAY_YEAR       = 1 << 0,
 	EGG_DATETIME_DISPLAY_MONTH      = 1 << 1,
 	EGG_DATETIME_DISPLAY_DAY        = 1 << 2,
-	EGG_DATETIME_DISPLAY_HOUR       = 1 << 3,
-	EGG_DATETIME_DISPLAY_MINUTE     = 1 << 4,
-	EGG_DATETIME_DISPLAY_SECOND     = 1 << 5,
 	EGG_DATETIME_DISPLAY_YEAR_OPT   = 1 << 6,
 	EGG_DATETIME_DISPLAY_MONTH_OPT  = 1 << 7,
-	EGG_DATETIME_DISPLAY_DAY_OPT    = 1 << 8,
-	EGG_DATETIME_DISPLAY_HOUR_OPT   = 1 << 9,
-	EGG_DATETIME_DISPLAY_MINUTE_OPT = 1 << 10,
-	EGG_DATETIME_DISPLAY_SECOND_OPT = 1 << 11
+	EGG_DATETIME_DISPLAY_DAY_OPT    = 1 << 8
 } EggDateTimeDisplayMode;
 
 /* ... use these instead */
@@ -90,7 +84,7 @@ GtkWidget		*egg_datetime_new			(void);
 GtkWidget		*egg_datetime_new_from_time_t		(time_t t);
 GtkWidget		*egg_datetime_new_from_struct_tm	(struct tm *tm);
 GtkWidget		*egg_datetime_new_from_gdate		(GDate *date);
-GtkWidget		*egg_datetime_new_from_datetime		(GDateYear year, GDateMonth month, GDateDay day, guint8 hour, guint8 minute, guint8 second);
+GtkWidget		*egg_datetime_new_from_datetime		(GDateYear year, GDateMonth month, GDateDay day);
 
 /* Accessors */
 void			 egg_datetime_set_none			(EggDateTime *edt);
@@ -102,8 +96,6 @@ void			 egg_datetime_set_from_gdate		(EggDateTime *edt, GDate *date);
 gboolean		 egg_datetime_get_as_gdate		(EggDateTime *edt, GDate *date);
 void			 egg_datetime_set_date			(EggDateTime *edt, GDateYear year, GDateMonth month, GDateDay day);
 gboolean		 egg_datetime_get_date			(EggDateTime *edt, GDateYear *year, GDateMonth *month, GDateDay *day);
-void			 egg_datetime_set_time			(EggDateTime *edt, guint8 hour, guint8 minute, guint8 second);
-gboolean		 egg_datetime_get_time			(EggDateTime *edt, guint8 *hour, guint8 *minute, guint8 *second);
 
 void			 egg_datetime_set_lazy			(EggDateTime *edt, gboolean lazy);
 gboolean		 egg_datetime_get_lazy			(EggDateTime *edt);
@@ -111,13 +103,10 @@ void			 egg_datetime_set_display_mode		(EggDateTime *edt, EggDateTimeDisplayMode
 EggDateTimeDisplayMode	 egg_datetime_get_display_mode		(EggDateTime *edt);
 
 void			 egg_datetime_set_clamp_date		(EggDateTime *edt, GDateYear minyear, GDateMonth minmonth, GDateDay minday, GDateYear maxyear, GDateMonth maxmonth, GDateDay maxday);
-void			 egg_datetime_set_clamp_time		(EggDateTime *edt, guint8 minhour, guint8 minminute, guint8 minsecond, guint8 maxhour, guint8 maxminute, guint8 maxsecond);
 void			 egg_datetime_set_clamp_time_t		(EggDateTime *edt);
 void			 egg_datetime_get_clamp_date		(EggDateTime *edt, GDateYear *minyear, GDateMonth *minmonth, GDateDay *minday, GDateYear *maxyear, GDateMonth *maxmonth, GDateDay *maxday);
-void			 egg_datetime_get_clamp_time		(EggDateTime *edt, guint8 *minhour, guint8 *minminute, guint8 *minsecond, guint8 *maxhour, guint8 *maxminute, guint8 *maxsecond);
 
 PangoLayout		*egg_datetime_get_date_layout		(EggDateTime *edt);
-PangoLayout		*egg_datetime_get_time_layout		(EggDateTime *edt);
 
 G_END_DECLS
 

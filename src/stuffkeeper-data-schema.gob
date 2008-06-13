@@ -59,7 +59,7 @@ requires 2.0.10
             // FIELD_TYPE_LINK
             N_("Link"),
             // FIELD_TYPE_DATE
-            N_("Date & Time"),  
+            N_("Date"),  
             //FIELD_TYPE_EXPANDER
             N_("Expander"),
             //FIELD_TYPE_END_EXPANDER
