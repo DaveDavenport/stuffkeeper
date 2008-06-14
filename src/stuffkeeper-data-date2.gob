@@ -49,13 +49,11 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
     }
 
 
-
-
-
     /**
      * Popups
      */
-    private void
+    private
+    void
     popup_show (self)
     {
         GdkCursor *cursor;
@@ -73,7 +71,8 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
         gdk_cursor_unref (cursor);
     }
 
-    private void
+    private
+    void
     popup_hide (self)
     {
         gtk_widget_hide (GTK_WIDGET (self->_priv->win));
@@ -121,32 +120,33 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
         gtk_window_move (GTK_WINDOW(popup), x, y);
     }
 
-    private gboolean
-        popup_button_pressed (self, GdkEventButton *event, GtkWidget *widget)
-        {
-            GtkWidget *child;
+    private
+    gboolean
+    popup_button_pressed (self, GdkEventButton *event, GtkWidget *widget)
+    {
+        GtkWidget *child;
 
-            child = gtk_get_event_widget ((GdkEvent *) event);
+        child = gtk_get_event_widget ((GdkEvent *) event);
 
-            /* We don't ask for button press events on the grab widget, so
-             * if an event is reported directly to the grab widget, it must
-             * be on a window outside the application (and thus we remove
-             * the popup window). Otherwise, we check if the widget is a child
-             * of the grab widget, and only remove the popup window if it
-             * is not.
-             */
-            if (child != widget) {
-                while (child) {
-                    if (child == widget)
-                        return FALSE;
-                    child = child->parent;
-                }
+        /* We don't ask for button press events on the grab widget, so
+         * if an event is reported directly to the grab widget, it must
+         * be on a window outside the application (and thus we remove
+         * the popup window). Otherwise, we check if the widget is a child
+         * of the grab widget, and only remove the popup window if it
+         * is not.
+         */
+        if (child != widget) {
+            while (child) {
+                if (child == widget)
+                    return FALSE;
+                child = child->parent;
             }
-
-            self_popup_hide (self);
-
-            return TRUE;
         }
+
+        self_popup_hide (self);
+
+        return TRUE;
+    }
 
     private 
     gboolean
@@ -259,10 +259,8 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
                stuffkeeper_data_item_set_integer(self->_priv->item, self->_priv->field, self->_priv->time);
             }
         }
-
-
-
     }
+
     override (G:Object)
     void
     finalize(G:Object *obj)
@@ -286,6 +284,7 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
 
         PARENT_HANDLER(obj);
     }
+
     private
     void
     backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
@@ -448,14 +447,10 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
         {
             self->_priv->time = (time_t) stuffkeeper_data_item_get_integer(self->_priv->item, self->_priv->field);
         }
-
         self_update_label_calendar (self);
+
         gtk_widget_show(GTK_WIDGET(self));
-
-
 
         return GTK_WIDGET(self);
     }
-
-   
 }
