@@ -1,0 +1,461 @@
+requires 2.0.10
+
+%h{
+#include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
+#include "stuffkeeper-data-item.h"
+%}
+
+%ph{
+#include "stuffkeeper-data-backend.h"
+%}
+
+
+class Stuffkeeper:Data:Date2 from Gtk:HBox
+{
+    private StuffkeeperDataItem *item = {NULL};
+    private gchar *field = {NULL} destroywith g_free;
+
+
+    private GtkWidget *win = {NULL};
+    private GtkWidget *button = {NULL};
+    private GtkWidget *popup_calendar = {NULL};
+    private GtkWidget *label = {NULL};
+    private GtkWidget *today_button = {NULL};
+    private GtkWidget *no_date_button = {NULL};
+
+    private time_t time = {0};
+    private gulong calendar_signal = {0};
+    private gulong changed_item_entry = {0};
+    private gulong signal_backend_locked = {0};
+
+    public
+    void
+    item_changed(self,const gchar *field, StuffkeeperDataItem *item)
+    {
+        if(self->_priv->field)
+        {
+            if(field && strcmp(field, self->_priv->field) == 0)
+            {
+                time_t value = (time_t)stuffkeeper_data_item_get_integer(item, self->_priv->field);
+
+                if(value != self->_priv->time)
+                {
+                    self->_priv->time = (time_t)value;
+                    self_update_label_calendar (self);
+                }
+            }
+        }
+    }
+
+
+
+
+
+    /**
+     * Popups
+     */
+    private void
+    popup_show (self)
+    {
+        GdkCursor *cursor;
+
+        gtk_widget_show (GTK_WIDGET (self->_priv->win));
+        gtk_widget_grab_focus (GTK_WIDGET (self->_priv->win));
+        gtk_grab_add (GTK_WIDGET (self->_priv->win));
+
+        cursor = gdk_cursor_new (GDK_ARROW);
+        gdk_pointer_grab (GTK_WIDGET (self->_priv->win)->window, TRUE,
+                (GDK_BUTTON_PRESS_MASK
+                 | GDK_BUTTON_RELEASE_MASK
+                 | GDK_POINTER_MOTION_MASK),
+                NULL, cursor, GDK_CURRENT_TIME);
+        gdk_cursor_unref (cursor);
+    }
+
+    private void
+    popup_hide (self)
+    {
+        gtk_widget_hide (GTK_WIDGET (self->_priv->win));
+        gtk_grab_remove (GTK_WIDGET (self->_priv->win));
+        gdk_pointer_ungrab (GDK_CURRENT_TIME);
+    }
+
+    private 
+    gboolean
+    popup_key_pressed (self, GdkEventKey *event, GtkWidget *widget)
+    {
+        if (event->keyval != GDK_Escape)
+            return FALSE;
+
+        g_signal_stop_emission_by_name (G_OBJECT (widget), "key_press_event");
+
+        self_popup_hide (self);
+
+        return TRUE;
+    }
+
+    private 
+    void
+    popup_position (self, GtkWidget *popup)
+    {
+        GtkWidget *widget = GTK_WIDGET(self);
+        GtkRequisition requisition;
+        gint x, y, width, height;
+
+        gtk_widget_size_request (GTK_WIDGET (popup), &requisition);
+        gdk_window_get_origin (widget->window, &x, &y);
+
+        x += widget->allocation.x;
+        y += widget->allocation.y;
+        width  = widget->allocation.width;
+        height = widget->allocation.height;
+        x += width - requisition.width;
+        y += height;
+
+        if (x < 0)
+            x = 0;
+        if (y < 0)
+            y = 0;
+
+        gtk_window_move (GTK_WINDOW(popup), x, y);
+    }
+
+    private gboolean
+        popup_button_pressed (self, GdkEventButton *event, GtkWidget *widget)
+        {
+            GtkWidget *child;
+
+            child = gtk_get_event_widget ((GdkEvent *) event);
+
+            /* We don't ask for button press events on the grab widget, so
+             * if an event is reported directly to the grab widget, it must
+             * be on a window outside the application (and thus we remove
+             * the popup window). Otherwise, we check if the widget is a child
+             * of the grab widget, and only remove the popup window if it
+             * is not.
+             */
+            if (child != widget) {
+                while (child) {
+                    if (child == widget)
+                        return FALSE;
+                    child = child->parent;
+                }
+            }
+
+            self_popup_hide (self);
+
+            return TRUE;
+        }
+
+    private 
+    gboolean
+    popup_closed (self, GtkWindow *popup)
+    {
+        self_popup_hide (self);
+
+        return TRUE;
+    }
+
+    private
+    void
+    clicked(self)
+    {
+        gtk_widget_show_all(self->_priv->win);
+        self_popup_show(self);
+        self_popup_position(self, self->_priv->win);
+    }
+
+    private
+    void
+    today_button_clicked(self,GtkWidget *button)
+    {
+        self->_priv->time = time(NULL);
+        self_update_label_calendar (self);
+        self_popup_hide(self);
+    }
+
+    private
+    void
+    no_date_button_clicked(self, GtkWidget *no_date)
+    {
+        self->_priv->time = 0; 
+        self_update_label_calendar (self);
+        self_popup_hide(self);
+    }
+
+    private
+    void
+    calendar_day_selected(self, GtkCalendar *calendar)
+    {
+        struct tm tm;
+        guint year,month, day;
+        gtk_calendar_get_date(calendar, &year, &month, &day);
+        printf("%i %i %i\n", year, month, day);
+        if(day > 0)
+        {
+            memset(&tm, 0, sizeof(struct tm));
+            tm.tm_year = year-1900;
+            tm.tm_mon  = month-1;
+            tm.tm_mday = day;
+            tm.tm_hour = 0;
+            tm.tm_min  = 0; 
+            tm.tm_sec  = 0; 
+            self->_priv->time = mktime (&tm);
+        }
+        else
+            self->_priv->time = 0; 
+
+
+        self_update_label_calendar (self);
+    }
+
+    private
+    void
+    calendar_day_selected_double_click(self, GtkCalendar *calendar)
+    {
+        self_popup_hide(self);
+    }
+
+    private
+    void
+    update_label_calendar(self)
+    {
+        guint year,month, day;
+        char buffer[64];
+        struct tm t;
+        if(self->_priv->time == 0)
+        {
+            gtk_label_set_text(GTK_LABEL(self->_priv->label),_("No date"));
+
+            g_signal_handler_block(GTK_CALENDAR(self->_priv->popup_calendar),self->_priv->calendar_signal); 
+            gtk_calendar_select_day(GTK_CALENDAR(self->_priv->popup_calendar), 0);
+            g_signal_handler_unblock(GTK_CALENDAR(self->_priv->popup_calendar),self->_priv->calendar_signal); 
+        }
+        else
+        {
+            localtime_r(&(self->_priv->time),&t);
+            strftime(buffer,64,"%x", &t);
+            gtk_label_set_text(GTK_LABEL(self->_priv->label), buffer);
+
+
+            gtk_calendar_get_date(GTK_CALENDAR(self->_priv->popup_calendar), &year, &month, &day);
+
+            if(year != t.tm_year+1900 || month != t.tm_mon+1 || day != t.tm_mday)
+            {
+                g_signal_handler_block(GTK_CALENDAR(self->_priv->popup_calendar),self->_priv->calendar_signal); 
+
+                gtk_calendar_select_day(GTK_CALENDAR(self->_priv->popup_calendar), t.tm_mday);
+                gtk_calendar_select_month(GTK_CALENDAR(self->_priv->popup_calendar), t.tm_mon+1, t.tm_year+1900);
+
+                g_signal_handler_unblock(GTK_CALENDAR(self->_priv->popup_calendar),self->_priv->calendar_signal); 
+            }
+        }
+        if(self->_priv->field)
+        {
+           time_t a= (time_t) stuffkeeper_data_item_get_integer(self->_priv->item, self->_priv->field);
+            if(a != self->_priv->time)
+            {
+               stuffkeeper_data_item_set_integer(self->_priv->item, self->_priv->field, self->_priv->time);
+            }
+        }
+
+
+
+    }
+    override (G:Object)
+    void
+    finalize(G:Object *obj)
+    {
+        Self *self = SELF(obj);
+
+        if(self->_priv->win)
+        {
+            gtk_widget_destroy(self->_priv->win);
+            self->_priv->win = NULL;
+        }
+        if(self->_priv->changed_item_entry)
+        {
+            g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
+            self->_priv->changed_item_entry = 0;
+        }
+        if(self->_priv->signal_backend_locked) {                                                                     
+            g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
+            self->_priv->signal_backend_locked = 0;
+        }
+
+        PARENT_HANDLER(obj);
+    }
+    private
+    void
+    backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
+    {
+        gboolean locked = stuffkeeper_data_backend_get_locked(backend);
+        if(locked)
+        {
+            gtk_widget_hide(self->_priv->button); 
+        }else{
+            gtk_widget_show(self->_priv->button); 
+        }
+    }
+
+    /**
+     * Public functions 
+     */
+    public
+    time_t 
+    get_time(self)
+    {
+        return self->_priv->time;
+    }
+
+    public
+    void
+    set_time(self, time_t time)
+    {
+        self->_priv->time = time;
+        self_update_label_calendar (self);
+    }
+
+
+    public
+    GtkWidget *
+    new(StuffkeeperDataItem *item, const gchar *field)
+
+    {
+        Self *self = GET_NEW;
+        GtkWidget *frame, *vbox, *hbox, *arrow;
+
+
+        gtk_widget_set_no_show_all(GTK_WIDGET(self), TRUE);
+
+        self->_priv->item = item;
+        self->_priv->field = g_strdup(field);
+
+        /* set spacing */
+        gtk_box_set_spacing(GTK_BOX(self), 6);
+
+        /* Label showing the date */
+        self->_priv->label = gtk_label_new("");
+        gtk_misc_set_alignment(GTK_MISC(self->_priv->label), 0.0, 0.5);
+        gtk_box_pack_start(GTK_BOX(self), self->_priv->label, TRUE, TRUE, 0);
+
+        /**
+         * The button to open the popup
+         */
+        self->_priv->button = gtk_button_new();
+        arrow = gtk_image_new_from_stock(GTK_STOCK_EDIT, GTK_ICON_SIZE_MENU);
+        gtk_button_set_relief(GTK_BUTTON(self->_priv->button), GTK_RELIEF_NONE);
+        gtk_container_add(GTK_CONTAINER(self->_priv->button), arrow);
+        gtk_box_pack_start(GTK_BOX(self), self->_priv->button, FALSE, TRUE, 0);
+        g_signal_connect_swapped(G_OBJECT(self->_priv->button), "clicked", 
+                G_CALLBACK(self_clicked), self);
+
+
+
+
+        /***
+         * Create popup 
+         */
+        self->_priv->win = gtk_window_new(GTK_WINDOW_POPUP);
+        gtk_widget_hide_on_delete(self->_priv->win);
+        gtk_widget_set_events (self->_priv->win,
+                gtk_widget_get_events (self->_priv->win) | GDK_KEY_PRESS_MASK);
+        gtk_window_set_resizable (GTK_WINDOW (self->_priv->win), FALSE);
+
+        g_signal_connect_swapped (G_OBJECT (self->_priv->win), 
+                "delete-event",
+                G_CALLBACK (self_popup_closed),
+                self);
+
+        g_signal_connect_swapped (G_OBJECT (self->_priv->win),
+                "key-press-event",
+                G_CALLBACK (self_popup_key_pressed),
+                self);
+
+        g_signal_connect_swapped (G_OBJECT (self->_priv->win),
+                "button-press-event",
+                G_CALLBACK (self_popup_button_pressed),
+                self);
+
+
+
+
+
+        /* frame */
+        frame = gtk_frame_new(NULL);
+        gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
+        gtk_container_add(GTK_CONTAINER(self->_priv->win),frame);
+
+        /* box */
+        vbox = gtk_vbox_new(FALSE, 6);
+        gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
+        gtk_container_add(GTK_CONTAINER(frame),vbox);
+
+
+        /* Calendar widget */
+        self->_priv->popup_calendar = gtk_calendar_new();
+        gtk_box_pack_start(GTK_BOX(vbox), self->_priv->popup_calendar, FALSE, TRUE, 0);
+
+        self->_priv->calendar_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->popup_calendar),
+                "day-selected", 
+                G_CALLBACK(self_calendar_day_selected), 
+                self);
+
+        g_signal_connect_swapped(G_OBJECT(self->_priv->popup_calendar), 
+                "day-selected-double-click", 
+                G_CALLBACK(self_calendar_day_selected_double_click),
+                self);
+
+
+        /* hbox containing the widgets */
+        hbox = gtk_hbox_new(FALSE, 6);
+        gtk_box_pack_start(GTK_BOX(vbox),hbox, FALSE, TRUE, 0);
+
+
+
+        /* Today button */ 
+        self->_priv->today_button = gtk_button_new_with_mnemonic(_("_Today"));
+        gtk_box_pack_start(GTK_BOX(hbox),self->_priv->today_button, FALSE, TRUE, 0);
+
+        g_signal_connect_swapped(G_OBJECT(self->_priv->today_button), 
+                "clicked", 
+                G_CALLBACK(self_today_button_clicked), 
+                self);
+
+        /* No date button */
+        self->_priv->no_date_button = gtk_button_new_with_mnemonic(_("_No date"));
+        gtk_box_pack_start(GTK_BOX(hbox),self->_priv->no_date_button, FALSE, TRUE, 0);
+
+        g_signal_connect_swapped(G_OBJECT(self->_priv->no_date_button), 
+                "clicked", 
+                G_CALLBACK(self_no_date_button_clicked), 
+                self);
+
+
+        gtk_widget_show_all(self->_priv->button);
+        gtk_widget_show_all(self->_priv->label);
+
+
+        self->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), self);
+        self->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
+                "notify::locked", G_CALLBACK(self_backend_locked), self);
+
+        self_backend_locked(self,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
+
+        /* update the label */
+        if(self->_priv->field)
+        {
+            self->_priv->time = (time_t) stuffkeeper_data_item_get_integer(self->_priv->item, self->_priv->field);
+        }
+
+        self_update_label_calendar (self);
+        gtk_widget_show(GTK_WIDGET(self));
+
+
+
+        return GTK_WIDGET(self);
+    }
+
+   
+}

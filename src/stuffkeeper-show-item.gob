@@ -14,7 +14,7 @@ requires 2.0.10
 #include "stuffkeeper-data-text.h"
 #include "stuffkeeper-data-image.h"
 #include "stuffkeeper-data-link.h"
-#include "stuffkeeper-data-date.h"
+#include "stuffkeeper-data-date2.h"
 #include "stuffkeeper-data-taglist2.h"
 #include "stuffkeeper-data-expander.h"
 %}
@@ -109,7 +109,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
             }else if (type == FIELD_TYPE_LINK) {
                 label1 = stuffkeeper_data_link_new(self->_priv->item,self->_priv->retv[i]);                    
             }else if (type == FIELD_TYPE_DATE) {
-                label1 = stuffkeeper_data_date_new(self->_priv->item,self->_priv->retv[i]);                    
+                label1 = stuffkeeper_data_date2_new(self->_priv->item,self->_priv->retv[i]);                    
             }else if (type == FIELD_TYPE_EXPANDER) {
                 GtkWidget *ali = gtk_alignment_new(0.0,0,1,1);
                 gtk_alignment_set_padding(GTK_ALIGNMENT(ali), 0,0,12,0);

@@ -15,6 +15,7 @@ stuffkeeper_SOURCES=\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-date.c\
+	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
 	stuffkeeper-data-taglist2.c\
@@ -42,6 +43,7 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-date.c\
+	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
 	stuffkeeper-data-taglist2.c\
@@ -126,6 +128,7 @@ EXTRA_DIST=\
 		   stuffkeeper-data-boolean.h\
 		   stuffkeeper-data-spinbutton.h\
 		   stuffkeeper-data-date.h\
+		   stuffkeeper-data-date2.h\
 		   stuffkeeper-data-tag.h\
 		   stuffkeeper-data-entry.h\
 		   stuffkeeper-data-taglist2.h\
@@ -151,6 +154,7 @@ EXTRA_DIST=\
 		   stuffkeeper-data-boolean-private.h\
 		   stuffkeeper-data-spinbutton-private.h\
 		   stuffkeeper-data-date-private.h\
+		   stuffkeeper-data-date2-private.h\
 		   stuffkeeper-data-tag-private.h\
 		   stuffkeeper-data-entry-private.h\
 		   stuffkeeper-data-taglist2-private.h\
