@@ -3,6 +3,7 @@ requires 2.0.10
 %h{
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+#include "misc.h"
 #include "stuffkeeper-data-item.h"
 %}
 
@@ -273,9 +274,14 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
         }
         else
         {
+            gchar *markup = g_key_file_get_string(config_file, "DateField","format", NULL);
+            if(!markup) {
+                markup = g_strdup("%x");
+            }
             localtime_r(&(self->_priv->time),&t);
-            strftime(buffer,64,"%x", &t);
+            strftime(buffer,64,markup, &t);
             gtk_label_set_text(GTK_LABEL(self->_priv->label), buffer);
+            g_free(markup);
 
 
             gtk_calendar_get_date(GTK_CALENDAR(self->_priv->popup_calendar), &year, &month, &day);
