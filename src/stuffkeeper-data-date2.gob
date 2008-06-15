@@ -16,7 +16,9 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
     private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
 
-
+    /**
+     * Popup Widgets
+     */
     private GtkWidget *win = {NULL};
     private GtkWidget *button = {NULL};
     private GtkWidget *popup_calendar = {NULL};
@@ -24,11 +26,24 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
     private GtkWidget *today_button = {NULL};
     private GtkWidget *no_date_button = {NULL};
 
+    /**
+     * The time the widget represents 
+     */
     private time_t time = {0};
+
+    /**
+     * Signal handlers
+     */
     private gulong calendar_signal = {0};
     private gulong changed_item_entry = {0};
     private gulong signal_backend_locked = {0};
 
+
+    /**
+     * This is called by the StuffkeeperDataBackend when 
+     * the item changed.
+     * Check if it is equal to my id, then update myself
+     */
     public
     void
     item_changed(self,const gchar *field, StuffkeeperDataItem *item)
@@ -100,17 +115,41 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
     {
         GtkWidget *widget = GTK_WIDGET(self);
         GtkRequisition requisition;
-        gint x, y, width, height;
+        gint x, y;
 
+
+        /* get the size of the widget */
         gtk_widget_size_request (GTK_WIDGET (popup), &requisition);
-        gdk_window_get_origin (widget->window, &x, &y);
 
-        x += widget->allocation.x;
-        y += widget->allocation.y;
-        width  = widget->allocation.width;
-        height = widget->allocation.height;
-        x += width - requisition.width;
-        y += height;
+        /* get the position of the widget lower right corner*/
+        gdk_window_get_origin (widget->window, &x, &y);
+        x += widget->allocation.x + widget->allocation.width;
+        y += widget->allocation.y + widget->allocation.height;
+
+        /**
+         * Get an idea about the monitor setup
+         */
+        /* get the screen */
+        GdkScreen *screen = gtk_widget_get_screen(GTK_WIDGET(self)); 
+        /* get the monitor the widget is on */
+        gint monitor = gdk_screen_get_monitor_at_point(screen, x,y);
+        /* get the monitor size */
+        GdkRectangle mon_rect;
+        gdk_screen_get_monitor_geometry(screen, monitor, &mon_rect);
+
+        /* right align poup with widget */
+        x -= requisition.width;
+
+        /* if the widget would go outside the bottom of the current monitor, move it up to fit again */
+        if((y+requisition.height) > (mon_rect.y+mon_rect.height))
+        {
+            y = mon_rect.y+mon_rect.height-requisition.height;
+        }
+        /* if it would fall of the left of the monitor, move it to the right */
+        if((x) < (mon_rect.x))
+        {
+            x = mon_rect.x;
+        }
 
         if (x < 0)
             x = 0;
@@ -191,14 +230,14 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
         struct tm tm;
         guint year,month, day;
         gtk_calendar_get_date(calendar, &year, &month, &day);
-        printf("%i %i %i\n", year, month, day);
         if(day > 0)
         {
             memset(&tm, 0, sizeof(struct tm));
             tm.tm_year = year-1900;
-            tm.tm_mon  = month-1;
+            tm.tm_mon  = month;
             tm.tm_mday = day;
-            tm.tm_hour = 0;
+            /* set it at 2 am, so we don't bother with summertime/winter time */
+            tm.tm_hour = 2;
             tm.tm_min  = 0; 
             tm.tm_sec  = 0; 
             self->_priv->time = mktime (&tm);
@@ -246,7 +285,7 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
                 g_signal_handler_block(GTK_CALENDAR(self->_priv->popup_calendar),self->_priv->calendar_signal); 
 
                 gtk_calendar_select_day(GTK_CALENDAR(self->_priv->popup_calendar), t.tm_mday);
-                gtk_calendar_select_month(GTK_CALENDAR(self->_priv->popup_calendar), t.tm_mon+1, t.tm_year+1900);
+                gtk_calendar_select_month(GTK_CALENDAR(self->_priv->popup_calendar), t.tm_mon, t.tm_year+1900);
 
                 g_signal_handler_unblock(GTK_CALENDAR(self->_priv->popup_calendar),self->_priv->calendar_signal); 
             }
