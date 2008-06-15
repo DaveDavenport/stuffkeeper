@@ -8,13 +8,11 @@ stuffkeeper_SOURCES=\
 	main.c\
 	debug.c\
 	sexy-icon-entry.c\
-	egg-datetime.c\
 	bacon-message-connection.c\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
-	stuffkeeper-data-date.c\
 	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
@@ -42,7 +40,6 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
-	stuffkeeper-data-date.c\
 	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
@@ -119,7 +116,6 @@ stuffkeeperincludedir =$(includedir)/stuffkeeper/
 
 EXTRA_DIST=\
 		   bacon-message-connection.h\
-		   egg-datetime.h\
 		   debug.h\
 		   misc.h\
 		   sexy-icon-entry.h\
@@ -127,7 +123,6 @@ EXTRA_DIST=\
 		   stuffkeeper-data-schema.h\
 		   stuffkeeper-data-boolean.h\
 		   stuffkeeper-data-spinbutton.h\
-		   stuffkeeper-data-date.h\
 		   stuffkeeper-data-date2.h\
 		   stuffkeeper-data-tag.h\
 		   stuffkeeper-data-entry.h\

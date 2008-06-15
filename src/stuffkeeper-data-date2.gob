@@ -236,8 +236,8 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
             tm.tm_year = year-1900;
             tm.tm_mon  = month;
             tm.tm_mday = day;
-            /* set it at 2 am, so we don't bother with summertime/winter time */
-            tm.tm_hour = 2;
+            /* set it at 12 am, so we don't bother with summertime/winter time */
+            tm.tm_hour = 12;
             tm.tm_min  = 0; 
             tm.tm_sec  = 0; 
             self->_priv->time = mktime (&tm);
