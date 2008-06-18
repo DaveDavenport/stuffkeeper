@@ -72,19 +72,19 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
     void
     popup_show (self)
     {
-        GdkCursor *cursor;
+        GdkCursor *cursor = NULL;
 
         gtk_widget_show (GTK_WIDGET (self->_priv->win));
         gtk_widget_grab_focus (GTK_WIDGET (self->_priv->win));
         gtk_grab_add (GTK_WIDGET (self->_priv->win));
 
-        cursor = gdk_cursor_new (GDK_ARROW);
+/*        cursor = gdk_cursor_new (GDK_ARROW);*/
         gdk_pointer_grab (GTK_WIDGET (self->_priv->win)->window, TRUE,
                 (GDK_BUTTON_PRESS_MASK
                  | GDK_BUTTON_RELEASE_MASK
                  | GDK_POINTER_MOTION_MASK),
                 NULL, cursor, GDK_CURRENT_TIME);
-        gdk_cursor_unref (cursor);
+    /*    gdk_cursor_unref (cursor);*/
     }
 
     private
@@ -202,8 +202,9 @@ class Stuffkeeper:Data:Date2 from Gtk:HBox
     clicked(self)
     {
         gtk_widget_show_all(self->_priv->win);
-        self_popup_show(self);
         self_popup_position(self, self->_priv->win);
+        self_popup_show(self);
+
     }
 
     private
