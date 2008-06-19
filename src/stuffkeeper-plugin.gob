@@ -16,11 +16,16 @@ typedef enum _PluginType {
  * And set plugin name.
  */
 %h{
-    /*
-     * gchar *plugin_name = "Plugin name";
+    /**
+     * register_plugin:
      *
-     * * In case off Stuffkeeper:Plugin:Test:
-     * GType register_plugin() { return stuffkeeeper_plugin_test_get_type();}
+     * A plugin must implement this function, it is called by stuffkeeper 
+     * after loading the module. This will register the object with the gobject system
+     * and allows stuffkeeper to create the plugin.
+     * For Stuffkeeper:Plugin:Test this can be done by adding this to the plugin:
+     * GType register_plugin() { return stuffkeeper_plugin_test_get_type();}
+	 * 
+	 * Returns: a #GType that identifies the plugin.
      */
     GType register_plugin();
 %}
@@ -28,7 +33,12 @@ typedef enum _PluginType {
 class Stuffkeeper:Plugin from G:Object
 {
     /**
-     * Return the type of the plugin 
+	 * get_plugin_type:
+	 *
+	 * Get the type of the plugin,if multiple types are implemented by one plugin,
+	 * you can logic OR them. F.e. type = PLUGIN_ITEM|PLUGIN_MENU.
+	 *
+     * Returns: a #PluginType 
      */
     virtual
     PluginType
