@@ -10,7 +10,6 @@ aclocal
 autoconf	>= 2.59
 intltool        >= 0.21 
 libtoool
-regex.h
 glib-2.0        >= 2.16
 gtk+-2.0        >= 2.12
 gmodule-2.0

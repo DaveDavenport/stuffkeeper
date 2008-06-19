@@ -85,8 +85,6 @@ fi
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
-AC_CHECK_HEADER([regex.h], [],
-                [AC_MSG_ERROR([Required header regex.h not found.])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
