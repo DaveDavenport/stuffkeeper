@@ -8,3 +8,4 @@ src/stuffkeeper-item-view.c
 src/stuffkeeper-show-item.c
 src/stuffkeeper-export-html.c
 src/stuffkeeper-data-schema-private.h
+src/stuffkeeper-data-date2.c

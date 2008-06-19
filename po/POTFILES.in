@@ -11,7 +11,7 @@ glade/stuffkeeper.glade
 # Gob files
 src/stuffkeeper-data-backend.gob
 src/stuffkeeper-data-boolean.gob
-src/stuffkeeper-data-date.gob
+src/stuffkeeper-data-date2.gob
 src/stuffkeeper-data-entry.gob
 src/stuffkeeper-data-image.gob
 src/stuffkeeper-data-item.gob
@@ -37,6 +37,5 @@ src/main.c
 
 # 3rd party files
 src/sexy-icon-entry.c
-src/egg-datetime.c
 src/bacon-message-connection.c
 
