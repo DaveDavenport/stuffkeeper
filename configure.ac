@@ -10,7 +10,7 @@ m4_define([stuffkeeper_email],      "qball@stuffkeeper.org");
 
 # Version
 m4_define([stuffkeeper_major_version], [0])
-m4_define([stuffkeeper_minor_version], [10])
+m4_define([stuffkeeper_minor_version], [11])
 m4_define([stuffkeeper_micro_version], [0])
 
 # generate needed values in f.e. header files
