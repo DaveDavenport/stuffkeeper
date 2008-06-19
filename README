@@ -1,0 +1,36 @@
+Requirments:
+============
+
+The following libraries and programs are required to compile stuffkeeper:
+make
+gcc
+automake        >= 1.6
+autoheader
+aclocal
+autoconf	>= 2.59
+intltool        >= 0.21 
+libtoool
+regex.h
+glib-2.0        >= 2.16
+gtk+-2.0        >= 2.12
+gmodule-2.0
+libglade-2.0
+sqlite3
+gio-2.0
+ghtread-2.0
+gob2            >= 2.0.10
+
+Compile options:
+================
+
+The following options are available, they are available for debuggin purpose only.
+--enable-debug  Outputs extra debug information.
+--enable-timing Outputs timing information.
+
+Compiling:
+==========
+
+./configure <compile options>
+make
+make install
+

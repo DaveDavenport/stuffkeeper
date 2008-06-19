@@ -7,6 +7,7 @@ m4_define([stuffkeeper_name],       "stuffkeeper")
 m4_define([stuffkeeper_website],    "http://stuffkeeper.org/")
 m4_define([stuffkeeper_bugtracker], "http://bugtracker.sarine.nl/")
 m4_define([stuffkeeper_email],      "qball@stuffkeeper.org");
+
 # Version
 m4_define([stuffkeeper_major_version], [0])
 m4_define([stuffkeeper_minor_version], [10])
@@ -20,9 +21,9 @@ AC_INIT(src)
 AM_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE([stuffkeeper], [stuffkeeper_version],  stuffkeeper_email)
 
-AC_DEFINE(PROGRAM_WEBSITE,      stuffkeeper_website,    ["Program website "])
+AC_DEFINE(PROGRAM_WEBSITE,      stuffkeeper_website,    ["Program website"])
 AC_DEFINE(PROGRAM_NAME,         stuffkeeper_name,       ["Program name"])
-AC_DEFINE(PROGRAM_BUGTRACKER,   stuffkeeper_bugtracker, ["Program bugtracker "])
+AC_DEFINE(PROGRAM_BUGTRACKER,   stuffkeeper_bugtracker, ["Program bugtracker"])
 
 ##
 # Versioning
@@ -96,7 +97,7 @@ AC_SUBST(GTK_REQUIRED)
 # Split this out, because pkgconfig macro doesn't return nicely what is missing
 
 # glib
-PKG_CHECK_MODULES([glib], glib-2.0 >= 2.10)
+PKG_CHECK_MODULES([glib], glib-2.0 >= 2.16)
 AC_SUBST(glib_LIBS)
 AC_SUBST(glib_CFLAGS)
 
@@ -106,7 +107,7 @@ AC_SUBST(gobject_LIBS)
 AC_SUBST(gobject_CFLAGS)
 
 #gtk
-PKG_CHECK_MODULES([gtk], gtk+-2.0 >= 2.10)
+PKG_CHECK_MODULES([gtk], gtk+-2.0 >= 2.12)
 AC_SUBST(gtk_LIBS)
 AC_SUBST(gtk_CFLAGS)
 
@@ -166,7 +167,7 @@ AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR,"$PACKAGE_LOCALE_DIR",[The package's local
 AC_SUBST(PACKAGE_LOCALE_DIR)
 AC_SUBST(PACKAGE_LIBS)
 
-GOB2_CHECK(2.0.0)
+GOB2_CHECK(2.0.10)
 
 STUFFKEEPER_PLUGIN_DIR="${PACKAGE_PREFIX}/lib/stuffkeeper_name/"
 AC_DEFINE_UNQUOTED(STUFFKEEPER_PLUGIN_DIR,"$STUFFKEEPER_PLUGIN_DIR",[The directory the plugins are installed]) 
@@ -194,4 +195,3 @@ if test x${enable_debug} = xyes;
 then
     echo "Debug output enabled";
 fi
-
