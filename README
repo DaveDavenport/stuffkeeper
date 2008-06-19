@@ -1,6 +1,10 @@
+License
+=======
+As I am no license expert, stuffkeeper is released under the latest version of GPL. (version 3, see COPYING).
+If this causes problems, let me know.
+
 Requirments:
 ============
-
 The following libraries and programs are required to compile stuffkeeper:
 make
 gcc
@@ -21,15 +25,26 @@ gob2            >= 2.0.10
 
 Compile options:
 ================
-
 The following options are available, they are available for debuggin purpose only.
 --enable-debug  Outputs extra debug information.
 --enable-timing Outputs timing information.
 
 Compiling:
 ==========
-
+Release
+-------
 ./configure <compile options>
 make
 make install
 
+Git
+---
+./autogen.sh <compile options>
+make
+make install
+
+Contact
+=======
+e-mail:	         qball_AT_stuffkeeper.org
+website:         http://stuffkeeper.org
+bugtracker:      http://bugtracker.sarine.nl/
