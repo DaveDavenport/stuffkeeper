@@ -1,3 +1,12 @@
+stuffkeeper (0.11.1-ubuntu0) hardy; urgency=low
+
+  * Code cleanups.
+  * Usability improvements
+  * Improved api interface
+
+
+ -- Qball Cow <qball@sarine.nl>  Fri, 20 Jun 2008 21:31:00 +0200
+
 stuffkeeper (0.09-ubuntu1) hardy; urgency=low
 
   * Expander Support. To hide block in the view.
