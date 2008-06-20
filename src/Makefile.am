@@ -3,12 +3,12 @@ CONF_VERSION=0
 -include Makefile.config
 
 bin_PROGRAMS=stuffkeeper
-stuffkeeper_SOURCES=\
-	misc.c\
-	main.c\
-	debug.c\
-	sexy-icon-entry.c\
-	bacon-message-connection.c\
+
+##
+# These files should be compiled, but may _not_ be
+# in the dist
+##
+nodist_stuffkeeper_SOURCES=\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
@@ -34,7 +34,20 @@ stuffkeeper_SOURCES=\
 	stuffkeeper-data-rating.c\
 	stuffkeeper-plugin.c\
 	stuffkeeper-plugin-manager.c
+##
+# Sources that should be in the distribution 
+##
+stuffkeeper_SOURCES=\
+	misc.c\
+	main.c\
+	debug.c\
+	sexy-icon-entry.c\
+	bacon-message-connection.c
 
+
+##
+# Generated sources
+##
 BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
@@ -62,7 +75,7 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-plugin.c\
 	stuffkeeper-plugin-manager.c
 
-%.c %.h %-private.h: %.gob
+%.c: %.gob
 	@GOB2@ --no-touch-headers --always-private-header $<
 
 revisiont.h:
@@ -103,7 +116,10 @@ AM_CFLAGS = @CFLAGS@\
 	@gio_CFLAGS@\
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\"
 
-stuffkeeperinclude_HEADERS = \
+##
+# Should be installed so plugins can be compiled
+##
+nodist_stuffkeeperinclude_HEADERS = \
 	stuffkeeper-data-item.h\
 	stuffkeeper-data-schema.h\
 	stuffkeeper-data-backend.h\
@@ -114,64 +130,46 @@ stuffkeeperinclude_HEADERS = \
 
 stuffkeeperincludedir =$(includedir)/stuffkeeper/
 
+##
+# Extra files that should be shipped with the distributions.
+# This include gob files and header files 
+##
 EXTRA_DIST=\
 		   bacon-message-connection.h\
 		   debug.h\
 		   misc.h\
 		   sexy-icon-entry.h\
-		   stuffkeeper-data-backend.h\
-		   stuffkeeper-data-schema.h\
-		   stuffkeeper-data-boolean.h\
-		   stuffkeeper-data-spinbutton.h\
-		   stuffkeeper-data-date2.h\
-		   stuffkeeper-data-tag.h\
-		   stuffkeeper-data-entry.h\
-		   stuffkeeper-data-taglist2.h\
-		   stuffkeeper-data-expander.h\
-		   stuffkeeper-data-text.h\
-		   stuffkeeper-data-image.h\
-		   stuffkeeper-edit-schema.h\
-		   stuffkeeper-data-item-search.h\
-		   stuffkeeper-export-html.h\
-		   stuffkeeper-data-item.h\
-		   stuffkeeper-interface.h\
-		   stuffkeeper-data-label.h\
-		   stuffkeeper-item-view.h\
-		   stuffkeeper-data-link.h\
-		   stuffkeeper-item-window.h\
-		   stuffkeeper-data-list2.h\
-		   stuffkeeper-show-item.h\
-		   stuffkeeper-data-rating.h\
-		   stuffkeeper-plugin.h\
-		   stuffkeeper-plugin-manager.h\
-		   stuffkeeper-data-backend-private.h\
-		   stuffkeeper-data-schema-private.h\
-		   stuffkeeper-data-boolean-private.h\
-		   stuffkeeper-data-spinbutton-private.h\
-		   stuffkeeper-data-date-private.h\
-		   stuffkeeper-data-date2-private.h\
-		   stuffkeeper-data-tag-private.h\
-		   stuffkeeper-data-entry-private.h\
-		   stuffkeeper-data-taglist2-private.h\
-		   stuffkeeper-data-expander-private.h\
-		   stuffkeeper-data-text-private.h\
-		   stuffkeeper-data-image-private.h\
-		   stuffkeeper-edit-schema-private.h\
-		   stuffkeeper-data-item-search-private.h\
-		   stuffkeeper-export-html-private.h\
-		   stuffkeeper-data-item-private.h\
-		   stuffkeeper-interface-private.h\
-		   stuffkeeper-data-label-private.h\
-		   stuffkeeper-item-view-private.h\
-		   stuffkeeper-data-link-private.h\
-		   stuffkeeper-item-window-private.h\
-		   stuffkeeper-data-list2-private.h\
-		   stuffkeeper-show-item-private.h\
-		   stuffkeeper-data-rating-private.h\
-		   stuffkeeper-plugin-private.h\
-		   stuffkeeper-plugin-manager-private.h
+		   stuffkeeper-data-backend.gob\
+		   stuffkeeper-data-boolean.gob\
+		   stuffkeeper-data-date2.gob\
+		   stuffkeeper-data-entry.gob\
+		   stuffkeeper-data-expander.gob\
+		   stuffkeeper-data-image.gob\
+		   stuffkeeper-data-item.gob\
+		   stuffkeeper-data-item-search.gob\
+		   stuffkeeper-data-label.gob\
+		   stuffkeeper-data-link.gob\
+		   stuffkeeper-data-list2.gob\
+		   stuffkeeper-data-rating.gob\
+		   stuffkeeper-data-schema.gob\
+		   stuffkeeper-data-spinbutton.gob\
+		   stuffkeeper-data-tag.gob\
+		   stuffkeeper-data-taglist2.gob\
+		   stuffkeeper-data-text.gob\
+		   stuffkeeper-edit-schema.gob\
+		   stuffkeeper-export-html.gob\
+		   stuffkeeper-interface.gob\
+		   stuffkeeper-item-view.gob\
+		   stuffkeeper-item-window.gob\
+		   stuffkeeper-plugin.gob\
+		   stuffkeeper-plugin-manager.gob\
+		   stuffkeeper-show-item.gob
 
+##
+# Removes all generated files, use DISTCLEANFILES for this?
+##
 clean-local:
 	-rm stuffkeeper-*.h
 	-rm stuffkeeper-*.c revision.h
 	-rm Makefile.config
+	-rm revision.h
