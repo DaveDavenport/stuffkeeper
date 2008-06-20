@@ -10,6 +10,4 @@ EXTRA_DIST = 		\
 	stuffkeeper.pc.in\
 	stuffkeeper.desktop.in 	
 
-
-
-
+DISTCLEANFILES=$(desktop_DATA)

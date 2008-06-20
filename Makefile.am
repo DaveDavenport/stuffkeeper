@@ -6,3 +6,9 @@ EXTRA_DIST=	intltool-extract.in\
 		intltool-update.in\
 		intltool-merge.in
 
+
+DISTCLEANFILES=\
+	       intltool-update\
+	       intltool-extract\
+	       intltool-merge
+
