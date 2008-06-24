@@ -193,7 +193,6 @@ pixmaps/Makefile
 data/Makefile
 data/stuffkeeper.pc
 doc/Makefile
-doc/stuffkeeper.doxy
 types/Makefile
 html/Makefile
 ])
