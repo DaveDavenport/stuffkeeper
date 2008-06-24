@@ -7,7 +7,7 @@ else
 MAYBE_DIR=
 endif
 
-SUBDIRS = src glade po pixmaps data types html doc
+SUBDIRS = src glade po pixmaps data types html $(MAYBE_DIR)
 
 EXTRA_DIST=	intltool-extract.in\
 		intltool-update.in\

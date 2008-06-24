@@ -143,9 +143,6 @@ AC_ARG_ENABLE(documentation,
 		esac],[enable_documentation=false])
 
 AM_CONDITIONAL([DOC], [test x$enable_documentation = xtrue])
-if [test x$enable_documentation = xtrue]; then
-	GTK_DOC_CHECK(1.0)
-fi
 
 # installation paths
 AC_MSG_CHECKING(prefix)
@@ -196,6 +193,7 @@ pixmaps/Makefile
 data/Makefile
 data/stuffkeeper.pc
 doc/Makefile
+doc/stuffkeeper.doxy
 types/Makefile
 html/Makefile
 ])
