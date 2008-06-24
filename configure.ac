@@ -132,6 +132,21 @@ AC_SUBST(gio_CFLAGS)
 PKG_CHECK_MODULES([gthread], gthread-2.0)
 AC_SUBST(gthread_LIBS)
 AC_SUBST(gthread_CFLAGS)
+
+# Check for gtk-doc
+AC_ARG_ENABLE(documentation, 
+              [ --enable-doc Enable documentation.], 
+              [case "${enableval}" in
+               	yes)	enable_documentation=true;;
+		no)	enable_documentation=false;;
+		*) AC_MSG_ERROR([bad value ${enableval} for --enable-documentation]);
+		esac],[enable_documentation=false])
+
+AM_CONDITIONAL([DOC], [test x$enable_documentation = xtrue])
+if [test x$enable_documentation = xtrue]; then
+	GTK_DOC_CHECK(1.0)
+fi
+
 # installation paths
 AC_MSG_CHECKING(prefix)
 
@@ -180,6 +195,7 @@ glade/Makefile
 pixmaps/Makefile
 data/Makefile
 data/stuffkeeper.pc
+doc/Makefile
 types/Makefile
 html/Makefile
 ])
