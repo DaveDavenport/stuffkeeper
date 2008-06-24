@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign 1.6
 
 #check if we want to build doc's
-if DOC
+if ENABLE_GTK_DOC
 MAYBE_DIR=doc
 else
 MAYBE_DIR=
