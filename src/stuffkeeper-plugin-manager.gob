@@ -14,7 +14,7 @@ typedef struct _FS{
     GType       gtype;
     GModule     *module;
     GObject     *object;
-    PluginType  plugin_type;
+    StuffkeeperPluginType  plugin_type;
 }FS;
 %}
 
