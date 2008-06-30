@@ -1,19 +1,21 @@
+# Dutch translation for stuffkeeper
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the stuffkeeper package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Stuffkeeper git\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-30 23:47+0200\n"
-"PO-Revision-Date: 2008-06-30 21:27+0000\n"
-"Last-Translator: Carnager13 <rasi13@gmx.de>\n"
-"Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
+"Project-Id-Version: stuffkeeper\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2008-06-29 19:13+0200\n"
+"PO-Revision-Date: 2008-06-30 21:30+0000\n"
+"Last-Translator: Qball Cow <qball@qballcow.nl>\n"
+"Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2008-06-30 21:40+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
-"X-Poedit-Country: GERMANY\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-SourceCharset: utf-8\n"
 
 #: ../data/stuffkeeper.desktop.in.h:1
 msgid "Another way to catalog stuff "
@@ -33,126 +35,124 @@ msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:3
 msgid "<b>Complete DB</b>"
-msgstr "<b>Komplette Datenbank</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:4
 msgid "<b>Directory:</b>"
-msgstr "<b>Verzeichnis.</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:5
 msgid "<b>Directory</b>"
-msgstr "<b>Directory</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:6
 msgid "<b>Filename</b>"
-msgstr "<b>Dateiname</b>"
+msgstr "<b>Bestandsnaam</b>"
 
 #: ../glade/stuffkeeper.glade.h:7
 msgid "<b>Include header</b>"
-msgstr "<b>Inklusive Header</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:8
 msgid "<b>Name:</b>"
-msgstr "<b>Name:</b>"
+msgstr "<b>Naam:</b>"
 
 #: ../glade/stuffkeeper.glade.h:9
 msgid "<b>Only visible</b>"
-msgstr "<b>Nur Sichtbares</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:10
-#, fuzzy
 msgid "<b>Packing:</b>"
-msgstr "<b>Tags</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:11
-msgid "<b>Template</b>"
-msgstr "<b>Vorlage</b>"
+msgid "<b>Schema:</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:12
-msgid "<b>Title</b>"
-msgstr "<b>Titel</b>"
+msgid "<b>Template</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:13
-msgid "<b>Type icon:</b>"
-msgstr "<b>Typ icon:</b>"
+msgid "<b>Title</b>"
+msgstr "<b>Titel:</b>"
 
-#: ../glade/stuffkeeper.glade.h:14 ../src/stuffkeeper-item-view.gob:101
-msgid "<b>Type:</b>"
-msgstr "<b>Typ:</b>"
+#: ../glade/stuffkeeper.glade.h:14
+msgid "<b>Type icon:</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:15
 msgid "<b>Type</b>"
-msgstr "<b>Typ</b>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:16
 msgid "<span size='large' weight='bold'>Export type</span>"
-msgstr "<span size='large' weight='bold'>Typ exportieren</span>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:17
 msgid "<span size='x-large' weight='bold'>Edit filter</span>"
-msgstr "<span size='x-large' weight='bold'>Filter bearbeiten</span>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:18
 msgid "<span size='x-large' weight='bold'>Export to CSV</span>"
-msgstr "<span size='x-large' weight='bold'>CSV exportieren</span>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:19
 msgid "<span size='x-large' weight='bold'>Export</span>"
-msgstr "<span size='x-large' weight='bold'>Exportieren</span>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:20
 msgid "<span size='x-large'><b>Edit Type</b></span>"
-msgstr "<span size='x-large'><b>Typ bearbeiten</b></span>"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:21
 msgid "Add Item"
-msgstr "Eintrag hinzufügen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:22
 msgid "Backup"
-msgstr "Sicherung"
+msgstr "Reservekopie"
 
 #: ../glade/stuffkeeper.glade.h:23
 msgid "Bug tracker"
-msgstr "Bug tracker"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:24
 msgid "Close"
-msgstr "Schließen"
+msgstr "Sluiten"
 
 #: ../glade/stuffkeeper.glade.h:25
 msgid "Edit Type"
-msgstr "Typ bearbeiten"
+msgstr "Type bewerken"
 
 #: ../glade/stuffkeeper.glade.h:26
 msgid "Edit search"
-msgstr "Suche bearbeiten"
+msgstr ""
 
 #. FIELD_TYPE_EXPANDER
 #: ../glade/stuffkeeper.glade.h:27 ../src/stuffkeeper-data-schema.gob:64
-#, fuzzy
 msgid "Expander"
-msgstr "Expander hinzufügen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:28 ../src/stuffkeeper-interface.gob:1074
 msgid "Export"
-msgstr "Exportieren"
+msgstr "Exporteer"
 
 #: ../glade/stuffkeeper.glade.h:29
 msgid "Export to CSV"
-msgstr "CSV Exportieren"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:30
 msgid "Filename:"
-msgstr "Dateiname:"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:31
 msgid "Help"
-msgstr "Hilfe"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:32
 msgid "Hold shift, to drag a field to its new position."
-msgstr "Halten Sie Shift, um ein Feld an eine neue Position zu schieben."
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:33
 msgid "Horizontal"
@@ -160,43 +160,43 @@ msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:34
 msgid "Items:"
-msgstr "Einträge"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:35
 msgid "Location:"
-msgstr "Ort:"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:36
 msgid "New Window"
-msgstr "Neues Fenster"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:37
 msgid "Reload"
-msgstr "Neu laden"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:38
 msgid "Restore"
-msgstr "Wiederherstellen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:39
 msgid "Select directory"
-msgstr "Verzeichnis auswählen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:40
 msgid "Show item pane"
-msgstr "Zeige Details"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:41
 msgid "Sort Ascending"
-msgstr "Aufsteigend sortieren"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:42
 msgid "Sort Descending"
-msgstr "Absteigend sortieren"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:43
 msgid "Sort item list"
-msgstr "Einträge sortieren"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:45
 msgid ""
@@ -204,9 +204,6 @@ msgid ""
 "Types\n"
 "Filters"
 msgstr ""
-"Tags\n"
-"Typen\n"
-"Filter"
 
 #: ../glade/stuffkeeper.glade.h:48
 msgid "Vertical"
@@ -214,87 +211,87 @@ msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:49
 msgid "Visit Website"
-msgstr "Webseite besuchen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:50
 msgid "_Export"
-msgstr "_Export"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:51
 msgid "_File"
-msgstr "_Datei"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:52
 msgid "_Filter"
-msgstr "_Filter"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:53
 msgid "_Import"
-msgstr "_Import"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:54
 msgid "_Lock editing"
-msgstr "_Editieren An/Aus"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:55
 msgid "_New"
-msgstr "_Neu"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:56
 msgid "_Tools"
-msgstr "_Tools"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:57
 msgid "_Type"
-msgstr "_Typ"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:58
 msgid "_View"
-msgstr "_Ansicht"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:59
 msgid "by creation time"
-msgstr "Nach Datum (Erstellung)"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:60
 msgid "by modification time"
-msgstr "Nach Datum (letzte Modifikation)"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:61
 msgid "by title"
-msgstr "Nach Titel"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:62
 msgid "by type"
-msgstr "Nach Typ"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:63
 msgid "database.csv"
-msgstr "database.csv"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:64
 msgid "database.html"
-msgstr "database.html"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:65
 msgid "gtk-add"
-msgstr "Hinzufügen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:66
 msgid "gtk-apply"
-msgstr "Anwenden"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:67
 msgid "gtk-cancel"
-msgstr "Abbrechen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:68
 msgid "gtk-remove"
-msgstr "Entfernen"
+msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:69
 msgid "gtk-save"
-msgstr "Speichern"
+msgstr ""
 
 #: ../src/stuffkeeper-data-date2.gob:270
 msgid "No date"
@@ -316,34 +313,31 @@ msgstr ""
 
 #: ../src/stuffkeeper-data-item.gob:583 ../src/stuffkeeper-data-item.gob:590
 msgid "N/A"
-msgstr "N/A"
+msgstr ""
 
 #: ../src/stuffkeeper-data-item.gob:632
 msgid "Failed to get title"
-msgstr "Konnte Titel nicht finden."
+msgstr ""
 
 #: ../src/stuffkeeper-data-list2.gob:259
 msgid "Open"
-msgstr "Öffnen"
+msgstr ""
 
 #. *
 #. * Buttons
-#.
+#. 
 #. import
 #: ../src/stuffkeeper-data-list2.gob:393
 msgid "Import"
-msgstr "Importieren"
+msgstr ""
 
 #: ../src/stuffkeeper-data-list2.gob:524
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Failed to open:\n"
 "<i>'%s'</i>.\n"
 "Make sure it is a valid text file."
 msgstr ""
-"Konnte:\n"
-"<i>'%s'</i>.\n"
-" nicht öffnenStellen Sie sicher, dass es ein gültiges Text File ist."
 
 #. FIELD_TYPE_STRING
 #: ../src/stuffkeeper-data-schema.gob:46
@@ -408,11 +402,11 @@ msgstr ""
 
 #: ../src/stuffkeeper-edit-schema.gob:75 ../src/stuffkeeper-interface.gob:1200
 msgid "Edit type"
-msgstr "Typ editieren"
+msgstr ""
 
 #: ../src/stuffkeeper-edit-schema.gob:293
 msgid "Pick an icon"
-msgstr "Wählen Sie ein Icon aus"
+msgstr ""
 
 #. This belongs to the parent, so if the user closes the parent, close it
 #. It is a warning, it _should_ be modal.
@@ -431,17 +425,16 @@ msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:884
 msgid "New Tag"
-msgstr "Neuer Tag"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:941
 msgid "New Schema"
-msgstr "Neues Schema"
+msgstr ""
 
 #. Add tag
 #: ../src/stuffkeeper-interface.gob:1155
-#, fuzzy
 msgid "New tag"
-msgstr "Neuer Tag"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:1169
 msgid "Remove tag"
@@ -449,9 +442,8 @@ msgstr ""
 
 #. Add item
 #: ../src/stuffkeeper-interface.gob:1180
-#, fuzzy
 msgid "New type"
-msgstr "Nach Typ"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:1194
 msgid "Remove type"
@@ -459,22 +451,20 @@ msgstr ""
 
 #. Add item
 #: ../src/stuffkeeper-interface.gob:1211
-#, fuzzy
 msgid "New filter"
-msgstr "Neue Suche"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:1227
 msgid "Remove filter"
 msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:1235
-#, fuzzy
 msgid "Edit filter"
-msgstr "Typ editieren"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:2107 ../src/main.c:142
 msgid "Revision"
-msgstr "Revision"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:2117
 msgid "Copyright 2008 Qball Cow"
@@ -482,63 +472,56 @@ msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:2119
 msgid "GNU General Public License"
-msgstr "GNU General Public License"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:2128
 msgid "translator-credits"
 msgstr ""
-"Übersetzungs Credits\n"
-"\n"
 "Launchpad Contributions:\n"
-"  Carnager13 https://launchpad.net/~rasi13"
+"  Qball Cow https://launchpad.net/~qball-qballcow"
 
 #: ../src/stuffkeeper-interface.gob:2191
 msgid ""
 "Restoring from a backup will destroy the current database.\n"
 "Use with care."
 msgstr ""
-"Eine Sicherung wieder einzuspielen, wird die momentane Datenbank "
-"zerstören. \n"
-"Benutzen Sie diese Funktion mit Vorsicht."
 
 #: ../src/stuffkeeper-interface.gob:2488
-#, fuzzy
 msgid "Import type"
-msgstr "Importieren"
+msgstr ""
 
 #: ../src/stuffkeeper-interface.gob:2495
-#, fuzzy
 msgid "Types files"
 msgstr ""
-"Tags\n"
-"Typen\n"
-"Filter"
 
 #: ../src/stuffkeeper-show-item.gob:137
 msgid "<b>Tags</b>"
-msgstr "<b>Tags</b>"
+msgstr ""
 
 #: ../src/stuffkeeper-data-item-search.gob:760
 msgid "New Search"
-msgstr "Neue Suche"
+msgstr ""
 
 #: ../src/stuffkeeper-item-view.gob:91
 msgid "<b>Title:</b>"
 msgstr "<b>Titel:</b>"
 
+#: ../src/stuffkeeper-item-view.gob:101
+msgid "<b>Type:</b>"
+msgstr ""
+
 #: ../src/stuffkeeper-item-view.gob:137
 msgid "Created"
-msgstr "Erstellt"
+msgstr ""
 
 #: ../src/stuffkeeper-item-view.gob:147
 msgid "Modified"
-msgstr "Geändert"
+msgstr "Aangepast"
 
 #: ../src/stuffkeeper-export-html.gob:110
 #: ../src/stuffkeeper-export-html.gob:163
-#, fuzzy
 msgid "Export templates"
-msgstr "Einträge sortieren"
+msgstr ""
 
 #: ../src/main.c:93
 msgid "Path to the database"
@@ -546,7 +529,7 @@ msgstr ""
 
 #: ../src/main.c:94 ../src/main.c:139
 msgid "Version"
-msgstr "Version"
+msgstr "Versie"
 
 #: ../src/main.c:95
 msgid "Act like it is the first time stuffkeeper is ran"
@@ -556,30 +539,3 @@ msgstr ""
 #: ../src/main.c:180
 msgid "There is allready an instance running. quitting."
 msgstr ""
-
-#~ msgid ""
-#~ "Failed to open:\n"
-#~ "<i>'%s'</i>.\n"
-#~ "Make sure it is a valid local image."
-#~ msgstr ""
-#~ "Konnte nicht öffnen::\n"
-#~ "<i>'%s'</i>.\n"
-#~ "Stellen Sie sicher, dass es sich um eine Bilddatei handelt."
-
-#~ msgid "Add h-padding"
-#~ msgstr "Horizontale Trennung hinzufügen"
-
-#~ msgid "Add v-padding"
-#~ msgstr "Vertikale Trennung hinzufügen"
-
-#~ msgid "gtk-about"
-#~ msgstr "Über"
-
-#~ msgid "gtk-close"
-#~ msgstr "Schließen"
-
-#~ msgid "gtk-edit"
-#~ msgstr "Bearbeiten"
-
-#~ msgid "gtk-new"
-#~ msgstr "Neu"

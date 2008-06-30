@@ -160,9 +160,9 @@ AC_DEFINE_UNQUOTED(PACKAGE_DATADIR, "$PACKAGE_DATADIR", [Stuffkeeper datadir])
 
 # i18n support
 dnl please keep them in alphabetical order
-ALL_LINGUAS="de"
+ALL_LINGUAS="de nl"
 
-GETTEXT_PACKAGE=stuffkeeper_name
+GETTEXT_PACKAGE=stuffkeeper
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",[STUFFKEEPER gettext package])
 AM_GLIB_GNU_GETTEXT
