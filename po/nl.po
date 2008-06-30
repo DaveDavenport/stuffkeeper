@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: stuffkeeper\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2008-06-29 19:13+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-06-30 23:49+0200\n"
 "PO-Revision-Date: 2008-06-30 21:30+0000\n"
 "Last-Translator: Qball Cow <qball@qballcow.nl>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -66,19 +66,19 @@ msgid "<b>Packing:</b>"
 msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:11
-msgid "<b>Schema:</b>"
-msgstr ""
-
-#: ../glade/stuffkeeper.glade.h:12
 msgid "<b>Template</b>"
 msgstr ""
 
-#: ../glade/stuffkeeper.glade.h:13
+#: ../glade/stuffkeeper.glade.h:12
 msgid "<b>Title</b>"
 msgstr "<b>Titel:</b>"
 
-#: ../glade/stuffkeeper.glade.h:14
+#: ../glade/stuffkeeper.glade.h:13
 msgid "<b>Type icon:</b>"
+msgstr ""
+
+#: ../glade/stuffkeeper.glade.h:14 ../src/stuffkeeper-item-view.gob:101
+msgid "<b>Type:</b>"
 msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:15
@@ -325,7 +325,7 @@ msgstr ""
 
 #. *
 #. * Buttons
-#. 
+#.
 #. import
 #: ../src/stuffkeeper-data-list2.gob:393
 msgid "Import"
@@ -505,10 +505,6 @@ msgstr ""
 #: ../src/stuffkeeper-item-view.gob:91
 msgid "<b>Title:</b>"
 msgstr "<b>Titel:</b>"
-
-#: ../src/stuffkeeper-item-view.gob:101
-msgid "<b>Type:</b>"
-msgstr ""
 
 #: ../src/stuffkeeper-item-view.gob:137
 msgid "Created"
