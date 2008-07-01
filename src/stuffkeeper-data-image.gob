@@ -116,7 +116,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
                         GTK_DIALOG_DESTROY_WITH_PARENT,
                         GTK_MESSAGE_WARNING,
                         GTK_BUTTONS_CLOSE,
-                        _("The choosen file is not a image format supported by gtk."));
+                        _("The chosen file is not a image format supported by gtk."));
 
                 gtk_dialog_run(GTK_DIALOG(dialog));
                 gtk_widget_destroy(dialog);
