@@ -7,7 +7,7 @@ requires 2.0.10
 #include "stuffkeeper-data-backend.h"
 %}
 %h{
-
+#include "stuffkeeperglue.h"
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-schema.h"
 
@@ -113,12 +113,12 @@ class Stuffkeeper:Data:Item from G:Object
         char *error;
         char *query = NULL; 
 
-        stuffkeeper_data_schema_remove_item(self->_priv->schema, G_OBJECT(self));
+        stuffkeeper_data_schema_remove_item(self->_priv->schema, self);
 
         GList *node = g_list_first(self->_priv->tags);
         for(;node;node = g_list_next(node))
         {
-            stuffkeeper_data_tag_remove_item(STUFFKEEPER_DATA_TAG(node->data), G_OBJECT(self));
+            stuffkeeper_data_tag_remove_item(STUFFKEEPER_DATA_TAG(node->data), self);
         }
         g_list_free(self->_priv->tags);
         self->_priv->tags = NULL;
@@ -134,7 +134,7 @@ class Stuffkeeper:Data:Item from G:Object
         query =  sqlite3_mprintf("DELETE FROM ItemsFields WHERE ItemId=%i",self->_priv->id);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-            debug_printf("failed: %s\n", error);                                                                  
+            debug_printf("failed: %s\n", error);
         }
         sqlite3_free(query);
 
@@ -144,7 +144,7 @@ class Stuffkeeper:Data:Item from G:Object
     /* Create new StuffkeeperDataBackend */
     public
         StuffkeeperDataItem *
-        new (G:Object *skdb, StuffkeeperDataSchema *schema)
+        new (StuffkeeperDataBackend *skdb, StuffkeeperDataSchema *schema)
         {
 
             Self *obj = GET_NEW;
@@ -223,14 +223,14 @@ class Stuffkeeper:Data:Item from G:Object
             obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
                     G_CALLBACK(self_item_schema_field_changed), obj);
 
-            stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
+            stuffkeeper_data_schema_add_item(obj->_priv->schema, obj);
 
             return obj;
         }
 
     public
         StuffkeeperDataItem *
-        open_from_id (G:Object *skdb, gint id,gint schemaid)
+        open_from_id (StuffkeeperDataBackend *skdb, gint id,gint schemaid)
         {
             char *query;
             const char *tail;
@@ -260,7 +260,7 @@ class Stuffkeeper:Data:Item from G:Object
                     StuffkeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tagid);
                     debug_printf("adding tagid: %i\n", tagid);
                     obj->_priv->tags = g_list_prepend(obj->_priv->tags, tag);
-                    stuffkeeper_data_tag_add_item(tag, G_OBJECT(obj));
+                    stuffkeeper_data_tag_add_item(tag, obj);
                 }
             }
             sqlite3_finalize(stmt);
@@ -270,34 +270,8 @@ class Stuffkeeper:Data:Item from G:Object
                     G_CALLBACK(self_item_schema_field_removed), obj);
             obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
                     G_CALLBACK(self_item_schema_field_changed), obj);
-            stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
+            stuffkeeper_data_schema_add_item(obj->_priv->schema, obj);
 
-/*
-            query = sqlite3_mprintf("SELECT value FROM Items WHERE ItemId=%i and type=%i ORDER BY value ASC",
-                    obj->_priv->id, DB_ITEMS_TYPE_SCHEMA);
-            r = sqlite3_prepare_v2(obj->_priv->sqlHandle, query, -1,  &stmt,  &tail);
-            sqlite3_free(query);
-            if (r != SQLITE_OK)
-            {
-                debug_printf("Failed: %s\n", sqlite3_errmsg(obj->_priv->sqlHandle));
-            }
-            else
-            {
-                debug_printf("stepping through rows\n");
-                if((r = sqlite3_step(stmt)) == SQLITE_ROW)
-                {
-                    int schemaid = sqlite3_column_int(stmt, 0); 
-                    debug_printf("adding schemaid: %i\n", schemaid);
-                    obj->_priv->schema = stuffkeeper_data_backend_get_schema(obj->_priv->skdb, schemaid);
-                    obj->_priv->schema_field_removed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-removed", 
-                            G_CALLBACK(self_item_schema_field_removed), obj);
-                    obj->_priv->schema_field_changed = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), "schema-field-changed", 
-                            G_CALLBACK(self_item_schema_field_changed), obj);
-                    stuffkeeper_data_schema_add_item(obj->_priv->schema, G_OBJECT(obj));
-                }
-            }
-            sqlite3_finalize(stmt);
-*/
             return obj;
         }
 
@@ -933,7 +907,7 @@ class Stuffkeeper:Data:Item from G:Object
             self_items_add_field_integer(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
             self_item_changed(self,NULL);
             self_item_tags_changed(self);
-            stuffkeeper_data_tag_add_item(tag,G_OBJECT(self));
+            stuffkeeper_data_tag_add_item(tag,self);
         }
     public
         void
@@ -943,7 +917,7 @@ class Stuffkeeper:Data:Item from G:Object
             self_items_remove_field_integer(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
             self_item_changed(self,NULL);
             self_item_tags_changed(self);
-            stuffkeeper_data_tag_remove_item(tag, G_OBJECT(self));
+            stuffkeeper_data_tag_remove_item(tag, self);
         }
     public
     GList * 
@@ -1050,10 +1024,10 @@ public
         }
 
     public
-    G:Object *
+    StuffkeeperDataBackend *
     get_backend(self)
     {
-        return G_OBJECT(self->_priv->skdb);
+        return self->_priv->skdb;
     }
 
 }

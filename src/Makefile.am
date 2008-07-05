@@ -120,6 +120,7 @@ AM_CFLAGS = @CFLAGS@\
 # Should be installed so plugins can be compiled
 ##
 nodist_stuffkeeperinclude_HEADERS = \
+    stuffkeeperglue.h\
 	stuffkeeper-data-item.h\
 	stuffkeeper-data-schema.h\
 	stuffkeeper-data-backend.h\
@@ -139,6 +140,7 @@ EXTRA_DIST=\
 		   debug.h\
 		   misc.h\
 		   sexy-icon-entry.h\
+		   stuffkeeperglue.h\
 		   stuffkeeper-data-backend.gob\
 		   stuffkeeper-data-boolean.gob\
 		   stuffkeeper-data-date2.gob\

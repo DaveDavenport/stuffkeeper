@@ -1,5 +1,8 @@
 requires 2.0.10
 
+%h{
+#include "stuffkeeperglue.h"
+%}
 %{
 #include "stuffkeeper-data-item.h"
 %}
@@ -41,7 +44,7 @@ class Stuffkeeper:Data:Tag from G:Object
      */
     public
     StuffkeeperDataTag *
-    open_from_id(GObject *skdb, gint id)
+    open_from_id(StuffkeeperDataBackend *skdb, gint id)
     {
         Self *obj = GET_NEW;
         obj->_priv->id = id;
@@ -51,7 +54,7 @@ class Stuffkeeper:Data:Tag from G:Object
     }
     public
         StuffkeeperDataTag*
-        new(GObject *skdb)
+        new(StuffkeeperDataBackend *skdb)
         {
             Self *obj = GET_NEW;
             int result = 0;
@@ -77,7 +80,7 @@ class Stuffkeeper:Data:Tag from G:Object
 
     public
     StuffkeeperDataTag*
-    new_with_id(GObject *skdb, gint id)
+    new_with_id(StuffkeeperDataBackend *skdb, gint id)
     {
         Self *obj = GET_NEW;
         int result = 0;
@@ -187,14 +190,14 @@ class Stuffkeeper:Data:Tag from G:Object
     }
     public
     void
-    add_item(self, GObject *item)
+    add_item(self, StuffkeeperDataItem *item)
     {
         self->_priv->items = g_list_append(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
         self_tag_changed(self);
     }
     public 
     void
-    remove_item(self, GObject *item)
+    remove_item(self, StuffkeeperDataItem *item)
     {
         self->_priv->items = g_list_remove(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
         self_tag_changed(self);

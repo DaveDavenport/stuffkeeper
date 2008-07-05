@@ -3,7 +3,7 @@ requires 2.0.10
 %h{
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
-
+#include "stuffkeeperglue.h"
 %}
 
 %ph{
@@ -171,7 +171,7 @@ class Stuffkeeper:Data:Schema from G:Object
 
    public
        StuffkeeperDataSchema *
-        open_from_id (GObject *skdb, gint id) 
+        open_from_id (StuffkeeperDataBackend *skdb, gint id) 
         {
             Self *obj = GET_NEW;
             obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
@@ -182,7 +182,7 @@ class Stuffkeeper:Data:Schema from G:Object
 
     public
         StuffkeeperDataSchema*
-        new(GObject *skdb)
+        new(StuffkeeperDataBackend *skdb)
         {
             Self *obj = GET_NEW;
             int result = 0;
@@ -258,7 +258,7 @@ class Stuffkeeper:Data:Schema from G:Object
         }
    public
         StuffkeeperDataSchema*
-        new_with_id(GObject *skdb,gint id)
+        new_with_id(StuffkeeperDataBackend *skdb,gint id)
         {
             Self *obj = GET_NEW;
             int result = 0;
@@ -882,14 +882,14 @@ class Stuffkeeper:Data:Schema from G:Object
         }
     public
         void
-        add_item(self, GObject *item)
+        add_item(self, StuffkeeperDataItem *item)
         {
             self->_priv->items = g_list_prepend(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
             self_schema_changed(self);
         }
     public 
         void
-        remove_item(self, GObject *item)
+        remove_item(self, StuffkeeperDataItem *item)
         {
             self->_priv->items = g_list_remove(self->_priv->items, STUFFKEEPER_DATA_ITEM(item));
             self_schema_changed(self);
@@ -988,7 +988,7 @@ class Stuffkeeper:Data:Schema from G:Object
          */
          public
          StuffkeeperDataSchema *
-         load_from_xml(GObject *skdb, const char *path)
+         load_from_xml(StuffkeeperDataBackend *skdb, const char *path)
          {
              Self *self;
              xmlDocPtr doc;
@@ -1116,11 +1116,10 @@ class Stuffkeeper:Data:Schema from G:Object
              return TRUE;
          }
          public
-         GObject *
+         StuffkeeperDataBackend *
          get_backend(self)
          {
-             printf("get backend\n");
-            return (GObject *)self->_priv->skdb;
+            return self->_priv->skdb;
          }
 
         public

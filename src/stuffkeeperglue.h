@@ -1,0 +1,9 @@
+#ifndef __TYPEDEF_STUFFKEEPER_DATA_BACKEND__
+#define __TYPEDEF_STUFFKEEPER_DATA_BACKEND__
+typedef struct _StuffkeeperDataBackend StuffkeeperDataBackend;
+#endif
+
+#ifndef __TYPEDEF_STUFFKEEPER_DATA_ITEM__
+#define __TYPEDEF_STUFFKEEPER_DATA_ITEM__
+typedef struct _StuffkeeperDataItem StuffkeeperDataItem;
+#endif

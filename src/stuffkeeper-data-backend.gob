@@ -223,7 +223,7 @@ class Stuffkeeper:Data:Backend from G:Object
         StuffkeeperDataItem *item;
         gchar *path = g_build_path(G_DIR_SEPARATOR_S, self->_priv->path, "items", NULL);
         /* create a new item */
-        item = stuffkeeper_data_item_new(G_OBJECT(self),schema);
+        item = stuffkeeper_data_item_new(self,schema);
         g_free(path);
         /* want to copy the key, even if it is an integer */
         id = g_malloc0(sizeof(gint));
@@ -364,7 +364,7 @@ class Stuffkeeper:Data:Backend from G:Object
                 StuffkeeperDataSchema *schema;
                 gint *id;
                 /* create a new item */
-                schema = stuffkeeper_data_schema_open_from_id(G_OBJECT(self), oid);
+                schema = stuffkeeper_data_schema_open_from_id(self, oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -423,7 +423,7 @@ class Stuffkeeper:Data:Backend from G:Object
                 StuffkeeperDataTag *tag;
                 gint *id;
                 /* create a new item */
-                tag = stuffkeeper_data_tag_open_from_id(G_OBJECT(self), oid);
+                tag = stuffkeeper_data_tag_open_from_id(self, oid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -456,7 +456,7 @@ class Stuffkeeper:Data:Backend from G:Object
                 StuffkeeperDataItem *item;
                 gint *id;
                 /* create a new item */
-                item = stuffkeeper_data_item_open_from_id(G_OBJECT(self),oid,schemaid);
+                item = stuffkeeper_data_item_open_from_id(self,oid,schemaid);
                 /* want to copy the key, even if it is an integer */
                 id = g_malloc0(sizeof(gint));
                 *id = oid; 
@@ -607,7 +607,7 @@ class Stuffkeeper:Data:Backend from G:Object
             return schema;
         }
         /* No tag, lets make one. */
-        schema = stuffkeeper_data_schema_new_with_id(G_OBJECT(self),id);
+        schema = stuffkeeper_data_schema_new_with_id(self,id);
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -630,7 +630,7 @@ class Stuffkeeper:Data:Backend from G:Object
         gint *ide;
         gint id; 
 
-        StuffkeeperDataSchema *schema = stuffkeeper_data_schema_load_from_xml(G_OBJECT(self), path);
+        StuffkeeperDataSchema *schema = stuffkeeper_data_schema_load_from_xml(self, path);
         if(schema == NULL)
         {
             return NULL;
@@ -654,7 +654,7 @@ class Stuffkeeper:Data:Backend from G:Object
 
 
         /* No schema, lets make one. */
-        schema = stuffkeeper_data_schema_new(G_OBJECT(self));
+        schema = stuffkeeper_data_schema_new(self);
         id = stuffkeeper_data_schema_get_id(schema);
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -709,7 +709,7 @@ class Stuffkeeper:Data:Backend from G:Object
         }
         debug_printf("Tag not found, this aint good\n");
         /* No tag, lets make one, with this id. */
-        tag = stuffkeeper_data_tag_new_with_id(G_OBJECT(self),id);
+        tag = stuffkeeper_data_tag_new_with_id(self,id);
 
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
@@ -734,7 +734,7 @@ class Stuffkeeper:Data:Backend from G:Object
     new_tag(self)
     {
         gint *ide;
-        StuffkeeperDataTag *tag = stuffkeeper_data_tag_new(G_OBJECT(self));
+        StuffkeeperDataTag *tag = stuffkeeper_data_tag_new(self);
         /* We have a valid id now, so add it */
         /* Add to the list */
         ide = g_malloc0(sizeof(gint));
