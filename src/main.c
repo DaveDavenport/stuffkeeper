@@ -170,14 +170,14 @@ int main ( int argc, char **argv )
         /* Check if we are the only instance, this can be checked by looking if we are the server */
         if (!bacon_message_connection_get_is_server (bacon_connection)) 
         {
-            /* There is an instant allready running */
+            /* There is an instant already running */
             /* message the running instance, to show a new window */
             bacon_message_connection_send(bacon_connection, "New Window");
 
             /* Close the connection */
             bacon_message_connection_free (bacon_connection);
             /* Returning */
-            debug_printf(_("There is allready an instance running. quitting."));
+            debug_printf(_("There is already an instance running. Quitting."));
             g_object_unref(skdb); 
             exit(EXIT_SUCCESS);
         }
