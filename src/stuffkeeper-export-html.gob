@@ -6,6 +6,7 @@ requires 2.0.10
 #include <glib/gstdio.h>
 #include <glade/glade.h>
 #include <config.h>
+#include "stuffkeeperglue.h"
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-item.h"
@@ -82,13 +83,14 @@ class Stuffkeeper:Export:HTML from G:Object
 
     public
         G:Object *
-    new_schema(G:Object *interface, StuffkeeperDataBackend *skdb,GtkListStore *store)
+    new_schema(StuffkeeperInterface *interface, StuffkeeperDataBackend *skdb,GtkListStore *store)
     {
         
         GtkWidget *dialog = NULL;
         Self *self = GET_NEW;
         GtkWidget *wid;
         GtkCellRenderer *renderer;
+        gchar *directory = NULL;
 
         self->_priv->skdb = skdb;
         self->_priv->interface = STUFFKEEPER_INTERFACE(interface);
@@ -99,10 +101,14 @@ class Stuffkeeper:Export:HTML from G:Object
         self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
         dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
 
+        directory = g_key_file_get_string(self->_priv->interface->config_file, "export-html", "export-directory",NULL);
+        if(directory)
+        {
+            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml, "file_chooser_button1")),directory);
+            g_free(directory); 
+            directory = NULL;
+        }
        
-        
-
-
         self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE_FULL);
 
@@ -144,9 +150,10 @@ class Stuffkeeper:Export:HTML from G:Object
 
     public
     G:Object *
-    new(G:Object *interface, StuffkeeperDataBackend *skdb,Stuffkeeper:Data:Item  *item)
+    new(StuffkeeperInterface *interface, StuffkeeperDataBackend *skdb,Stuffkeeper:Data:Item  *item)
     {
         GtkWidget *dialog = NULL;
+        gchar *directory = NULL;
         Self *self = GET_NEW;
         self->_priv->skdb = skdb;
         self->_priv->interface = STUFFKEEPER_INTERFACE(interface);
@@ -157,6 +164,13 @@ class Stuffkeeper:Export:HTML from G:Object
         self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
         dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
         /* file chooser */
+        directory = g_key_file_get_string(self->_priv->interface->config_file, "export-html", "export-directory",NULL);
+        if(directory)
+        {
+            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml, "file_chooser_button1")),directory);
+            g_free(directory); 
+            directory = NULL;
+        }
         self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE);
         gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
@@ -216,6 +230,7 @@ class Stuffkeeper:Export:HTML from G:Object
                                     GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml,"file_chooser_button1")));
                         gchar *template = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->_priv->fc_template));
                         StuffkeeperDataSchema *schema = NULL;
+                        g_key_file_set_string(self->_priv->interface->config_file, "export-html", "export-directory",directory);
 
                         if(have_schema && !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(self->_priv->chk_cdb)))
                         {
@@ -334,7 +349,6 @@ class Stuffkeeper:Export:HTML from G:Object
     {
         int i;
         int found = 0;
-        printf("bu: %s\n", buffer);
         for(i=0; buffer[i] != '\0';i++)
         { 
             if(temp)
@@ -464,7 +478,6 @@ class Stuffkeeper:Export:HTML from G:Object
                 int found = 0;
                 for(item_type=0; item_type < FIELD_TYPE_NUM_FIELDS && 
                     strncasecmp(&buffer[6],FieldNames[item_type],strlen(FieldNames[item_type])) != 0;item_type++);
-                printf("buffer: %s\n", &buffer[6]);
                 if(item_type >= FIELD_TYPE_NUM_FIELDS)
                 {
                     /** */
@@ -494,7 +507,6 @@ class Stuffkeeper:Export:HTML from G:Object
                 
 
                 i=strlen(FieldNames[item_type])+6;
-                printf("b%s\n", FieldNames[item_type]);
                 {
 
                     if(type == FIELD_TYPE_LIST)

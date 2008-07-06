@@ -7,3 +7,8 @@ typedef struct _StuffkeeperDataBackend StuffkeeperDataBackend;
 #define __TYPEDEF_STUFFKEEPER_DATA_ITEM__
 typedef struct _StuffkeeperDataItem StuffkeeperDataItem;
 #endif
+
+#ifndef __TYPEDEF_STUFFKEEPER_INTERFACE__
+#define __TYPEDEF_STUFFKEEPER_INTERFACE__
+typedef struct _StuffkeeperInterface StuffkeeperInterface;
+#endif
