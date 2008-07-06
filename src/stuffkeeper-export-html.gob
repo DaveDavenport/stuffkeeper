@@ -334,6 +334,7 @@ class Stuffkeeper:Export:HTML from G:Object
     {
         int i;
         int found = 0;
+        printf("bu: %s\n", buffer);
         for(i=0; buffer[i] != '\0';i++)
         { 
             if(temp)
@@ -463,17 +464,20 @@ class Stuffkeeper:Export:HTML from G:Object
                 int found = 0;
                 for(item_type=0; item_type < FIELD_TYPE_NUM_FIELDS && 
                     strncasecmp(&buffer[6],FieldNames[item_type],strlen(FieldNames[item_type])) != 0;item_type++);
-
+                printf("buffer: %s\n", &buffer[6]);
                 if(item_type >= FIELD_TYPE_NUM_FIELDS)
                 {
                     /** */
                     if(strncasecmp(&buffer[6],"name", 4) == 0)
                     {
-                        StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
-                        gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
-                        self_printout(self,&buffer[10],temp,fp_out);
-                        if(temp)
-                            g_free(temp);
+                        if(type < FIELD_TYPE_EXPANDER)
+                        {
+                            StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
+                            gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
+                            self_printout(self,&buffer[10],temp,fp_out);
+                            if(temp)
+                                g_free(temp);
+                        }
                     }
                     else
                     {
@@ -482,7 +486,7 @@ class Stuffkeeper:Export:HTML from G:Object
                     }
                     return;
                 }
-                else if ( item_type != type)
+                else if (!( item_type == type || (item_type == FIELD_TYPE_END_EXPANDER && type == FIELD_TYPE_END)))
                 {
                     /* need a way to "skip" the new line */ 
                     return;
@@ -490,6 +494,7 @@ class Stuffkeeper:Export:HTML from G:Object
                 
 
                 i=strlen(FieldNames[item_type])+6;
+                printf("b%s\n", FieldNames[item_type]);
                 {
 
                     if(type == FIELD_TYPE_LIST)
@@ -587,9 +592,12 @@ class Stuffkeeper:Export:HTML from G:Object
                                 fputc(buffer[i], fp_out);
                             }
                         }
+                    }else if (type == FIELD_TYPE_END || type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING)
+                    {
+                        self_printout(self,&buffer[i],"",fp_out);
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
-                        self_printout(self,&buffer[i],temp,fp_out);
+                        self_printout(self,&buffer[i],(temp)?temp:"",fp_out);
                         if(temp)
                             g_free(temp);
                     }
@@ -633,7 +641,7 @@ class Stuffkeeper:Export:HTML from G:Object
                     {
                         StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                         FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]); 
-                        if(type < FIELD_TYPE_EXPANDER)
+                       // if(type < FIELD_TYPE_EXPANDER)
                         {
                             fseek(fp_in, point, SEEK_SET);
                             self->_priv->cur_field = retv[i];
