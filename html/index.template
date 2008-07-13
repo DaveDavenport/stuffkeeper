@@ -84,6 +84,10 @@
                         }{field:list <div id='list'>
                            }{field:list <i>%</i><BR />
                         }{field:list </div>
+                        }{field:horizontal packing <div id='hbox'>
+                        }{field:vertical packing <div id='vbox'>
+                        }{field:expander <br /><div id='expander' style='display: %block:none%;'>
+                        }{field:end </div>
                         }
                     </td>
                 <tr>
