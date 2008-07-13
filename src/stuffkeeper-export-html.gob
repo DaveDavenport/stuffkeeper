@@ -483,7 +483,7 @@ class Stuffkeeper:Export:HTML from G:Object
                     /** */
                     if(strncasecmp(&buffer[6],"name", 4) == 0)
                     {
-                        if(type < FIELD_TYPE_EXPANDER)
+                        if(type <= FIELD_TYPE_EXPANDER)
                         {
                             StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
                             gchar *temp = stuffkeeper_data_schema_get_field_name(schema, self->_priv->cur_field);
@@ -576,7 +576,7 @@ class Stuffkeeper:Export:HTML from G:Object
                         if(temp)
                             g_free(temp);
                     }
-                    else if (type == FIELD_TYPE_BOOLEAN)
+                    else if (type == FIELD_TYPE_BOOLEAN || type == FIELD_TYPE_EXPANDER)
                     {
                         int val = stuffkeeper_data_item_get_integer(self->_priv->cur_item, self->_priv->cur_field);
                         for(; buffer[i] != '\0';i++)

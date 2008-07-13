@@ -4,6 +4,18 @@
         <title>
             StuffKeeper {item:title - %} 
         </title>
+        <script language=javascript type='text/javascript'>
+        function showhide(id){
+            if (document.getElementById){
+                obj = document.getElementById(id);
+                if (obj.style.display == "none"){
+                    obj.style.display = "";
+                } else {
+                    obj.style.display = "none";
+                }
+            }
+        } 
+        </script>
         <style  TYPE="text/css"> 
         body \{
             background: white;
@@ -47,10 +59,14 @@
             \}
         #name \{
             display: inline-block;
-            width: 6em;
+            width: 8em;
             text-align: right;
             vertical-align: top;
             font-weight: bold;
+        \}
+        #list \{
+            margin-left: 8em;
+
         \}
         p \{
             padding-left: 7em;
@@ -79,7 +95,7 @@
                     }{field:list </div><BR />
                     }{field:horizontal packing <div id='hbox'>
                     }{field:vertical packing <div id='vbox'>
-                    }{field:expander <div id='expander'>
+                    }{field:expander <BR /><div id='expander' style='display: %block:none%;'>
                     }{field:end </div>
                     }
         ]
