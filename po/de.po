@@ -2,72 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Stuffkeeper git\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-01 21:02+0200\n"
-"PO-Revision-Date: 2008-07-01 20:45+0000\n"
+"POT-Creation-Date: 2008-07-14 19:57+0200\n"
+"PO-Revision-Date: 2008-07-09 21:12+0000\n"
 "Last-Translator: Carnager13 <rasi13@gmx.de>\n"
 "Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2008-07-09 20:00+0000\n"
+"X-Launchpad-Export-Date: 2008-07-14 17:08+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-Language: German\n"
 "X-Poedit-SourceCharset: utf-8\n"
-
-#~ msgid "<b>Directory</b>"
-#~ msgstr "<b>Directory</b>"
-
-#~ msgid "<b>Title</b>"
-#~ msgstr "<b>Titel</b>"
-
-#~ msgid "<b>Type</b>"
-#~ msgstr "<b>Typ</b>"
-
-#~ msgid "Filename:"
-#~ msgstr "Dateiname:"
-
-#~ msgid "gtk-add"
-#~ msgstr "Hinzufügen"
-
-#~ msgid "gtk-apply"
-#~ msgstr "Anwenden"
-
-#~ msgid "gtk-cancel"
-#~ msgstr "Abbrechen"
-
-#~ msgid "gtk-remove"
-#~ msgstr "Entfernen"
-
-#~ msgid "gtk-save"
-#~ msgstr "Speichern"
-
-#~ msgid ""
-#~ "Failed to open:\n"
-#~ "<i>'%s'</i>.\n"
-#~ "Make sure it is a valid local image."
-#~ msgstr ""
-#~ "Konnte nicht öffnen::\n"
-#~ "<i>'%s'</i>.\n"
-#~ "Stellen Sie sicher, dass es sich um eine Bilddatei handelt."
-
-#~ msgid "Add h-padding"
-#~ msgstr "Horizontale Trennung hinzufügen"
-
-#~ msgid "Add v-padding"
-#~ msgstr "Vertikale Trennung hinzufügen"
-
-#~ msgid "gtk-about"
-#~ msgstr "Über"
-
-#~ msgid "gtk-close"
-#~ msgstr "Schließen"
-
-#~ msgid "gtk-edit"
-#~ msgstr "Bearbeiten"
-
-#~ msgid "gtk-new"
-#~ msgstr "Neu"
 
 #: ../data/stuffkeeper.desktop.in.h:1
 msgid "Another way to catalog stuff "
@@ -179,7 +125,7 @@ msgstr "Suche bearbeiten"
 msgid "Expander"
 msgstr "Expander hinzufügen"
 
-#: ../glade/stuffkeeper.glade.h:25 ../src/stuffkeeper-interface.gob:1074
+#: ../glade/stuffkeeper.glade.h:25 ../src/stuffkeeper-interface.gob:1075
 msgid "Export"
 msgstr "Exportieren"
 
@@ -331,11 +277,11 @@ msgstr ""
 msgid "The chosen file is not a image format supported by gtk."
 msgstr ""
 
-#: ../src/stuffkeeper-data-item.gob:583 ../src/stuffkeeper-data-item.gob:590
+#: ../src/stuffkeeper-data-item.gob:557 ../src/stuffkeeper-data-item.gob:564
 msgid "N/A"
 msgstr "N/A"
 
-#: ../src/stuffkeeper-data-item.gob:632
+#: ../src/stuffkeeper-data-item.gob:606
 msgid "Failed to get title"
 msgstr "Konnte Titel nicht finden."
 
@@ -345,7 +291,7 @@ msgstr "Öffnen"
 
 #. *
 #. * Buttons
-#. 
+#.
 #. import
 #: ../src/stuffkeeper-data-list2.gob:393
 msgid "Import"
@@ -423,7 +369,7 @@ msgstr ""
 msgid "horizontal packing"
 msgstr ""
 
-#: ../src/stuffkeeper-edit-schema.gob:75 ../src/stuffkeeper-interface.gob:1200
+#: ../src/stuffkeeper-edit-schema.gob:75 ../src/stuffkeeper-interface.gob:1201
 msgid "Edit type"
 msgstr "Typ editieren"
 
@@ -435,73 +381,73 @@ msgstr "Wählen Sie ein Icon aus"
 #. It is a warning, it _should_ be modal.
 #. It is a warning message.
 #. yes/no question
-#: ../src/stuffkeeper-interface.gob:524
+#: ../src/stuffkeeper-interface.gob:525
 msgid ""
 "Deleting an entry cannot be undone.\n"
 "Are you sure you want to continue?"
 msgstr ""
 
-#: ../src/stuffkeeper-interface.gob:853
+#: ../src/stuffkeeper-interface.gob:854
 msgid ""
 "<b>No item to preview, select an item from the item list to preview it</b>"
 msgstr ""
 
-#: ../src/stuffkeeper-interface.gob:884
+#: ../src/stuffkeeper-interface.gob:885
 msgid "New Tag"
 msgstr "Neuer Tag"
 
-#: ../src/stuffkeeper-interface.gob:941
+#: ../src/stuffkeeper-interface.gob:942
 msgid "New Schema"
 msgstr "Neues Schema"
 
 #. Add tag
-#: ../src/stuffkeeper-interface.gob:1155
+#: ../src/stuffkeeper-interface.gob:1156
 #, fuzzy
 msgid "New tag"
 msgstr "Neuer Tag"
 
-#: ../src/stuffkeeper-interface.gob:1169
+#: ../src/stuffkeeper-interface.gob:1170
 msgid "Remove tag"
 msgstr ""
 
 #. Add item
-#: ../src/stuffkeeper-interface.gob:1180
+#: ../src/stuffkeeper-interface.gob:1181
 #, fuzzy
 msgid "New type"
 msgstr "Nach Typ"
 
-#: ../src/stuffkeeper-interface.gob:1194
+#: ../src/stuffkeeper-interface.gob:1195
 msgid "Remove type"
 msgstr ""
 
 #. Add item
-#: ../src/stuffkeeper-interface.gob:1211
+#: ../src/stuffkeeper-interface.gob:1212
 #, fuzzy
 msgid "New filter"
 msgstr "Neue Suche"
 
-#: ../src/stuffkeeper-interface.gob:1227
+#: ../src/stuffkeeper-interface.gob:1228
 msgid "Remove filter"
 msgstr ""
 
-#: ../src/stuffkeeper-interface.gob:1235
+#: ../src/stuffkeeper-interface.gob:1236
 #, fuzzy
 msgid "Edit filter"
 msgstr "Typ editieren"
 
-#: ../src/stuffkeeper-interface.gob:2107 ../src/main.c:142
+#: ../src/stuffkeeper-interface.gob:2108 ../src/main.c:142
 msgid "Revision"
 msgstr "Revision"
 
-#: ../src/stuffkeeper-interface.gob:2117
+#: ../src/stuffkeeper-interface.gob:2118
 msgid "Copyright 2008 Qball Cow"
 msgstr ""
 
-#: ../src/stuffkeeper-interface.gob:2119
+#: ../src/stuffkeeper-interface.gob:2120
 msgid "GNU General Public License"
 msgstr "GNU General Public License"
 
-#: ../src/stuffkeeper-interface.gob:2128
+#: ../src/stuffkeeper-interface.gob:2129
 msgid "translator-credits"
 msgstr ""
 "Übersetzungs Credits\n"
@@ -510,23 +456,26 @@ msgstr ""
 "  Carnager13 https://launchpad.net/~rasi13\n"
 "\n"
 "Launchpad Contributions:\n"
+"  Carnager13 https://launchpad.net/~rasi13\n"
+"\n"
+"Launchpad Contributions:\n"
 "  Carnager13 https://launchpad.net/~rasi13"
 
-#: ../src/stuffkeeper-interface.gob:2191
+#: ../src/stuffkeeper-interface.gob:2192
 msgid ""
 "Restoring from a backup will destroy the current database.\n"
 "Use with care."
 msgstr ""
-"Eine Sicherung wieder einzuspielen, wird die momentane Datenbank zerstören. "
-"\n"
+"Eine Sicherung wieder einzuspielen, wird die momentane Datenbank "
+"zerstören. \n"
 "Benutzen Sie diese Funktion mit Vorsicht."
 
-#: ../src/stuffkeeper-interface.gob:2488
+#: ../src/stuffkeeper-interface.gob:2489
 #, fuzzy
 msgid "Import type"
 msgstr "Importieren"
 
-#: ../src/stuffkeeper-interface.gob:2495
+#: ../src/stuffkeeper-interface.gob:2496
 #, fuzzy
 msgid "Types files"
 msgstr ""
@@ -550,8 +499,8 @@ msgstr "Erstellt"
 msgid "Modified"
 msgstr "Geändert"
 
-#: ../src/stuffkeeper-export-html.gob:110
-#: ../src/stuffkeeper-export-html.gob:163
+#: ../src/stuffkeeper-export-html.gob:116
+#: ../src/stuffkeeper-export-html.gob:177
 #, fuzzy
 msgid "Export templates"
 msgstr "Einträge sortieren"
@@ -572,3 +521,57 @@ msgstr ""
 #: ../src/main.c:180
 msgid "There is already an instance running. Quitting."
 msgstr ""
+
+#~ msgid "<b>Directory</b>"
+#~ msgstr "<b>Directory</b>"
+
+#~ msgid "<b>Title</b>"
+#~ msgstr "<b>Titel</b>"
+
+#~ msgid "<b>Type</b>"
+#~ msgstr "<b>Typ</b>"
+
+#~ msgid "Filename:"
+#~ msgstr "Dateiname:"
+
+#~ msgid "gtk-add"
+#~ msgstr "Hinzufügen"
+
+#~ msgid "gtk-apply"
+#~ msgstr "Anwenden"
+
+#~ msgid "gtk-cancel"
+#~ msgstr "Abbrechen"
+
+#~ msgid "gtk-remove"
+#~ msgstr "Entfernen"
+
+#~ msgid "gtk-save"
+#~ msgstr "Speichern"
+
+#~ msgid ""
+#~ "Failed to open:\n"
+#~ "<i>'%s'</i>.\n"
+#~ "Make sure it is a valid local image."
+#~ msgstr ""
+#~ "Konnte nicht öffnen::\n"
+#~ "<i>'%s'</i>.\n"
+#~ "Stellen Sie sicher, dass es sich um eine Bilddatei handelt."
+
+#~ msgid "Add h-padding"
+#~ msgstr "Horizontale Trennung hinzufügen"
+
+#~ msgid "Add v-padding"
+#~ msgstr "Vertikale Trennung hinzufügen"
+
+#~ msgid "gtk-about"
+#~ msgstr "Über"
+
+#~ msgid "gtk-close"
+#~ msgstr "Schließen"
+
+#~ msgid "gtk-edit"
+#~ msgstr "Bearbeiten"
+
+#~ msgid "gtk-new"
+#~ msgstr "Neu"
