@@ -355,16 +355,9 @@ class Stuffkeeper:Export:HTML from G:Object
             {
                 if(buffer[i]  == '%')
                 {
-                    gchar *esc = self_escape(self, temp);//g_markup_escape_text(temp, -1); 
+                    gchar *esc = self_escape(self, temp);
                     found = 1;
-                    /*
-                    for(j=0;esc[j];j++) {
-                        if(esc[j] == '\n') {
-                            fputs("<BR />", fp_out);
-                        } else
-                            fputc(esc[j], fp_out);
-                    }
-                    */
+
                     fputs(esc, fp_out);
                     g_free(esc);
 
@@ -554,14 +547,7 @@ class Stuffkeeper:Export:HTML from G:Object
                                         g_free(spath);
                                         g_free(dpath);
                                     }
-                                    /*
-                                    for(j=0;esc[j];j++) {
-                                        if(esc[j] == '\n') {
-                                            fputs("<BR />", fp_out);
-                                        } else
-                                            fputc(esc[j], fp_out);
-                                    }
-                                    */
+
                                     fputs(esc,fp_out);
                                     g_free(esc);
 
@@ -588,7 +574,8 @@ class Stuffkeeper:Export:HTML from G:Object
                                 int j;
                                 for(;buffer[end] != '\0' && buffer[end] != '%'; end++) 
                                 {
-                                    if(buffer[end] == ':') bbreak = end;
+                                    /* if we see an escape char, skip the next one, cannot be a break */
+                                    if( buffer[end-1] != '\\' && buffer[end] == ':') bbreak = end;
                                 }
                                 if(val) {
                                     for(j=i+1;j<bbreak;j++) fputc(buffer[j],fp_out);
