@@ -376,13 +376,16 @@ class Stuffkeeper:Export:HTML from G:Object
     {
         int a;
         int i= 0;
+        int depth = 0;
         char buffer[1024];
 
 
         a = fgetc(fp_in);
-        while(a != '}') {
+        while(a != '}' && !depth) {
             buffer[i] = a;
             i++;
+            if(a == '}') depth--;
+            else if(a == '{') depth++;
             a = fgetc(fp_in);
         };
         buffer[i] = '\0';
