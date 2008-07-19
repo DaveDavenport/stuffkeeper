@@ -109,6 +109,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
                                 debug_printf("Plugin: %s succesfull loaded\n",fs->name);
                             }else {
                                 /* unload module */
+																debug_printf("Plugin: %s failed to create object\n", fs->name);
                                 g_module_close(fs->module);
                                 g_free(fs);
                             }
@@ -118,7 +119,10 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             debug_printf("Failed: %s\n", g_module_error());
                             g_module_close(module);
                         }
-                    }
+										}
+										else{
+											debug_printf("Failed to load plugin: %s\n", g_module_error()); 
+										}
                     g_free(path);
                 }
             }
