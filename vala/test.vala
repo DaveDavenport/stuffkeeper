@@ -4,6 +4,8 @@ using Stuffkeeper;
 
 public class Test : Stuffkeeper.Plugin {
 	private Dialog win;
+	private long signal = 0;
+	private DataBackend skdb = null;
 
 	public override PluginType get_plugin_type()
 	{
@@ -15,9 +17,9 @@ public class Test : Stuffkeeper.Plugin {
 		return "Tag Cloud";
 	}
 
-	public override void run_menu(Stuffkeeper.DataBackend skdb)
+	public override void run_menu(Stuffkeeper.DataBackend skdb_e)
 	{
-		this.show_window(skdb);
+		this.show_window(skdb_e);
 	}
 
 	/* Destruction */
@@ -37,12 +39,20 @@ public class Test : Stuffkeeper.Plugin {
 	{
 		return tag1.get_title().collate(tag2.get_title()); 	
 	}
-	private string generate_cloud(Stuffkeeper.DataBackend skdb, Gtk.VBox box)
+	private string generate_cloud(Stuffkeeper.DataBackend skdb_e, Gtk.VBox box)
 	{
 		string str = new string();
-		List<weak DataTag> list = skdb.get_tags();
+		List<weak DataTag> list = skdb_e.get_tags();
 		double max = -1;
-
+		
+		/** 
+		 * THIS NEEDS TO BE FIXED, BUG IN GTK VAPI FILE! 
+	   */
+		weak List<weak Widget> children = box.get_children();
+		foreach (Widget child in children)
+		{
+			child.destroy();
+		}
 
 		list.sort((GLib.CompareFunc)tag_compare);
 		/* Get the max size */
@@ -82,9 +92,28 @@ public class Test : Stuffkeeper.Plugin {
 				cur_size += req.width;
 			}
 		}
+		box.show_all();
 		return str;
 	}
-	private void show_window(Stuffkeeper.DataBackend skdb)
+	/* signal handler */
+	private void tag_added (Stuffkeeper.DataBackend skdb_e, DataTag tag)
+	{
+		stdout.printf("Tag added\n");
+
+		generate_cloud(skdb, win.vbox); 
+	}
+	private void tag_removed (Stuffkeeper.DataBackend skdb_e,uint id)
+	{
+		stdout.printf("Tag removed\n");
+		generate_cloud(skdb, win.vbox); 
+	}
+	private void tag_changed (DataBackend skdb_e, DataTag tag)
+	{
+		stdout.printf("Tag changed\n");
+		generate_cloud(skdb, win.vbox); 
+	}
+
+	private void show_window(Stuffkeeper.DataBackend skdb_e)
 	{
 		/* if window is already open, do nothing */
 		if(win != null)
@@ -92,16 +121,22 @@ public class Test : Stuffkeeper.Plugin {
 			win.present();
 			return;
 		}
+		skdb = skdb_e;
 		/* create dialog */
 		win = new Dialog ();
 		win.title = "Tag cloud";
 		win.add_buttons(Gtk.STOCK_CLOSE, ResponseType.CLOSE);
 
-		/* Generate the cloud */
-		generate_cloud(skdb, win.vbox); 
+		
+		
 
 		win.response += this.response_window;
-		win.show_all();
+		win.show();
+		/* Generate the cloud */
+		generate_cloud(skdb, win.vbox); 
+		skdb.tag_added += tag_added;
+		skdb.tag_removed += tag_removed;
+		skdb.tag_changed += tag_changed;
 	}
 
 	private void response_window(Dialog dialog, int resonse_id)
@@ -110,6 +145,9 @@ public class Test : Stuffkeeper.Plugin {
 
 		stdout.printf("Close window\n");
 		win = null;
+		skdb.tag_added -= tag_added;
+		skdb.tag_removed -= tag_removed;
+		skdb.tag_changed -= tag_changed;
 	}
 }
 

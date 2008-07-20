@@ -118,6 +118,10 @@ namespace Stuffkeeper {
 		public void remove_search (int id);
 		public void remove_tag (int id);
 		public void set_locked (bool val);
+		[HasEmitter]
+		public virtual signal void tag_added(Stuffkeeper.DataTag tag);
+		public virtual signal void tag_changed(Stuffkeeper.DataTag tag);
+		public virtual signal void tag_removed(uint id);
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
@@ -132,8 +136,6 @@ namespace Stuffkeeper {
 		public weak GLib.Callback schema_added;
 		public weak GLib.Callback schema_removed;
 		public weak GLib.Callback tag_changed;
-		public weak GLib.Callback tag_added;
-		public weak GLib.Callback tag_removed;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
