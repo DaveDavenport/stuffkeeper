@@ -90,7 +90,7 @@ int main ( int argc, char **argv )
 
     GOptionEntry entries[] = 
     {
-        { "db-path", 'd', 0, G_OPTION_ARG_STRING, &db_path,     _("Path to the database"),                                 "Path" },
+        { "db-path", 'd', 0, G_OPTION_ARG_FILENAME, &db_path,     _("Path to the database"),                                 "Path" },
         { "version", 'v', 0, G_OPTION_ARG_NONE,   &version,     _("Version"),                                              NULL},
         { "firstrun",'f', 0, G_OPTION_ARG_NONE,   &first_run,   _("Act like it is the first time stuffkeeper is ran"),     NULL},
         { NULL }
