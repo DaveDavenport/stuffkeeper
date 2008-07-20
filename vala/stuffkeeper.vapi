@@ -105,7 +105,7 @@ namespace Stuffkeeper {
 		public weak Stuffkeeper.DataItemSearch get_search (int id);
 		public weak GLib.List get_searches ();
 		public weak Stuffkeeper.DataTag get_tag (int id);
-		public weak GLib.List get_tags ();
+		public GLib.List<weak DataTag> get_tags ();
 		public void load (string db_path);
 		public weak Stuffkeeper.DataSchema load_from_xml (string path);
 		public DataBackend ();
