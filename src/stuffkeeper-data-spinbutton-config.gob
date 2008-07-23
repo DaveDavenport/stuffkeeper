@@ -68,7 +68,7 @@ class Stuffkeeper:Data:Spinbutton:Config from Gtk:HBox
 						return;
 				if(stuffkeeper_data_schema_get_custom_field_integer(schema, self->_priv->field,field, &value))
         {
-            if(text == value)
+            if(text != value)
             {
                 g_signal_handler_block(gtk_spin_button_get_adjustment(self->_priv->spinbutton),self->_priv->changed_entry);
                 gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->_priv->spinbutton), (gdouble)value);
@@ -109,6 +109,7 @@ class Stuffkeeper:Data:Spinbutton:Config from Gtk:HBox
         /* field */
         obj->_priv->field = g_strdup(field);
 				obj->_priv->spinbutton = gtk_spin_button_new_with_range(G_MININT, G_MAXINT,1);
+				gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj->_priv->spinbutton), 0.0);
 
 				gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
 				gtk_box_pack_start(GTK_BOX(obj), label, FALSE, TRUE,0);
