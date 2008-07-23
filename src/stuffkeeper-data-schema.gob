@@ -88,8 +88,10 @@ requires 2.0.10
         DB_SCHEMAS_FIELD_TYPE_ORDER = 2,
         DB_SCHEMAS_FIELD_TYPE_TYPE = 3,
         DB_SCHEMAS_FIELD_TYPE_NAME = 4,
-        DB_SCHEMAS_FIELD_TYPE_IN_TITLE = 5
-
+        DB_SCHEMAS_FIELD_TYPE_IN_TITLE = 5,
+	DB_SCHEMAS_FIELD_TYPE_DEFAULT_VALUE = 6,
+	/* MASK to add to custom field, this leaves 16635 custom fields */
+	DB_SCHEMAS_FIELD_CUSTOM = (1<<31)
     }DbSchemaFieldType;
 %}
 class Stuffkeeper:Data:Schema from G:Object 
@@ -126,6 +128,14 @@ class Stuffkeeper:Data:Schema from G:Object
         schema_field_added(self,const gchar *field)
         {
         }
+
+    private 
+    signal last NONE (STRING, INT)
+    void
+    schema_custom_field_changed(self, const gchar *id, int field)
+    {
+    }
+
     private
     signal last NONE (NONE)
     void
@@ -596,7 +606,7 @@ class Stuffkeeper:Data:Schema from G:Object
             retv = g_strdup("Failed to get title\n");
         return retv;
     }
-
+	
     /**
      * Fields
      */
@@ -872,6 +882,40 @@ class Stuffkeeper:Data:Schema from G:Object
         self_schema_field_removed(self, id);
         stuffkeeper_data_backend_end_transaction(self->_priv->skdb);
     }
+
+    /*** 
+     * CUSTOM FIELDS
+     */
+    public
+	gchar *
+	get_custom_field_string(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM))
+	{
+		char *retv = self_field_schemas_get_field_string(self, field&DB_SCHEMAS_FIELD_CUSTOM,id);
+		return retv;
+	}
+	public
+	void
+	set_custom_field_string(self,const gchar *id, int field (check < DB_SCHEMAS_FIELD_CUSTOM), const gchar *value)
+	{
+		self_field_schemas_set_field_string(self, field&DB_SCHEMAS_FIELD_CUSTOM,id,value);
+		self_schema_custom_field_changed(self,id,field);
+	}
+	public
+	gint
+	get_custom_field_integer(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM))
+	{
+		gint retv = 0;
+		self_field_schemas_get_field_integer(self,field&DB_SCHEMAS_FIELD_CUSTOM, id,&retv);
+		return retv;
+	}
+	public
+	void
+	set_custom_field_integer(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM), const gint value)
+	{
+		self_field_schemas_set_field_integer(self,field&DB_SCHEMAS_FIELD_CUSTOM,id,value);
+		self_schema_custom_field_changed(self,id,field);
+	}
+
 
     /* Item handling */
     public

@@ -641,8 +641,8 @@ class Stuffkeeper:Export:HTML from G:Object
                     int i;
                     for(i=0;i<length;i++)
                     {
-                        StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
-                        FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]); 
+                        //StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->cur_item);
+                        //FieldType type = stuffkeeper_data_schema_get_field_type(schema, retv[i]); 
                        // if(type < FIELD_TYPE_EXPANDER)
                         {
                             fseek(fp_in, point, SEEK_SET);
