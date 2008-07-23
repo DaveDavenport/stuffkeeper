@@ -90,9 +90,9 @@ requires 2.0.10
         DB_SCHEMAS_FIELD_TYPE_NAME = 4,
         DB_SCHEMAS_FIELD_TYPE_IN_TITLE = 5,
 	DB_SCHEMAS_FIELD_TYPE_DEFAULT_VALUE = 6,
-	/* MASK to add to custom field, this leaves 16635 custom fields */
-	DB_SCHEMAS_FIELD_CUSTOM = (1<<31)
-    }DbSchemaFieldType;
+	/* MASK to add to custom field, this leaves sufficient custom fields */
+	DB_SCHEMAS_FIELD_CUSTOM = (1<<30)
+		}DbSchemaFieldType;
 %}
 class Stuffkeeper:Data:Schema from G:Object 
 {

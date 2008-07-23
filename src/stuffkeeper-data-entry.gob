@@ -10,6 +10,13 @@
 #include "stuffkeeper-data-backend.h"
 %}
 
+%{
+	typedef enum {
+		PRIVATE_FIELD_DEFAULT = 0
+	};
+
+%}
+
 class Stuffkeeper:Data:Entry from Gtk:Entry 
 {
     private StuffkeeperDataItem *item = {NULL};
@@ -160,6 +167,19 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
             gtk_entry_set_text(GTK_ENTRY(obj), value);
             g_free(value);
         }
+				else
+				{
+					gchar *field = stuffkeeper_data_schema_get_custom_field_string(stuffkeeper_data_item_get_schema(item), 
+							obj->_priv->field,
+							PRIVATE_FIELD_DEFAULT); 
+						if(field)
+						{
+	            gtk_entry_set_text(GTK_ENTRY(obj), field);
+							/* make it stick */
+							self_changed(obj,NULL);
+							g_free(field);
+						}
+				}
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
         self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
@@ -194,5 +214,4 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
 
             PARENT_HANDLER(obj);
         }
-
 }

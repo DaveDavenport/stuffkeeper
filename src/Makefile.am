@@ -16,6 +16,7 @@ nodist_stuffkeeper_SOURCES=\
 	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
+	stuffkeeper-data-entry-config.c\
 	stuffkeeper-data-taglist2.c\
 	stuffkeeper-data-expander.c\
 	stuffkeeper-data-text.c\
@@ -56,6 +57,7 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
+	stuffkeeper-data-entry-config.c\
 	stuffkeeper-data-taglist2.c\
 	stuffkeeper-data-expander.c\
 	stuffkeeper-data-text.c\
@@ -145,7 +147,8 @@ EXTRA_DIST=\
 		   stuffkeeper-data-boolean.gob\
 		   stuffkeeper-data-date2.gob\
 		   stuffkeeper-data-entry.gob\
-		   stuffkeeper-data-expander.gob\
+			 stuffkeeper-data-entry-config.gob\
+			 stuffkeeper-data-expander.gob\
 		   stuffkeeper-data-image.gob\
 		   stuffkeeper-data-item.gob\
 		   stuffkeeper-data-item-search.gob\
