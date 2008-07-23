@@ -1,1 +1,1 @@
-* Make the StuffKeeperDataSchema, StuffKeeperDataItem and StuffKeeperDataTag childs of one class, they share alot of sub functions.
+* Make spinbutton data type update using colors and with delay (see config thing */
