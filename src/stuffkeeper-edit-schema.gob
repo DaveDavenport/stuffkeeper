@@ -856,9 +856,9 @@ class Stuffkeeper:Edit:Schema from G:Object
 					if(type == FIELD_TYPE_STRING)
 					{
 						widget = stuffkeeper_data_entry_config_new(self->_priv->schema, id);
-						
-					} 
-
+					} else if (type == FIELD_TYPE_INTEGER) {
+						widget = stuffkeeper_data_spinbutton_config_new(self->_priv->schema, id);
+					}
 					if(widget){
 						gtk_container_add(GTK_CONTAINER(container), widget);
 						gtk_widget_show_all(container);

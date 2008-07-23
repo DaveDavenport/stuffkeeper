@@ -13,6 +13,7 @@ nodist_stuffkeeper_SOURCES=\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
+	stuffkeeper-data-spinbutton-config.c\
 	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
@@ -54,6 +55,7 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
 	stuffkeeper-data-spinbutton.c\
+	stuffkeeper-data-spinbutton-config.c\
 	stuffkeeper-data-date2.c\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
@@ -158,6 +160,7 @@ EXTRA_DIST=\
 		   stuffkeeper-data-rating.gob\
 		   stuffkeeper-data-schema.gob\
 		   stuffkeeper-data-spinbutton.gob\
+	stuffkeeper-data-spinbutton-config.gob\
 		   stuffkeeper-data-tag.gob\
 		   stuffkeeper-data-taglist2.gob\
 		   stuffkeeper-data-text.gob\

@@ -901,12 +901,10 @@ class Stuffkeeper:Data:Schema from G:Object
 		self_schema_custom_field_changed(self,id,field);
 	}
 	public
-	gint
-	get_custom_field_integer(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM))
+	gboolean
+	get_custom_field_integer(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM), int *retv)
 	{
-		gint retv = 0;
-		self_field_schemas_get_field_integer(self,field&DB_SCHEMAS_FIELD_CUSTOM, id,&retv);
-		return retv;
+		return self_field_schemas_get_field_integer(self,field&DB_SCHEMAS_FIELD_CUSTOM, id,retv);
 	}
 	public
 	void
