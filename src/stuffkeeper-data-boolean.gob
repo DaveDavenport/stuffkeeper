@@ -59,7 +59,7 @@ class Stuffkeeper:Data:Boolean from Gtk:Check:Button
     new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
-        gboolean value =FALSE;
+        int value =FALSE;
 
         /* store item */
         obj->_priv->item = item; 
@@ -71,6 +71,15 @@ class Stuffkeeper:Data:Boolean from Gtk:Check:Button
         /* update the entry */
         value = stuffkeeper_data_item_get_boolean(item, obj->_priv->field);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(obj), value);
+
+
+				/* get the default value from the schema. */
+				if(stuffkeeper_data_schema_get_custom_field_integer(stuffkeeper_data_item_get_schema(item), obj->_priv->field,0, &value))
+				{
+					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(obj), value);
+					self_changed(obj,NULL);
+				}
+
 
         obj->_priv->changed_entry = g_signal_connect(G_OBJECT(obj), "toggled", G_CALLBACK(self_changed), NULL);
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
