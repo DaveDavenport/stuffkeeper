@@ -890,30 +890,94 @@ class Stuffkeeper:Data:Schema from G:Object
 	gchar *
 	get_custom_field_string(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM))
 	{
-		char *retv = self_field_schemas_get_field_string(self, field&DB_SCHEMAS_FIELD_CUSTOM,id);
+		char *retv = self_field_schemas_get_field_string(self, field|DB_SCHEMAS_FIELD_CUSTOM,id);
 		return retv;
 	}
 	public
 	void
 	set_custom_field_string(self,const gchar *id, int field (check < DB_SCHEMAS_FIELD_CUSTOM), const gchar *value)
 	{
-		self_field_schemas_set_field_string(self, field&DB_SCHEMAS_FIELD_CUSTOM,id,value);
+		self_field_schemas_set_field_string(self, field|DB_SCHEMAS_FIELD_CUSTOM,id,value);
 		self_schema_custom_field_changed(self,id,field);
 	}
 	public
 	gboolean
 	get_custom_field_integer(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM), int *retv)
 	{
-		return self_field_schemas_get_field_integer(self,field&DB_SCHEMAS_FIELD_CUSTOM, id,retv);
+		return self_field_schemas_get_field_integer(self,field|DB_SCHEMAS_FIELD_CUSTOM, id,retv);
 	}
 	public
 	void
 	set_custom_field_integer(self, const gchar *id,int field (check < DB_SCHEMAS_FIELD_CUSTOM), const gint value)
 	{
-		self_field_schemas_set_field_integer(self,field&DB_SCHEMAS_FIELD_CUSTOM,id,value);
+		self_field_schemas_set_field_integer(self,field|DB_SCHEMAS_FIELD_CUSTOM,id,value);
 		self_schema_custom_field_changed(self,id,field);
 	}
 
+	/**
+	 * Fields
+	 */
+
+	public
+	int *
+	get_custom_fields(self, char *field_id, gsize *size)
+	{
+		int fields =-1;
+		char *query;
+		int *retv = NULL;
+		int i=0;
+		/* count the number of fields */
+		query = sqlite3_mprintf("SELECT COUNT(id) FROM SchemasFields WHERE SchemaId=%i and FieldId=%q and type >= %i",self->_priv->id,field_id,DB_SCHEMAS_FIELD_CUSTOM );
+		sqlite3_stmt *stmt;
+		const char *tail;
+		int r;
+		r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+		if (r == SQLITE_OK)
+		{
+			if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+			{
+				fields = sqlite3_column_int(stmt, 0);
+			}
+		}
+		else
+		{
+			printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+		}
+		sqlite3_finalize(stmt);
+		sqlite3_free(query);
+		/* if no rows, return */
+		if(fields <= 0)
+		{
+			printf(" no fields: %i\n", fields);
+			*size = 0;
+			return NULL;
+		}
+		/* get the rows, ordered */
+		retv = g_malloc0((fields+1)*sizeof(int *));
+		query = sqlite3_mprintf("SELECT type FROM SchemasFields WHERE SchemaId=%i and FieldId=%q and type>=%i" ,
+				self->_priv->id,
+				field_id,
+				DB_SCHEMAS_FIELD_CUSTOM);
+
+		r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+		sqlite3_free(query);
+		if (r != SQLITE_OK)
+		{
+			printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+		}
+		else
+		{
+			while((r = sqlite3_step(stmt)) == SQLITE_ROW)
+			{
+				retv[i] = sqlite3_column_int(stmt, 0)-DB_SCHEMAS_FIELD_CUSTOM;
+				i++;
+			}
+		}
+		sqlite3_finalize(stmt);
+
+		*size = fields;
+		return retv;
+	}
 
     /* Item handling */
     public
@@ -1147,7 +1211,20 @@ class Stuffkeeper:Data:Schema from G:Object
                  xmlNewProp(new, (xmlChar *) "in_title", (xmlChar *)type);
                  g_free(type);
 		 /* TODO: store custom fields property*/
-
+		 gsize flength = 0;
+		 int *cfields = self_get_custom_fields(self, retv[i], &flength);
+		 int j;
+		 for(j=0;j<flength;j++)
+		 {
+			gchar *value = self_get_custom_field_string(self, retv[i], cfields[j]);
+			printf("custom field: %s\n", value);
+			if(value)
+			{
+				xmlNode *cnew = xmlNewTextChild(new, NULL, (xmlChar *)"custom_field",(xmlChar *)value);
+				g_free(value);
+			}
+		 }
+		 if(cfields) g_free(cfields);	
                  g_free(name);
              }
 	     if(length) g_strfreev(retv);
