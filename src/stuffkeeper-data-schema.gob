@@ -1217,7 +1217,6 @@ class Stuffkeeper:Data:Schema from G:Object
 		 for(j=0;j<flength;j++)
 		 {
 			gchar *value = self_get_custom_field_string(self, retv[i], cfields[j]);
-			printf("custom field: %s\n", value);
 			if(value)
 			{
 				xmlNode *cnew = xmlNewTextChild(new, NULL, (xmlChar *)"custom_field",(xmlChar *)value);
