@@ -1146,9 +1146,13 @@ class Stuffkeeper:Data:Schema from G:Object
                  type = g_strdup_printf("%i",in_title);
                  xmlNewProp(new, (xmlChar *) "in_title", (xmlChar *)type);
                  g_free(type);
+		 /* TODO: store custom fields property*/
 
                  g_free(name);
              }
+	     if(length) g_strfreev(retv);
+	     
+
              if(xmlSaveFormatFile(path, doc, 1) < 0)
              {
                  xmlFreeDoc(doc);

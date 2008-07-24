@@ -22,14 +22,41 @@ class Stuffkeeper:Data:SpinButton from Gtk:Spin:Button
     /* lock signal */
     private gulong signal_backend_locked = {0};
 
+
+    private GdkColor writing ;
+    private GdkColor base;
+    private GdkColor text;
+
+
+    private guint changed_entry_timeout = {0};
+
+
     public
-    void
-    value_changed(self, gpointer data)
+    gboolean 
+    value_changed(self)
     {
         const int value = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self));
         stuffkeeper_data_item_set_integer(self->_priv->item, self->_priv->field, value);
-
+        gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->text));
+        gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->base));
+        self->_priv->changed_entry_timeout = 0;
+	return FALSE;
     }
+    private
+    void
+    value_changed_timeout(self, gpointer data)
+    {
+        if(self->_priv->changed_entry_timeout)
+        {
+            g_source_remove(self->_priv->changed_entry_timeout);
+        }
+        self->_priv->changed_entry_timeout = g_timeout_add(1000,(GSourceFunc)self_value_changed,self);
+
+        gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
+        gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->writing));
+    }
+
+
 
     public
     void
@@ -70,6 +97,17 @@ class Stuffkeeper:Data:SpinButton from Gtk:Spin:Button
             gtk_spin_button_set_range(GTK_SPIN_BUTTON(self), value, value);
         }
     }
+    private 
+	    void
+	    style_set(self, GtkStyle *prev, GtkWidget *wid)
+	    {
+		    if(self->_priv->changed_entry_timeout == 0) {
+			    self->_priv->base = (GTK_WIDGET(self)->style->base[GTK_STATE_NORMAL]);
+			    self->_priv->text = (GTK_WIDGET(self)->style->text[GTK_STATE_NORMAL]);
+		    }
+	    }
+
+
 
     public
     GtkWidget *
@@ -84,6 +122,15 @@ class Stuffkeeper:Data:SpinButton from Gtk:Spin:Button
         gtk_spin_button_set_range(GTK_SPIN_BUTTON(obj), G_MININT, G_MAXINT);
         gtk_spin_button_set_increments(GTK_SPIN_BUTTON(obj),1,5);
 
+	/* Color setup */
+        obj->_priv->base = (GTK_WIDGET(obj)->style->base[GTK_STATE_NORMAL]);
+        obj->_priv->text = (GTK_WIDGET(obj)->style->text[GTK_STATE_NORMAL]);
+        obj->_priv->writing.red = 255*255;
+        obj->_priv->writing.green = 253*255;
+        obj->_priv->writing.blue = 197*255;
+        gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &(obj->_priv->writing), TRUE,TRUE);
+        g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set),obj);
+
         /* store item */
         obj->_priv->item = item; 
         /* field */
@@ -92,19 +139,20 @@ class Stuffkeeper:Data:SpinButton from Gtk:Spin:Button
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
         /* update the entry */
-				if(stuffkeeper_data_item_get_integer_real(item, obj->_priv->field, &value))
-					gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj), (gdouble)value);
-				else
-				{
-					if(stuffkeeper_data_schema_get_custom_field_integer(stuffkeeper_data_item_get_schema(item), obj->_priv->field,PRIVATE_FIELD_DEFAULT, &value))
-					{
-						gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj), (gdouble)value);
-						self_value_changed(obj,NULL);
-					}
+	if(stuffkeeper_data_item_get_integer_real(item, obj->_priv->field, &value))
+		gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj), (gdouble)value);
+	else
+	{
+		/* get the default value from the schema. */
+		if(stuffkeeper_data_schema_get_custom_field_integer(stuffkeeper_data_item_get_schema(item), obj->_priv->field,PRIVATE_FIELD_DEFAULT, &value))
+		{
+			gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj), (gdouble)value);
+			self_value_changed(obj);
+		}
 
-				}
+	}
 
-        obj->_priv->changed_spin_value = g_signal_connect(G_OBJECT(obj), "value_changed", G_CALLBACK(self_value_changed), NULL);
+        obj->_priv->changed_spin_value = g_signal_connect(G_OBJECT(obj), "value_changed", G_CALLBACK(self_value_changed_timeout), NULL);
 
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
@@ -127,6 +175,14 @@ class Stuffkeeper:Data:SpinButton from Gtk:Spin:Button
                 g_signal_handler_disconnect(self->_priv->item,self->_priv->changed_item_entry);
                 self->_priv->changed_item_entry = 0;
             }
+           if(self->_priv->changed_entry_timeout)
+            {
+                g_source_remove(self->_priv->changed_entry_timeout);
+                self->_priv->changed_entry_timeout = 0;
+
+                self_value_changed(self);
+            }
+
             PARENT_HANDLER(obj);
         }
 
