@@ -12,6 +12,7 @@ nodist_stuffkeeper_SOURCES=\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
+	stuffkeeper-data-boolean-config.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-spinbutton-config.c\
 	stuffkeeper-data-date2.c\
@@ -54,6 +55,7 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-backend.c\
 	stuffkeeper-data-schema.c\
 	stuffkeeper-data-boolean.c\
+	stuffkeeper-data-boolean-config.c\
 	stuffkeeper-data-spinbutton.c\
 	stuffkeeper-data-spinbutton-config.c\
 	stuffkeeper-data-date2.c\
@@ -147,7 +149,9 @@ EXTRA_DIST=\
 		   stuffkeeperglue.h\
 		   stuffkeeper-data-backend.gob\
 		   stuffkeeper-data-boolean.gob\
-		   stuffkeeper-data-date2.gob\
+			 stuffkeeper-data-boolean-config.c\
+			 stuffkeeper-data-boolean-config.h\
+			 stuffkeeper-data-date2.gob\
 		   stuffkeeper-data-entry.gob\
 			 stuffkeeper-data-entry-config.gob\
 			 stuffkeeper-data-expander.gob\

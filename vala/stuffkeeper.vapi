@@ -2,13 +2,13 @@
 
 [CCode (cprefix = "Stuffkeeper", lower_case_cprefix = "stuffkeeper_")]
 namespace Stuffkeeper {
-	[CCode (cprefix = "DB_ITEMS_FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "DB_ITEMS_FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum DbItemFieldType {
 		ID,
 		TYPE,
 		NAME
 	}
-	[CCode (cprefix = "DB_ITEMS_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "DB_ITEMS_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum DbItemType {
 		ID,
 		SCHEMA,
@@ -18,7 +18,7 @@ namespace Stuffkeeper {
 		NAME,
 		NAME_GENERATED_CACHE
 	}
-	[CCode (cprefix = "DB_SCHEMAS_FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "DB_SCHEMAS_FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum DbSchemaFieldType {
 		ID,
 		ORDER,
@@ -26,7 +26,7 @@ namespace Stuffkeeper {
 		NAME,
 		IN_TITLE
 	}
-	[CCode (cprefix = "DB_SCHEMAS_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "DB_SCHEMAS_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum DbSchemaType {
 		ID,
 		MTIME,
@@ -34,7 +34,7 @@ namespace Stuffkeeper {
 		ICON,
 		NAME
 	}
-	[CCode (cprefix = "FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum FieldType {
 		STRING,
 		INTEGER,
@@ -52,14 +52,14 @@ namespace Stuffkeeper {
 		HPACKING,
 		NUM_FIELDS
 	}
-	[CCode (cprefix = "PLUGIN_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "PLUGIN_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum PluginType {
 		NONE,
 		ITEM,
 		BACKGROUND,
 		MENU
 	}
-	[CCode (cprefix = "", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum SearchFieldType {
 		SEARCH_TITLE,
 		SEARCH_FIELD_SCHEMA,
@@ -68,7 +68,7 @@ namespace Stuffkeeper {
 		SEARCH_FIELD_VALUE,
 		NUM_SEARCH_FIELD
 	}
-	[CCode (cprefix = "SEARCH_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cprefix = "SEARCH_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum SearchType {
 		NONE,
 		IS,
@@ -78,7 +78,7 @@ namespace Stuffkeeper {
 		NUM_ITEMS
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class SearchField {
 		public int id;
 		public int field_id;
@@ -87,7 +87,7 @@ namespace Stuffkeeper {
 		public weak string value;
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataBackend : GLib.Object {
 		public weak Stuffkeeper.DataTag add_tag (int id);
 		public void begin_transaction ();
@@ -124,7 +124,7 @@ namespace Stuffkeeper {
 		public virtual signal void tag_removed(uint id);
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataBackendClass {
 		public weak GLib.Callback search_changed;
 		public weak GLib.Callback search_added;
@@ -138,7 +138,7 @@ namespace Stuffkeeper {
 		public weak GLib.Callback tag_changed;
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItem : GLib.Object{
 		public void add_tag (Stuffkeeper.DataTag tag);
 		public void delete_yourself ();
@@ -168,15 +168,18 @@ namespace Stuffkeeper {
 		public void set_list (string field, string value, ulong length);
 		public void set_string (string id, string title);
 		public void set_title (string title);
+
+
+
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItemClass {
 		public weak GLib.Callback item_changed;
 		public weak GLib.Callback item_tags_changed;
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItemSearch {
 		public void add_field (Gtk.Widget button);
 		public void delete_yourself ();
@@ -200,12 +203,12 @@ namespace Stuffkeeper {
 		public void style_set (Gtk.Style style, Gtk.Widget wid);
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItemSearchClass {
 		public weak GLib.Callback search_changed;
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataSchema : GLib.Object{
 		public void add_field (Stuffkeeper.FieldType field, string name, int in_title);
 		public void add_item (GLib.Object item);
@@ -238,9 +241,22 @@ namespace Stuffkeeper {
 		public void set_field_type (string id, Stuffkeeper.FieldType type);
 		public void set_icon (string filename);
 		public void set_title (string title);
+
+		public string get_custom_field_string (string id, int field);
+		public bool get_custom_field_integer (string id, int field, out int value);
+
+		public void set_custom_field_integer (string id, int field, int value);
+
+
+		[HasEmitter]
+		public virtual signal void schema_custom_field_changed(string id, int field);
+
+
+
+
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataSchemaClass {
 		public weak GLib.Callback schema_changed;
 		public weak GLib.Callback schema_field_changed;
@@ -249,7 +265,7 @@ namespace Stuffkeeper {
 		public weak GLib.Callback schema_field_removed;
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataTag : GLib.Object {
 		public void add_item (GLib.Object item);
 		public void delete_yourself ();
@@ -263,12 +279,12 @@ namespace Stuffkeeper {
 		public void set_title (string title);
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataTagClass {
 		public weak GLib.Callback tag_changed;
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class Interface {
 		public void about_dialog ();
 		public void backend_locked_toggled (Gtk.ToggleButton button);
@@ -323,11 +339,11 @@ namespace Stuffkeeper {
 		public void visit_homepage ();
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class InterfaceClass {
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class Plugin : GLib.Object {
 		public virtual weak Gdk.Pixbuf get_icon ();
 		public virtual weak string get_name ();
@@ -337,7 +353,7 @@ namespace Stuffkeeper {
 		public virtual void run_menu (Stuffkeeper.DataBackend skdb);
 	}
 	[Compact]
-	[CCode (cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class PluginClass {
 		public weak GLib.Callback get_plugin_type;
 		public weak GLib.Callback get_name;
@@ -346,6 +362,6 @@ namespace Stuffkeeper {
 		public weak GLib.Callback run_background;
 		public weak GLib.Callback get_icon;
 	}
-	[CCode (cname = "register_plugin", cheader_filename = "stuffkeeper/stuffkeeper-plugin.h")]
+	[CCode (cname = "register_plugin", cheader_filename = "stuffkeeper-plugin.h")]
 	public static GLib.Type register_plugin ();
 }
