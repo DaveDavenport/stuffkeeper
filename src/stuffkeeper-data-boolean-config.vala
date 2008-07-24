@@ -62,9 +62,9 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 		 * Set it up 
 		 */
 		public void setup (Stuffkeeper.DataSchema schema, string fid) {
+			int value;
 			this.schema = schema;
 			this.field = fid;
-			int value;
 
 			if(schema.get_custom_field_integer(field, 0, out value))
 			{
