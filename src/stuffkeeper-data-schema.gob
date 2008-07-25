@@ -1221,6 +1221,9 @@ class Stuffkeeper:Data:Schema from G:Object
 			{
 				xmlNode *cnew = xmlNewTextChild(new, NULL, (xmlChar *)"custom_field",(xmlChar *)value);
 				g_free(value);
+				type = g_strdup_printf("%i",cfields[j]);
+				xmlNewProp(cnew, (xmlChar *) "type", (xmlChar *)type);
+				g_free(type);
 			}
 		 }
 		 if(cfields) g_free(cfields);	

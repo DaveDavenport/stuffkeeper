@@ -84,6 +84,9 @@ BUILT_SOURCES= revisiont.h\
 %.c: %.gob
 	@GOB2@ --no-touch-headers --always-private-header $<
 
+%.c: %.vala
+	valac -C --vapidir=../vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 --pkg=gmodule-2.0 --pkg=stuffkeeper $<
+
 revisiont.h:
 	@if test '$(REVISION)' != '$(CONF_VERSION)'; then\
 		echo "Writing new Makefile.config file";\
@@ -149,12 +152,11 @@ EXTRA_DIST=\
 		   stuffkeeperglue.h\
 		   stuffkeeper-data-backend.gob\
 		   stuffkeeper-data-boolean.gob\
-			 stuffkeeper-data-boolean-config.c\
-			 stuffkeeper-data-boolean-config.h\
-			 stuffkeeper-data-date2.gob\
+		   stuffkeeper-data-boolean-config.vala\
+		   stuffkeeper-data-date2.gob\
 		   stuffkeeper-data-entry.gob\
-			 stuffkeeper-data-entry-config.gob\
-			 stuffkeeper-data-expander.gob\
+		   stuffkeeper-data-entry-config.gob\
+		   stuffkeeper-data-expander.gob\
 		   stuffkeeper-data-image.gob\
 		   stuffkeeper-data-item.gob\
 		   stuffkeeper-data-item-search.gob\
