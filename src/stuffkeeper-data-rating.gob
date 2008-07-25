@@ -7,6 +7,16 @@ requires 2.0.10
 %ph{
 #include "stuffkeeper-data-backend.h"
 %}
+
+%{
+typedef enum {
+	MIN_RANGE = 0,
+	MAX_RANGE = 1,
+	DEFAULT_VALUE =2	
+
+}CustomField;
+
+%}
 class Stuffkeeper:Data:Rating from Gtk:HScale
 {
     private StuffkeeperDataItem *item = {NULL};
@@ -63,7 +73,7 @@ class Stuffkeeper:Data:Rating from Gtk:HScale
     new(StuffkeeperDataItem *item, const gchar *field)
     {
         Self *obj = GET_NEW;
-        int value; 
+        int value, min_value, max_value; 
         g_signal_connect_swapped(obj, "scroll-event", G_CALLBACK(self_button_scroll_event), obj);
 
         /* setup */
@@ -72,11 +82,23 @@ class Stuffkeeper:Data:Rating from Gtk:HScale
         gtk_range_set_increments(GTK_RANGE(obj),0.1,1);
         gtk_range_set_update_policy(GTK_RANGE(obj), GTK_UPDATE_DELAYED);
 
+
         /* store item */
         obj->_priv->item = item; 
         /* field */
         obj->_priv->field = g_strdup(field);
-            
+            	
+	/* get custom values */
+
+	if(stuffkeeper_data_schema_get_custom_field_integer(stuffkeeper_data_item_get_schema(item), obj->_priv->field,MIN_RANGE, &min_value))
+	{
+		if(stuffkeeper_data_schema_get_custom_field_integer(stuffkeeper_data_item_get_schema(item), obj->_priv->field,MAX_RANGE, &max_value))
+		{
+			printf("set range: %i %i\n", min_value, max_value);
+			gtk_range_set_range(GTK_RANGE(obj), min_value, max_value);
+		}
+	}
+
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
         /* update the entry */
