@@ -21,9 +21,11 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 			{
 				if(checkbox.active != (bool)value)
 				{
-					schema.schema_custom_field_changed -= field_changed;
+					//schema.schema_custom_field_changed -= field_changed;
+					this.checkbox.toggled += toggled;	
 					checkbox.active = (bool)value;	
-					schema.schema_custom_field_changed += field_changed;
+					//schema.schema_custom_field_changed += field_changed;
+					this.checkbox.toggled += toggled;	
 				}
 			}
 		}	

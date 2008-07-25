@@ -35,6 +35,7 @@ nodist_stuffkeeper_SOURCES=\
 	stuffkeeper-data-list2.c\
 	stuffkeeper-show-item.c\
 	stuffkeeper-data-rating.c\
+	stuffkeeper-data-rating-config.c\
 	stuffkeeper-plugin.c\
 	stuffkeeper-plugin-manager.c
 ##
@@ -78,6 +79,7 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-list2.c\
 	stuffkeeper-show-item.c\
 	stuffkeeper-data-rating.c\
+	stuffkeeper-data-rating-config.c\
 	stuffkeeper-plugin.c\
 	stuffkeeper-plugin-manager.c
 
@@ -164,6 +166,7 @@ EXTRA_DIST=\
 		   stuffkeeper-data-link.gob\
 		   stuffkeeper-data-list2.gob\
 		   stuffkeeper-data-rating.gob\
+		   stuffkeeper-data-rating-config.vala\
 		   stuffkeeper-data-schema.gob\
 		   stuffkeeper-data-spinbutton.gob\
 	stuffkeeper-data-spinbutton-config.gob\

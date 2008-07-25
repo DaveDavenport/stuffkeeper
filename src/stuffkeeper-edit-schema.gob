@@ -861,7 +861,11 @@ class Stuffkeeper:Edit:Schema from G:Object
 					} else if (type == FIELD_TYPE_BOOLEAN) {
 						widget = stuffkeeper_data_boolean_config_new();
 						stuffkeeper_data_boolean_config_setup(widget,self->_priv->schema, id);
+					}else if (type == FIELD_TYPE_RATING) {
+						widget = stuffkeeper_data_rating_config_new();
+						stuffkeeper_data_rating_config_setup(widget,self->_priv->schema, id);
 					}
+
 					if(widget){
 						gtk_container_add(GTK_CONTAINER(container), widget);
 						gtk_widget_show_all(container);
