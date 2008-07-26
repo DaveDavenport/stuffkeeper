@@ -927,7 +927,10 @@ class Stuffkeeper:Data:Schema from G:Object
 		int *retv = NULL;
 		int i=0;
 		/* count the number of fields */
-		query = sqlite3_mprintf("SELECT COUNT(id) FROM SchemasFields WHERE SchemaId=%i and FieldId=%q and type >= %i",self->_priv->id,field_id,DB_SCHEMAS_FIELD_CUSTOM );
+		query = sqlite3_mprintf("SELECT COUNT(id) FROM SchemasFields WHERE SchemaId=%i and FieldId=%q and type >= %i",
+							self->_priv->id,
+							field_id,
+							DB_SCHEMAS_FIELD_CUSTOM );
 		sqlite3_stmt *stmt;
 		const char *tail;
 		int r;
@@ -948,7 +951,6 @@ class Stuffkeeper:Data:Schema from G:Object
 		/* if no rows, return */
 		if(fields <= 0)
 		{
-			printf(" no fields: %i\n", fields);
 			*size = 0;
 			return NULL;
 		}
@@ -1155,91 +1157,91 @@ class Stuffkeeper:Data:Schema from G:Object
          public
          gboolean
          save_to_xml(self,const char *path)
-         {
-             int i=0;
-             gsize length=0;
-             gchar **retv;
-             xmlDocPtr doc;
-             xmlNodePtr root,new,fields;
-             gchar *field = NULL;
-             /* open file */
-             doc = xmlNewDoc((xmlChar *)"1.0"); 
-             if(!doc)
-             {
-                 printf("Failed to open xml file\n");
-                 return FALSE;
-             }
-             /* create root node */
-             root = xmlNewDocNode (doc, NULL, (xmlChar *) "StuffkeeperSchema", NULL);
-             /* Set root node */
-             xmlDocSetRootElement(doc, root);
+				 {
+					 int i=0;
+					 gsize length=0;
+					 gchar **retv;
+					 xmlDocPtr doc;
+					 xmlNodePtr root,new,fields;
+					 gchar *field = NULL;
+					 /* open file */
+					 doc = xmlNewDoc((xmlChar *)"1.0"); 
+					 if(!doc)
+					 {
+						 printf("Failed to open xml file\n");
+						 return FALSE;
+					 }
+					 /* create root node */
+					 root = xmlNewDocNode (doc, NULL, (xmlChar *) "StuffkeeperSchema", NULL);
+					 /* Set root node */
+					 xmlDocSetRootElement(doc, root);
 
-             /* Save title */
-             field = self_get_title(self);
-             new = xmlNewTextChild(root, NULL, (xmlChar *)"title", (xmlChar *)field);
-             g_free(field);
+					 /* Save title */
+					 field = self_get_title(self);
+					 new = xmlNewTextChild(root, NULL, (xmlChar *)"title", (xmlChar *)field);
+					 g_free(field);
 
-             /* Save fields */
-             /* create root node */
-             fields = xmlNewTextChild(root, NULL, (xmlChar *)"fields", NULL);
-             /* get fields */
-             retv = self_get_fields(self, &length);
-             for(i=0;i<length;i++)
-             {
-                 char *type;
-                 FieldType ft= self_get_field_type(self, retv[i]);
-                 /*int order = self_get_field_pos(self, retv[i]);*/
-                 char *name = self_get_field_name(self, retv[i]);
-                 int in_title= self_get_field_in_title(self, retv[i]);
+					 /* Save fields */
+					 /* create root node */
+					 fields = xmlNewTextChild(root, NULL, (xmlChar *)"fields", NULL);
+					 /* get fields */
+					 retv = self_get_fields(self, &length);
+					 for(i=0;i<length;i++)
+					 {
+						 char *type;
+						 FieldType ft= self_get_field_type(self, retv[i]);
+						 /*int order = self_get_field_pos(self, retv[i]);*/
+						 char *name = self_get_field_name(self, retv[i]);
+						 int in_title= self_get_field_in_title(self, retv[i]);
 
-                 new = xmlNewTextChild(fields, NULL, (xmlChar *)"row",(xmlChar *)name);
+						 new = xmlNewTextChild(fields, NULL, (xmlChar *)"row",(xmlChar *)name);
 
-                 /* Order */
-                /* 
-                 type = g_strdup_printf("%i",order);
-                 xmlNewProp(new, (xmlChar *) "order", (xmlChar *)type);
-                 g_free(type);
-                 */
+						 /* Order */
+						 /* 
+								type = g_strdup_printf("%i",order);
+								xmlNewProp(new, (xmlChar *) "order", (xmlChar *)type);
+								g_free(type);
+							*/
 
-                 /* Type */
-                 type = g_strdup_printf("%i",ft);
-                 xmlNewProp(new, (xmlChar *) "type", (xmlChar *)type);
-                 g_free(type);
+						 /* Type */
+						 type = g_strdup_printf("%i",ft);
+						 xmlNewProp(new, (xmlChar *) "type", (xmlChar *)type);
+						 g_free(type);
 
-                 /* in_title*/
-                 type = g_strdup_printf("%i",in_title);
-                 xmlNewProp(new, (xmlChar *) "in_title", (xmlChar *)type);
-                 g_free(type);
-		 /* TODO: store custom fields property*/
-		 gsize flength = 0;
-		 int *cfields = self_get_custom_fields(self, retv[i], &flength);
-		 int j;
-		 for(j=0;j<flength;j++)
-		 {
-			gchar *value = self_get_custom_field_string(self, retv[i], cfields[j]);
-			if(value)
-			{
-				xmlNode *cnew = xmlNewTextChild(new, NULL, (xmlChar *)"custom_field",(xmlChar *)value);
-				g_free(value);
-				type = g_strdup_printf("%i",cfields[j]);
-				xmlNewProp(cnew, (xmlChar *) "type", (xmlChar *)type);
-				g_free(type);
-			}
-		 }
-		 if(cfields) g_free(cfields);	
-                 g_free(name);
-             }
-	     if(length) g_strfreev(retv);
-	     
+						 /* in_title*/
+						 type = g_strdup_printf("%i",in_title);
+						 xmlNewProp(new, (xmlChar *) "in_title", (xmlChar *)type);
+						 g_free(type);
+						 /* TODO: store custom fields property*/
+						 gsize flength = 0;
+						 int *cfields = self_get_custom_fields(self, retv[i], &flength);
+						 int j;
+						 for(j=0;j<flength;j++)
+						 {
+							 gchar *value = self_get_custom_field_string(self, retv[i], cfields[j]);
+							 if(value)
+							 {
+								 xmlNode *cnew = xmlNewTextChild(new, NULL, (xmlChar *)"custom_field",(xmlChar *)value);
+								 g_free(value);
+								 type = g_strdup_printf("%i",cfields[j]);
+								 xmlNewProp(cnew, (xmlChar *) "type", (xmlChar *)type);
+								 g_free(type);
+							 }
+						 }
+						 if(cfields) g_free(cfields);	
+						 g_free(name);
+					 }
+					 if(length) g_strfreev(retv);
 
-             if(xmlSaveFormatFile(path, doc, 1) < 0)
-             {
-                 xmlFreeDoc(doc);
-                 return FALSE;
-             }
-             xmlFreeDoc(doc);
-             return TRUE;
-         }
+
+					 if(xmlSaveFormatFile(path, doc, 1) < 0)
+					 {
+						 xmlFreeDoc(doc);
+						 return FALSE;
+					 }
+					 xmlFreeDoc(doc);
+					 return TRUE;
+				 }
          public
          StuffkeeperDataBackend *
          get_backend(self)
