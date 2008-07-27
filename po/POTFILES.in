@@ -31,6 +31,8 @@ src/stuffkeeper-show-item.gob
 src/stuffkeeper-data-item-search.gob
 src/stuffkeeper-item-view.gob
 src/stuffkeeper-export-html.gob
+src/stuffkeeper-data-entry-config.gob
+src/stuffkeeper-data-spinbutton-config.gob
 
 #common files
 src/main.c

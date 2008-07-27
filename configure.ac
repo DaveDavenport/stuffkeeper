@@ -196,6 +196,7 @@ data/stuffkeeper.pc
 doc/Makefile
 types/Makefile
 html/Makefile
+vala/Makefile
 ])
 
 echo "Now type make to build"

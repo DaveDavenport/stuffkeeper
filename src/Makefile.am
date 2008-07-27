@@ -87,7 +87,7 @@ BUILT_SOURCES= revisiont.h\
 	@GOB2@ --no-touch-headers --always-private-header $<
 
 %.c: %.vala
-	@VALAC@ -C --vapidir=../vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 --pkg=gmodule-2.0 --pkg=stuffkeeper $<
+	@VALAC@ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 --pkg=gmodule-2.0 --pkg=stuffkeeper $<
 
 revisiont.h:
 	@if test '$(REVISION)' != '$(CONF_VERSION)'; then\

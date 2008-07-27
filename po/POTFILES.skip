@@ -9,3 +9,7 @@ src/stuffkeeper-show-item.c
 src/stuffkeeper-export-html.c
 src/stuffkeeper-data-schema-private.h
 src/stuffkeeper-data-date2.c
+src/stuffkeeper-data-entry-config.c
+src/stuffkeeper-data-spinbutton-config.c
+src/stuffkeeper-data-entry-config.c
+src/stuffkeeper-data-spinbutton-config.c
