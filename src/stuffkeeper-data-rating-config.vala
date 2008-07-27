@@ -32,7 +32,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 				{
 					min_spin.changed -= spin_changed;		
 					min_spin.value = (double)value;	
-					max_spin.set_range(min_spin.value, int.MAX);
+					max_spin.set_range(min_spin.value+1, int.MAX);
 					min_spin.changed += spin_changed;					
 				}
 			}
@@ -47,7 +47,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 				{
 					max_spin.changed -= spin_changed;		
 					max_spin.value = (double)value;	
-					min_spin.set_range(int.MIN, max_spin.value);
+					min_spin.set_range(int.MIN, max_spin.value-1);
 					max_spin.changed += spin_changed;					
 				}
 			}
@@ -100,9 +100,9 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 	private void spin_changed(SpinButton spin)
 	{
 		/* force update */
-		spin.update();
-		min_spin.set_range(int.MIN, max_spin.value);
-		max_spin.set_range(min_spin.value, int.MAX);
+		//spin.update();
+		min_spin.set_range(int.MIN, max_spin.value-1);
+		max_spin.set_range(min_spin.value+1, int.MAX);
 		if(update_timeout > 0)
 		{
 			Source.remove(update_timeout);	
@@ -118,18 +118,31 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		var label = new Gtk.Label("Minimum value");
 		label.set_alignment(1.0f,0.5f);
 		min_spin = new Gtk.SpinButton.with_range(int.MIN, int.MAX, 1);
-		this.attach(label, 0,1,0,1,AttachOptions.SHRINK|AttachOptions.FILL, AttachOptions.SHRINK,0,0);
-		this.attach(min_spin, 1,2,0,1,AttachOptions.SHRINK|AttachOptions.FILL, AttachOptions.SHRINK,0,0);
-		min_spin.value =  0.0;//(double)int.MIN;
-		min_spin.changed += spin_changed;
+		min_spin.numeric= true;
+		this.attach(label, 0,1,0,1,
+					AttachOptions.SHRINK|AttachOptions.FILL,
+					AttachOptions.SHRINK,0,0);
+		this.attach(min_spin, 1,2,0,1,
+					AttachOptions.SHRINK|AttachOptions.FILL,
+					AttachOptions.SHRINK,0,0);
+
+		min_spin.value =  0.0;
+		min_spin.value_changed += spin_changed;
 
 		label = new Gtk.Label("Maximum value");
 		label.set_alignment(1.0f,0.5f);
+
 		max_spin = new Gtk.SpinButton.with_range(int.MIN, int.MAX, 1);
-		this.attach(label, 0,1,1,2,AttachOptions.SHRINK|AttachOptions.FILL, AttachOptions.SHRINK,0,0);
-		this.attach(max_spin, 1,2,1,2,AttachOptions.SHRINK|AttachOptions.FILL, AttachOptions.SHRINK,0,0);
-		max_spin.value = 10.0;// (double)int.MAX;
-		max_spin.changed += spin_changed;
+		max_spin.numeric= true;
+
+		this.attach(label, 0,1,1,2,
+				AttachOptions.SHRINK|AttachOptions.FILL,
+				AttachOptions.SHRINK,0,0);
+		this.attach(max_spin, 1,2,1,2,
+				AttachOptions.SHRINK|AttachOptions.FILL,
+				AttachOptions.SHRINK,0,0);
+		max_spin.value = 10.0;
+		max_spin.value_changed += spin_changed;
 
 		this.show_all();
 	}

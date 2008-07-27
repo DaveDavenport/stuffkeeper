@@ -69,7 +69,9 @@ class Stuffkeeper:Data:Rating from Gtk:HScale
 								self->_priv->field,MAX_RANGE, &max_value))
 					{
 						printf("set range: %i %i\n", min_value, max_value);
-						gtk_range_set_range(GTK_RANGE(self), min_value, max_value);
+						/* sometimes they update "out of order", so you can have equal min/max, ignore those */
+						if(min_value < max_value)
+							gtk_range_set_range(GTK_RANGE(self), min_value, max_value);
 					}
 				}
 			}
