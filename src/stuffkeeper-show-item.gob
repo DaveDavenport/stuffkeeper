@@ -7,6 +7,7 @@ requires 2.0.10
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
+#include "stuffkeeper-data-password.h"
 #include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
@@ -68,7 +69,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
                 hbox = gtk_hbox_new(FALSE, 6);
             }
             /* Title */
-            if(type < FIELD_TYPE_EXPANDER)// != FIELD_TYPE_EXPANDER && type != FIELD_TYPE_END_EXPANDER)
+            if(type < FIELD_TYPE_EXPANDER || type >= FIELD_TYPE_PASSWORD)// != FIELD_TYPE_EXPANDER && type != FIELD_TYPE_END_EXPANDER)
             {
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
@@ -118,6 +119,8 @@ class Stuffkeeper:Show:Item from Gtk:VBox
                 gtk_container_add(GTK_CONTAINER(ali), sub_part);
                 gtk_container_add(GTK_CONTAINER(label1), ali);
                 g_queue_push_head(queue, sub_part);
+	    }else if (type == FIELD_TYPE_PASSWORD) {
+		    label1 = stuffkeeper_data_password_new(self->_priv->item,self->_priv->retv[i]);
             }else {
                 label1 = gtk_label_new("not supported\n");
             }

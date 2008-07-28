@@ -19,6 +19,8 @@ nodist_stuffkeeper_SOURCES=\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
 	stuffkeeper-data-entry-config.c\
+	stuffkeeper-data-password.c\
+	stuffkeeper-data-password-config.c\
 	stuffkeeper-data-taglist2.c\
 	stuffkeeper-data-expander.c\
 	stuffkeeper-data-text.c\
@@ -63,6 +65,8 @@ BUILT_SOURCES= revisiont.h\
 	stuffkeeper-data-tag.c\
 	stuffkeeper-data-entry.c\
 	stuffkeeper-data-entry-config.c\
+	stuffkeeper-data-password.c\
+	stuffkeeper-data-password-config.c\
 	stuffkeeper-data-taglist2.c\
 	stuffkeeper-data-expander.c\
 	stuffkeeper-data-text.c\
@@ -110,7 +114,8 @@ LIBS= \
 	@libglade_LIBS@\
 	@sqlite3_LIBS@\
 	@gthread_LIBS@\
-	@gio_LIBS@
+	@gio_LIBS@\
+	@GPGME_LIBS@
 
 
 AM_LDFLAGS = \
@@ -125,6 +130,7 @@ AM_CFLAGS = @CFLAGS@\
 	@sqlite3_CFLAGS@\
 	@gthread_CFLAGS@\
 	@gio_CFLAGS@\
+	@GPGME_CFLAGS@\
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\"
 
 ##
@@ -158,6 +164,8 @@ EXTRA_DIST=\
 		   stuffkeeper-data-date2.gob\
 		   stuffkeeper-data-entry.gob\
 		   stuffkeeper-data-entry-config.gob\
+		   stuffkeeper-data-password.gob\
+		   stuffkeeper-data-password-config.gob\
 		   stuffkeeper-data-expander.gob\
 		   stuffkeeper-data-image.gob\
 		   stuffkeeper-data-item.gob\

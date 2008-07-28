@@ -36,6 +36,7 @@ requires 2.0.10
         FIELD_TYPE_VPACKING = 11,
         FIELD_TYPE_END= 12,
         FIELD_TYPE_HPACKING = 13,
+	FIELD_TYPE_PASSWORD = 14,
         FIELD_TYPE_NUM_FIELDS
     } FieldType;
     extern char *FieldNames[FIELD_TYPE_NUM_FIELDS];
@@ -69,7 +70,9 @@ requires 2.0.10
             // FIELD_TYPE_END_PACKING
             N_("End"),              
             // FIELD_TYPE_VPACKING
-            N_("horizontal packing") 
+            N_("horizontal packing"),
+	    // FIELD_TYPE_PASSWORD
+	    N_("Password") 
     };
 
     typedef struct _a { char *id; int pos; }a;

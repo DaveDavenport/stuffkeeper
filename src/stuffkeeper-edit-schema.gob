@@ -491,11 +491,14 @@ class Stuffkeeper:Edit:Schema from G:Object
 
 
             self->_priv->model_fields = (GtkTreeModel *)gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
-            for(i=0; i <FIELD_TYPE_EXPANDER;i++)
+            for(i=0; i <FIELD_TYPE_NUM_FIELDS;i++)
             {
-                GtkTreeIter iter;
-                gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_fields),&iter);
-                gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_fields), &iter, 0, i, 1,_(FieldNames[i]), -1); 
+		if(i < FIELD_TYPE_EXPANDER || i > FIELD_TYPE_HPACKING)
+		{
+			GtkTreeIter iter;
+			gtk_list_store_append(GTK_LIST_STORE(self->_priv->model_fields),&iter);
+			gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_fields), &iter, 0, i, 1,_(FieldNames[i]), -1); 	
+		}
             }
 
             g_signal_connect_swapped(G_OBJECT(self->_priv->win), "style-set", G_CALLBACK(self_style_set), self);
@@ -864,6 +867,8 @@ class Stuffkeeper:Edit:Schema from G:Object
 					}else if (type == FIELD_TYPE_RATING) {
 						widget = stuffkeeper_data_rating_config_new();
 						stuffkeeper_data_rating_config_setup(widget,self->_priv->schema, id);
+					} else if (type == FIELD_TYPE_PASSWORD) {
+						widget = stuffkeeper_data_password_config_new(self->_priv->schema, id);
 					}
 
 					if(widget){
