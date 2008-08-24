@@ -3,17 +3,71 @@ msgstr ""
 "Project-Id-Version: Stuffkeeper git\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-14 19:57+0200\n"
-"PO-Revision-Date: 2008-07-09 21:12+0000\n"
-"Last-Translator: Carnager13 <rasi13@gmx.de>\n"
+"PO-Revision-Date: 2008-07-30 21:14+0000\n"
+"Last-Translator: Dieter Smorra <Unknown>\n"
 "Language-Team: Rasmus Steinke <rasi13@gmx.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2008-07-14 17:08+0000\n"
+"X-Launchpad-Export-Date: 2008-08-24 18:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-Language: German\n"
 "X-Poedit-SourceCharset: utf-8\n"
+
+#~ msgid "<b>Directory</b>"
+#~ msgstr "<b>Directory</b>"
+
+#~ msgid "<b>Title</b>"
+#~ msgstr "<b>Titel</b>"
+
+#~ msgid "<b>Type</b>"
+#~ msgstr "<b>Typ</b>"
+
+#~ msgid "Filename:"
+#~ msgstr "Dateiname:"
+
+#~ msgid "gtk-add"
+#~ msgstr "Hinzufügen"
+
+#~ msgid "gtk-apply"
+#~ msgstr "Anwenden"
+
+#~ msgid "gtk-cancel"
+#~ msgstr "Abbrechen"
+
+#~ msgid "gtk-remove"
+#~ msgstr "Entfernen"
+
+#~ msgid "gtk-save"
+#~ msgstr "Speichern"
+
+#~ msgid ""
+#~ "Failed to open:\n"
+#~ "<i>'%s'</i>.\n"
+#~ "Make sure it is a valid local image."
+#~ msgstr ""
+#~ "Konnte nicht öffnen::\n"
+#~ "<i>'%s'</i>.\n"
+#~ "Stellen Sie sicher, dass es sich um eine Bilddatei handelt."
+
+#~ msgid "Add h-padding"
+#~ msgstr "Horizontale Trennung hinzufügen"
+
+#~ msgid "Add v-padding"
+#~ msgstr "Vertikale Trennung hinzufügen"
+
+#~ msgid "gtk-about"
+#~ msgstr "Über"
+
+#~ msgid "gtk-close"
+#~ msgstr "Schließen"
+
+#~ msgid "gtk-edit"
+#~ msgstr "Bearbeiten"
+
+#~ msgid "gtk-new"
+#~ msgstr "Neu"
 
 #: ../data/stuffkeeper.desktop.in.h:1
 msgid "Another way to catalog stuff "
@@ -143,7 +197,7 @@ msgstr "Halten Sie Shift, um ein Feld an eine neue Position zu schieben."
 
 #: ../glade/stuffkeeper.glade.h:29
 msgid "Horizontal"
-msgstr ""
+msgstr "Horizontal"
 
 #: ../glade/stuffkeeper.glade.h:30
 msgid "Items:"
@@ -193,7 +247,7 @@ msgstr ""
 
 #: ../glade/stuffkeeper.glade.h:43
 msgid "Vertical"
-msgstr ""
+msgstr "Vertikal"
 
 #: ../glade/stuffkeeper.glade.h:44
 msgid "Visit Website"
@@ -261,17 +315,17 @@ msgstr "database.html"
 
 #: ../src/stuffkeeper-data-date2.gob:270
 msgid "No date"
-msgstr ""
+msgstr "Kein Datum"
 
 #. Today button
 #: ../src/stuffkeeper-data-date2.gob:463
 msgid "_Today"
-msgstr ""
+msgstr "_Heute"
 
 #. No date button
 #: ../src/stuffkeeper-data-date2.gob:472
 msgid "_No date"
-msgstr ""
+msgstr "_Kein Datum"
 
 #: ../src/stuffkeeper-data-image.gob:119
 msgid "The chosen file is not a image format supported by gtk."
@@ -291,7 +345,7 @@ msgstr "Öffnen"
 
 #. *
 #. * Buttons
-#.
+#. 
 #. import
 #: ../src/stuffkeeper-data-list2.gob:393
 msgid "Import"
@@ -311,47 +365,47 @@ msgstr ""
 #. FIELD_TYPE_STRING
 #: ../src/stuffkeeper-data-schema.gob:46
 msgid "String"
-msgstr ""
+msgstr "Zeichenkette"
 
 #. FIELD_TYPE_INTEGER
 #: ../src/stuffkeeper-data-schema.gob:48
 msgid "Integer"
-msgstr ""
+msgstr "Ganzzahl"
 
 #. FIELD_TYPE_BOOLEAN
 #: ../src/stuffkeeper-data-schema.gob:50
 msgid "Boolean"
-msgstr ""
+msgstr "Boolescher Wert"
 
 #. FIELD_TYPE_RATING
 #: ../src/stuffkeeper-data-schema.gob:52
 msgid "Slider"
-msgstr ""
+msgstr "Schieberegler"
 
 #. FIELD_TYPE_LIST
 #: ../src/stuffkeeper-data-schema.gob:54
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
 #. FIELD_TYPE_TEXT
 #: ../src/stuffkeeper-data-schema.gob:56
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 #. FIELD_TYPE_IMAGE
 #: ../src/stuffkeeper-data-schema.gob:58
 msgid "Image"
-msgstr ""
+msgstr "Bild"
 
 #. FIELD_TYPE_LINK
 #: ../src/stuffkeeper-data-schema.gob:60
 msgid "Link"
-msgstr ""
+msgstr "Verknüpfung"
 
 #. FIELD_TYPE_DATE
 #: ../src/stuffkeeper-data-schema.gob:62
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #. FIELD_TYPE_END_EXPANDER
 #. FIELD_TYPE_END_PACKING
@@ -386,6 +440,8 @@ msgid ""
 "Deleting an entry cannot be undone.\n"
 "Are you sure you want to continue?"
 msgstr ""
+"Das Löschen eines Eintrags kann nicht rückgängig gemacht werden.\n"
+"Wollen Sie sicher fortfahren?"
 
 #: ../src/stuffkeeper-interface.gob:854
 msgid ""
@@ -428,7 +484,7 @@ msgstr "Neue Suche"
 
 #: ../src/stuffkeeper-interface.gob:1228
 msgid "Remove filter"
-msgstr ""
+msgstr "Filter entfernen"
 
 #: ../src/stuffkeeper-interface.gob:1236
 #, fuzzy
@@ -459,15 +515,19 @@ msgstr ""
 "  Carnager13 https://launchpad.net/~rasi13\n"
 "\n"
 "Launchpad Contributions:\n"
-"  Carnager13 https://launchpad.net/~rasi13"
+"  Carnager13 https://launchpad.net/~rasi13\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Carnager13 https://launchpad.net/~rasi13\n"
+"  Dieter Smorra https://launchpad.net/~dieda"
 
 #: ../src/stuffkeeper-interface.gob:2192
 msgid ""
 "Restoring from a backup will destroy the current database.\n"
 "Use with care."
 msgstr ""
-"Eine Sicherung wieder einzuspielen, wird die momentane Datenbank "
-"zerstören. \n"
+"Eine Sicherung wieder einzuspielen, wird die momentane Datenbank zerstören. "
+"\n"
 "Benutzen Sie diese Funktion mit Vorsicht."
 
 #: ../src/stuffkeeper-interface.gob:2489
@@ -507,7 +567,7 @@ msgstr "Einträge sortieren"
 
 #: ../src/main.c:93
 msgid "Path to the database"
-msgstr ""
+msgstr "Pfad zur Datenbank"
 
 #: ../src/main.c:94 ../src/main.c:139
 msgid "Version"
@@ -521,57 +581,3 @@ msgstr ""
 #: ../src/main.c:180
 msgid "There is already an instance running. Quitting."
 msgstr ""
-
-#~ msgid "<b>Directory</b>"
-#~ msgstr "<b>Directory</b>"
-
-#~ msgid "<b>Title</b>"
-#~ msgstr "<b>Titel</b>"
-
-#~ msgid "<b>Type</b>"
-#~ msgstr "<b>Typ</b>"
-
-#~ msgid "Filename:"
-#~ msgstr "Dateiname:"
-
-#~ msgid "gtk-add"
-#~ msgstr "Hinzufügen"
-
-#~ msgid "gtk-apply"
-#~ msgstr "Anwenden"
-
-#~ msgid "gtk-cancel"
-#~ msgstr "Abbrechen"
-
-#~ msgid "gtk-remove"
-#~ msgstr "Entfernen"
-
-#~ msgid "gtk-save"
-#~ msgstr "Speichern"
-
-#~ msgid ""
-#~ "Failed to open:\n"
-#~ "<i>'%s'</i>.\n"
-#~ "Make sure it is a valid local image."
-#~ msgstr ""
-#~ "Konnte nicht öffnen::\n"
-#~ "<i>'%s'</i>.\n"
-#~ "Stellen Sie sicher, dass es sich um eine Bilddatei handelt."
-
-#~ msgid "Add h-padding"
-#~ msgstr "Horizontale Trennung hinzufügen"
-
-#~ msgid "Add v-padding"
-#~ msgstr "Vertikale Trennung hinzufügen"
-
-#~ msgid "gtk-about"
-#~ msgstr "Über"
-
-#~ msgid "gtk-close"
-#~ msgstr "Schließen"
-
-#~ msgid "gtk-edit"
-#~ msgstr "Bearbeiten"
-
-#~ msgid "gtk-new"
-#~ msgstr "Neu"

@@ -10,13 +10,13 @@ msgstr ""
 "Project-Id-Version: _stuffkeeper-ru\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-07-14 19:57+0200\n"
-"PO-Revision-Date: 2008-07-13 09:45+0000\n"
-"Last-Translator: Sergei Zivukov <Unknown>\n"
+"PO-Revision-Date: 2008-07-14 20:57+0000\n"
+"Last-Translator: Qball Cow <qball@qballcow.nl>\n"
 "Language-Team: <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2008-07-14 17:08+0000\n"
+"X-Launchpad-Export-Date: 2008-08-24 18:52+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../data/stuffkeeper.desktop.in.h:1
@@ -290,7 +290,7 @@ msgstr "Открыть"
 
 #. *
 #. * Buttons
-#.
+#. 
 #. import
 #: ../src/stuffkeeper-data-list2.gob:393
 msgid "Import"
@@ -450,6 +450,11 @@ msgstr "GNU General Public License"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Sergei Zivukov https://launchpad.net/~ekonomvygoda\n"
+"  Serhey Kusyumoff (Сергій Кусюмов) https://launchpad.net/~sergemine\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Qball Cow https://launchpad.net/~qball-qballcow\n"
 "  Sergei Zivukov https://launchpad.net/~ekonomvygoda\n"
 "  Serhey Kusyumoff (Сергій Кусюмов) https://launchpad.net/~sergemine"
 
