@@ -2,6 +2,7 @@
 
 %h{
 #include <gtk/gtk.h>
+#include "debug.h"
 #include "misc.h"
 #include "stuffkeeper-data-item.h"
 %}
@@ -43,7 +44,6 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
         }else{
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
-
 
         gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->text));
         gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->base));
@@ -98,12 +98,38 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
         }
     }
     private 
-        void
+    void
     style_set(self, GtkStyle *prev, GtkWidget *wid)
     {
         if(self->_priv->changed_entry_timeout == 0) {
-            self->_priv->base = (GTK_WIDGET(self)->style->base[GTK_STATE_NORMAL]);
-            self->_priv->text = (GTK_WIDGET(self)->style->text[GTK_STATE_NORMAL]);
+	    if(self->_priv->field == NULL && 
+		    !stuffkeeper_data_item_has_generated_title(self->_priv->item)
+	    ) {
+		/* Special case: Item is an editable title - use default system colors */
+		self->_priv->base = (GTK_WIDGET(self)->style->base[GTK_STATE_NORMAL]);
+		self->_priv->text = (GTK_WIDGET(self)->style->text[GTK_STATE_NORMAL]);
+	    }
+	    else {
+		/* Normal case: match colors with parent (hereby making enrty "transparent") */
+		GtkBin *parent_bin = NULL;
+
+		debug_printf("Matching colors for StuffkeeperDataEntry with parent\n");
+		parent_bin = wid->parent; 
+		while(parent_bin && !GTK_IS_BIN(parent_bin)) {
+		    parent_bin = GTK_WIDGET(parent_bin)->parent;
+		}
+		if(parent_bin) {
+		    g_signal_handlers_block_by_func(G_OBJECT(self), self_style_set, wid);
+		    self->_priv->base = (GTK_WIDGET(parent_bin)->style->bg[GTK_STATE_NORMAL]);
+		    self->_priv->text = (GTK_WIDGET(parent_bin)->style->text[GTK_STATE_NORMAL]);
+		    gtk_widget_modify_base(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(self->_priv->base));
+		    gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(self->_priv->text));
+		    g_signal_handlers_unblock_by_func(G_OBJECT(self),self_style_set , wid);
+		}
+		else {
+		    debug_printf("No GtkBin parent found for StuffkeeperDataEntr\n");
+		}
+	    }
         }
     }
     private
@@ -131,10 +157,6 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
         if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
-    
-    
-
-
         obj->_priv->base = (GTK_WIDGET(obj)->style->base[GTK_STATE_NORMAL]);
         obj->_priv->text = (GTK_WIDGET(obj)->style->text[GTK_STATE_NORMAL]);
         obj->_priv->writing.red = 255*255;
@@ -142,7 +164,6 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
         obj->_priv->writing.blue = 197*255;
         gdk_colormap_alloc_color(gtk_widget_get_default_colormap(), &(obj->_priv->writing), TRUE,TRUE);
         g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set),obj);
-
 
         /* store item */
         obj->_priv->item = item; 
@@ -157,29 +178,31 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
             value = stuffkeeper_data_item_get_string(item, obj->_priv->field);
         }else{
             value = stuffkeeper_data_item_get_title(item); 
-            if(stuffkeeper_data_item_has_generated_title(item))
+            if(stuffkeeper_data_item_has_generated_title(item)) {
                 gtk_editable_set_editable(GTK_EDITABLE(obj), FALSE);
-            else
+		GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(obj), GTK_CAN_FOCUS);
+	    }
+            else {
                 gtk_editable_set_editable(GTK_EDITABLE(obj), TRUE);
+		GTK_WIDGET_SET_FLAGS(GTK_WIDGET(obj), GTK_CAN_FOCUS);
+	    }
         }
         if(value)
         {
             gtk_entry_set_text(GTK_ENTRY(obj), value);
             g_free(value);
         }
-				else
-				{
-					gchar *field = stuffkeeper_data_schema_get_custom_field_string(stuffkeeper_data_item_get_schema(item), 
-							obj->_priv->field,
-							PRIVATE_FIELD_DEFAULT); 
-						if(field)
-						{
-	            gtk_entry_set_text(GTK_ENTRY(obj), field);
-							/* make it stick */
-							self_changed(obj,NULL);
-							g_free(field);
-						}
-				}
+	else {
+	    gchar *field = stuffkeeper_data_schema_get_custom_field_string(stuffkeeper_data_item_get_schema(item), 
+		obj->_priv->field,
+		PRIVATE_FIELD_DEFAULT); 
+	    if(field) {
+		gtk_entry_set_text(GTK_ENTRY(obj), field);
+		/* make it stick */
+		self_changed(obj,NULL);
+		g_free(field);
+	    }
+	}
         obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
         self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
@@ -210,7 +233,6 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
 
                 self_save_changes(self);
             }
-
 
             PARENT_HANDLER(obj);
         }
