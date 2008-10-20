@@ -246,6 +246,83 @@
               </widget>
             </child>
             <child>
+              <widget class="GtkMenuItem" id="menuitem_item">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Item</property>
+                <property name="use_underline">True</property>
+                <child>
+                  <widget class="GtkMenu" id="menu7">
+                    <property name="visible">True</property>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem_item_open">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-open</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="interface_item_open"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="menuitem_item_sep">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem_item_add">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-add</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem_item_remove">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">gtk-remove</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="interface_item_remove"/>
+                        <accelerator key="D" modifiers="GDK_CONTROL_MASK" signal="activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem_item_clone">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Clone</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="C" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK" signal="activate"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image16">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-copy</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem2">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="menuitem_item_export">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Export</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="export_html_item"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="menu-item-image15">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-save</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
               <widget class="GtkMenuItem" id="menuitem_filter">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">_Filter</property>
@@ -428,7 +505,6 @@
                 <property name="is_important">True</property>
                 <property name="label" translatable="yes">Add Item</property>
                 <property name="stock_id">gtk-add</property>
-                <signal name="show_menu" handler="interface_item_add_menu"/>
                 <signal name="clicked" handler="interface_item_add"/>
               </widget>
               <packing>

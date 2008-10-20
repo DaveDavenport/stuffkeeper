@@ -74,6 +74,7 @@ class Stuffkeeper:Interface from G:Object
 
     /* Menu */
     private GtkWidget           *menu               = {NULL};
+    private GtkWidget           *menu_item_add      = {NULL};
     /**
      * Treeview 1 & 2
      */
@@ -95,6 +96,8 @@ class Stuffkeeper:Interface from G:Object
 
     private GtkWidget           *item_view_container;
     private GtkWidget           *show_item_pane_menu_item;
+
+    private GtkWidget           *menuitem_item_add;
 
     private StuffkeeperDataBackend *skdbg = {NULL};
     private StuffkeeperPluginManager *spm = {NULL};
@@ -232,6 +235,8 @@ class Stuffkeeper:Interface from G:Object
 
 
         g_free(title);
+
+	self_update_all_item_add_menus(self);
     }
     private
     void 
@@ -256,6 +261,8 @@ class Stuffkeeper:Interface from G:Object
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
+
+	self_update_all_item_add_menus(self);
     }
     private
     void 
@@ -263,7 +270,6 @@ class Stuffkeeper:Interface from G:Object
     {
         GtkTreeIter iter;
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->model_schemas);
-
 
         if(gtk_tree_model_get_iter_first(model, &iter))
         {
@@ -273,10 +279,12 @@ class Stuffkeeper:Interface from G:Object
                 if(oid == id)
                 {
                     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-                    return;
+                    break;
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
+
+	self_update_all_item_add_menus(self);
     }
 
     /**
@@ -1288,6 +1296,8 @@ class Stuffkeeper:Interface from G:Object
             
              self->_priv->cb_search = glade_xml_get_widget(self->_priv->xml, "cb_search");
             
+	    self->_priv->menuitem_item_add = glade_xml_get_widget(self->_priv->xml, "menuitem_item_add");
+
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
 
             /* Accel group */
@@ -1440,13 +1450,21 @@ class Stuffkeeper:Interface from G:Object
     }
 
     /* Add item menu */
-    public
-    void
-    interface_item_add_menu(self, GtkWidget *but)
+    private
+    void 
+    update_all_item_add_menus(self) {
+	self_update_item_add_menu(self, GTK_MENU_SHELL(self->_priv->menu), FALSE);
+	self_update_item_add_menu(self, GTK_MENU_SHELL(self->_priv->menu_item_add), TRUE);
+    }
+
+    private
+    void 
+    update_item_add_menu(self, Gtk:MenuShell *menu, gboolean add_hotkeys)
     {
         GtkTreeIter iter;
         GList *node,*items = NULL;
-        items = gtk_container_get_children(GTK_CONTAINER(self->_priv->menu));
+
+        items = gtk_container_get_children(GTK_CONTAINER(menu));
         for(node = items; node;node = g_list_next(node))
         {
             gtk_widget_destroy(GTK_WIDGET(node->data));
@@ -1456,24 +1474,60 @@ class Stuffkeeper:Interface from G:Object
 
         if(gtk_tree_model_get_iter_first(self->_priv->model_schemas,&iter))
         {
+	    gchar *menu_hotkeys = NULL;
+	    gchar **menu_hotkeys_list = NULL;
+	    gchar **menu_hotkey_ptr = NULL;
+
+	    /* Colon-seperated list of shortcut-prefixes for menu items the
+	     * last item on the list will be repeated for all menu entries
+	     * witout their own items */
+	    if(add_hotkeys) {
+		menu_hotkeys = _("_1. :_2. :_3. :_4. :_5. :_6. :_7. :_8. :_9. :_0. :_A. :_B. :_C. :_D. :_E. :_F. :_G. :_H. :_I. :_J. :_K. :_L. :_M. :_M. :_N. :_O. :_P. :_Q. :_R. :_S. :_T. :_U. :_V. :_W. :_X. :_Y. :_Z. :   ");
+		menu_hotkeys_list = g_strsplit(menu_hotkeys, ":", -1);
+		menu_hotkey_ptr = menu_hotkeys_list;
+	    }
             do{
                 gchar *title = NULL;
-                GtkWidget *m =NULL;
+		gchar *menu_entry = NULL;
+                GtkWidget *m = NULL;
                 StuffkeeperDataSchema *schema = NULL;
+
                 gtk_tree_model_get(self->_priv->model_schemas, &iter, 1, &title,3,&schema, -1);
-                m=gtk_image_menu_item_new_with_label((title==NULL)?"n/a":title);
+		if(add_hotkeys) {
+		    if(title && g_strstr_len(title, -1, "_")) {
+			gchar **tsplit;
+			/* Need to escape underscores in the title */
+			tsplit = g_strsplit(title, "_", -1);
+			g_free(title);
+			title = g_strjoinv("__",tsplit);
+			g_strfreev(tsplit);
+		    }
+		    menu_entry = g_strconcat(*menu_hotkey_ptr, (title == NULL)?_("n/a"):title, NULL);
+		    m=gtk_image_menu_item_new_with_mnemonic(menu_entry);
+		} else {
+		    m=gtk_image_menu_item_new_with_label((title == NULL)?_("n/a"):title);
+		}
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(m), 
                     gtk_image_new_from_pixbuf(stuffkeeper_data_schema_get_pixbuf(schema)));
-                gtk_menu_shell_insert(GTK_MENU_SHELL(self->_priv->menu), m,-1);
+                gtk_menu_shell_insert(GTK_MENU_SHELL(menu), m,-1);
                 g_object_set_data(G_OBJECT(m), "schema", schema);
                 g_signal_connect_swapped(G_OBJECT(m), "activate", G_CALLBACK(self_interface_item_add_menu_button), self);
-                gtk_widget_show_all(self->_priv->menu);
-                if(title)
+                gtk_widget_show_all(menu);
+                if(title) {
                     g_free(title);
+		}
+		if(menu_entry) {
+			g_free(menu_entry);
+		}
+		if(add_hotkeys && menu_hotkey_ptr[1]) {
+		    menu_hotkey_ptr++;
+		}
 
-            }while(gtk_tree_model_iter_next(self->_priv->model_schemas, &iter));
+            } while(gtk_tree_model_iter_next(self->_priv->model_schemas, &iter));
+	    if(add_hotkeys) {
+		g_strfreev(menu_hotkeys_list);
+	    }
         }
-        debug_printf("show menu\n");
     }
 
     public
@@ -1533,12 +1587,20 @@ class Stuffkeeper:Interface from G:Object
         {
             g_object_set(G_OBJECT(self->_priv->treeview1_renderer), "editable", FALSE, NULL);
             gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "toolbar1"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_sep"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_add"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_remove"));
+            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_clone"));
             gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_filter"));
             gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_type_new"));
             gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_type_import"));
         } else {
             g_object_set(G_OBJECT(self->_priv->treeview1_renderer), "editable", TRUE, NULL);
             gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "toolbar1"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_sep"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_add"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_remove"));
+            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_clone"));
             gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_filter"));
             gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_type_new"));
             gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_type_import"));
@@ -1590,18 +1652,16 @@ class Stuffkeeper:Interface from G:Object
             /* locked signal */
             self->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(self->_priv->skdbg), "notify::locked", G_CALLBACK(self_backend_locked), self);
 
-
-            self->_priv->menu = gtk_menu_new();
-            gtk_menu_tool_button_set_menu(GTK_MENU_TOOL_BUTTON(self->_priv->AddMenuButton), (self->_priv->menu));
-
-
-
-
             /* Setting up backends */
             self->_priv->model_schemas = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
-
-
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_schemas), 1, GTK_SORT_ASCENDING);
+
+	    /* New Item menus */
+            self->_priv->menu = gtk_menu_new();
+            gtk_menu_tool_button_set_menu(GTK_MENU_TOOL_BUTTON(self->_priv->AddMenuButton), (self->_priv->menu));
+            self->_priv->menu_item_add = gtk_menu_new();
+	    gtk_menu_item_set_submenu(GTK_MENU_ITEM(self->_priv->menuitem_item_add), self->_priv->menu_item_add);
+
             /** Load the schemas*/
             node = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))
@@ -1622,7 +1682,6 @@ class Stuffkeeper:Interface from G:Object
                     "schema-changed", 
                     G_CALLBACK(self_schema_changed),
                     self);
-
 
 
 
