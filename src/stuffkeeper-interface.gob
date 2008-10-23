@@ -427,7 +427,6 @@ class Stuffkeeper:Interface from G:Object
         g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_item_added);
         GtkTreeIter iter;
         StuffkeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
-        stuffkeeper_data_item_set_title(item,"New Item");
         if(gtk_tree_model_get_iter_first(self->_priv->model_tags, &iter))
         {
             do{

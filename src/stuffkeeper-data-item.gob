@@ -492,6 +492,33 @@ class Stuffkeeper:Data:Item from G:Object
 	self_set_core_field_string(self, DB_ITEMS_TYPE_NAME_GENERATED_CACHE, value);
         g_free(value);
     }
+    private gchar *find_first_title_field(self)
+    {
+        gsize length = 0;
+        gchar **fields;
+
+        if(self_has_generated_title(self) && 
+		NULL != (fields = stuffkeeper_data_schema_get_fields(self->_priv->schema,&length)))
+        {
+            gchar **field;
+	    gchar *found_field = NULL;
+
+            for(field = fields; field; ++field)
+            {
+                if(stuffkeeper_data_schema_get_field_in_title(self->_priv->schema, *field)) 
+                {
+		    FieldType ft = stuffkeeper_data_schema_get_field_type(self->_priv->schema, *field);
+		    if(ft == FIELD_TYPE_STRING || ft == FIELD_TYPE_TEXT) {
+			found_field = g_strdup(*field);
+			break;
+		    }
+                }
+            }
+            g_strfreev(fields);
+            return found_field;
+        }
+        return NULL;
+    }
     private void set_backend(self, StuffkeeperDataBackend *skdb)
     {
 	self->_priv->skdb = STUFFKEEPER_DATA_BACKEND(skdb);
@@ -646,9 +673,27 @@ class Stuffkeeper:Data:Item from G:Object
     public StuffkeeperDataItem *new(StuffkeeperDataBackend *skdb, 
 	    StuffkeeperDataSchema *schema)
     {
+	gchar *title_field, *new_title, *schema_name;
+
 	Self *obj = GET_NEW;
 	self_set_backend(obj, skdb);
 	self_make_dbobject(obj, schema);
+
+	/* Set a generic new item title */
+	schema_name = stuffkeeper_data_schema_get_title(schema);
+	new_title = g_strconcat(_("New "), schema_name?schema_name:_("Item"), NULL);
+	g_free(schema_name);
+	if(self_has_generated_title(obj)) {
+	    if(NULL != (title_field = self_find_first_title_field(obj))) {
+		self_set_custom_field_string(obj, title_field, new_title);
+		self_title_cache_refresh(obj);
+		g_free(title_field);
+	    }
+	}
+	else {
+	    self_set_core_field_string(obj, DB_ITEMS_TYPE_NAME, new_title);
+	}
+	g_free(new_title);
 	return obj;
     }
 
