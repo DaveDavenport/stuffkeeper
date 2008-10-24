@@ -400,6 +400,24 @@ class Stuffkeeper:Data:Item from G:Object
 	}
 	return value_changed;
     }
+    private void add_tag_internal(self, StuffkeeperDataTag *tag)
+    {
+	if (self_has_tag(self, tag)) {
+	    return;
+	}
+	self->_priv->tags = g_list_append(self->_priv->tags, tag);
+	self_dbcore_insert_into_items_int(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
+	stuffkeeper_data_tag_add_item(tag,self);
+    }
+    public void remove_tag_internal(self, StuffkeeperDataTag *tag)
+    {
+	if (!self_has_tag(self, tag)) {
+	    return;
+	}
+	self->_priv->tags = g_list_remove(self->_priv->tags, tag);
+	self_dbcore_delete_from_items_int_single(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
+	stuffkeeper_data_tag_remove_item(tag, self);
+    }
     private gboolean get_custom_field_integer(self, const gchar *fieldid, int *value)
     {
 	return self_dbcore_select_from_itemsfields_int_single(self, fieldid, value);
@@ -629,7 +647,6 @@ class Stuffkeeper:Data:Item from G:Object
         self_item_changed(self, NULL);
     }
 
-
     /**************************************************************************
      * Public Interface
      **************************************************************************/
@@ -694,6 +711,64 @@ class Stuffkeeper:Data:Item from G:Object
 	    self_set_core_field_string(obj, DB_ITEMS_TYPE_NAME, new_title);
 	}
 	g_free(new_title);
+	return obj;
+    }
+
+    public StuffkeeperDataItem *new_clone(
+	    Stuffkeeper:Data:Item *item (check null type))
+    {
+	gchar *title_field, *old_title, *new_title;
+	int result = 0;
+	char *error = NULL;
+	char *query = NULL;
+	GList *item_tags, *item_tag;
+
+	Self *obj = GET_NEW;
+	self_set_backend(obj, item->_priv->skdb);
+	self_make_dbobject(obj, item->_priv->schema);
+
+	query = sqlite3_mprintf(
+		"INSERT INTO 'ItemsFields' ('ItemId','fieldid','value') " 
+		"SELECT %i, fieldid, value FROM ItemsFields WHERE itemid=%i;",
+		obj->_priv->id, item->_priv->id
+	);
+	result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
+	if (result != SQLITE_OK) {
+	    debug_printf("failed: %s\n", error);
+	}
+	sqlite3_free(query);
+
+	/* Add "copy of" to item title */
+	if(self_has_generated_title(obj)) {
+	    if(NULL != (title_field = self_find_first_title_field(obj))) {
+		old_title = self_get_custom_field_string(item, title_field);
+		new_title = g_strconcat(_("Copy of "), 
+			old_title?old_title:_("Untitled Item"), NULL);
+		self_set_custom_field_string(obj, title_field, new_title);
+		self_title_cache_refresh(obj);
+		g_free(title_field);
+		g_free(old_title);
+		g_free(new_title);
+	    }
+	}
+	else {
+	    old_title = self_get_title(item);
+	    new_title = g_strconcat(_("Copy of "), 
+		    old_title?old_title:_("Untitled Item"), NULL);
+	    self_set_core_field_string(obj, DB_ITEMS_TYPE_NAME, new_title);
+	    g_free(old_title);
+	    g_free(new_title);
+	}
+
+	/* Copy tags */
+	item_tags = self_get_tags(item);
+	for(item_tag = g_list_first(item_tags); item_tag; 
+		item_tag = g_list_next(item_tag)) 
+	{
+	    self_add_tag_internal(obj, STUFFKEEPER_DATA_TAG(item_tag->data));
+	}
+	g_list_free(item_tags);
+
 	return obj;
     }
 
@@ -934,25 +1009,15 @@ class Stuffkeeper:Data:Item from G:Object
     }
     public void add_tag(self, StuffkeeperDataTag *tag)
     {
-	if (self_has_tag(self, tag)) {
-	    return;
-	}
-	self->_priv->tags = g_list_append(self->_priv->tags, tag);
-	self_dbcore_insert_into_items_int(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
+	self_add_tag_internal(self, tag);
 	self_item_changed(self,NULL);
 	self_item_tags_changed(self);
-	stuffkeeper_data_tag_add_item(tag,self);
     }
     public void remove_tag(self, StuffkeeperDataTag *tag)
     {
-	if (!self_has_tag(self, tag)) {
-	    return;
-	}
-	self->_priv->tags = g_list_remove(self->_priv->tags, tag);
-	self_dbcore_delete_from_items_int_single(self, DB_ITEMS_TYPE_TAG, stuffkeeper_data_tag_get_id(tag));
+	self_remove_tag_internal(self, tag);
 	self_item_changed(self,NULL);
 	self_item_tags_changed(self);
-	stuffkeeper_data_tag_remove_item(tag, self);
     }
     public GList *get_tags(self)
     {

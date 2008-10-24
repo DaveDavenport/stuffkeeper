@@ -231,7 +231,26 @@ class Stuffkeeper:Data:Backend from G:Object
         /* insert it into my hash-list */
         g_hash_table_insert(self->_priv->items,id, item);
         self_item_added(self, item);
+        return item;
+    }
 
+    public StuffkeeperDataItem *clone_item(self, 
+	    Stuffkeeper:Data:Item *orig_item (check null type))
+    {
+        gint *id;
+        StuffkeeperDataItem *item;
+        /* create a new item */
+	/* TODO: Could be a bug here: if we have multipile backends at some 
+	 * point, the item we clone might not even belong to this backend, 
+	 * the right way to fix this would be to have the new items signal the
+	 * backend when they are created */
+        item = stuffkeeper_data_item_new_clone(orig_item);
+        /* want to copy the key, even if it is an integer */
+        id = g_malloc0(sizeof(gint));
+        *id = stuffkeeper_data_item_get_id(item);
+        /* insert it into my hash-list */
+        g_hash_table_insert(self->_priv->items,id, item);
+        self_item_added(self, item);
         return item;
     }
 

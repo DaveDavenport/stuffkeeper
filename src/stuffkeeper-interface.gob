@@ -445,9 +445,7 @@ class Stuffkeeper:Interface from G:Object
         }
     }
 
-    private
-    void
-    add_item(self, StuffkeeperDataSchema *schema)
+    private void add_item(self, StuffkeeperDataSchema *schema)
     {
         GtkTreeIter iter;
         StuffkeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
@@ -472,84 +470,95 @@ class Stuffkeeper:Interface from G:Object
     /**
      * Add item button clicked 
      */
-    public
-        void 
-        interface_item_add(self,GtkWidget *button)
-        {
-            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
-            if(locked){printf("**ERROR** should not be callable\n");return;}
+    public void interface_item_add(self,GtkWidget *button)
+    {
+	gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+	if(locked){printf("**ERROR** should not be callable\n");return;}
 
-            GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
-            /* check if there are schema's */
-            if(list)
-            {
-                StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
-                /* if there is no schema, get the first*/
-                if(schema  == NULL || !STUFFKEEPER_IS_DATA_SCHEMA(schema))
-                {
-                    schema = list->data;
-                }
-                self_add_item(self, schema);
-                g_list_free(list);
-            }
+	GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
+	/* check if there are schema's */
+	if(list)
+	{
+	    StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+	    /* if there is no schema, get the first*/
+	    if(schema  == NULL || !STUFFKEEPER_IS_DATA_SCHEMA(schema))
+	    {
+		schema = list->data;
+	    }
+	    self_add_item(self, schema);
+	    g_list_free(list);
+	}
+    }
 
-        }
-
-    private
-        void 
-        interface_item_add_menu_button(self, GtkWidget *button)
-        {
-            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
-            if(locked){printf("**ERROR** should not be callable\n");return;}
-            StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
-            if(schema)
-            {
-                self_add_item(self, schema);
-                /* Store last added item. */
-                g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", schema);
-            }
-
-        }
-
+    private void interface_item_add_menu_button(self, GtkWidget *button)
+    {
+	gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+	if(locked){printf("**ERROR** should not be callable\n");return;}
+	StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+	if(schema)
+	{
+	    self_add_item(self, schema);
+	    /* Store last added item. */
+	    g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", schema);
+	}
+    }
 
     /**
      * Remove selected item
      */
-    public
-        void interface_item_remove(self)
-        {
-            gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
-            if(locked){printf("**ERROR** should not be callable\n");return;}
+    public void interface_item_remove(self)
+    {
+	if(stuffkeeper_data_backend_get_locked(self->_priv->skdbg)){
+	    printf("**ERROR** should not be callable\n");
+	    return;
+	}
 
-            /** Setup a dialog that ask the user if he is sure */
-            GtkWidget *tree = self->_priv->treeview2;//glade_xml_get_widget(xml, "treeview2");
-            GtkWidget *dialog;
-            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-            GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
-            GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(selection, &model, &iter))
-            {
+	/** Setup a dialog that ask the user if he is sure */
+	GtkWidget *tree = self->_priv->treeview2;
+	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+	GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
+	GtkTreeIter iter;
+	if(gtk_tree_selection_get_selected(selection, &model, &iter))
+	{
+	    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(self->_priv->win), 
+		    GTK_DIALOG_DESTROY_WITH_PARENT|// This belongs to the parent, so if the user closes the parent, close it
+		    GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
+		    GTK_MESSAGE_WARNING, // It is a warning message.
+		    GTK_BUTTONS_YES_NO, // yes/no question
+		    _("Deleting an entry cannot be undone.\nAre you sure you want to continue?"));
+	    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
+	    {
+		gint id;
+		gtk_tree_model_get(model, &iter ,0,&id, -1);
+		stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
+	    }
+	    gtk_widget_destroy(dialog);
+	}
+    }
+    /**
+     * Clone selectd item
+     */
+    public void interface_item_clone(self)
+    {
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	GtkTreeSelection *selection;
 
-                dialog = gtk_message_dialog_new(GTK_WINDOW(self->_priv->win), 
-                        GTK_DIALOG_DESTROY_WITH_PARENT|// This belongs to the parent, so if the user closes the parent, close it
-                        GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
-                        GTK_MESSAGE_WARNING, // It is a warning message.
-                        GTK_BUTTONS_YES_NO, // yes/no question
-                        _("Deleting an entry cannot be undone.\nAre you sure you want to continue?"));
-                switch(gtk_dialog_run(GTK_DIALOG(dialog)))
-                {
-                    case GTK_RESPONSE_YES:
-                        {
-                            gint id;
-                            gtk_tree_model_get(model, &iter ,0,&id, -1);
-                            stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
+	if(stuffkeeper_data_backend_get_locked(self->_priv->skdbg)){
+	    printf("**ERROR** should not be callable\n");
+	    return;
+	}
 
-                        }
-                    default:
-                        gtk_widget_destroy(dialog);
-                }
-            }
-        }
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
+	if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
+	    StuffkeeperDataItem *orig_item, *item; 
+	    gtk_tree_model_get(model, &iter , 2, &orig_item, -1);
+	    item = stuffkeeper_data_backend_clone_item(self->_priv->skdbg, orig_item);
+	    /* signal to other window components that the item was added on this
+	     * window */
+	    self_item_added_here(self, item);
+	}
+    }
 
     /**
      * Tag is enabled/disabled
