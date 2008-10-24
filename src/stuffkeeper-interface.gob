@@ -1517,7 +1517,6 @@ class Stuffkeeper:Interface from G:Object
                 gtk_menu_shell_insert(GTK_MENU_SHELL(menu), m,-1);
                 g_object_set_data(G_OBJECT(m), "schema", schema);
                 g_signal_connect_swapped(G_OBJECT(m), "activate", G_CALLBACK(self_interface_item_add_menu_button), self);
-                gtk_widget_show_all(menu);
                 if(title) {
                     g_free(title);
 		}
@@ -1529,6 +1528,7 @@ class Stuffkeeper:Interface from G:Object
 		}
 
             } while(gtk_tree_model_iter_next(self->_priv->model_schemas, &iter));
+	    gtk_widget_show_all(GTK_WIDGET(menu));
 	    if(add_hotkeys) {
 		g_strfreev(menu_hotkeys_list);
 	    }
