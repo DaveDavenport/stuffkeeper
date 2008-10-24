@@ -127,6 +127,32 @@ class Stuffkeeper:Interface from G:Object
 
     private int item_sort_column = {3};
     private int item_sort_order = {GTK_SORT_DESCENDING};
+    
+    private signal last NONE (POINTER)
+    void item_added_here(self, Stuffkeeper:Data:Item *item (check null type)) 
+    {
+	GtkTreeIter iter;
+	GtkTreePath *path = NULL;
+	GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items_filter);
+
+        if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
+	    StuffkeeperDataItem *found_item = NULL;
+	    debug_printf("Searching new item in tree\n");
+	    do {
+		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 2, &found_item, -1);
+		if(found_item == item) {
+		    debug_printf("Found new item in tree\n");
+		    path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+		    break;
+		}
+	    } while(gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter));
+	    if(path) {
+		debug_printf("Moving cursor to new item\n");
+		gtk_tree_view_set_cursor(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL, FALSE);
+		gtk_tree_path_free(path);
+	    }
+	}
+    }
 
     /**
     * Changes in the GtkTreeModelFilter wrapper, updating the total item label.
@@ -423,10 +449,9 @@ class Stuffkeeper:Interface from G:Object
     void
     add_item(self, StuffkeeperDataSchema *schema)
     {
-        /* If the user add's an item, add it ourself, and don't listen to the signal */
-        g_signal_handler_block(self->_priv->skdbg,self->_priv->signal_item_added);
         GtkTreeIter iter;
         StuffkeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
+	/* Set new item tags */
         if(gtk_tree_model_get_iter_first(self->_priv->model_tags, &iter))
         {
             do{
@@ -440,28 +465,9 @@ class Stuffkeeper:Interface from G:Object
 
             }while(gtk_tree_model_iter_next(self->_priv->model_tags, &iter));
         }
-        if(item)
-        {
-            GtkTreeIter iter;
-            GtkTreePath *path = NULL;
-            GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items);
-            gchar *title = stuffkeeper_data_item_get_title(item);
-
-            gtk_list_store_insert_with_values(GTK_LIST_STORE(store), &iter,-1,
-                    0, stuffkeeper_data_item_get_id(item),
-                    1, title, 
-                    2, item,
-                    3, stuffkeeper_data_item_get_creation_time(item),
-                    4, stuffkeeper_data_schema_get_id(stuffkeeper_data_item_get_schema(item)),
-                    5,  stuffkeeper_data_item_get_modification_time(item),
-                    -1);
-            g_free(title);
-
-            path = gtk_tree_model_get_path(self->_priv->model_items, &iter);
-            gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL,NULL, TRUE);
-            gtk_tree_path_free(path);
-        }
-        g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_item_added);
+	/* signal to other window components that the item was added on this
+	 * window */
+	self_item_added_here(self, item);
     }
     /**
      * Add item button clicked 
