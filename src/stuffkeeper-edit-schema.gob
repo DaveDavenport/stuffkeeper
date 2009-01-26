@@ -37,7 +37,7 @@ class Stuffkeeper:Edit:Schema from G:Object
 {
     private Stuffkeeper:Data:Schema *schema = {NULL};
     private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,GTK_TYPE_TREE_MODEL)}  destroywith g_object_unref;
-
+    private GtkCellRendererCombo *renderer_model= NULL;
     private GladeXML *xml;
     private GtkWidget *tree;
     private GtkWidget *win;
@@ -69,6 +69,7 @@ class Stuffkeeper:Edit:Schema from G:Object
          * update title
          */
         gchar *temp;
+        printf("schema changed\n");
         temp = stuffkeeper_data_schema_get_title(schema);
         if(temp)
         {
@@ -89,8 +90,8 @@ class Stuffkeeper:Edit:Schema from G:Object
     schema_field_changed(self, const gchar *field, StuffkeeperDataSchema *schema)
     {
         GtkTreeIter iter;
-
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+        printf("field changed\n");
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
         {
             do{
@@ -114,7 +115,10 @@ class Stuffkeeper:Edit:Schema from G:Object
 
 
 
-
+                    g_object_set(G_OBJECT(self->_priv->renderer_model), "model", 
+                                (type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_EXPANDER)?
+														self->_priv->model_packings:self->_priv->model_fields,
+                                                        NULL);
                     gtk_list_store_set(self->_priv->store, &iter, 
                             COL_NAME, name,
                             COL_TYPE, type,
@@ -122,9 +126,10 @@ class Stuffkeeper:Edit:Schema from G:Object
                             COL_NAME_EDITABLE, editable,
                             COL_IN_TITLE, in_title,
                             COL_TYPE_EDITABLE, type_editable,
-                            COL_TYPE_MODEL,(type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_EXPANDER)?
+                            -1);
+/*                            COL_TYPE_MODEL,(type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_EXPANDER)?
 														self->_priv->model_packings:self->_priv->model_fields,
-														-1);
+														-1);*/
                     g_free(name);
                     return;
                 }
@@ -166,6 +171,7 @@ class Stuffkeeper:Edit:Schema from G:Object
             int type = stuffkeeper_data_schema_get_field_type(schema, id);
             gboolean editable = TRUE, type_editable =TRUE;
             gboolean in_title = (gboolean)  stuffkeeper_data_schema_get_field_in_title(schema, id);
+            printf("field added\n");
             gtk_list_store_append(self->_priv->store, &iter);
             name = stuffkeeper_data_schema_get_field_name(schema, id);
             if(type == FIELD_TYPE_END_EXPANDER ||  type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_END)
@@ -176,6 +182,10 @@ class Stuffkeeper:Edit:Schema from G:Object
             }
 //            if (type == FIELD_TYPE_EXPANDER) type_editable = FALSE;
 
+            g_object_set(G_OBJECT(self->_priv->renderer_model), "model", 
+                    (type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_EXPANDER)?
+                    self->_priv->model_packings:self->_priv->model_fields,
+                    NULL);
             gtk_list_store_set(self->_priv->store, &iter, 
                     COL_ID, id, 
                     COL_TYPE, type ,
@@ -184,8 +194,9 @@ class Stuffkeeper:Edit:Schema from G:Object
                     COL_IN_TITLE, in_title,
                     COL_NAME_EDITABLE, editable,
                     COL_TYPE_EDITABLE, type_editable,
-                    COL_TYPE_MODEL,(type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_EXPANDER)?self->_priv->model_packings:self->_priv->model_fields,
                     -1);
+                    /*COL_TYPE_MODEL,(type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_EXPANDER)?self->_priv->model_packings:self->_priv->model_fields,
+                    -1);*/
             g_free(name);
         }
         private
@@ -214,6 +225,7 @@ class Stuffkeeper:Edit:Schema from G:Object
         {
             GtkTreeIter iter;
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+            printf("new: %s\n", new_text);
             debug_printf("new: %s\n", new_text);
             if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
@@ -238,23 +250,27 @@ class Stuffkeeper:Edit:Schema from G:Object
         {
             GtkTreeIter iter;
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+            printf("new type: %s\n", new_text);
             debug_printf("new: %s\n", new_text);
-            if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+            if(new_text)
             {
-                int type;
-                gchar *id = NULL;
-                gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
-                for(type=0;strcmp(new_text,_(FieldNames[type])) && type < FIELD_TYPE_NUM_FIELDS;type++);
-                /* somehow type is not found default to string */
-                if(type == FIELD_TYPE_NUM_FIELDS) type = FIELD_TYPE_STRING; 
-                stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
-                stuffkeeper_data_schema_set_field_type(self->_priv->schema,id, type);
-                stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
-                g_free(id);
+                if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+                {
+                    int type;
+                    gchar *id = NULL;
+                    gtk_tree_model_get(model, &iter, COL_ID, &id, -1);
+                    for(type=0;strcmp(new_text,_(FieldNames[type])) && type < FIELD_TYPE_NUM_FIELDS;type++);
+                    /* somehow type is not found default to string */
+                    if(type == FIELD_TYPE_NUM_FIELDS) type = FIELD_TYPE_STRING; 
+                    stuffkeeper_data_backend_begin_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+                    stuffkeeper_data_schema_set_field_type(self->_priv->schema,id, type);
+                    stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
+                    g_free(id);
 
 
-								self_update_field_config(self);
-						}
+                    self_update_field_config(self);
+                }
+            }
         }
     private
     void
@@ -512,8 +528,14 @@ class Stuffkeeper:Edit:Schema from G:Object
             gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_packings), &iter, 0, FIELD_TYPE_EXPANDER,1,_(FieldNames[FIELD_TYPE_EXPANDER]), -1); 
 
             /* fill tree with columns */
-            renderer = gtk_cell_renderer_combo_new();
-            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,"Type", renderer, "text", COL_TYPE_NAME, "editable", COL_TYPE_EDITABLE,"model",COL_TYPE_MODEL, NULL);
+            self->_priv->renderer_model = renderer = gtk_cell_renderer_combo_new();
+            gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(self->_priv->tree),-1,
+                        "Type", renderer,
+                        "text", COL_TYPE_NAME,
+                        "editable", COL_TYPE_EDITABLE,
+                        NULL);
+
+            /*          "model",COL_TYPE_MODEL, */
             //g_object_set(G_OBJECT(renderer), "model", GTK_TREE_MODEL(store), NULL);
             g_object_set(G_OBJECT(renderer), "text-column", 1,"has-entry", FALSE, NULL);
 //            g_object_set(G_OBJECT(renderer), "editable", TRUE, NULL);
@@ -848,7 +870,7 @@ class Stuffkeeper:Edit:Schema from G:Object
 				gtk_widget_destroy(child);
 			}
 			/* ok, now we set it up */
-			if(gtk_tree_selection_get_selected(selection, &(self->_priv->store), &iter))
+			if(gtk_tree_selection_get_selected(selection, (GtkTreeModel **)&(self->_priv->store), &iter))
 			{
 				int type = 0;
 				char *id = NULL;
