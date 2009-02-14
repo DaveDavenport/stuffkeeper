@@ -7,7 +7,7 @@ CONF_VERSION=0
 bin_PROGRAMS=stuffkeeper
 
 stuffkeeper_GOBFILES=\
-     	stuffkeeper-data-backend.gob \
+   	stuffkeeper-data-backend.gob \
 	stuffkeeper-data-boolean.gob \
 	stuffkeeper-data-date2.gob \
 	stuffkeeper-data-entry-config.gob \
@@ -67,7 +67,7 @@ nodist_stuffkeeper_SOURCES=\
 ##
 stuffkeeper_SOURCES=\
 	revisiont.h \
-    	bacon-message-connection.c \
+	bacon-message-connection.c \
 	bacon-message-connection.h \
 	debug.c \
 	debug.h \
@@ -103,17 +103,17 @@ stuffkeeper.vala.stamp: $(stuffkeeper_VALAFILES)
 # This code avoids problems with parallel compilation by using an empty 
 # directory as a lock mechanism
 $(stuffkeeper_VALASOURCES): stuffkeeper.vala.stamp
-	@if test -f $@; then :; else \
-		trap 'rm -rf $<.lock $<' 1 2 13 15; \
-		if mkdir $<.lock 2>/dev/null; then \
-			rm -f $<; \
-			$(MAKE) $(AM_MAKEFLAGS) $<; \
-			rmdir $<.lock; \
-		else ;
-			while test -d $<.lock; do sleep 1; done; \
-			test -f $<; exit $$?; \
-		fi; \
-	fi
+#	@if test -f $@; then :; else \
+#		trap 'rm -rf $<.lock $<' 1 2 13 15; \
+#		if mkdir $<.lock 2>/dev/null; then \
+#			rm -f $<; \
+#			$(MAKE) $(AM_MAKEFLAGS) $<; \
+#			rmdir $<.lock; \
+#		else ;
+#			while test -d $<.lock; do sleep 1; done; \
+#			test -f $<; exit $$?; \
+#		fi; \
+#	fi
 
 revisiont.h:
 	@if test '$(REVISION)' != '$(CONF_VERSION)'; then\
@@ -180,9 +180,9 @@ stuffkeeperincludedir =$(includedir)/stuffkeeper/
 # This include gob files and vala files 
 ##
 EXTRA_DIST=\
-	$(stuffkeeper_GOBFILES) \
-	$(stuffkeeper_VALAFILES) \
-	Makefile.config \
+	$(stuffkeeper_GOBFILES)\
+	$(stuffkeeper_VALAFILES)\
+	Makefile.config\
 	$(NULL)
 
 ##
