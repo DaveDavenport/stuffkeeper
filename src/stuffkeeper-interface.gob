@@ -40,6 +40,7 @@ extern GList *interface_list;
     NULL};
     const gchar *authors[] = {
         "Martijn Koedam (qball) <Qball@Stuffkeeper.org>", 
+        "Barak Korren (ifireball)",
         "\nTester:",
         "Greg Fitzgerald",
         "Rasi <rasi@stuffkeeper.org>",
