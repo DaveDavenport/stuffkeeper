@@ -77,8 +77,8 @@ class Stuffkeeper:Item:View from Gtk:VBox
             /* The title */ 
             {
                 /* The title */
-                GtkWidget *vbox,*vbox2;
-                GtkWidget *label1,*button;
+                GtkWidget *vbox,*vbox2,*buttonbox;
+                GtkWidget *label1,*button, *image;
                 /**
                  * Header
                  */
@@ -107,10 +107,19 @@ class Stuffkeeper:Item:View from Gtk:VBox
                 } else {
                     label1 = gtk_label_new("N/A");
                 }
+                gtk_misc_set_alignment(GTK_MISC(label1), 0.0, 0.5);
 
                 self_interface_color(label1);
                 button = gtk_button_new();
-                gtk_container_add(GTK_CONTAINER(button), label1);
+                /* Vbox that packs label and image */
+                buttonbox = gtk_hbox_new(FALSE, 3);
+                gtk_container_add(GTK_CONTAINER(button), buttonbox);
+                /* Add label */
+                gtk_box_pack_end(GTK_BOX(buttonbox), label1, TRUE, TRUE, 0);
+                /* create and add image */
+                image = gtk_image_new_from_pixbuf(stuffkeeper_data_schema_get_pixbuf(self->_priv->schema));
+                gtk_box_pack_start(GTK_BOX(buttonbox), image, FALSE, FALSE,0);
+                /* Give button a pointer to schema */
                 g_object_set_data(G_OBJECT(button), "schema", self->_priv->schema);
                 gtk_button_set_relief(GTK_BUTTON(button),GTK_RELIEF_NONE); 
                 gtk_box_pack_start(GTK_BOX(vbox),button, FALSE,TRUE, 0);
