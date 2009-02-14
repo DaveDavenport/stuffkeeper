@@ -48,7 +48,7 @@ public class Test : Stuffkeeper.Plugin {
 		/** 
 		 * THIS NEEDS TO BE FIXED, BUG IN GTK VAPI FILE! 
 	   */
-		weak List<weak Widget> children = box.get_children();
+		List<weak Widget> children = box.get_children();
 		foreach (Widget child in children)
 		{
 			child.destroy();
@@ -77,7 +77,7 @@ public class Test : Stuffkeeper.Plugin {
 				double scaled = Math.pow(items/max,0.5);
 				var lab =  new Label (item.get_title());
 				lab.set_markup("<span size='%.0f'>%s</span> ".printf (48*1024*(scaled),Markup.escape_text(item.get_title(),-1)));
-				lab.size_request(req);
+				lab.size_request(out req);
 
 				/* check if it still fits, if it doesn't create a new row */
 				if(cur_size+req.width > max_width || hbox == null)
