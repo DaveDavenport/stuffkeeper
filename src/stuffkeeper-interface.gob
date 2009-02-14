@@ -133,7 +133,7 @@ class Stuffkeeper:Interface from G:Object
     {
 	GtkTreeIter iter;
 	GtkTreePath *path = NULL;
-	GtkListStore *store = GTK_LIST_STORE(self->_priv->model_items_filter);
+	GtkTreeModel *store =GTK_TREE_MODEL(self->_priv->model_items_filter);
 
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
 	    StuffkeeperDataItem *found_item = NULL;
