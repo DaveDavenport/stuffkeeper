@@ -84,6 +84,7 @@ class Stuffkeeper:Interface from G:Object
     private GtkWidget           *LeftPaneCB;
     private GtkWidget           *treeview1;
     private GtkWidget           *treeview2;
+    private GtkTreeViewColumn   *column_lv_pixbuf = {NULL};
     private GtkCellRenderer     *treeview1_renderer = {NULL};
     private GtkCellRenderer     *renderer_toggle = {NULL};
     
@@ -1421,9 +1422,13 @@ class Stuffkeeper:Interface from G:Object
     left_pane_changed(self, GtkComboBox *box)
     {
         int i = gtk_combo_box_get_active(box);
+
+        gtk_tree_view_column_set_visible(self->_priv->column_lv_pixbuf, FALSE);
         if(i==0){
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
         }else if (i == 1){
+
+            gtk_tree_view_column_set_visible(self->_priv->column_lv_pixbuf, TRUE);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
         }else if ( i == 2) {
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_searches));
@@ -1462,6 +1467,27 @@ class Stuffkeeper:Interface from G:Object
         }
         /* refilter the items list */
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+    }
+
+    /* This function sets the right image on the CellRenderer for the pixbuf column.
+     * Only does it when showing Schema list
+     */
+    private
+    void
+    interface_lv_get_schema_pixbuf(GtkTreeViewColumn *col, GtkCellRenderer *renderer,GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+    {
+        Self *self = SELF(data);
+        int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+        if(type == LP_TYPE_SCHEMA)
+        {
+            StuffkeeperDataSchema *schema;
+            gtk_tree_model_get(self->_priv->model_schemas, iter, LP_ITEM, &schema, -1);
+            if(schema)
+            {
+                GdkPixbuf *pb = stuffkeeper_data_schema_get_pixbuf(schema);
+                g_object_set(G_OBJECT(renderer), "pixbuf", pb,NULL);
+            }
+        }
     }
 
     /* Add item menu */
@@ -1877,7 +1903,13 @@ class Stuffkeeper:Interface from G:Object
 
 
             gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
-            
+            /* icon */
+            self->_priv->column_lv_pixbuf = column = gtk_tree_view_column_new();
+            renderer = gtk_cell_renderer_pixbuf_new();
+            gtk_tree_view_column_pack_start(GTK_TREE_VIEW_COLUMN(column), renderer, FALSE);
+            gtk_tree_view_column_set_visible(self->_priv->column_lv_pixbuf, FALSE);
+            gtk_tree_view_append_column(GTK_TREE_VIEW(self->_priv->treeview1), column);
+            gtk_tree_view_column_set_cell_data_func(column, renderer, self_interface_lv_get_schema_pixbuf, self, NULL);
             /* TAGS */
             column = gtk_tree_view_column_new();
             /* Tag name */
