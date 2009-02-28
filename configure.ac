@@ -180,6 +180,10 @@ AC_SUBST(PACKAGE_LOCALE_DIR)
 AC_SUBST(PACKAGE_LIBS)
 
 GOB2_CHECK(2.0.10)
+# Make the gob2 check fatal
+if test x${GOB2} = x""; then
+	exit 0;
+fi
 VALA_PROG_VALAC([3.4.0])
 
 STUFFKEEPER_PLUGIN_DIR="${PACKAGE_PREFIX}/lib/stuffkeeper_name/"
