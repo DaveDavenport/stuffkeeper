@@ -273,7 +273,6 @@ class Stuffkeeper:Data:Item:Search from G:Object
         {
             SearchField *field = node->data;
             gchar *comp = NULL;
-            int v = 0;
             found = FALSE;
 
             if(field->field_type== SEARCH_FIELD_TITLE)
@@ -285,19 +284,17 @@ class Stuffkeeper:Data:Item:Search from G:Object
             {
                 if(field->type == SEARCH_TYPE_IS || field->type == SEARCH_TYPE_IS_NOT)
                 {
-                    v = stuffkeeper_data_item_has_value_exact(item, field->value);
-                    if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
-                    {
-                        found = TRUE;
-                    }
+                    found = stuffkeeper_data_item_has_value_exact(item, field->value);
                 }
                 if(field->type == SEARCH_TYPE_CONTAINS || field->type == SEARCH_TYPE_NOT_CONTAINS )
                 {
-                    v = stuffkeeper_data_item_has_value(item, field->value);
-                    if((field->type == SEARCH_TYPE_CONTAINS && v) || (field->type == SEARCH_TYPE_NOT_CONTAINS && !v)) {
-                        found = TRUE;
-                    }
+                    found = stuffkeeper_data_item_has_value(item, field->value);
                 }
+                /* invert result for the _NOT_ */
+                if(field->type == SEARCH_TYPE_NOT_CONTAINS || field->type == SEARCH_TYPE_IS_NOT) {
+                    found = !found;
+                }
+
             }
             else if (field->field_type== SEARCH_FIELD_TAG)
             {
@@ -310,23 +307,15 @@ class Stuffkeeper:Data:Item:Search from G:Object
                         comp = stuffkeeper_data_tag_get_title(STUFFKEEPER_DATA_TAG(node2->data));
                         if(field->type == SEARCH_TYPE_IS || field->type == SEARCH_TYPE_IS_NOT)
                         {
-                            int v= (g_utf8_collate(field->value,comp) == 0); 
-                            if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
-                            {
-                                found = TRUE;
-                            }
+                            found = (g_utf8_collate(field->value,comp) == 0); 
                         }
                         if(field->type == SEARCH_TYPE_CONTAINS || field->type == SEARCH_TYPE_NOT_CONTAINS )
                         {
-                            int v =  0;
                             gchar *sb1 = g_utf8_casefold(field->value, -1);
                             gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
                             gchar *sa1 = g_utf8_casefold(comp, -1);
                             gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
-                            v =(strstr(sa,sb) != NULL);
-                            if((field->type == SEARCH_TYPE_CONTAINS && v) || (field->type == SEARCH_TYPE_NOT_CONTAINS && !v)) {
-                                found = TRUE;
-                            }
+                            found =(strstr(sa,sb) != NULL);
                             g_free(sa1);g_free(sb1);
                             g_free(sa);g_free(sb);
 
@@ -335,6 +324,10 @@ class Stuffkeeper:Data:Item:Search from G:Object
                         comp = NULL;
                     }
                     g_list_free(list2);
+                    /* invert result for the _NOT_ */
+                    if(field->type == SEARCH_TYPE_NOT_CONTAINS || field->type == SEARCH_TYPE_IS_NOT) {
+                        found = !found;
+                    }
                 }
             }
             else if (field->field_type== SEARCH_FIELD_SCHEMA)
@@ -346,28 +339,25 @@ class Stuffkeeper:Data:Item:Search from G:Object
             {
                 if(field->type == SEARCH_TYPE_IS || field->type == SEARCH_TYPE_IS_NOT)                   
                 {
-                    int v= (g_utf8_collate(field->value,comp) == 0); 
-                    if((v && field->type == SEARCH_TYPE_IS) || (field->type == SEARCH_TYPE_IS_NOT && !v))
-                    {
-                        found = TRUE;
-                    }
+                    found = (g_utf8_collate(field->value,comp) == 0); 
                 }
                 if(field->type == SEARCH_TYPE_CONTAINS || field->type == SEARCH_TYPE_NOT_CONTAINS )
                 {
-                    int v =  0;
                     gchar *sb1 = g_utf8_casefold(field->value, -1);
                     gchar *sb = g_utf8_normalize(sb1,-1,G_NORMALIZE_ALL_COMPOSE);
                     gchar *sa1 = g_utf8_casefold(comp, -1);
                     gchar *sa = g_utf8_normalize(sa1,-1,G_NORMALIZE_ALL_COMPOSE);
-                    v =(strstr(sa,sb) != NULL);
-                    if((field->type == SEARCH_TYPE_CONTAINS && v) || (field->type == SEARCH_TYPE_NOT_CONTAINS && !v)) {
-                        found = TRUE;
-                    }
+                    found =(strstr(sa,sb) != NULL);
                     g_free(sa1);g_free(sb1);
                     g_free(sa);g_free(sb);
 
                 }
                 g_free(comp);
+                /* invert result for the _NOT_ */
+                if(field->type == SEARCH_TYPE_NOT_CONTAINS || field->type == SEARCH_TYPE_IS_NOT) {
+                    found = !found;
+                }
+
             }
 
         }
