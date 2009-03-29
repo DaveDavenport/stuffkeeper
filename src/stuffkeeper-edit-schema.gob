@@ -16,6 +16,12 @@ requires 2.0.10
 #include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
+
+#include "stuffkeeper-data-entry-config.h"
+#include "stuffkeeper-data-spinbutton-config.h"
+#include "stuffkeeper-data-boolean-config.h"
+#include "stuffkeeper-data-rating-config.h"
+#include "stuffkeeper-data-password-config.h"
 extern GList *interface_list;
 %}
 %ph{
@@ -49,6 +55,10 @@ class Stuffkeeper:Edit:Schema from G:Object
     private guint field_removed_signal = 0;
     private guint fields_reordered_signal = 0;
 
+    private GtkWidget *title_entry = NULL;
+    private gulong field_title_entry_changed_signal = 0;
+    private guint title_entry_changed_timeout = 0;
+
     private guint model_changed_signal = 0;
     private guint model_added_signal = 0;
     private guint model_removed_signal = 0;
@@ -57,6 +67,27 @@ class Stuffkeeper:Edit:Schema from G:Object
     private GtkTreeModel *model_fields = NULL;
     private GtkTreeModel *model_packings = NULL;
 
+    private gboolean title_entry_changed(self)
+    {
+        const gchar *text = gtk_entry_get_text(GTK_ENTRY(self->_priv->title_entry));
+        stuffkeeper_data_schema_set_title(self->_priv->schema, text);
+        self->_priv->title_entry_changed_timeout = 0;
+        return FALSE;
+    }
+    private
+    void
+    title_changed_real(self, gpointer data)
+    {
+        if(self->_priv->title_entry_changed_timeout)
+        {
+            g_source_remove(self->_priv->title_entry_changed_timeout);
+        }
+        self->_priv->title_entry_changed_timeout = g_timeout_add(1000,(GSourceFunc)self_title_entry_changed,self);
+/*
+        gtk_widget_modify_text(GTK_WIDGET(title_entry), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
+        gtk_widget_modify_base(GTK_WIDGET(title_entry), GTK_STATE_NORMAL, &(self->_priv->writing));
+        */
+    }
 
     private
     void
@@ -71,14 +102,21 @@ class Stuffkeeper:Edit:Schema from G:Object
         gchar *temp;
         printf("schema changed\n");
         temp = stuffkeeper_data_schema_get_title(schema);
+
+        g_signal_handler_block(self->_priv->title_entry,self->_priv->field_title_entry_changed_signal);
         if(temp)
         {
-            gchar *str = g_markup_printf_escaped("<span size='large' weight='bold'>%s: '%s'</span>",_("Edit type"), temp);
+            gchar *temp_escaped = g_markup_escape_text(temp,-1);
+            gchar *str = g_markup_printf_escaped("<span size='large' weight='bold'>%s: '%s'</span>",_("Edit type"), temp_escaped);
             gtk_label_set_markup(GTK_LABEL(label),str);
             g_free(str);
+            g_free(temp_escaped);
+
+            gtk_entry_set_text(GTK_ENTRY(self->_priv->title_entry), temp);
             g_free(temp);
         }
-
+        else gtk_entry_set_text(GTK_ENTRY(self->_priv->title_entry), "");
+        g_signal_handler_unblock(self->_priv->title_entry,self->_priv->field_title_entry_changed_signal);
         if(pixbuf)
         {
             gtk_image_set_from_pixbuf(GTK_IMAGE(image), pixbuf);
@@ -658,6 +696,62 @@ class Stuffkeeper:Edit:Schema from G:Object
             g_key_file_set_integer(config_file, "EDIT_SCHEMA_WINDOW", "height", value);
 
             self_apply_order(self);
+
+            printf("Disconnecting everything\n");
+            if(self->_priv->changed_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->changed_signal);
+                self->_priv->changed_signal =0;
+            }
+
+            if(self->_priv->model_changed_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_changed_signal);
+                self->_priv->model_changed_signal =0;
+            }
+            if(self->_priv->model_added_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_added_signal);
+                self->_priv->model_added_signal =0;
+            }
+            if(self->_priv->model_removed_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_removed_signal);
+                self->_priv->model_removed_signal =0;
+            }
+
+
+            if(self->_priv->field_changed_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_changed_signal);
+                self->_priv->field_changed_signal =0;
+            }
+            if(self->_priv->field_added_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_added_signal);
+                self->_priv->field_added_signal =0;
+            }
+            if(self->_priv->field_removed_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_removed_signal);
+                self->_priv->field_removed_signal =0;
+            }
+            if(self->_priv->fields_reordered_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->fields_reordered_signal);
+                self->_priv->fields_reordered_signal =0;
+            }
+
+            if(self->_priv->field_title_entry_changed_signal)
+            {
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->title_entry), self->_priv->field_title_entry_changed_signal);
+                self->_priv->field_title_entry_changed_signal =0;
+            }
+            if(self->_priv->title_entry_changed_timeout) {
+                g_source_remove(self->_priv->title_entry_changed_timeout);
+                self->_priv->title_entry_changed_timeout = 0;
+                self_title_entry_changed(self);
+            }
             gtk_widget_destroy(GTK_WIDGET(self->_priv->win));
             g_object_unref(self->_priv->xml);
             g_object_unref(self);
@@ -790,10 +884,17 @@ class Stuffkeeper:Edit:Schema from G:Object
 
                             G_CALLBACK(self_schema_fields_reordered),
                             self);
+
+        self->_priv->title_entry = glade_xml_get_widget(self->_priv->xml, "title_entry");
+        self->_priv->field_title_entry_changed_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->title_entry), "changed", G_CALLBACK(self_title_changed_real), self);
         self_schema_changed(self, schema);
+
         self->_priv->model_removed_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-deleted", G_CALLBACK(self_reload_preview_del), self);
         self->_priv->model_added_signal =  g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-inserted", G_CALLBACK(self_reload_preview_ins), self);
         self->_priv->model_changed_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->store), "row-changed", G_CALLBACK(self_reload_preview_ins), self);
+        
+        
+        
         self_reload_preview(self); 
         
     }
@@ -802,57 +903,7 @@ class Stuffkeeper:Edit:Schema from G:Object
     void
     finalize(G:Object *obj)
     {
-        Self *self = SELF(obj);
         debug_printf("** Finalize edit schema\n");
-        if(self->_priv->changed_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->changed_signal);
-            self->_priv->changed_signal =0;
-        }
-/*        if(self->_priv->preview_box)
-        {
-            gtk_widget_destroy(self->_priv->preview_box);
-            self->_priv->preview_box  = NULL;
-        }
-
-*/
-        if(self->_priv->model_changed_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_changed_signal);
-            self->_priv->model_changed_signal =0;
-        }
-        if(self->_priv->model_added_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_added_signal);
-            self->_priv->model_added_signal =0;
-        }
-        if(self->_priv->model_removed_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->store), self->_priv->model_removed_signal);
-            self->_priv->model_removed_signal =0;
-        }
-
-
-        if(self->_priv->field_changed_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_changed_signal);
-            self->_priv->field_changed_signal =0;
-        }
-        if(self->_priv->field_added_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_added_signal);
-            self->_priv->field_added_signal =0;
-        }
-        if(self->_priv->field_removed_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->field_removed_signal);
-            self->_priv->field_removed_signal =0;
-        }
-        if(self->_priv->fields_reordered_signal)
-        {
-            g_signal_handler_disconnect(G_OBJECT(self->_priv->schema), self->_priv->fields_reordered_signal);
-            self->_priv->fields_reordered_signal =0;
-        }
         PARENT_HANDLER(obj);
     }
 
