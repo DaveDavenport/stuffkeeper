@@ -13,3 +13,4 @@ src/stuffkeeper-data-entry-config.c
 src/stuffkeeper-data-spinbutton-config.c
 src/stuffkeeper-data-entry-config.c
 src/stuffkeeper-data-spinbutton-config.c
+src/stuffkeeper-data-password-config.c

@@ -69,7 +69,6 @@ nodist_stuffkeeper_SOURCES=\
 # Sources that should be in the distribution 
 ##
 stuffkeeper_SOURCES=\
-	revisiont.h \
 	bacon-message-connection.c \
 	bacon-message-connection.h \
 	debug.c \
@@ -86,6 +85,7 @@ stuffkeeper_SOURCES=\
 # Generated sources
 ##
 BUILT_SOURCES=\
+	revision.h \
 	revisiont.h \
 	stuffkeeper.vala.stamp \
 	$(stuffkeeper_GOBSTAMPS) \
@@ -119,13 +119,15 @@ $(stuffkeeper_VALASOURCES): stuffkeeper.vala.stamp
 #		fi; \
 #	fi
 
+.PHONY: revisiont.h
 revisiont.h:
 	@if test '$(REVISION)' != '$(CONF_VERSION)'; then\
 		echo "Writing new Makefile.config file";\
-		echo "static char *revision = \"$(REVISION)""\"; "> revision.h;\
 		echo "CONF_VERSION=$(REVISION)" > Makefile.config;\
 	fi;
 
+revision.h:
+		echo "static char *revision = \"$(REVISION)""\"; "> revision.h;
 
 LIBS= \
 	@glib_LIBS@\
@@ -194,6 +196,8 @@ EXTRA_DIST=\
 ##
 CLEANFILES=\
 	stuffkeeper.vala.stamp \
+	revision.h\
+	Makefile.config\
 	$(stuffkeeper_GOBSOURCES) \
 	$(stuffkeeper_VALASOURCES) \
 	$(stuffkeeper_GOBSTAMPS) \

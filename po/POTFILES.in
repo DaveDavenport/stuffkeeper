@@ -33,6 +33,7 @@ src/stuffkeeper-item-view.gob
 src/stuffkeeper-export-html.gob
 src/stuffkeeper-data-entry-config.gob
 src/stuffkeeper-data-spinbutton-config.gob
+src/stuffkeeper-data-password-config.gob
 
 #common files
 src/main.c
@@ -40,4 +41,5 @@ src/main.c
 # 3rd party files
 src/sexy-icon-entry.c
 src/bacon-message-connection.c
+
 

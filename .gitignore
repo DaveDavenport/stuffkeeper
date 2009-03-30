@@ -35,6 +35,7 @@ src/.deps
 ##
 # Stamp files
 ##
+src/*.o
 src/*.stamp
 src/stuffkeeper-*.h
 src/stuffkeeper-*.c
