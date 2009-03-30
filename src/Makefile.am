@@ -44,6 +44,9 @@ stuffkeeper_GOBSOURCES=\
 	$(stuffkeeper_GOBFILES:.gob=-private.h) \
 	$(NULL)
 
+stuffkeeper_GOBSTAMPS=\
+	$(stuffkeeper_GOBFILES:.gob=.gob.stamp) \
+	$(NULL)
 stuffkeeper_VALAFILES=\
 	stuffkeeper-data-boolean-config.vala \
 	stuffkeeper-data-rating-config.vala \
@@ -85,12 +88,13 @@ stuffkeeper_SOURCES=\
 BUILT_SOURCES=\
 	revisiont.h \
 	stuffkeeper.vala.stamp \
-	$(stuffkeeper_GOBSOURCES) \
+	$(stuffkeeper_GOBSTAMPS) \
 	$(stuffkeeper_VALASOURCES) \
 	$(NULL)
 
-%.c %.h %.private.h: %.gob
-	@GOB2@ --no-touch-headers --always-private-header $<
+%.gob.stamp: %.gob
+	@GOB2@ --always-private-header $<
+	@touch $@
 
 stuffkeeper.vala.stamp: $(stuffkeeper_VALAFILES)
 	@rm -f stuffkeeper.vala.tmp
@@ -192,4 +196,5 @@ CLEANFILES=\
 	stuffkeeper.vala.stamp \
 	$(stuffkeeper_GOBSOURCES) \
 	$(stuffkeeper_VALASOURCES) \
+	$(stuffkeeper_GOBSTAMPS) \
 	$(NULL)
