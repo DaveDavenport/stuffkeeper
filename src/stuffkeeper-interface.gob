@@ -133,27 +133,27 @@ class Stuffkeeper:Interface from G:Object
     private signal last NONE (POINTER)
     void item_added_here(self, Stuffkeeper:Data:Item *item (check null type)) 
     {
-	GtkTreeIter iter;
-	GtkTreePath *path = NULL;
-	GtkTreeModel *store =GTK_TREE_MODEL(self->_priv->model_items_filter);
+        GtkTreeIter iter;
+        GtkTreePath *path = NULL;
+        GtkTreeModel *store =GTK_TREE_MODEL(self->_priv->model_items_filter);
 
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
-	    StuffkeeperDataItem *found_item = NULL;
-	    debug_printf("Searching new item in tree\n");
-	    do {
-		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 2, &found_item, -1);
-		if(found_item == item) {
-		    debug_printf("Found new item in tree\n");
-		    path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
-		    break;
-		}
-	    } while(gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter));
-	    if(path) {
-		debug_printf("Moving cursor to new item\n");
-		gtk_tree_view_set_cursor(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL, FALSE);
-		gtk_tree_path_free(path);
-	    }
-	}
+            StuffkeeperDataItem *found_item = NULL;
+            debug_printf("Searching new item in tree\n");
+            do {
+                gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 2, &found_item, -1);
+                if(found_item == item) {
+                    debug_printf("Found new item in tree\n");
+                    path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+                    break;
+                }
+            } while(gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter));
+            if(path) {
+                debug_printf("Moving cursor to new item\n");
+                gtk_tree_view_set_cursor(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL, FALSE);
+                gtk_tree_path_free(path);
+            }
+        }
     }
 
     /**
@@ -311,8 +311,12 @@ class Stuffkeeper:Interface from G:Object
                 }
             }while(gtk_tree_model_iter_next(model, &iter));
         }
-
-	self_update_all_item_add_menus(self);
+        printf("Resetting schema\n" );
+        /* Reset tooltip and item that is added on AddButton */
+        g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", NULL);
+        gtk_widget_set_tooltip_text(self->_priv->AddMenuButton, "");
+        /* Update both menus */
+        self_update_all_item_add_menus(self);
     }
 
     /**
@@ -474,35 +478,39 @@ class Stuffkeeper:Interface from G:Object
      */
     public void interface_item_add(self,GtkWidget *button)
     {
-	gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
-	if(locked){printf("**ERROR** should not be callable\n");return;}
+        gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+        if(locked){printf("**ERROR** should not be callable\n");return;}
 
-	GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
-	/* check if there are schema's */
-	if(list)
-	{
-	    StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
-	    /* if there is no schema, get the first*/
-	    if(schema  == NULL || !STUFFKEEPER_IS_DATA_SCHEMA(schema))
-	    {
-		schema = list->data;
-	    }
-	    self_add_item(self, schema);
-	    g_list_free(list);
-	}
+        GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
+        /* check if there are schema's */
+        if(list)
+        {
+            StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+            /* if there is no schema, get the first*/
+            if(schema  == NULL || !STUFFKEEPER_IS_DATA_SCHEMA(schema))
+            {
+                schema = list->data;
+            }
+            /* Update tooltip with the name of the schema to be added */
+            gtk_widget_set_tooltip_text(button, stuffkeeper_data_schema_get_title(schema));
+            self_add_item(self, schema);
+            g_list_free(list);
+        }
     }
 
     private void interface_item_add_menu_button(self, GtkWidget *button)
     {
-	gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
-	if(locked){printf("**ERROR** should not be callable\n");return;}
-	StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
-	if(schema)
-	{
-	    self_add_item(self, schema);
-	    /* Store last added item. */
-	    g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", schema);
-	}
+        gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+        if(locked){printf("**ERROR** should not be callable\n");return;}
+        StuffkeeperDataSchema *schema = g_object_get_data(G_OBJECT(button), "schema");
+        if(schema)
+        {
+            self_add_item(self, schema);
+            /* Store last added item. */
+            g_object_set_data(G_OBJECT(self->_priv->AddMenuButton), "schema", schema);
+            /* Set tooltip */
+            gtk_widget_set_tooltip_text(self->_priv->AddMenuButton, stuffkeeper_data_schema_get_title(schema));
+        }
     }
 
     /**
@@ -1494,8 +1502,22 @@ class Stuffkeeper:Interface from G:Object
     private
     void 
     update_all_item_add_menus(self) {
-	self_update_item_add_menu(self, GTK_MENU_SHELL(self->_priv->menu), FALSE);
-	self_update_item_add_menu(self, GTK_MENU_SHELL(self->_priv->menu_item_add), TRUE);
+        self_update_item_add_menu(self, GTK_MENU_SHELL(self->_priv->menu), FALSE);
+        self_update_item_add_menu(self, GTK_MENU_SHELL(self->_priv->menu_item_add), TRUE);
+        
+        
+        if(g_object_get_data(G_OBJECT(self->_priv->AddMenuButton), "schema") == NULL)
+        {
+            GList *list = stuffkeeper_data_backend_get_schemas(self->_priv->skdbg);
+            if(list)
+            {
+               gtk_widget_set_tooltip_text(self->_priv->AddMenuButton, stuffkeeper_data_schema_get_title((StuffkeeperDataSchema *)list->data));
+               g_list_free(list);
+            }
+            else
+                gtk_widget_set_tooltip_text(self->_priv->AddMenuButton, "");
+
+        }
     }
 
     private
