@@ -290,7 +290,11 @@ class Stuffkeeper:Interface from G:Object
             }while(gtk_tree_model_iter_next(model, &iter));
         }
 
-	self_update_all_item_add_menus(self);
+        if(g_object_get_data(G_OBJECT(self->_priv->AddMenuButton), "schema")  == schema)
+        {
+               gtk_widget_set_tooltip_text(self->_priv->AddMenuButton, stuffkeeper_data_schema_get_title(schema));
+        }
+        self_update_all_item_add_menus(self);
     }
     private
     void 
