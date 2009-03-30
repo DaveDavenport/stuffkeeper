@@ -525,56 +525,77 @@ class Stuffkeeper:Interface from G:Object
      */
     public void interface_item_remove(self)
     {
-	if(stuffkeeper_data_backend_get_locked(self->_priv->skdbg)){
-	    printf("**ERROR** should not be callable\n");
-	    return;
-	}
+        if(stuffkeeper_data_backend_get_locked(self->_priv->skdbg)){
+            printf("**ERROR** should not be callable\n");
+            return;
+        }
 
-	/** Setup a dialog that ask the user if he is sure */
-	GtkWidget *tree = self->_priv->treeview2;
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
-	GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
-	GtkTreeIter iter;
-	if(gtk_tree_selection_get_selected(selection, &model, &iter))
-	{
-	    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(self->_priv->win), 
-		    GTK_DIALOG_DESTROY_WITH_PARENT|// This belongs to the parent, so if the user closes the parent, close it
-		    GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
-		    GTK_MESSAGE_WARNING, // It is a warning message.
-		    GTK_BUTTONS_YES_NO, // yes/no question
-		    _("Deleting an entry cannot be undone.\nAre you sure you want to continue?"));
-	    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
-	    {
-		gint id;
-		gtk_tree_model_get(model, &iter ,0,&id, -1);
-		stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
-	    }
-	    gtk_widget_destroy(dialog);
-	}
+        /** Setup a dialog that ask the user if he is sure */
+        GtkWidget *tree = self->_priv->treeview2;
+        GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+        GtkTreeModel *model = GTK_TREE_MODEL(gtk_tree_view_get_model(GTK_TREE_VIEW(tree)));
+        GtkTreeIter iter;
+        if(gtk_tree_selection_count_selected_rows(selection)>0)
+        {
+            GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(self->_priv->win), 
+                    GTK_DIALOG_DESTROY_WITH_PARENT|// This belongs to the parent, so if the user closes the parent, close it
+                    GTK_DIALOG_MODAL, // It is a warning, it _should_ be modal.
+                    GTK_MESSAGE_WARNING, // It is a warning message.
+                    GTK_BUTTONS_YES_NO, // yes/no question
+                    _("Deleting an entry cannot be undone.\nAre you sure you want to continue?"));
+            if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES)
+            {
+                gint id;
+                GList *node,*list = gtk_tree_selection_get_selected_rows(selection, &model);
+                for(node = g_list_last(list); node; node = g_list_previous(node))
+                {
+                    if(gtk_tree_model_get_iter(model, &iter, (GtkTreePath*)node->data))
+                    {
+                        gtk_tree_model_get(model, &iter ,0,&id, -1);
+                        stuffkeeper_data_backend_remove_item(self->_priv->skdbg, id);
+                    }
+                }
+                if(list){
+                    g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
+                    g_list_free (list);
+                }
+            }
+            gtk_widget_destroy(dialog);
+        }
     }
     /**
      * Clone selectd item
      */
     public void interface_item_clone(self)
     {
-	GtkTreeModel *model;
-	GtkTreeIter iter;
-	GtkTreeSelection *selection;
+        GtkTreeModel *model;
+        GtkTreeIter iter;
+        GtkTreeSelection *selection;
+        GList *node,*list;
+        if(stuffkeeper_data_backend_get_locked(self->_priv->skdbg)){
+            printf("**ERROR** should not be callable\n");
+            return;
+        }
 
-	if(stuffkeeper_data_backend_get_locked(self->_priv->skdbg)){
-	    printf("**ERROR** should not be callable\n");
-	    return;
-	}
-
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
-	if(gtk_tree_selection_get_selected(selection, &model, &iter)) {
-	    StuffkeeperDataItem *orig_item, *item; 
-	    gtk_tree_model_get(model, &iter , 2, &orig_item, -1);
-	    item = stuffkeeper_data_backend_clone_item(self->_priv->skdbg, orig_item);
-	    /* signal to other window components that the item was added on this
-	     * window */
-	    self_item_added_here(self, item);
-	}
+        selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
+        list = gtk_tree_selection_get_selected_rows(selection, &model);
+        for(node = g_list_first(list); node; node = g_list_next(node))
+        {
+            if(gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)node->data))
+            {
+                StuffkeeperDataItem *orig_item, *item; 
+                gtk_tree_model_get(model, &iter , 2, &orig_item, -1);
+                item = stuffkeeper_data_backend_clone_item(self->_priv->skdbg, orig_item);
+                /* signal to other window components that the item was added on this
+                 * window */
+                self_item_added_here(self, item);
+            }
+        }
+        if(list)
+        {
+            g_list_foreach(list, (GFunc) gtk_tree_path_free, NULL);
+            g_list_free(list);
+        }
     }
 
     /**
@@ -869,15 +890,24 @@ class Stuffkeeper:Interface from G:Object
 
 
             model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
-            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+            if(gtk_tree_selection_count_selected_rows(selection) == 1)
             {
                 StuffkeeperDataItem *item;
-                gtk_tree_model_get(model, &iter, 2, &item, -1);
-                if(item)
+                GList *list = gtk_tree_selection_get_selected_rows(selection, &model);
+                if(gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)list->data))
                 {
-                    GtkWidget *wid = stuffkeeper_item_view_new(item);
-                    gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), wid);
-                    gtk_widget_show_all(self->_priv->item_view_container);
+                    gtk_tree_model_get(model, &iter, 2, &item, -1);
+                    if(item)
+                    {
+                        GtkWidget *wid = stuffkeeper_item_view_new(item);
+                        gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), wid);
+                        gtk_widget_show_all(self->_priv->item_view_container);
+                    }
+                }
+                if(list)
+                {
+                    g_list_foreach(list, (GFunc) gtk_tree_path_free, NULL);
+                    g_list_free(list);
                 }
             }
             else
@@ -1054,7 +1084,7 @@ class Stuffkeeper:Interface from G:Object
     gboolean 
     treeview2_button_press_event(self, GdkEventButton *event, GtkWidget *widget)
     {
-
+        return self_click_fix(self, event, widget);
         return FALSE;
     }
     private
@@ -1068,14 +1098,26 @@ class Stuffkeeper:Interface from G:Object
             GtkWidget *tree = self->_priv->treeview2;
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
             GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+//            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+            if(gtk_tree_selection_count_selected_rows(selection) == 1)
             {
+                GList *node,*list;
                 StuffkeeperDataItem *item;
-                gtk_tree_model_get(model, &iter, 2, &item, -1);
-                if(item)
+
+                list = gtk_tree_selection_get_selected_rows(selection, &model);
+                if(gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)list->data))
                 {
-                    stuffkeeper_plugin_run_item(STUFFKEEPER_PLUGIN(plugin), item);
-                    return;
+                    gtk_tree_model_get(model, &iter, 2, &item, -1);
+                    if(item)
+                    {
+                        stuffkeeper_plugin_run_item(STUFFKEEPER_PLUGIN(plugin), item);
+                        return;
+                    }
+                }
+                if(list)
+                {
+                    g_list_foreach(list, (GFunc) gtk_tree_path_free, NULL);
+                    g_list_free(list);
                 }
             }
         }
@@ -1090,8 +1132,7 @@ class Stuffkeeper:Interface from G:Object
         {
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
-            GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(selection,&model, &iter))
+            if(gtk_tree_selection_count_selected_rows(selection) > 0)
             {
                 GtkWidget *menu;                
                 GtkWidget *menu_item;
@@ -1702,6 +1743,25 @@ class Stuffkeeper:Interface from G:Object
         }
     }
 
+	private 
+	gboolean click_fix (self, GdkEventButton *event, GtkWidget *tree)
+    {
+        GtkTreePath *path = NULL;
+        if(event->button == 3 && gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(tree), event->x, event->y,&path,NULL,NULL,NULL))
+        {	
+            GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+            if(gtk_tree_selection_path_is_selected(sel, path))
+            {
+                gtk_tree_path_free(path);
+                return TRUE;
+
+            }
+        }
+        if(path) {
+            gtk_tree_path_free(path);
+        }
+        return FALSE;
+    }
     /**
      * Initialize the main gui
      */
@@ -1913,6 +1973,7 @@ class Stuffkeeper:Interface from G:Object
             /* get changed selection */
             sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
             g_signal_connect_swapped(G_OBJECT(sel), "changed", G_CALLBACK(self_interface_item_selection_changed), self);
+            gtk_tree_selection_set_mode(sel, GTK_SELECTION_MULTIPLE);
 
             /* Tag list */
             gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter), 
@@ -2141,14 +2202,26 @@ class Stuffkeeper:Interface from G:Object
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(selection,&model, &iter))
+            if(gtk_tree_selection_count_selected_rows(selection) > 0)
             {
                 StuffkeeperDataItem *item;
-                gtk_tree_model_get(model, &iter, 2, &item, -1);
-                if(item)
+                GList *list, *node;
+                list = gtk_tree_selection_get_selected_rows(selection, &model);
+                for(node = g_list_first(list); node; node = g_list_next(node))
                 {
-                    self_popup_item(self, item);
-                }                                                          
+                    if(gtk_tree_model_get_iter(model, &iter, (GtkTreePath*)node->data))
+                    {
+                        gtk_tree_model_get(model, &iter, 2, &item, -1);
+                        if(item)
+                        {
+                            self_popup_item(self, item);
+                        }
+                    }
+                }
+                if(list){
+                    g_list_foreach (list,(GFunc) gtk_tree_path_free, NULL);
+                    g_list_free (list);
+                }
             }
         }
 
@@ -2415,14 +2488,23 @@ class Stuffkeeper:Interface from G:Object
             GtkWidget *tree = self->_priv->treeview2;
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
             GtkTreeIter iter;
-            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+            if(gtk_tree_selection_count_selected_rows(selection) == 1)
             {
-                StuffkeeperDataItem *item;
-                gtk_tree_model_get(model, &iter, 2, &item, -1);
-                if(item)
+                GList *list = gtk_tree_selection_get_selected_rows(selection, &model);
+                if(list && gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)list->data))
                 {
-                    stuffkeeper_export_html_new(self,self->_priv->skdbg,STUFFKEEPER_DATA_ITEM(item));
-                    return;
+                    StuffkeeperDataItem *item;
+                    gtk_tree_model_get(model, &iter, 2, &item, -1);
+                    if(item)
+                    {
+                        stuffkeeper_export_html_new(self,self->_priv->skdbg,STUFFKEEPER_DATA_ITEM(item));
+                        return;
+                    }
+                }
+
+                if(list){
+                    g_list_foreach (list, (GFunc)gtk_tree_path_free, NULL);
+                    g_list_free (list);
                 }
             }
         }
