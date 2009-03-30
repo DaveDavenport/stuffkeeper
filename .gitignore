@@ -21,9 +21,37 @@ intltool-update.in
 libtool
 ltmain.sh
 missing
+stamp-h1
+
+##
+# build po files
+##
+po/*.gmo
 po/Makefile.in.in
 po/POTFILES
 po/stamp-it
 src/.deps
-stamp-h1
 
+##
+# Stamp files
+##
+src/*.stamp
+src/stuffkeeper-*.h
+src/stuffkeeper-*.c
+
+##
+# Desktop files 
+##
+data/stuffkeeper.desktop
+
+##
+# Glade-crap
+##
+glade/stuffkeeper.glade.bak
+glade/stuffkeeper.gladep
+
+##
+# Code for getting revision
+##
+src/Makefile.config
+src/revision.h
