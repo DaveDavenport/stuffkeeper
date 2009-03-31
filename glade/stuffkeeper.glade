@@ -41,7 +41,7 @@
 	      <property name="use_underline">True</property>
 
 	      <child>
-		<widget class="GtkMenu" id="menu1">
+		<widget class="GtkMenu" id="menuitem1_menu">
 
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem3">
@@ -52,7 +52,8 @@
 		      <accelerator key="N" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image1">
+			<widget class="GtkImage" id="image7">
+			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
@@ -87,10 +88,10 @@
 		      <signal name="activate" handler="export_to_html"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image8">
+			<widget class="GtkImage" id="image8">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save-as</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -108,10 +109,10 @@
 		      <signal name="activate" handler="make_backup"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image2">
+			<widget class="GtkImage" id="image9">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -129,10 +130,10 @@
 		      <signal name="activate" handler="restore_backup"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image4">
+			<widget class="GtkImage" id="image10">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -143,7 +144,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkSeparatorMenuItem" id="">
+		    <widget class="GtkSeparatorMenuItem" id="item1">
 		      <property name="visible">True</property>
 		    </widget>
 		  </child>
@@ -156,10 +157,10 @@
 		      <signal name="activate" handler="reload"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image3">
+			<widget class="GtkImage" id="image11">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-refresh</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -195,8 +196,7 @@
 	      <property name="use_underline">True</property>
 
 	      <child>
-		<widget class="GtkMenu" id="menu4">
-		  <property name="visible">True</property>
+		<widget class="GtkMenu" id="menuitem_view_menu">
 
 		  <child>
 		    <widget class="GtkMenuItem" id="menuitem18">
@@ -205,8 +205,7 @@
 		      <property name="use_underline">True</property>
 
 		      <child>
-			<widget class="GtkMenu" id="menu6">
-			  <property name="visible">True</property>
+			<widget class="GtkMenu" id="menuitem18_menu">
 
 			  <child>
 			    <widget class="GtkRadioMenuItem" id="menu_sort_by_creation_time">
@@ -223,7 +222,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">by title</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <property name="group">menu_sort_by_creation_time</property>
 			      <signal name="activate" handler="sort_item_by_title"/>
 			    </widget>
@@ -234,7 +233,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">by type</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <property name="group">menu_sort_by_creation_time</property>
 			      <signal name="toggled" handler="sort_item_by_schema"/>
 			    </widget>
@@ -245,7 +244,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">by modification time</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <property name="group">menu_sort_by_creation_time</property>
 			      <signal name="toggled" handler="sort_item_by_modification_time"/>
 			    </widget>
@@ -262,7 +261,7 @@
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">Sort Ascending</property>
 			      <property name="use_underline">True</property>
-			      <property name="active">False</property>
+			      <property name="active">True</property>
 			      <signal name="toggled" handler="sort_item_ascending"/>
 			    </widget>
 			  </child>
@@ -294,6 +293,16 @@
 		  </child>
 
 		  <child>
+		    <widget class="GtkCheckMenuItem" id="alternative_layout_cb">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Show layout 2</property>
+		      <property name="use_underline">True</property>
+		      <property name="active">False</property>
+		      <signal name="activate" handler="on_alternative_layout_cb_activate" last_modification_time="Tue, 31 Mar 2009 11:22:53 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
 		    <widget class="GtkCheckMenuItem" id="menuitem_view_locked">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Lock editing</property>
@@ -315,8 +324,7 @@
 	      <property name="use_underline">True</property>
 
 	      <child>
-		<widget class="GtkMenu" id="menu7">
-		  <property name="visible">True</property>
+		<widget class="GtkMenu" id="menuitem_item_menu">
 
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_item_open">
@@ -360,10 +368,10 @@
 		      <accelerator key="C" modifiers="GDK_CONTROL_MASK | GDK_SHIFT_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image16">
+			<widget class="GtkImage" id="image12">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-copy</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -387,10 +395,10 @@
 		      <signal name="activate" handler="export_html_item"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image15">
+			<widget class="GtkImage" id="image13">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -411,8 +419,7 @@
 	      <property name="use_underline">True</property>
 
 	      <child>
-		<widget class="GtkMenu" id="menu5">
-		  <property name="visible">True</property>
+		<widget class="GtkMenu" id="menuitem_filter_menu">
 
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_filter_new">
@@ -422,7 +429,8 @@
 		      <signal name="activate" handler="new_search"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image12">
+			<widget class="GtkImage" id="image14">
+			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
@@ -463,8 +471,7 @@
 	      <property name="use_underline">True</property>
 
 	      <child>
-		<widget class="GtkMenu" id="menu3">
-		  <property name="visible">True</property>
+		<widget class="GtkMenu" id="menuitem_type_menu">
 
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_type_new">
@@ -474,7 +481,7 @@
 		      <signal name="activate" handler="schema_new"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image11">
+			<widget class="GtkImage" id="image15">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">1</property>
@@ -495,10 +502,10 @@
 		      <signal name="activate" handler="schema_import"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image9">
+			<widget class="GtkImage" id="image16">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -516,10 +523,10 @@
 		      <signal name="activate" handler="schema_export"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image10">
+			<widget class="GtkImage" id="image17">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -548,9 +555,7 @@
 	      <property name="use_underline">True</property>
 
 	      <child>
-		<widget class="GtkMenu" id="menu2">
-		  <property name="visible">True</property>
-		  <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+		<widget class="GtkMenu" id="menuitem6_menu">
 
 		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem9">
@@ -560,10 +565,10 @@
 		      <signal name="activate" handler="visit_homepage"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image5">
+			<widget class="GtkImage" id="image18">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-home</property>
-			  <property name="icon_size">4</property>
+			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -574,23 +579,11 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkImageMenuItem" id="Bug Tracker">
+		    <widget class="GtkMenuItem" id="Bug Tracker">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Bug tracker</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="visit_bugtracker"/>
-
-		      <child internal-child="image">
-			<widget class="GtkImage" id="menu-item-image7">
-			  <property name="visible">True</property>
-			  <property name="icon_size">4</property>
-			  <property name="icon_name">internet-web-browser</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-		      </child>
 		    </widget>
 		  </child>
 

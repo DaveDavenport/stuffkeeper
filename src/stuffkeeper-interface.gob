@@ -2834,4 +2834,59 @@ class Stuffkeeper:Interface from G:Object
         {
             gtk_window_present(GTK_WINDOW(self->_priv->win));
         }
+
+
+        public
+        void
+        on_alternative_layout_cb_activate(self, GtkCheckMenuItem *activate)
+        {
+            GError *error = NULL;
+            int value =0;
+            int active = gtk_check_menu_item_get_active(activate);
+            if(active && GTK_IS_VPANED(self->_priv->vpaned1))
+            {
+                GtkWidget *p1 = g_object_ref(gtk_paned_get_child1(GTK_PANED(self->_priv->vpaned1)));
+                GtkWidget *p2 = g_object_ref(gtk_paned_get_child2(GTK_PANED(self->_priv->vpaned1)));
+                gtk_container_remove(GTK_CONTAINER(self->_priv->vpaned1), p1);
+                gtk_container_remove(GTK_CONTAINER(self->_priv->vpaned1), p2);
+                gtk_widget_destroy(self->_priv->vpaned1);
+                self->_priv->vpaned1 = gtk_hpaned_new();
+                gtk_paned_add2(GTK_PANED(self->_priv->hpaned1), self->_priv->vpaned1);
+                gtk_paned_add1(GTK_PANED(self->_priv->vpaned1), p1);
+                gtk_paned_add2(GTK_PANED(self->_priv->vpaned1), p2);
+                g_object_unref(p1);
+                g_object_unref(p2);
+                gtk_widget_show(self->_priv->vpaned1);
+
+
+            }else if(!active && GTK_IS_HPANED(self->_priv->vpaned1)){
+
+                GtkWidget *p1 = g_object_ref(gtk_paned_get_child1(GTK_PANED(self->_priv->vpaned1)));
+                GtkWidget *p2 = g_object_ref(gtk_paned_get_child2(GTK_PANED(self->_priv->vpaned1)));
+                gtk_container_remove(GTK_CONTAINER(self->_priv->vpaned1), p1);
+                gtk_container_remove(GTK_CONTAINER(self->_priv->vpaned1), p2);
+                gtk_widget_destroy(self->_priv->vpaned1);
+                self->_priv->vpaned1 = gtk_vpaned_new();
+                gtk_paned_add2(GTK_PANED(self->_priv->hpaned1), self->_priv->vpaned1);
+                gtk_paned_add1(GTK_PANED(self->_priv->vpaned1), p1);
+                gtk_paned_add2(GTK_PANED(self->_priv->vpaned1), p2);
+                g_object_unref(p1);
+                g_object_unref(p2);
+
+                gtk_widget_show(self->_priv->vpaned1);
+            }
+
+            value = g_key_file_get_integer(self->config_file, "WINDOW", "vpane", &error);
+            if(error ) {
+                debug_printf("No valid vpane position: %s\n", error->message);
+                /* Free error */
+                g_error_free(error);
+                error = NULL;
+            }
+            else if(value > 50)
+            {
+                debug_printf("Setting position: %i\n", value);
+                gtk_paned_set_position(GTK_PANED(self->_priv->vpaned1), value);
+            }
+        }
 }
