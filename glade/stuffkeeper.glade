@@ -295,7 +295,7 @@
 		  <child>
 		    <widget class="GtkCheckMenuItem" id="alternative_layout_cb">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">Show layout 2</property>
+		      <property name="label" translatable="yes">Vertical layout</property>
 		      <property name="use_underline">True</property>
 		      <property name="active">False</property>
 		      <signal name="activate" handler="on_alternative_layout_cb_activate" last_modification_time="Tue, 31 Mar 2009 11:22:53 GMT"/>
