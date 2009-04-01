@@ -997,8 +997,36 @@ class Stuffkeeper:Interface from G:Object
              }
          }
      }
+
     /* Types */
 
+     private
+     void
+     add_item_of_type(self, GtkMenuItem *item)
+     {
+         gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+         if(locked){printf("**ERROR** should not be callable\n");return;}
+
+         GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeIter iter;
+         if(gtk_tree_selection_get_selected(selection,&model, &iter))
+         {
+            StuffkeeperDataSchema *schema = NULL;
+             /* Get id and items */
+             gtk_tree_model_get(model, &iter,LP_ITEM,&schema, -1);
+            if(schema)
+            {
+                StuffkeeperDataItem *item = stuffkeeper_data_backend_new_item(self->_priv->skdbg,schema);
+                if(item)
+                {
+                    /* signal to other window components that the item was added on this
+                     * window */
+                    self_item_added_here(self, item);
+                }
+            }
+        }
+     }
      private
      void
      add_type(self, GtkMenuItem *item)
@@ -1267,8 +1295,11 @@ class Stuffkeeper:Interface from G:Object
                 if(gtk_tree_selection_get_selected(selection,&model, &iter))
                 {
                     int items;
+                    gchar *temp;
+                    StuffkeeperDataSchema *schema = NULL;
                     /* Get the number of items */
-                    gtk_tree_model_get(model, &iter, 4, &items, -1);
+                    gtk_tree_model_get(model, &iter, LP_ITEM, &schema, 4, &items, -1);
+
 
                     /* no items, then you can delete it*/
                     if(items ==  0)
@@ -1285,6 +1316,16 @@ class Stuffkeeper:Interface from G:Object
                     g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_edit_type),self);
                     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
+
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), gtk_separator_menu_item_new());
+                    /* add item of this type */
+                    temp = g_strdup_printf("%s %s %s", _("Add new"), stuffkeeper_data_schema_get_title(schema), _("item"));
+                    menu_item = gtk_image_menu_item_new_with_label(temp);
+                    g_free(temp);
+                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
+                            gtk_image_new_from_stock(GTK_STOCK_ADD, GTK_ICON_SIZE_MENU));
+                    g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_add_item_of_type),self);
+                    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                 }
 
             } else if (type == LP_TYPE_SEARCH)
