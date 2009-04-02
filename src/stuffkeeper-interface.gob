@@ -2917,8 +2917,8 @@ class Stuffkeeper:Interface from G:Object
                 gtk_widget_destroy(self->_priv->vpaned1);
                 self->_priv->vpaned1 = gtk_hpaned_new();
                 gtk_paned_add2(GTK_PANED(self->_priv->hpaned1), self->_priv->vpaned1);
-                gtk_paned_add1(GTK_PANED(self->_priv->vpaned1), p1);
-                gtk_paned_add2(GTK_PANED(self->_priv->vpaned1), p2);
+                gtk_paned_pack1(GTK_PANED(self->_priv->vpaned1), p1,TRUE, FALSE);
+                gtk_paned_pack2(GTK_PANED(self->_priv->vpaned1), p2,TRUE, FALSE);
                 g_object_unref(p1);
                 g_object_unref(p2);
                 gtk_widget_show(self->_priv->vpaned1);
@@ -2934,8 +2934,8 @@ class Stuffkeeper:Interface from G:Object
                 gtk_widget_destroy(self->_priv->vpaned1);
                 self->_priv->vpaned1 = gtk_vpaned_new();
                 gtk_paned_add2(GTK_PANED(self->_priv->hpaned1), self->_priv->vpaned1);
-                gtk_paned_add1(GTK_PANED(self->_priv->vpaned1), p1);
-                gtk_paned_add2(GTK_PANED(self->_priv->vpaned1), p2);
+                gtk_paned_pack1(GTK_PANED(self->_priv->vpaned1), p1,TRUE, FALSE);
+                gtk_paned_pack2(GTK_PANED(self->_priv->vpaned1), p2,TRUE, FALSE);
                 g_object_unref(p1);
                 g_object_unref(p2);
 
