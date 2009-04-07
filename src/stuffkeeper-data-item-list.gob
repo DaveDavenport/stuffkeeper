@@ -1,0 +1,37 @@
+requires 2.0.10
+
+%ph{
+#include <glib/gstdio.h>
+#include <sqlite3.h>
+#include "debug.h"
+#include "stuffkeeper-data-backend.h"
+#include "stuffkeeper-data-item.h"
+%}
+
+%h{
+#include "stuffkeeperglue.h"
+#include "stuffkeeper-data-tag.h"
+#include "stuffkeeper-data-schema.h"
+%}
+
+class Stuffkeeper:Data:Item:List from G:Object 
+            (interface Stuffkeeper:Data:Item)
+{
+    private GList *list = NULL destroywith g_list_free;
+    public StuffkeeperDataItem *new(GList *list)
+    {
+        Self *self = GET_NEW;
+        self->_priv->list = g_list_copy(list);
+        return (StuffkeeperDataItem *)self;
+    }
+
+    override (Stuffkeeper:Data:Item)
+    GList *get_tags(self)
+    {
+
+    }
+
+    
+
+
+}
