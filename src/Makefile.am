@@ -57,6 +57,9 @@ stuffkeeper_VALASOURCES=\
 	$(stuffkeeper_VALAFILES:.vala=.h) \
 	$(NULL)
 
+stuffkeeper_VALASTAMPS=\
+	$(stuffkeeper_VALAFILES:.vala=.vala.stamp) \
+	$(NULL)
 ##
 # These files should be compiled, but may _not_ be
 # in the dist
@@ -87,26 +90,32 @@ stuffkeeper_SOURCES=\
 BUILT_SOURCES=\
 	revision.h \
 	revisiont.h \
-	stuffkeeper.vala.stamp \
 	$(stuffkeeper_GOBSTAMPS) \
-	$(stuffkeeper_VALASOURCES) \
+	$(stuffkeeper_VALASTAMPS) \
 	$(NULL)
 
 %.gob.stamp: %.gob
 	@GOB2@ --always-private-header $<
 	@touch $@
 
-stuffkeeper.vala.stamp: $(stuffkeeper_VALAFILES)
-	@rm -f stuffkeeper.vala.tmp
-	@touch -f stuffkeeper.vala.tmp
+#stuffkeeper.vala.stamp: $(stuffkeeper_VALAFILES)
+#	@rm -f stuffkeeper.vala.tmp
+#	@touch -f stuffkeeper.vala.tmp
+#	@VALAC@ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 \
+#		--pkg=gmodule-2.0 --pkg=stuffkeeper $^
+#	@mv -f stuffkeeper.vala.tmp $@
+
+%.vala.stamp: %.vala
 	@VALAC@ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 \
-		--pkg=gmodule-2.0 --pkg=stuffkeeper $^
-	@mv -f stuffkeeper.vala.tmp $@
+	--pkg=gmodule-2.0 --pkg=stuffkeeper $<
+	@touch -f $@
+
+
 
 # Handle the case where a vala file was deleted but not the stamp file
 # This code avoids problems with parallel compilation by using an empty 
 # directory as a lock mechanism
-$(stuffkeeper_VALASOURCES): stuffkeeper.vala.stamp
+#$(stuffkeeper_VALASOURCES): stuffkeeper.vala.stamp
 #	@if test -f $@; then :; else \
 #		trap 'rm -rf $<.lock $<' 1 2 13 15; \
 #		if mkdir $<.lock 2>/dev/null; then \
