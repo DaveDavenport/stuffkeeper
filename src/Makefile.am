@@ -210,4 +210,5 @@ CLEANFILES=\
 	$(stuffkeeper_GOBSOURCES) \
 	$(stuffkeeper_VALASOURCES) \
 	$(stuffkeeper_GOBSTAMPS) \
+	$(stuffkeeper_VALASTAMPS)\
 	$(NULL)
