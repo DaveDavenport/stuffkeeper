@@ -190,7 +190,22 @@ STUFFKEEPER_PLUGIN_DIR="${PACKAGE_PREFIX}/lib/stuffkeeper_name/"
 AC_DEFINE_UNQUOTED(STUFFKEEPER_PLUGIN_DIR,"$STUFFKEEPER_PLUGIN_DIR",[The directory the plugins are installed]) 
 
 
+
+AC_ARG_ENABLE([shave],
+            [  --disable-shave			Use shave output cleaner when building.],
+              [ case "${enableval}" in
+                    yes)    enable_shave=yes;;
+                     no)    enable_shave=no;;
+                      *)    AC_MSG_ERROR([bad value ${enableval} for --disable-shave]);;
+                esac],
+              [enable_shave=no])
+if test x$enable_shave = xyes; then
+SHAVE_INIT([./]) 
+fi
+
 AC_OUTPUT([
+shave
+shave-libtool
 Makefile 
 src/Makefile 
 po/Makefile.in
