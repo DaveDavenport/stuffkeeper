@@ -34,8 +34,8 @@ class Stuffkeeper:Data:Spinbutton:Config from Gtk:HBox
     save_changes(self)
     {
 	    gint text = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(self->_priv->spinbutton));
-	printf("Setting: %i\n", text);
-	    stuffkeeper_data_schema_set_custom_field_integer(self->_priv->schema,self->_priv->field,PRIVATE_FIELD_DEFAULT,text); 
+        printf("Setting: %i\n", text);
+        stuffkeeper_data_schema_set_custom_field_integer(self->_priv->schema,self->_priv->field,PRIVATE_FIELD_DEFAULT,text); 
 
         gtk_widget_modify_text(GTK_WIDGET(self->_priv->spinbutton), GTK_STATE_NORMAL, &(self->_priv->text));
         gtk_widget_modify_base(GTK_WIDGET(self->_priv->spinbutton), GTK_STATE_NORMAL, &(self->_priv->base));
@@ -94,10 +94,10 @@ class Stuffkeeper:Data:Spinbutton:Config from Gtk:HBox
     new(StuffkeeperDataSchema *schema, const gchar *field (check null))
     {
         Self *obj = GET_NEW;
-				gint value = 0;
-				GtkWidget *label = gtk_label_new(_("Default value:"));
+        gint value = 0;
+        GtkWidget *label = gtk_label_new(_("Default value:"));
 
-				obj->_priv->text = (GTK_WIDGET(obj)->style->text[GTK_STATE_NORMAL]);
+        obj->_priv->text = (GTK_WIDGET(obj)->style->text[GTK_STATE_NORMAL]);
         obj->_priv->writing.red = 255*255;
         obj->_priv->writing.green = 253*255;
         obj->_priv->writing.blue = 197*255;
@@ -105,23 +105,23 @@ class Stuffkeeper:Data:Spinbutton:Config from Gtk:HBox
         g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set),obj);
 
 
-				
+
         /* store item */
         obj->_priv->schema = schema; 
         /* field */
         obj->_priv->field = g_strdup(field);
-				obj->_priv->spinbutton = gtk_spin_button_new_with_range(G_MININT, G_MAXINT,1);
-				gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj->_priv->spinbutton), 0.0);
+        obj->_priv->spinbutton = gtk_spin_button_new_with_range(G_MININT, G_MAXINT,1);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj->_priv->spinbutton), 0.0);
 
-				gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
-				gtk_box_pack_start(GTK_BOX(obj), label, FALSE, TRUE,0);
-				gtk_box_pack_start(GTK_BOX(obj), obj->_priv->spinbutton, TRUE, TRUE,0);
+        gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
+        gtk_box_pack_start(GTK_BOX(obj), label, FALSE, TRUE,0);
+        gtk_box_pack_start(GTK_BOX(obj), obj->_priv->spinbutton, TRUE, TRUE,0);
 
         obj->_priv->changed_custom_field = g_signal_connect_swapped(G_OBJECT(obj->_priv->schema), 
-						"schema_custom_field_changed", G_CALLBACK(self_item_changed), obj);
+                "schema_custom_field_changed", G_CALLBACK(self_item_changed), obj);
 
-				if(stuffkeeper_data_schema_get_custom_field_integer(schema, obj->_priv->field,PRIVATE_FIELD_DEFAULT, &value))
-				{
+        if(stuffkeeper_data_schema_get_custom_field_integer(schema, obj->_priv->field,PRIVATE_FIELD_DEFAULT, &value))
+        {
             gtk_spin_button_set_value(GTK_SPIN_BUTTON(obj->_priv->spinbutton), (gdouble)value);
         }
 

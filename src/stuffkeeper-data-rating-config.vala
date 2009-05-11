@@ -15,9 +15,6 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		DEFAULT_VALUE = 2
 	}
 
-	/* hack to fix vala bug */
-	static bool quit = 0;
-
 	/**
 	 * Listen to changes to this field
 	 */
@@ -30,10 +27,10 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 			{
 				if(min_spin.value != (double)value)
 				{
-					min_spin.changed -= spin_changed;		
+					min_spin.value_changed -= spin_changed;		
 					min_spin.value = (double)value;	
 					max_spin.set_range(min_spin.value+1, int.MAX);
-					min_spin.changed += spin_changed;					
+					min_spin.value_changed += spin_changed;					
 				}
 			}
 		}	
@@ -45,10 +42,10 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 			{
 				if(max_spin.value != (double)value)
 				{
-					max_spin.changed -= spin_changed;		
+					max_spin.value_changed -= spin_changed;		
 					max_spin.value = (double)value;	
 					min_spin.set_range(int.MIN, max_spin.value-1);
-					max_spin.changed += spin_changed;					
+					max_spin.value_changed += spin_changed;					
 				}
 			}
 		}	
@@ -80,17 +77,15 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 
 		/* This gets called twice.. 
 		 * Hack it to have it run only once*/
-		if(!quit)
-		{
 			schema.schema_custom_field_changed -= field_changed;
 			if(update_timeout > 0)
 			{
+                stdout.printf("force saving\n");
 				Source.remove(update_timeout);
 				update_timeout = 0;
 				save_changes();	
 			}
-		}
-		quit = true;
+        stdout.printf("kdispose_done\n");
 	}
 	/**
 	 * Construct 
@@ -99,7 +94,8 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 	/* handle updates */
 	private void spin_changed(SpinButton spin)
 	{
-		/* force update */
+        stdout.printf("value changed\n");
+        /* force update */
 		//spin.update();
 		min_spin.set_range(int.MIN, max_spin.value-1);
 		max_spin.set_range(min_spin.value+1, int.MAX);
