@@ -1129,7 +1129,7 @@ class Stuffkeeper:Interface from G:Object
 //            if(gtk_tree_selection_get_selected(selection, &model, &iter))
             if(gtk_tree_selection_count_selected_rows(selection) == 1)
             {
-                GList *node,*list;
+                GList *list;
                 StuffkeeperDataItem *item;
 
                 list = gtk_tree_selection_get_selected_rows(selection, &model);
@@ -1159,7 +1159,7 @@ class Stuffkeeper:Interface from G:Object
         if(event->button == 3)
         {
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
-            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
+            //GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             if(gtk_tree_selection_count_selected_rows(selection) > 0)
             {
                 GtkWidget *menu;                

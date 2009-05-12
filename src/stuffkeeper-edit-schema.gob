@@ -43,7 +43,7 @@ class Stuffkeeper:Edit:Schema from G:Object
 {
     private Stuffkeeper:Data:Schema *schema = {NULL};
     private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,GTK_TYPE_TREE_MODEL)}  destroywith g_object_unref;
-    private GtkCellRendererCombo *renderer_model= NULL;
+    private GtkCellRenderer *renderer_model= NULL;
     private GladeXML *xml;
     private GtkWidget *tree;
     private GtkWidget *win;
@@ -936,13 +936,13 @@ class Stuffkeeper:Edit:Schema from G:Object
 					} else if (type == FIELD_TYPE_INTEGER) {
 						widget = stuffkeeper_data_spinbutton_config_new(self->_priv->schema, id);
 					} else if (type == FIELD_TYPE_BOOLEAN) {
-						widget = stuffkeeper_data_boolean_config_new();
-						stuffkeeper_data_boolean_config_setup(widget,self->_priv->schema, id);
+						widget = (GtkWidget *)stuffkeeper_data_boolean_config_new();
+						stuffkeeper_data_boolean_config_setup(STUFFKEEPER_DATA_BOOLEAN_CONFIG(widget),self->_priv->schema, id);
 					}else if (type == FIELD_TYPE_RATING) {
-						widget = stuffkeeper_data_rating_config_new();
-						stuffkeeper_data_rating_config_setup(widget,self->_priv->schema, id);
+						widget = (GtkWidget *)stuffkeeper_data_rating_config_new();
+						stuffkeeper_data_rating_config_setup(STUFFKEEPER_DATA_RATING_CONFIG(widget),self->_priv->schema, id);
 					} else if (type == FIELD_TYPE_PASSWORD) {
-						widget = stuffkeeper_data_password_config_new(self->_priv->schema, id);
+						widget = (GtkWidget *)stuffkeeper_data_password_config_new(self->_priv->schema, id);
 					}
 
 					if(widget){
