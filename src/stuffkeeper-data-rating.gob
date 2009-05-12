@@ -128,8 +128,17 @@ class Stuffkeeper:Data:Rating from Gtk:HScale
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
         /* update the entry */
-        value = stuffkeeper_data_item_get_integer(item, obj->_priv->field);
-        gtk_range_set_value(GTK_RANGE(obj), (gdouble)(value/10.0));
+        if(stuffkeeper_data_item_get_integer_real(item, obj->_priv->field, &value))
+        {
+            gtk_range_set_value(GTK_RANGE(obj), (gdouble)(value/10.0));
+        }else{
+            if(stuffkeeper_data_schema_get_custom_field_integer(stuffkeeper_data_item_get_schema(item), obj->_priv->field,DEFAULT_VALUE, &value)){
+                gtk_range_set_value(GTK_RANGE(obj), (gdouble)(value/10.0));
+            }else{
+                gtk_range_set_value(GTK_RANGE(obj), (gdouble)(0));
+            }
+
+        }
 
         obj->_priv->changed_spin_value = g_signal_connect(G_OBJECT(obj), "value_changed", G_CALLBACK(self_value_changed), NULL);
 

@@ -7,6 +7,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 	private DataSchema schema = null;
 	private Gtk.SpinButton min_spin = null;
 	private Gtk.SpinButton max_spin = null;
+	private Gtk.SpinButton default_spin = null;
 	private uint update_timeout = 0;
 
 	public enum CustomFields  {
@@ -30,6 +31,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 					min_spin.value_changed -= spin_changed;		
 					min_spin.value = (double)value;	
 					max_spin.set_range(min_spin.value+1, int.MAX);
+                    default_spin.set_range((double)value, max_spin.value);
 					min_spin.value_changed += spin_changed;					
 				}
 			}
@@ -45,10 +47,24 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 					max_spin.value_changed -= spin_changed;		
 					max_spin.value = (double)value;	
 					min_spin.set_range(int.MIN, max_spin.value-1);
+                    default_spin.set_range(min_spin.value, (double)value);
 					max_spin.value_changed += spin_changed;					
 				}
 			}
 		}	
+        if(field == CustomFields.DEFAULT_VALUE)
+        {
+			int value = 0;
+			if(schema.get_custom_field_integer(id, field, out value))
+			{
+				if(default_spin.value != (double)(value/10.0))
+				{
+					default_spin.value_changed -= spin_changed;		
+					default_spin.value = (double)value/10.0;	
+					default_spin.value_changed += spin_changed;					
+				}
+			}
+		}
 	}
 	private 
 	bool
@@ -62,6 +78,8 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		value = max_spin.value;
 		schema.set_custom_field_integer(field, CustomFields.MAX_RANGE, (int)value);
 
+		value = default_spin.value;
+		schema.set_custom_field_integer(field, CustomFields.DEFAULT_VALUE, (int)(value*10));
 		return false;
 	}
 
@@ -99,7 +117,8 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		//spin.update();
 		min_spin.set_range(int.MIN, max_spin.value-1);
 		max_spin.set_range(min_spin.value+1, int.MAX);
-		if(update_timeout > 0)
+        default_spin.set_range(min_spin.value, max_spin.value);
+        if(update_timeout > 0)
 		{
 			Source.remove(update_timeout);	
 		}
@@ -140,6 +159,22 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		max_spin.value = 10.0;
 		max_spin.value_changed += spin_changed;
 
+        label = new Gtk.Label("Default value");
+		label.set_alignment(1.0f,0.5f);
+
+		default_spin = new Gtk.SpinButton.with_range(int.MIN, int.MAX,0.1);
+		default_spin.numeric= true;
+
+		this.attach(label, 0,1,2,3,
+				AttachOptions.SHRINK|AttachOptions.FILL,
+				AttachOptions.SHRINK,0,0);
+		this.attach(default_spin, 1,2,2,3,
+				AttachOptions.SHRINK|AttachOptions.FILL,
+				AttachOptions.SHRINK,0,0);
+		default_spin.value = 5.0;
+		default_spin.value_changed += spin_changed;
+
+
 		this.show_all();
 	}
 
@@ -147,13 +182,13 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 	 * Set it up 
 	 */
 	public void setup (Stuffkeeper.DataSchema schema, string fid) {
-		int value;
 		this.schema = schema;
 		this.field = fid;
 
 		/* update all the boxes */
 		field_changed(schema,field, CustomFields.MIN_RANGE);
 		field_changed(schema,field, CustomFields.MAX_RANGE);
+		field_changed(schema,field, CustomFields.DEFAULT_VALUE);
 
 		/* connect signals */
 		schema.schema_custom_field_changed += field_changed;
