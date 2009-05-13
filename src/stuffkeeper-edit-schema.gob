@@ -792,6 +792,45 @@ class Stuffkeeper:Edit:Schema from G:Object
             stuffkeeper_data_backend_end_transaction(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_schema_get_backend(self->_priv->schema)));
         }
 
+   public 
+   void 
+   move_field_up(self)
+   {
+       GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+       GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
+       GtkTreeIter iter;
+       if(gtk_tree_selection_get_selected(sel, &model, &iter))
+       {
+            GtkTreeIter prev;
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+            if(gtk_tree_path_prev(path))
+            {
+                if(gtk_tree_model_get_iter(model, &prev, path)){
+                    gtk_list_store_swap(GTK_LIST_STORE(model), &iter, &prev);
+                }
+            }
+            gtk_tree_path_free(path);
+       }
+   }
+   public
+   void
+   move_field_down(self)
+   {
+       GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
+       GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
+       GtkTreeIter iter;
+       if(gtk_tree_selection_get_selected(sel, &model, &iter))
+       {
+            GtkTreeIter prev;
+            GtkTreePath *path = gtk_tree_model_get_path(model, &iter);
+            gtk_tree_path_next(path);
+            if(gtk_tree_model_get_iter(model, &prev, path)){
+                gtk_list_store_swap(GTK_LIST_STORE(model), &iter, &prev);
+            }
+            gtk_tree_path_free(path);
+       }
+   }
+
    public
    void
    remove_field(self)
