@@ -7,7 +7,7 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 	private DataSchema schema = null;
 	private Gtk.CheckButton checkbox = null;
 	/* hack to fix vala bug */
-	static bool quit = 0;
+	static bool quit = false;
 
 	/**
 	 * Listen to changes to this field
@@ -48,7 +48,7 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 	 * Destruction 
 	 */
 	~DataBooleanConfig() {
-		stdout.printf("Dispose\n");
+		stdout.printf("Dispose data boolean config\n");
 
 		/* This gets called twice.. 
 		 * Hack it to have it run only once*/

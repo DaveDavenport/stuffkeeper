@@ -107,7 +107,7 @@ BUILT_SOURCES=\
 
 %.vala.stamp: %.vala
 	@VALAC@ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 \
-	--pkg=gmodule-2.0 --pkg=stuffkeeper $<
+	--pkg=gmodule-2.0 --pkg=stuffkeeper $< -H $(<:.vala=.h)
 	@touch -f $@
 
 
