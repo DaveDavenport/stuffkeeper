@@ -169,7 +169,9 @@ namespace Stuffkeeper {
 		public void set_string (string id, string title);
 		public void set_title (string title);
 
-
+        
+		[HasEmitter]
+		public virtual signal void item_tags_changed ();
 
 	}
 	[Compact]

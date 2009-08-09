@@ -780,17 +780,17 @@ class Stuffkeeper:Data:Backend from G:Object
         {
             return;
         }
+        /* Add extra reference so it does not get destroyed when removed from hash table */
+        g_object_ref(tag);
+        g_hash_table_remove(self->_priv->tags, &id);
         self_tag_removed(self,id);
+
         if(tag)
         {
             stuffkeeper_data_tag_delete_yourself(tag); 
+            /* This should be the last ref and it should be destroyed */
+            g_object_unref(tag);
         }
-
-        if(g_hash_table_remove(self->_priv->tags, &id) == FALSE)
-        {
-            return;
-        }
-
     }
 
     public

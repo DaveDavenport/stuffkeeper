@@ -2,12 +2,73 @@ using GLib;
 using Gtk;
 using Stuffkeeper;
 
+private class MultipleItemTag : Gtk.CheckButton
+{
+    private weak Stuffkeeper.DataBackend backend = null;
+    private weak List <weak Stuffkeeper.DataItem> items = null;
+    private DataTag tag = null;
+    private bool updating = false;
+  
+    private void update_check_state()
+    {
+        int check = 0;
+        foreach (DataItem item in this.items) {
+           if(item.has_tag(tag)) check++;
+        }
+
+        this.set_active(false);
+        this.set_inconsistent(false);
+
+        if(check == this.items.length()) this.set_active(true);
+        else if (check > 0) this.set_inconsistent(true);
+
+    }
+    /* The following callbacks where lambda's but because of vala bug, it are actual callbacks now */
+    private void toggled_callback()
+    {
+        if(this.updating) return;
+        if(this.active) {
+            foreach(DataItem item in this.items) {
+                if(item.has_tag(this.tag) == false)
+                    item.add_tag(this.tag);
+            }
+        }else{
+            foreach(DataItem item in this.items) {
+                if(item.has_tag(this.tag) == true)
+                    item.remove_tag(this.tag);
+            }
+        }
+    }
+    private void item_tags_changed_callback(DataItem item)
+    {
+        if(this.updating) return;
+        this.updating = true;
+        update_check_state();
+        this.updating = false;
+    }
+    public MultipleItemTag (DataTag tag, List<weak Stuffkeeper.DataItem> items)
+    {
+        this.items = items;
+        this.backend = this.items.data.get_backend();
+        this.tag = tag;
+        this.update_check_state();
+        foreach (DataItem item in this.items) {
+            item.item_tags_changed.connect(item_tags_changed_callback);
+        }
+
+        this.toggled.connect(toggled_callback);
+    }
+
+
+}
 public class Stuffkeeper.MultipleItemView : Gtk.VBox
 {
     private List <weak Stuffkeeper.DataItem> items = null;
     private Gtk.EventBox sw_event = null;
     private Gtk.EventBox header =null;
     private weak Stuffkeeper.DataBackend backend = null;
+    private Gtk.VBox sw_vbox = null;
+    private Gtk.VBox tag_vbox = null;
 
     public MultipleItemView (List<weak Stuffkeeper.DataItem> items)
     {
@@ -43,7 +104,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
                 this.sw_event.modify_bg(Gtk.StateType.NORMAL, color);
         });
 
-        var sw_vbox = new Gtk.VBox(false, 6);
+        sw_vbox = new Gtk.VBox(false, 6);
         sw_vbox.border_width = 8;
         sw.add_with_viewport(sw_event);
         sw_event.add(sw_vbox);
@@ -58,7 +119,8 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         sw_vbox.pack_start(title_labels, false, false, 0);
         foreach(DataItem item in this.items) {
             var hbox = new Gtk.HBox(false, 6);
-            var arrow = new Gtk.Arrow(Gtk.ArrowType.RIGHT, Gtk.ShadowType.NONE);
+            var arrow = new Gtk.Image.from_pixbuf(item.get_schema().get_pixbuf());
+            /** TODO image needs updating when schema changed it icon! */
             hbox.pack_start(arrow, false, false,0);
             var title = new Stuffkeeper.DataEntry(item, null);
             hbox.pack_start(title, true, true, 0);
@@ -71,14 +133,47 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         tag_label.set_alignment(0.0f, 0.5f);
         sw_vbox.pack_start(tag_label, false, false, 0);
 
-        foreach ( DataTag tag in this.backend.get_tags())
-        {
-            var tlabel = new Stuffkeeper.DataLabel.tag(tag);
-            tlabel.set_alignment(0.0f, 0.5f);
-            sw_vbox.pack_start(tlabel, false, false, 0);
-        }
+        tag_vbox = new Gtk.VBox(false, 6);
+        sw_vbox.pack_start(tag_vbox, false, false, 0);
+       
+        reload_tags(0);
+
+        this.backend.tag_added.connect(tag_added);
+        this.backend.tag_removed.connect(reload_tags);
 
         this.show_all();
     }
+    private void tag_added(DataTag tag)
+    {
+        reload_tags(0);
+    }
+    private void add_tag(DataTag tag)
+    {
+        var hbox = new Gtk.HBox (false, 6);
+        var chk = new MultipleItemTag(tag, this.items);
+        hbox.pack_start(chk, false, false, 0);
 
+        var tlabel = new Stuffkeeper.DataLabel.tag(tag);
+        tlabel.set_alignment(0.0f, 0.5f);
+        hbox.pack_start(tlabel, false, false, 0);
+        tag_vbox.pack_start(hbox, false, false, 0);
+        hbox.show_all();
+    }
+    static int compare_func(DataTag tag1, DataTag tag2)
+    {
+        return tag1.get_title().collate(tag2.get_title());
+    }
+    private void reload_tags(uint id)
+    {
+        var list = tag_vbox.get_children();
+        foreach(Gtk.Widget child in list) {
+            child.destroy();
+        }
+        var taglist = this.backend.get_tags();
+        taglist.sort((GLib.CompareFunc)compare_func);
+        foreach ( DataTag tag in taglist) 
+        {
+            this.add_tag(tag);
+        }
+    }
 }
