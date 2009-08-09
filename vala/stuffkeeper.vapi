@@ -142,7 +142,7 @@ namespace Stuffkeeper {
 	public class DataItem : GLib.Object{
 		public void add_tag (Stuffkeeper.DataTag tag);
 		public void delete_yourself ();
-		public weak GLib.Object get_backend ();
+		public weak Stuffkeeper.DataBackend get_backend ();
 		public int get_boolean (string field);
 		public int get_creation_time ();
 		public int get_id ();
@@ -364,4 +364,19 @@ namespace Stuffkeeper {
 	}
 	[CCode (cname = "register_plugin", cheader_filename = "stuffkeeper-plugin.h")]
 	public static GLib.Type register_plugin ();
+
+    [CCode (cheader_filename="stuffkeeper-data-entry.h")]
+    public class DataEntry : Gtk.Entry 
+    {
+        public DataEntry(DataItem item, string? field);
+
+    }
+
+    [CCode (cheader_filename="stuffkeeper-data-label.h")]
+    public class DataLabel : Gtk.Label 
+    {
+        public DataLabel.tag (DataTag tag);
+
+    }
+
 }
