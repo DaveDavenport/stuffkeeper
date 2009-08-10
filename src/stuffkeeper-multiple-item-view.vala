@@ -68,7 +68,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
     private Gtk.EventBox header =null;
     private weak Stuffkeeper.DataBackend backend = null;
     private Gtk.VBox sw_vbox = null;
-    private Gtk.VBox tag_vbox = null;
+    private Gtk.Table tag_vbox = null;
 
     public MultipleItemView (List<weak Stuffkeeper.DataItem> items)
     {
@@ -133,7 +133,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         tag_label.set_alignment(0.0f, 0.5f);
         sw_vbox.pack_start(tag_label, false, false, 0);
 
-        tag_vbox = new Gtk.VBox(false, 6);
+        tag_vbox = new Gtk.Table(0,0,false);
         sw_vbox.pack_start(tag_vbox, false, false, 0);
        
         reload_tags(0);
@@ -147,24 +147,14 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
     {
         reload_tags(0);
     }
-    private void add_tag(DataTag tag)
-    {
-        var hbox = new Gtk.HBox (false, 6);
-        var chk = new MultipleItemTag(tag, this.items);
-        hbox.pack_start(chk, false, false, 0);
-
-        var tlabel = new Stuffkeeper.DataLabel.tag(tag);
-        tlabel.set_alignment(0.0f, 0.5f);
-        hbox.pack_start(tlabel, false, false, 0);
-        tag_vbox.pack_start(hbox, false, false, 0);
-        hbox.show_all();
-    }
     static int compare_func(DataTag tag1, DataTag tag2)
     {
         return tag1.get_title().collate(tag2.get_title());
     }
     private void reload_tags(uint id)
     {
+        int column=3;
+        int items = 0;
         var list = tag_vbox.get_children();
         foreach(Gtk.Widget child in list) {
             child.destroy();
@@ -173,7 +163,17 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         taglist.sort((GLib.CompareFunc)compare_func);
         foreach ( DataTag tag in taglist) 
         {
-            this.add_tag(tag);
+            var hbox = new Gtk.HBox (false, 6);
+            var chk = new MultipleItemTag(tag, this.items);
+            hbox.pack_start(chk, false, false, 0);
+
+            var tlabel = new Stuffkeeper.DataLabel.tag(tag);
+            tlabel.set_alignment(0.0f, 0.5f);
+            hbox.pack_start(tlabel, true, true, 0);
+            this.tag_vbox.attach(hbox, items%column, items%column+1, items/column, items/column+1, 
+                    Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL, Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL,0,0);
+            items++;
         }
+        tag_vbox.show_all();
     }
 }
