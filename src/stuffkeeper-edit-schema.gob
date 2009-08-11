@@ -413,10 +413,10 @@ class Stuffkeeper:Edit:Schema from G:Object
 
         gtk_container_add(GTK_CONTAINER(self->_priv->preview_box), vbox);
         label = gtk_label_new("");
-        gtk_label_set_markup(GTK_LABEL(label), "<span size='x-large'>Preview layout</span>");
+        gtk_label_set_markup(GTK_LABEL(label), "<span size='x-large' weight='bold'>Preview layout</span>");
         gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
+        gtk_misc_set_padding(GTK_MISC(label), 6,6);
         gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
-        gtk_misc_set_padding(GTK_MISC(label), 0,6);
 
         g_queue_push_head(queue, vbox);
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
@@ -520,6 +520,7 @@ class Stuffkeeper:Edit:Schema from G:Object
         Stuffkeeper:Edit:Schema * 
         new(void)
         {
+            GtkWidget *sw;
             GtkTreeIter iter;
             int i,width,height;
             GtkCellRenderer *renderer;
@@ -538,10 +539,14 @@ class Stuffkeeper:Edit:Schema from G:Object
             self->_priv->win = glade_xml_get_widget(self->_priv->xml, "edit_schema_dialog");
             gtk_widget_hide_on_delete(self->_priv->win);
 
-            self->_priv->preview_box = gtk_frame_new(NULL);
-           gtk_paned_add2(GTK_PANED(glade_xml_get_widget(self->_priv->xml, "hpaned2")),
-                    self->_priv->preview_box);
-
+            self->_priv->preview_box = gtk_viewport_new(NULL, NULL);
+            /* Wrap preview in a scrolled window */ 
+            sw = gtk_scrolled_window_new(NULL, NULL);
+            gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+            gtk_container_add(GTK_CONTAINER(sw), self->_priv->preview_box);
+            gtk_paned_add2(GTK_PANED(glade_xml_get_widget(self->_priv->xml, "hpaned2")),
+                    sw);
+            gtk_widget_show(sw);
 
 
             self->_priv->model_fields = (GtkTreeModel *)gtk_list_store_new(2, G_TYPE_INT, G_TYPE_STRING);
