@@ -916,6 +916,7 @@ class Stuffkeeper:Interface from G:Object
             }
             else if ( selected_items > 1) 
             {
+                GtkWidget *wid = NULL;
                 StuffkeeperDataItem *item;
                 /* Multiple items selected */
                 GList *list = gtk_tree_selection_get_selected_rows(selection, &model);
@@ -929,7 +930,7 @@ class Stuffkeeper:Interface from G:Object
                 }
                 if(mitems) mitems = g_list_reverse(mitems);
                 /* Edit multiple items widget */
-                GtkWidget *wid = stuffkeeper_multiple_item_view_new(mitems);
+                wid = (GtkWidget *)stuffkeeper_multiple_item_view_new(mitems);
                 gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), wid);
                 gtk_widget_show_all(self->_priv->item_view_container);
                 /* cleanup */
@@ -2438,8 +2439,32 @@ class Stuffkeeper:Interface from G:Object
         void
         make_backup(self)
         {
+            GError *error = NULL;
+            gchar *value = NULL;
             GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","dialog_backup",NULL);
             GtkWidget *dialog = glade_xml_get_widget(xml,"dialog_backup");
+            /* Restore previous location */ 
+            value = g_key_file_get_string(self->config_file, "BACKUP", "directory", &error);
+            if(error == NULL) {
+                if(value ) {
+                    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "location_chooser")), value);
+                    g_free(value);
+                }
+            }else{
+                g_error_free(error);
+                error = NULL;
+            }
+
+            value = g_key_file_get_string(self->config_file, "BACKUP", "filename", &error);
+            if(error == NULL) {
+                if(value ) {
+                    gtk_entry_set_text(GTK_ENTRY(glade_xml_get_widget(xml, "entry_filename")), value);
+                    g_free(value);
+                }
+            }else{
+                g_error_free(error);
+                error = NULL;
+            }
 
             glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
@@ -2450,6 +2475,10 @@ class Stuffkeeper:Interface from G:Object
                         GtkWidget *entry = glade_xml_get_widget(xml, "entry_filename"); 
                         const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
                         const gchar *source = stuffkeeper_data_backend_get_path(self->_priv->skdbg);
+                        /* Store for next time */
+                        g_key_file_set_string(self->config_file, "BACKUP", "directory", directory);
+                        g_key_file_set_string(self->config_file, "BACKUP", "filename", file);
+
                         if(file)                                                                                      
                         {
                             gchar *suffix = g_path_get_dirname(directory);
