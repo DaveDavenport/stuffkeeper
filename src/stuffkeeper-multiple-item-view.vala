@@ -56,6 +56,11 @@ private class MultipleItemTag : Gtk.CheckButton
             item.item_tags_changed.connect(item_tags_changed_callback);
         }
 
+        this.backend.notify["locked"].connect((source) => {
+                this.set_sensitive(!this.backend.get_locked());
+        });
+
+        this.set_sensitive(!this.backend.get_locked());
         this.toggled.connect(toggled_callback);
     }
 
