@@ -46,6 +46,10 @@ private class MultipleItemTag : Gtk.CheckButton
         update_check_state();
         this.updating = false;
     }
+    private void database_locked(ParamSpec arg1)
+    {
+        this.set_sensitive(!this.backend.get_locked());
+    }
     public MultipleItemTag (DataTag tag, List<weak Stuffkeeper.DataItem> items)
     {
         this.items = items;
@@ -56,9 +60,7 @@ private class MultipleItemTag : Gtk.CheckButton
             item.item_tags_changed.connect(item_tags_changed_callback);
         }
 
-        this.backend.notify["locked"].connect((source) => {
-                this.set_sensitive(!this.backend.get_locked());
-        });
+        this.backend.notify["locked"].connect(database_locked);
 
         this.set_sensitive(!this.backend.get_locked());
         this.toggled.connect(toggled_callback);
