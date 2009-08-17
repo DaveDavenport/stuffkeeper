@@ -7,6 +7,7 @@ requires 2.0.10
 %}
 %ph{
 #include "config.h"
+#include <gdk/gdkkeysyms.h>
 #if HAVE_GTKSPELL == 1
     #include <gtkspell/gtkspell.h>
 #endif
@@ -23,20 +24,33 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
     private GdkColor writing ;
     private GdkColor base;
     private GtkWidget *text_view = NULL;
+    private GdkAtom atom;
+    private GtkTextTag *bold_tag=NULL;
+    private GtkTextTag *italic_tag=NULL;
+    private GtkTextTag *underline_tag=NULL;
 
     /* lock signal */
     private gulong signal_backend_locked = {0};
 
     private guint changed_entry_timeout = {0};
     private
-    gboolean  
+    gboolean
     save_changes(self)
     {
         GtkTextIter start, stop;
         gchar *text = NULL;
-        gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);        
-        gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop); 
-        text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
+        guint8      *spew;
+        gsize        spew_length;
+
+        gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);
+        gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop);
+//        text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
+
+        spew = gtk_text_buffer_serialize (self->_priv->buffer, self->_priv->buffer, self->_priv->atom,
+                &start, &stop, &spew_length);
+        printf("%lu '%s' : %s\n", spew_length, (char *)spew, (char*)&spew[31]);
+        text = g_base64_encode((guchar *)spew, spew_length);
+        g_free(spew);
         if(self->_priv->field)
         {
            stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
@@ -48,11 +62,12 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
 
         gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->base));
         self->_priv->changed_entry_timeout = 0;
+        gtk_text_buffer_set_modified(self->_priv->buffer, FALSE);
         return FALSE;
     }
 
 
-    private 
+    private
     void
     changed(self, gpointer data)
     {
@@ -66,7 +81,7 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
     }
 
 
-    private 
+    private
     void
     item_changed(self,const gchar *field, StuffkeeperDataItem *item)
     {
@@ -74,22 +89,60 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
         {
             GtkTextIter start, stop;
             gchar *text = NULL;
-            gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);        
-            gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop); 
-            text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
             gchar *value;
+            guint8      *spew;
+            gsize        spew_length;
+
+            gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);
+            gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop);
+//            text = gtk_text_buffer_get_text(self->_priv->buffer, &start, &stop, FALSE);
+
+            /* test code */
+
+
+            spew = gtk_text_buffer_serialize (self->_priv->buffer, self->_priv->buffer, self->_priv->atom,
+                                    &start, &stop, &spew_length);
+            printf("%lu '%s' : %s\n", spew_length, (char *)spew, (char*)&spew[31]);
+            text = g_base64_encode((guchar *)spew, spew_length);
+            g_free(spew);
             if(self->_priv->field)
             {
                 value = stuffkeeper_data_item_get_string(item, self->_priv->field);
             }else{
-                value = stuffkeeper_data_item_get_title(item); 
+                value = stuffkeeper_data_item_get_title(item);
             }
             if(value)
             {
                 if(strcmp(text,value))
                 {
+                    gsize out=0;
+                    GError *error = NULL;
+                    GtkTextIter start,stop;
+                    guchar *base= NULL;
+                    gboolean result;
                     g_signal_handler_block(self->_priv->buffer,self->_priv->changed_entry);
-                    gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
+                    /* Try to decode the entry */
+                    base = g_base64_decode(value, &out);
+                    if(base != NULL)
+                    {
+                        gtk_text_buffer_get_bounds(self->_priv->buffer, &start, &stop);
+                        gtk_text_buffer_delete(self->_priv->buffer, &start, &stop);
+                        result = gtk_text_buffer_deserialize(self->_priv->buffer, self->_priv->buffer, self->_priv->atom,&start,
+                                base, out,&error);
+                        if(!result)
+                        {
+                            g_warning("Failed to parse context: %s::%s. default to normal text\n", value, error->message);
+                            gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
+                            self_changed(self, NULL);
+                            g_error_free(error);
+                        }
+                        g_free(base);
+                    }
+                    else {
+                        gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
+                    }
+
+                    gtk_text_buffer_set_modified(self->_priv->buffer, FALSE);
                     g_signal_handler_unblock(self->_priv->buffer,self->_priv->changed_entry);
                 }
                 g_free(value);
@@ -97,7 +150,7 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
             g_free(text);
         }
     }
-    private 
+    private
     void
     style_set(self, GtkStyle *prev, GtkWidget *wid)
     {
@@ -147,11 +200,38 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
 
         /* Get buffer */
         obj->_priv->buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj->_priv->text_view));
+
+        /* Create tagset. (bold and italic) */
+
+        GtkTextTagTable *table;
+        /* get buffer's tag table */
+        table = gtk_text_buffer_get_tag_table(obj->_priv->buffer);
+        /* Create bold tag */
+        obj->_priv->bold_tag = gtk_text_tag_new("bold");
+        g_object_set(G_OBJECT(obj->_priv->bold_tag), "weight", PANGO_WEIGHT_BOLD,NULL);
+        /* add bold_tag to tag table */
+        gtk_text_tag_table_add(table, obj->_priv->bold_tag);
+
+        /* Create italic tag */
+        obj->_priv->italic_tag = gtk_text_tag_new("italic");
+        g_object_set(G_OBJECT(obj->_priv->italic_tag), "style", PANGO_STYLE_ITALIC,NULL);
+        /* add italic_tag to tag table */
+        gtk_text_tag_table_add(table, obj->_priv->italic_tag);
+
+        /* Create italic tag */
+        obj->_priv->underline_tag = gtk_text_tag_new("underline");
+        g_object_set(G_OBJECT(obj->_priv->underline_tag), "underline", PANGO_UNDERLINE_SINGLE,NULL);
+        /* add underline_tag to tag table */
+        gtk_text_tag_table_add(table, obj->_priv->underline_tag);
+
+        obj->_priv->atom = gtk_text_buffer_register_deserialize_tagset (obj->_priv->buffer, NULL);
+        gtk_text_buffer_deserialize_set_can_create_tags (obj->_priv->buffer, obj->_priv->atom, FALSE);
+
         /* store item */
-        obj->_priv->item = item; 
+        obj->_priv->item = item;
         /* field */
         obj->_priv->field = g_strdup(field);
-            
+
         gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(obj->_priv->text_view), GTK_WRAP_WORD);
         obj->_priv->changed_item_entry = g_signal_connect_swapped(G_OBJECT(item), "item-changed", G_CALLBACK(self_item_changed), obj);
 
@@ -165,19 +245,91 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
         {
             value = stuffkeeper_data_item_get_string(item, obj->_priv->field);
         }else{
-            value = stuffkeeper_data_item_get_title(item); 
+            value = stuffkeeper_data_item_get_title(item);
         }
         if(value)
         {
-            gtk_text_buffer_set_text(obj->_priv->buffer, value, -1);
+            gsize out=0;
+            guchar *base = g_base64_decode(value, &out);
+            GError *error = NULL;
+            GtkTextIter start;
+            gboolean result;
+            if(base != NULL)
+            {
+                gtk_text_buffer_get_start_iter(obj->_priv->buffer, &start);
+                result = gtk_text_buffer_deserialize(obj->_priv->buffer, obj->_priv->buffer, obj->_priv->atom,&start,
+                        base, out,&error);
+                if(!result)
+                {
+                    g_warning("Failed to parse context: %s::%s. default to normal text\n", value, error->message);
+                    gtk_text_buffer_set_text(obj->_priv->buffer, value, -1);
+                    self_changed(obj, NULL);
+                    g_error_free(error);
+                }
+                g_free(base);
+            }
+            else {
+                    gtk_text_buffer_set_text(obj->_priv->buffer, value, -1);
+            }
             g_free(value);
         }
-        obj->_priv->changed_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->buffer), "changed", G_CALLBACK(self_changed), obj);
 
-        obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)), 
+        gtk_text_buffer_set_modified(obj->_priv->buffer, FALSE);
+        obj->_priv->changed_entry = g_signal_connect_swapped(G_OBJECT(obj->_priv->buffer), "modified-changed", G_CALLBACK(self_changed), obj);
+
+        obj->_priv->signal_backend_locked = g_signal_connect_swapped(G_OBJECT(stuffkeeper_data_item_get_backend(item)),
                                                                      "notify::locked", G_CALLBACK(self_backend_locked), obj);
         self_backend_locked(obj,NULL, STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item)));
+
+        g_signal_connect_swapped(G_OBJECT(obj), "key-press-event", G_CALLBACK(self_key_press_event), obj);
         return GTK_WIDGET(obj);
+    }
+
+    private gboolean key_press_event(self, GdkEventKey *event, gpointer data)
+    {
+        if(event->state&GDK_CONTROL_MASK && event->keyval == GDK_b){
+            GtkTextIter start, stop;
+            if(gtk_text_buffer_get_selection_bounds(self->_priv->buffer, &start, &stop)){
+                if( (gtk_text_iter_has_tag(&start, self->_priv->bold_tag) || gtk_text_iter_begins_tag(&start, self->_priv->bold_tag))
+                && (gtk_text_iter_has_tag(&stop, self->_priv->bold_tag) || gtk_text_iter_ends_tag(&stop, self->_priv->bold_tag)))
+                    gtk_text_buffer_remove_tag(self->_priv->buffer, self->_priv->bold_tag, &start, &stop);
+                else
+                    gtk_text_buffer_apply_tag(self->_priv->buffer, self->_priv->bold_tag, &start, &stop);
+            }
+            else{
+            }
+            self_changed(self,NULL);
+            return TRUE;
+        }
+        else if(event->state&GDK_CONTROL_MASK && event->keyval == GDK_i){
+            GtkTextIter start, stop;
+            if(gtk_text_buffer_get_selection_bounds(self->_priv->buffer, &start, &stop)){
+                if( (gtk_text_iter_has_tag(&start, self->_priv->italic_tag) || gtk_text_iter_begins_tag(&start, self->_priv->italic_tag))
+                 && (gtk_text_iter_has_tag(&stop, self->_priv->italic_tag) || gtk_text_iter_ends_tag(&stop, self->_priv->italic_tag)))
+                    gtk_text_buffer_remove_tag(self->_priv->buffer, self->_priv->italic_tag, &start, &stop);
+                else
+                    gtk_text_buffer_apply_tag(self->_priv->buffer, self->_priv->italic_tag, &start, &stop);
+            }
+            else{
+            }
+            self_changed(self,NULL);
+            return TRUE;
+        }
+        else if(event->state&GDK_CONTROL_MASK && event->keyval == GDK_u){
+            GtkTextIter start, stop;
+            if(gtk_text_buffer_get_selection_bounds(self->_priv->buffer, &start, &stop)){
+                if( (gtk_text_iter_has_tag(&start, self->_priv->underline_tag) || gtk_text_iter_begins_tag(&start, self->_priv->underline_tag))
+                && (gtk_text_iter_has_tag(&stop, self->_priv->underline_tag) || gtk_text_iter_ends_tag(&stop, self->_priv->underline_tag)))
+                    gtk_text_buffer_remove_tag(self->_priv->buffer, self->_priv->underline_tag, &start, &stop);
+                else
+                    gtk_text_buffer_apply_tag(self->_priv->buffer, self->_priv->underline_tag, &start, &stop);
+            }
+            else{
+            }
+            self_changed(self,NULL);
+            return TRUE;
+        }
+        return FALSE;
     }
 
     override (G:Object)
@@ -185,7 +337,7 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
-            if(self->_priv->signal_backend_locked) {                                                                     
+            if(self->_priv->signal_backend_locked) {
                 g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
                 self->_priv->signal_backend_locked = 0;
             }
