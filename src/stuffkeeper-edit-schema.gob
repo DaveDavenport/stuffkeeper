@@ -816,6 +816,8 @@ class Stuffkeeper:Edit:Schema from G:Object
             }
             gtk_tree_path_free(path);
        }
+
+        self_reload_preview(self);
    }
    public
    void
@@ -834,6 +836,7 @@ class Stuffkeeper:Edit:Schema from G:Object
             }
             gtk_tree_path_free(path);
        }
+        self_reload_preview(self);
    }
 
    public
