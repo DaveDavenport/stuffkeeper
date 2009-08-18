@@ -10,8 +10,8 @@ m4_define([stuffkeeper_email],      "qball@stuffkeeper.org");
 
 # Version
 m4_define([stuffkeeper_major_version], [0])
-m4_define([stuffkeeper_minor_version], [11])
-m4_define([stuffkeeper_micro_version], [2])
+m4_define([stuffkeeper_minor_version], [12])
+m4_define([stuffkeeper_micro_version], [0])
 
 # generate needed values in f.e. header files
 m4_define([stuffkeeper_version], [stuffkeeper_major_version.stuffkeeper_minor_version.stuffkeeper_micro_version])
@@ -184,7 +184,7 @@ GOB2_CHECK(2.0.10)
 if test x${GOB2} = x""; then
 	exit 0;
 fi
-VALA_PROG_VALAC([3.4.0])
+VALA_PROG_VALAC([7.0.0])
 
 STUFFKEEPER_PLUGIN_DIR="${PACKAGE_PREFIX}/lib/stuffkeeper_name/"
 AC_DEFINE_UNQUOTED(STUFFKEEPER_PLUGIN_DIR,"$STUFFKEEPER_PLUGIN_DIR",[The directory the plugins are installed]) 
