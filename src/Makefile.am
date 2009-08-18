@@ -91,13 +91,13 @@ stuffkeeper_SOURCES=\
 BUILT_SOURCES=\
 	revision.h \
 	revisiont.h \
-	$(stuffkeeper_GOBSTAMPS) \
 	$(stuffkeeper_VALASTAMPS) \
+	$(stuffkeeper_GOBSTAMPS) \
 	$(NULL)
 
 %.gob.stamp: %.gob
 	@GOB2@ --always-private-header $<
-	@touch $@
+	@touch $(top_builddir)/src/$@
 
 #stuffkeeper.vala.stamp: $(stuffkeeper_VALAFILES)
 #	@rm -f stuffkeeper.vala.tmp
@@ -107,8 +107,8 @@ BUILT_SOURCES=\
 #	@mv -f stuffkeeper.vala.tmp $@
 
 %.vala.stamp: %.vala
-	@VALAC@ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 \
-	--pkg=gmodule-2.0 --pkg=stuffkeeper $< -H $(<:.vala=.h)
+	@VALAC@ -b $(top_builddir)/src/ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 \
+	--pkg=gmodule-2.0 --pkg=stuffkeeper $^ -h $(notdir $(^:.vala=.h))
 	@touch -f $@
 
 
@@ -198,7 +198,6 @@ stuffkeeperincludedir =$(includedir)/stuffkeeper/
 EXTRA_DIST=\
 	$(stuffkeeper_GOBFILES)\
 	$(stuffkeeper_VALAFILES)\
-	Makefile.config\
 	$(NULL)
 
 ##
