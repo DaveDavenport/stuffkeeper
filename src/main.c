@@ -119,8 +119,10 @@ int main ( int argc, char **argv )
     g_option_context_add_group (context, gtk_get_option_group (TRUE));
     g_option_context_parse (context, &argc, &argv, &error);
     g_option_context_free(context);
-
-    g_thread_init(NULL);
+    if(!g_thread_supported())
+    {
+        g_thread_init(NULL);
+    }
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))
     {
