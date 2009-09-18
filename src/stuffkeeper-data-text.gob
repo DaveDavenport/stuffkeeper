@@ -48,7 +48,6 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
 
         spew = gtk_text_buffer_serialize (self->_priv->buffer, self->_priv->buffer, self->_priv->atom,
                 &start, &stop, &spew_length);
-        printf("%lu '%s' : %s\n", spew_length, (char *)spew, (char*)&spew[31]);
         text = g_base64_encode((guchar *)spew, spew_length);
         g_free(spew);
         if(self->_priv->field)
@@ -102,7 +101,6 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
 
             spew = gtk_text_buffer_serialize (self->_priv->buffer, self->_priv->buffer, self->_priv->atom,
                                     &start, &stop, &spew_length);
-            printf("%lu '%s' : %s\n", spew_length, (char *)spew, (char*)&spew[31]);
             text = g_base64_encode((guchar *)spew, spew_length);
             g_free(spew);
             if(self->_priv->field)
