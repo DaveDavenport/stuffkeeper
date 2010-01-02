@@ -84,8 +84,8 @@ class Stuffkeeper:Item:View from Gtk:VBox
                  */
                 GtkWidget *event2 = gtk_event_box_new();
                 vbox = gtk_hbox_new(FALSE, 6);
-                vbox2 = gtk_vbox_new(FALSE,6);
-                gtk_container_set_border_width(GTK_CONTAINER(vbox2), 8);
+                vbox2 = gtk_vbox_new(FALSE,0);
+                gtk_container_set_border_width(GTK_CONTAINER(vbox2), 6);
                 /* Title */
                 label1 = gtk_label_new("");
                 gtk_label_set_markup(GTK_LABEL(label1), _("<b>Title:</b>"));
