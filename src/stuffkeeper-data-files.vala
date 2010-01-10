@@ -55,26 +55,35 @@ namespace Stuffkeeper{
         }
         private void drag_data_recieved (Gdk.DragContext context, int x, int y, Gtk.SelectionData sel_data, uint info, uint time)
         {
-            string[] uris = sel_data.get_uris();
-            item.append_list(this.field, uris);
-            Gtk.drag_finish(context,false, false, time);
+            DataBackend backend = item.get_backend();
+            if(!backend.get_locked())
+            {
+                string[] uris = sel_data.get_uris();
+                item.append_list(this.field, uris);
+                Gtk.drag_finish(context,true, false, time);
+            }
+            Gtk.drag_finish(context,true, false, time);
         }
         private void delete_selected_items()
         {
-            /* TODO leaks, wrong binding */
-            List<string> items = null;
-            weak List<Gtk.TreePath> list =this.iv.get_selected_items();
-            foreach (Gtk.TreePath path in list)
+            DataBackend backend = item.get_backend();
+            if(!backend.get_locked())
             {
-                Gtk.TreeIter iter;
-                if(this.store.get_iter(out iter, path)){
-                    string uri= null;
-                    this.store.get(iter,0, out uri);
-                    items.append(uri);
+                /* TODO leaks, wrong binding */
+                List<string> items = null;
+                weak List<Gtk.TreePath> list =this.iv.get_selected_items();
+                foreach (Gtk.TreePath path in list)
+                {
+                    Gtk.TreeIter iter;
+                    if(this.store.get_iter(out iter, path)){
+                        string uri= null;
+                        this.store.get(iter,0, out uri);
+                        items.append(uri);
+                    }
                 }
-            }
-            foreach(string del in items) {
-                item.remove_from_list(this.field, del);
+                foreach(string del in items) {
+                    item.remove_from_list(this.field, del);
+                }
             }
         }
         private void activate_selected_items()
@@ -155,11 +164,15 @@ namespace Stuffkeeper{
                             activate_selected_items();
                             });
                         menu.append(mitem);
-                        mitem = new Gtk.ImageMenuItem.from_stock("gtk-delete",null);
-                        mitem.activate.connect((item) => {
-                            delete_selected_items();
-                            });
-                        menu.append(mitem);
+
+                        DataBackend backend = this.item.get_backend();
+                        if(!backend.get_locked()){
+                            mitem = new Gtk.ImageMenuItem.from_stock("gtk-delete",null);
+                            mitem.activate.connect((item) => {
+                                delete_selected_items();
+                                });
+                            menu.append(mitem);
+                        }
 
                         menu.popup(null, null, null, event.button, event.time);
                         menu.show_all();
