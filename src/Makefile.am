@@ -48,6 +48,7 @@ stuffkeeper_GOBSTAMPS=\
 	$(stuffkeeper_GOBFILES:.gob=.gob.stamp) \
 	$(NULL)
 stuffkeeper_VALAFILES=\
+    stuffkeeper-data-files.vala\
 	stuffkeeper-data-boolean-config.vala \
 	stuffkeeper-data-rating-config.vala \
     stuffkeeper-multiple-item-view.vala \
@@ -107,7 +108,7 @@ BUILT_SOURCES=\
 #	@mv -f stuffkeeper.vala.tmp $@
 
 %.vala.stamp: %.vala
-	@VALAC@ -b $(top_builddir)/src/ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 \
+	@VALAC@ -b $(top_builddir)/src/ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 --pkg=gio-2.0 \
 	--pkg=gmodule-2.0 --pkg=stuffkeeper $^ -h $(notdir $(^:.vala=.h))
 	@touch -f $@
 

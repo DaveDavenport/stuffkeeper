@@ -18,6 +18,7 @@ requires 2.0.10
 #include "stuffkeeper-data-date2.h"
 #include "stuffkeeper-data-taglist2.h"
 #include "stuffkeeper-data-expander.h"
+#include "stuffkeeper-data-files.h"
 %}
 
 class Stuffkeeper:Show:Item from Gtk:VBox
@@ -69,7 +70,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
                 hbox = gtk_hbox_new(FALSE, 6);
             }
             /* Title */
-            if(type < FIELD_TYPE_EXPANDER || type >= FIELD_TYPE_PASSWORD)// != FIELD_TYPE_EXPANDER && type != FIELD_TYPE_END_EXPANDER)
+            if(type < FIELD_TYPE_EXPANDER || type >= FIELD_TYPE_FILES)// != FIELD_TYPE_EXPANDER && type != FIELD_TYPE_END_EXPANDER)
             {
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
@@ -121,7 +122,10 @@ class Stuffkeeper:Show:Item from Gtk:VBox
                 g_queue_push_head(queue, sub_part);
 	    }else if (type == FIELD_TYPE_PASSWORD) {
 		    label1 = stuffkeeper_data_password_new(self->_priv->item,self->_priv->retv[i]);
-            }else {
+	    }else if (type == FIELD_TYPE_FILES) {
+            gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
+            label1 = stuffkeeper_data_files_new(self->_priv->item,self->_priv->retv[i]);
+        }else {
                 label1 = gtk_label_new("not supported\n");
             }
             if(label1)

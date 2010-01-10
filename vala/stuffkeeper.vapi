@@ -148,7 +148,7 @@ namespace Stuffkeeper {
 		public int get_id ();
 		public int get_integer (string field);
 		public bool get_integer_real (string field, int @out);
-		public weak string get_list (string field, ulong size);
+		public weak string[] get_list (string field);
 		public int get_modification_time ();
 		public weak Stuffkeeper.DataSchema get_schema ();
 		public weak string get_string (string field);
@@ -158,20 +158,22 @@ namespace Stuffkeeper {
 		public bool has_tag (Stuffkeeper.DataTag tag);
 		public bool has_value (string value);
 		public bool has_value_exact (string value);
-		public void item_changed (string field);
 		public DataItem (GLib.Object skdb, Stuffkeeper.DataSchema schema);
 		public static weak Stuffkeeper.DataItem open_from_id (GLib.Object skdb, int id, int schemaid);
 		public void remove_tag (Stuffkeeper.DataTag tag);
 		public void save_yourself ();
 		public void set_boolean (string field, int value);
 		public void set_integer (string id, int title);
-		public void set_list (string field, string value, ulong length);
+		public void set_list (string field, string[] value);
+		public void append_list (string field, string[] value);
+		public void remove_from_list (string field, string value);
 		public void set_string (string id, string title);
 		public void set_title (string title);
 
         
 		[HasEmitter]
 		public virtual signal void item_tags_changed ();
+        public virtual signal void item_changed (string field);
 
 	}
 	[Compact]

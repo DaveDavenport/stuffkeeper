@@ -220,6 +220,23 @@ class Stuffkeeper:Data:Item from G:Object
 	sqlite3_free(query);
 	return (result == SQLITE_OK);
     }
+    private gboolean dbcore_delete_from_itemsfields_with_value(self, const gchar *fieldid,const gchar *value) 
+    {
+        int result = 0;
+        char *error = NULL;
+        char *query = NULL;
+
+        query = sqlite3_mprintf(
+                "DELETE FROM 'ItemsFields' WHERE itemid=%i AND fieldid=%q AND value=%Q",
+                self->_priv->id, fieldid,value
+                );
+        result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
+        if (result != SQLITE_OK) {
+            debug_printf("failed: %s\n", error);
+        }
+        sqlite3_free(query);
+        return (result == SQLITE_OK);
+    }
     private gboolean dbcore_insert_into_itemsfields_int(self, const gchar *fieldid, int value) 
     {
 	int result = 0;
@@ -886,8 +903,8 @@ class Stuffkeeper:Data:Item from G:Object
     }
     public void set_string(self,const gchar *id, const gchar *value)
     {
-	if(self_set_custom_field_string(self, id, value)) {
-	    self_item_changed(self,id);
+        if(self_set_custom_field_string(self, id, value)) {
+            self_item_changed(self,id);
 	}
     }
 
@@ -986,7 +1003,11 @@ class Stuffkeeper:Data:Item from G:Object
         return retv;
 
     }
-
+    public void remove_from_list(self, const gchar *field, const gchar *values)
+    {
+        self_dbcore_delete_from_itemsfields_with_value(self, field, values);
+        self_item_changed(self,field);
+    }
     public void set_list(self, const gchar *field, const gchar **value, gsize length)
     {
 	gint i;
@@ -998,6 +1019,16 @@ class Stuffkeeper:Data:Item from G:Object
 	}
 	/* now add everything */
 	self_item_changed(self,field);
+    }
+    public void append_list(self, const gchar *field, const gchar **value, gsize length)
+    {
+        gint i;
+        for(i = 0; i < length; ++i)
+        {
+            self_dbcore_insert_into_itemsfields_string(self, field, value[i]);
+        }
+        /* now add everything */
+        self_item_changed(self,field);
     }
 
     /**
