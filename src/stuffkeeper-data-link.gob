@@ -53,19 +53,21 @@ class Stuffkeeper:Data:Link from Sexy:Icon:Entry
     save_changes(self)
     {
         const gchar *text = gtk_entry_get_text(GTK_ENTRY(self));
+        g_object_ref(self);
 
+        gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->text));
+        gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->base));
+        self->_priv->changed_entry_timeout = 0;
+
+        self_update_icon(self);
         if(self->_priv->field)
         {
             stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field, text);
         }else{
             stuffkeeper_data_item_set_title(self->_priv->item, text);
         }
-        self_update_icon(self);
 
-        gtk_widget_modify_text(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->text));
-        gtk_widget_modify_base(GTK_WIDGET(self), GTK_STATE_NORMAL, &(self->_priv->base));
-        self->_priv->changed_entry_timeout = 0;
-
+        g_object_unref(self);
         return FALSE;
     }
     public
