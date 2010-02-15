@@ -71,7 +71,7 @@ namespace Stuffkeeper{
             {
                 /* TODO leaks, wrong binding */
                 List<string> items = null;
-                weak List<Gtk.TreePath> list =this.iv.get_selected_items();
+                List<Gtk.TreePath> list =this.iv.get_selected_items();
                 foreach (Gtk.TreePath path in list)
                 {
                     Gtk.TreeIter iter;
@@ -89,7 +89,7 @@ namespace Stuffkeeper{
         private void activate_selected_items()
         {
             /* TODO leaks, wrong binding */
-            weak List<Gtk.TreePath> list =this.iv.get_selected_items();
+            List<Gtk.TreePath> list =this.iv.get_selected_items();
             foreach (Gtk.TreePath path in list)
             {
                 Gtk.TreeIter iter;
