@@ -597,6 +597,37 @@ class Stuffkeeper:Export:HTML from G:Object
                     }else if (type == FIELD_TYPE_END || type == FIELD_TYPE_VPACKING || type == FIELD_TYPE_HPACKING)
                     {
                         self_printout(self,&buffer[i],"",fp_out);
+                    } else if (type == FIELD_TYPE_TEXT) {
+                                GtkTextBuffer *text_buffer = gtk_text_buffer_new(NULL);
+                                gsize out=0;
+                                GtkTextIter start,stop;
+                                GdkAtom atom = gtk_text_buffer_register_deserialize_tagset (text_buffer, NULL);
+                                gchar *base;
+                                gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
+                                gtk_text_buffer_deserialize_set_can_create_tags (text_buffer, atom, TRUE);
+                                if(temp)
+                                {
+                                        base = g_base64_decode(temp, &out);
+
+                                        gtk_text_buffer_get_start_iter(text_buffer, &start);
+                                        if(base && gtk_text_buffer_deserialize(text_buffer, text_buffer, atom,&start, base, out, NULL)){
+                                                gchar *text=NULL;
+                                                gtk_text_buffer_get_start_iter(text_buffer, &start);
+                                                gtk_text_buffer_get_end_iter(text_buffer, &stop);
+                                                text = gtk_text_buffer_get_text(text_buffer, &start, &stop,FALSE);
+                                                if(text) {
+                                                        self_printout(self,&buffer[i],text,fp_out);
+                                                }
+                                                g_free(text);
+                                        }
+                                       
+                                        if(base)
+                                            g_free(base);
+                                }
+                                if(temp)
+                                    g_free(temp);
+                                g_object_unref(g_object_ref_sink(text_buffer));
+
                     } else {
                         gchar *temp = stuffkeeper_data_item_get_string(self->_priv->cur_item, self->_priv->cur_field);
                         self_printout(self,&buffer[i],(temp)?temp:"",fp_out);
