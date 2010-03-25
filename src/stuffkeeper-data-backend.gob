@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#define DB_VERSION 0.05
+#define DB_VERSION 0.06
 %}
 
 
@@ -1056,6 +1056,11 @@ class Stuffkeeper:Data:Backend from G:Object
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SchemaId2 ON SchemasFields(SchemaId);", NULL, NULL, NULL);
                     sqlite3_exec(self->_priv->sqlHandle, "CREATE INDEX SearchId ON SearchFields(SearchId);", NULL, NULL, NULL);
                 }
+                else if (version <= 0.05)
+                {
+                    /* Need to update all rich text entries */
+                    self_update_005_db(self); 
+                }
 
                 query = sqlite3_mprintf( "UPDATE 'General' SET value=%f WHERE key='Version'",DB_VERSION); 
                 sqlite3_exec(self->_priv->sqlHandle,query, NULL, NULL, NULL);
@@ -1097,5 +1102,90 @@ class Stuffkeeper:Data:Backend from G:Object
     get_handle(self)
     {
         return self->_priv->sqlHandle;
+    }
+
+
+    private void update_005_db_field(self, int rowid)
+    {
+        GtkTextBuffer *buffer = gtk_text_buffer_new(NULL);
+        GdkAtom atom = gtk_text_buffer_register_deserialize_tagset (buffer, NULL);
+        gtk_text_buffer_deserialize_set_can_create_tags (buffer, atom, FALSE);
+        int r;
+        sqlite3_stmt *stmt;
+        const char *tail;
+        char *query = sqlite3_mprintf(
+                "SELECT value FROM ItemsFields " 
+                "WHERE id=%i", 
+                rowid 
+                );
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        sqlite3_free(query);
+        if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+        {
+            const char *value = sqlite3_column_text(stmt, 0);
+            gsize out;
+            if(value != NULL && value[0] != '\0')
+            {
+                gchar *base64 = g_base64_decode(value, &out);
+                if(base64 && out > 0)
+                {
+
+                    GtkTextIter end,start;
+                    gtk_text_buffer_get_start_iter(buffer, &start);
+                    end = start;
+                    gboolean result = gtk_text_buffer_deserialize(buffer, buffer, atom,&start,
+                            base64, out,NULL);
+                    if(result)
+                    {
+                        gtk_text_buffer_get_start_iter(buffer, &start);
+                        gtk_text_buffer_get_end_iter(buffer, &end);
+                        gchar *re = gtk_text_buffer_get_text(buffer,&start,&end, FALSE);
+                        /* store it */
+
+                        query = sqlite3_mprintf(
+                                "UPDATE ItemsFields " 
+                                "SET value=%Q WHERE id=%i", 
+                                re,
+                                rowid 
+                                );
+                        sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &value);
+                        printf("%i: Converted from rich to normal\n",rowid);
+
+                        sqlite3_free(query);
+                        g_free(re);
+                    }
+
+                }
+                if(base64)g_free(base64);
+            }
+        }
+        g_object_unref(buffer);
+        sqlite3_finalize(stmt);
+    }
+    private void
+    update_005_db(self)
+    {
+        char *query = NULL;
+        gboolean set = FALSE;
+        int r;
+        sqlite3_stmt *stmt;
+        const char *tail;
+        printf("Start 005 db update\n");
+        //select itemsfields from itemsfields JOIN schemasfields on Schemasfields.FieldId == Itemsfields.fieldid where schemasfields.type=3 and schemasfields.value=5;         
+        self_begin_transaction(self); 
+        query = sqlite3_mprintf(
+                "SELECT ItemsFields.ItemId,ItemsFields.id FROM ItemsFields JOIN SchemasFields on SchemasFields.FieldId == ItemsFields.FieldId "
+                "WHERE SchemasFields.type=%i and SchemasFields.value=%i", 
+                DB_ITEMS_FIELD_TYPE_TYPE, FIELD_TYPE_TEXT 
+                );
+
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        sqlite3_free(query);
+        while((r = sqlite3_step(stmt)) == SQLITE_ROW){
+            int rowid = sqlite3_column_int(stmt, 1); 
+            self_update_005_db_field(self, rowid);
+        }
+        sqlite3_finalize(stmt);
+        self_end_transaction(self); 
     }
 }
