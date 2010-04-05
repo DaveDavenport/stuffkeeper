@@ -88,7 +88,7 @@ AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
-
+AC_SYS_LARGEFILE
 AC_SUBST(GLIB_REQUIRED)
 AC_SUBST(GTK_REQUIRED)
 
