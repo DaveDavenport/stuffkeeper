@@ -9,7 +9,7 @@
 #include <locale.h> /* For setlocale */
 #include <config.h>
 #include <gio/gio.h>
-
+#include <gpgme.h>
 #include "debug.h"
 #include "revision.h"
 
@@ -123,6 +123,7 @@ int main ( int argc, char **argv )
     {
         g_thread_init(NULL);
     }
+	printf("GPGME Version: %s\n",gpgme_check_version(NULL));
     /* Initialize gtk */
     if(!gtk_init_check(&argc, &argv))
     {
