@@ -964,6 +964,9 @@ class Stuffkeeper:Interface from G:Object
                 gtk_container_add(GTK_CONTAINER(frame),hbox);
                 gtk_container_add(GTK_CONTAINER(event),frame);
                 gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), event);
+
+                gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &(self->_priv->item_view_container->style->white));
+                gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &(self->_priv->item_view_container->style->black));
                 gtk_widget_show_all(self->_priv->item_view_container);
             }
             return;
