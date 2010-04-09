@@ -64,6 +64,7 @@ class Stuffkeeper:Data:Expander from Gtk:Expander
         Self *obj = GET_NEW;
         StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
         GtkWidget *label = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(schema),field); 
+        gtk_widget_modify_fg(GTK_WIDGET(label), GTK_STATE_NORMAL, &(GTK_WIDGET(obj)->style->black));
         gtk_expander_set_label_widget(GTK_EXPANDER(obj), label);
         /* store item */
         obj->_priv->item = item; 

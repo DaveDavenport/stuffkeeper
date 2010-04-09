@@ -72,6 +72,7 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
                 StuffkeeperDataTag *tag = iter->data;
                 GtkWidget *event_box = gtk_event_box_new();
                 GtkWidget *label = stuffkeeper_data_label_new_tag(tag);
+                gtk_widget_modify_fg(GTK_WIDGET(label), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
                 gtk_container_add(GTK_CONTAINER(event_box), label);
                 self->_priv->tagsw = g_list_prepend(self->_priv->tagsw, event_box);
            

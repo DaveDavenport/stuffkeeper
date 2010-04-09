@@ -21,10 +21,12 @@ requires 2.0.10
 #include "stuffkeeper-data-files.h"
 %}
 
-class Stuffkeeper:Show:Item from Gtk:VBox
+class Stuffkeeper:Show:Item from Gtk:Event:Box
 {
     private StuffkeeperDataSchema *schema = {NULL};
     private StuffkeeperDataItem *item = {NULL};
+
+    private GtkWidget *vbox = {gtk_vbox_new(FALSE, 6)};
     /* list */
     private gchar **retv = NULL;
     private gsize length = 0;
@@ -43,7 +45,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
         int i,last_type = -1;//, reuse = FALSE;
         GtkWidget *label1,*hbox = NULL;
         GtkWidget *sub_part = NULL;
-        GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self));
+        GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self->_priv->vbox));
         GQueue *queue = g_queue_new();
 
         /* removing old widgets */
@@ -57,7 +59,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
             g_object_unref(self->_priv->group);
         self->_priv->group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
-        g_queue_push_head(queue, self);
+        g_queue_push_head(queue, self->_priv->vbox);
         for(i=0;i<self->_priv->length;i++) 
         {
             GtkWidget *vbox = g_queue_peek_head(queue);
@@ -74,6 +76,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
             {
                 label1 = (GtkWidget *)stuffkeeper_data_label_new_schema_field(STUFFKEEPER_DATA_SCHEMA(self->_priv->schema), self->_priv->retv[i]);
                 gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+                gtk_widget_modify_fg(GTK_WIDGET(label1), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
                 gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
                 gtk_size_group_add_widget(self->_priv->group, label1);
             }
@@ -127,9 +130,10 @@ class Stuffkeeper:Show:Item from Gtk:VBox
             label1 = stuffkeeper_data_files_new(self->_priv->item,self->_priv->retv[i]);
         }else {
                 label1 = gtk_label_new("not supported\n");
-            }
-            if(label1)
+        }
+            if(label1){
                 gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
+            }
             if(!reuse){
                 if(GTK_IS_HBOX(vbox))//GTK_IS_VBOX(label1))
                     gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
@@ -142,6 +146,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
         hbox = gtk_hbox_new(FALSE, 6);
         label1 = gtk_label_new("");
         gtk_label_set_markup(GTK_LABEL(label1),_("<b>Tags</b>"));
+        gtk_widget_modify_fg(GTK_WIDGET(label1), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
         gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
         gtk_size_group_add_widget(self->_priv->group, label1);
         gtk_box_pack_start(GTK_BOX(hbox), label1, FALSE, TRUE, 0);
@@ -149,7 +154,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
         label1 =stuffkeeper_data_taglist2_new(self->_priv->item); 
         gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
 
-        gtk_box_pack_start(GTK_BOX(self), hbox, FALSE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(self->_priv->vbox), hbox, FALSE, TRUE, 0);
         gtk_widget_show_all(GTK_WIDGET(self));
         g_queue_free(queue);
     }
@@ -181,7 +186,9 @@ class Stuffkeeper:Show:Item from Gtk:VBox
     new(Stuffkeeper:Data:Item *item)
     {
         Self *self = GET_NEW;
-        gtk_box_set_spacing(GTK_BOX(self), 6);
+//        gtk_box_set_spacing(GTK_BOX(self), 6);
+        gtk_container_add(GTK_CONTAINER(self), self->_priv->vbox);
+        gtk_container_set_border_width(GTK_CONTAINER(self->_priv->vbox), 6);
         /* Get the schema  */
         self->_priv->schema = stuffkeeper_data_item_get_schema(item);
         /* Get the item */
@@ -205,6 +212,7 @@ class Stuffkeeper:Show:Item from Gtk:VBox
                 G_CALLBACK(self_fields_reordered),
                 self);
 
+        gtk_widget_modify_bg(GTK_WIDGET(self), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->white));
 
         /* update */
         self_field_changed(self, NULL, self->_priv->schema);
