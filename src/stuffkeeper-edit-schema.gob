@@ -399,6 +399,7 @@ class Stuffkeeper:Edit:Schema from G:Object
     void
     reload_preview(self)
     {
+        GtkWidget *event = NULL;
         GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
         GList *node, *list = gtk_container_get_children(GTK_CONTAINER(self->_priv->preview_box));
         GQueue *queue = g_queue_new();
@@ -411,11 +412,15 @@ class Stuffkeeper:Edit:Schema from G:Object
         }
         g_list_free(list);
 
-        gtk_container_add(GTK_CONTAINER(self->_priv->preview_box), vbox);
+        event = gtk_event_box_new();
+        gtk_widget_modify_bg(GTK_WIDGET(event), GTK_STATE_NORMAL, &(self->_priv->preview_box->style->white));
+        gtk_container_add(GTK_CONTAINER(self->_priv->preview_box), event);
+        gtk_container_add(GTK_CONTAINER(event), vbox);
         label = gtk_label_new("");
         gtk_label_set_markup(GTK_LABEL(label), "<span size='x-large' weight='bold'>Preview layout</span>");
         gtk_misc_set_alignment(GTK_MISC(label), 0,0.0);
         gtk_misc_set_padding(GTK_MISC(label), 6,6);
+        gtk_widget_modify_fg(GTK_WIDGET(label), GTK_STATE_NORMAL, &(self->_priv->preview_box->style->black));
         gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
         g_queue_push_head(queue, vbox);
@@ -496,6 +501,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                     color.blue  = ((depth%3) == 1)?65535:256*128;
                     color.green = ((depth%3) == 2)?65535:256*128;
                     gtk_widget_modify_bg(event, GTK_STATE_NORMAL, &color);
+                    gtk_widget_modify_fg(GTK_WIDGET(label), GTK_STATE_NORMAL, &(self->_priv->preview_box->style->black));
                     gtk_container_add(GTK_CONTAINER(event), label);
                     gtk_container_set_border_width(GTK_CONTAINER(event), 6);
                     gtk_box_pack_start(GTK_BOX(vbox), event, FALSE, TRUE, 0);
