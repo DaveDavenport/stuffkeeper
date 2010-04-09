@@ -8,7 +8,7 @@ private class MultipleItemTag : Gtk.CheckButton
     private weak List <weak Stuffkeeper.DataItem> items = null;
     private DataTag tag = null;
     private bool updating = false;
-  
+
     private void update_check_state()
     {
         int check = 0;
@@ -107,7 +107,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         /* Color background */
         sw_event = new Gtk.EventBox();
         this.style_set.connect((source, style) => {
-                Gdk.Color color =source.style.light[Gtk.StateType.NORMAL];
+                Gdk.Color color =source.style.white;//light[Gtk.StateType.NORMAL];
                 this.sw_event.modify_bg(Gtk.StateType.NORMAL, color);
         });
 
@@ -123,6 +123,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         var title_labels = new Gtk.Label("");
         title_labels.set_markup(GLib.Markup.printf_escaped("<b>%s</b>", "Items:"));
         title_labels.set_alignment(0.0f, 0.5f);
+        title_labels.modify_fg(Gtk.StateType.NORMAL, this.style.black);
         sw_vbox.pack_start(title_labels, false, false, 0);
         foreach(DataItem item in this.items) {
             var hbox = new Gtk.HBox(false, 6);
@@ -138,11 +139,12 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         var tag_label = new Gtk.Label("");
         tag_label.set_markup(GLib.Markup.printf_escaped("<b>%s</b>", "Tags:"));
         tag_label.set_alignment(0.0f, 0.5f);
+        tag_label.modify_fg(Gtk.StateType.NORMAL, this.style.black);
         sw_vbox.pack_start(tag_label, false, false, 0);
 
         tag_vbox = new Gtk.Table(0,0,false);
         sw_vbox.pack_start(tag_vbox, false, false, 0);
-       
+
         reload_tags(0);
 
         this.backend.tag_added.connect(tag_added);
@@ -168,16 +170,17 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         }
         var taglist = this.backend.get_tags();
         taglist.sort((GLib.CompareFunc)compare_func);
-        foreach ( DataTag tag in taglist) 
+        foreach ( DataTag tag in taglist)
         {
             var hbox = new Gtk.HBox (false, 6);
             var chk = new MultipleItemTag(tag, this.items);
             hbox.pack_start(chk, false, false, 0);
 
             var tlabel = new Stuffkeeper.DataLabel.tag(tag);
+            tlabel.modify_fg(Gtk.StateType.NORMAL, this.style.black);
             tlabel.set_alignment(0.0f, 0.5f);
             hbox.pack_start(tlabel, true, true, 0);
-            this.tag_vbox.attach(hbox, items%column, items%column+1, items/column, items/column+1, 
+            this.tag_vbox.attach(hbox, items%column, items%column+1, items/column, items/column+1,
                     Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL, Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL,0,0);
             items++;
         }
