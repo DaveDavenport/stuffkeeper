@@ -7,6 +7,8 @@ public class Test : Stuffkeeper.Plugin {
 	private long signal = 0;
 	private DataBackend skdb = null;
 
+    construct{
+    }
 	public override PluginType get_plugin_type()
 	{
 		return PluginType.MENU;
@@ -23,7 +25,7 @@ public class Test : Stuffkeeper.Plugin {
 	}
 
 	/* Destruction */
-	~Test ()  
+	~Test ()
 	{
 		/* if the response window is still open, close it.. */
 		if(win != null)
@@ -33,20 +35,20 @@ public class Test : Stuffkeeper.Plugin {
 	}
 
 	/**
-	 * Show window 
+	 * Show window
 	 */
 	static int tag_compare(DataTag tag1, DataTag tag2)
 	{
-		return tag1.get_title().collate(tag2.get_title()); 	
+		return tag1.get_title().collate(tag2.get_title());
 	}
 	private string generate_cloud(Stuffkeeper.DataBackend skdb_e, Gtk.VBox box)
 	{
-		string str = new string();
+		string str = "";
 		List<weak DataTag> list = skdb_e.get_tags();
 		double max = -1;
-		
-		/** 
-		 * THIS NEEDS TO BE FIXED, BUG IN GTK VAPI FILE! 
+
+		/**
+		 * THIS NEEDS TO BE FIXED, BUG IN GTK VAPI FILE!
 	   */
 		List<weak Widget> children = box.get_children();
 		foreach (Widget child in children)
@@ -59,11 +61,11 @@ public class Test : Stuffkeeper.Plugin {
 		foreach (DataTag item in list){
 			double items = item.num_items();
 			if(items > max) {
-				max = items; 
+				max = items;
 			}
 		}
 		/* no max item, is no item found, so skip it, nothing to draw. */
-		if(max <= 0.0) 
+		if(max <= 0.0)
 			return str;
 
 		Gtk.HBox hbox  = null;
@@ -87,7 +89,7 @@ public class Test : Stuffkeeper.Plugin {
 					ali.add(hbox);
 					box.pack_start(ali, true,true,0);
 					cur_size = 0;
-				}	
+				}
 				hbox.pack_start(lab, false, false,0);
 				cur_size += req.width;
 			}
@@ -100,17 +102,17 @@ public class Test : Stuffkeeper.Plugin {
 	{
 		stdout.printf("Tag added\n");
 
-		generate_cloud(skdb, win.vbox); 
+		generate_cloud(skdb, win.vbox);
 	}
 	private void tag_removed (Stuffkeeper.DataBackend skdb_e,uint id)
 	{
 		stdout.printf("Tag removed\n");
-		generate_cloud(skdb, win.vbox); 
+		generate_cloud(skdb, win.vbox);
 	}
 	private void tag_changed (DataBackend skdb_e, DataTag tag)
 	{
 		stdout.printf("Tag changed\n");
-		generate_cloud(skdb, win.vbox); 
+		generate_cloud(skdb, win.vbox);
 	}
 
 	private void show_window(Stuffkeeper.DataBackend skdb_e)
@@ -127,13 +129,13 @@ public class Test : Stuffkeeper.Plugin {
 		win.title = "Tag cloud";
 		win.add_buttons(Gtk.STOCK_CLOSE, ResponseType.CLOSE);
 
-		
-		
+
+
 
 		win.response += this.response_window;
 		win.show();
 		/* Generate the cloud */
-		generate_cloud(skdb, win.vbox); 
+		generate_cloud(skdb, win.vbox);
 		skdb.tag_added += tag_added;
 		skdb.tag_removed += tag_removed;
 		skdb.tag_changed += tag_changed;

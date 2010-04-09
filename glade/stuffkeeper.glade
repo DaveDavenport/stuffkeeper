@@ -673,11 +673,13 @@ Filters</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
             <property name="border_width">9</property>
+            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="eventbox">
@@ -807,6 +809,7 @@ Filters</property>
                     <child>
                       <widget class="GtkVButtonBox" id="vbuttonbox1">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <property name="spacing">6</property>
                         <property name="layout_style">start</property>
                         <child>
@@ -1001,6 +1004,7 @@ Filters</property>
                 </child>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="position">5</property>
               </packing>
             </child>
