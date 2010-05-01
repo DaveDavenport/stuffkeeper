@@ -151,6 +151,9 @@ private class GenericInputDialog:GLib.Object
             v.pack_start(file_entry, false, true, 0);
             var check_button = new Gtk.Button.from_stock(Gtk.STOCK_APPLY);
             v.pack_start(check_button, false, true, 0);
+            /**
+             * Read the file content and feed it to the parser 
+             */
             check_button.clicked.connect((source) => {
                 string a = file_entry.get_text();
                 if(a.length > 0) {
@@ -318,19 +321,6 @@ public class GenericInput : Stuffkeeper.Plugin {
 
 	public override void run_menu(Stuffkeeper.DataBackend skdb_e)
 	{
-        /* Testing code */
-        try{
-            Parser p = new Parser("aap::noot\\nnew line\nnoot::mies\nmies::aap");
-
-            List<unowned string> items = p.get_fields();
-            foreach (string a in items) 
-            {
-                stdout.printf("key: %s value: %s\n", a, p.get_value(a));
-            }
-        }catch (Error e) {
-            stdout.printf("Failed to parse file: %s\n", e.message);
-        }
-
         /* Quick hack to make sure it does not get destroyed to early */
         var a = new GenericInputDialog(skdb_e);
 
