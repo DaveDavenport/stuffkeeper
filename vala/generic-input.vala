@@ -16,6 +16,7 @@ errordomain ParserDataError {
  *   * <field> is unique,
  *   * <data> is simple string where newline is escaped. \n
  *   * All input data is valid utf-8!
+ *   * Boolean data are (for true):  YES, yes, 1, true, TRUE
  */
 private class Parser {
     /* The key pair combination */
@@ -44,12 +45,16 @@ private class Parser {
         /* Parse each line */
         foreach(string line in lines)
         {
+            /* Skip empty lines */
+            if(line.length == 0) continue;
             /* Split the line on the separator */
             string[] entries = line.split(Separator, 2);
             /* If the line does not consist of 2 entries, we bail out and throw an error. */
             if(entries.length != 2) {
+                GLib.warning("The splitted line: '%s' has only one entry", line);
                 throw new ParserDataError.INVALID_STRUCTURE("Input data has invalid structure");              
             }
+            GLib.debug("parsed line: %s -> %s '%s'", line, entries[0], entries[1]);
             /* Insert into hash key */
             if(!values.lookup_extended(entries[0], null, null)){
                 values.insert(entries[0], entries[1]);
@@ -84,8 +89,12 @@ private class GenericInputDialog:GLib.Object
 	private DataBackend skdb  = null;
     private DataSchema schema = null;
     private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf)); 
+    private Parser p = null;
+
     public GenericInputDialog(DataBackend skdb_e)
     {
+        List<unowned Gtk.ComboBox> matching = null;
+        Gtk.VBox import_page = null;
         this.skdb = skdb_e;
         Gtk.ComboBox schema_selection = null;
         /* Setup schemas */
@@ -135,29 +144,147 @@ private class GenericInputDialog:GLib.Object
 
         /* Input page */
         {
+            /* Entry box and Check button */
+            var file_entry = new Gtk.Entry();
+            var v = new Gtk.VBox(false, 6);
 
-            var v = new Gtk.VBox(false, 0);
+            v.pack_start(file_entry, false, true, 0);
+            var check_button = new Gtk.Button.from_stock(Gtk.STOCK_APPLY);
+            v.pack_start(check_button, false, true, 0);
+            check_button.clicked.connect((source) => {
+                string a = file_entry.get_text();
+                if(a.length > 0) {
+                    try {
+                        string contents;
+                        size_t size;
+                        GLib.FileUtils.get_contents(a, out contents, out size);
+                        stdout.printf("%s\n", contents); 
+                        try{
+                        p = new Parser(contents);
+                        }catch (Error e) {
+                            GLib.warning("Failed to create parser: %s\n", e.message);
+                            p = null;
+                        }
+                    }catch(Error e) {
+                        GLib.warning("Failed to open file: %s", e.message);
+                        p = null;
+                    }
+                }else{
+                    p = null;
+                }
+                if(p != null){
+                    ass.set_page_complete(v, true);
+                }else{
+                    ass.set_page_complete(v, false);
+                }
+            });
 
-            v.show();
+            v.show_all();
             ass.append_page(v);
             ass.set_page_title(v, "Select input");
-            ass.set_page_complete(v, true);
+            ass.set_page_complete(v, false);
         }
 
         /* Import page */
         {
-            var v = new Gtk.VBox(false, 0);
+            import_page = new Gtk.VBox(false, 0);
 
 
-            v.show();
-            ass.append_page(v);
-            ass.set_page_title(v, "Import");
+            import_page.show();
+            ass.append_page(import_page);
+            ass.set_page_title(import_page, "Import");
+            ass.set_page_complete(import_page, false);
+            ass.set_page_type(import_page, Gtk.AssistantPageType.CONFIRM);
         }
+        ass.prepare.connect((source, page) => {
+            /* Clear previous matching tables */
+            matching = null;
+
+            if(page == import_page) {
+                /* Allow the user to finish te page */
+                ass.set_page_complete(import_page, true);
+
+                GLib.debug("hitting the import page\n");
+                /* Create model with entries from parser */
+                var model = new Gtk.ListStore(1, typeof(string));
+                foreach(string a in p.get_fields()) {
+                    TreeIter iter;
+                    model.insert_with_values(out iter, 0, 0, a);
+                }
+
+                /* we want to create the page here: */
+                var sg = new Gtk.SizeGroup(Gtk.SizeGroupMode.HORIZONTAL);
+                string[] fields = schema.get_fields();
+                foreach(string field in fields)
+                {
+                    var type = schema.get_field_type(field);
+                    if(type != FieldType.STRING && type != FieldType.INTEGER && type != FieldType.BOOLEAN 
+                        && type != FieldType.RATING && type != FieldType.TEXT && type != FieldType.LINK) continue;
+                    var hb = new Gtk.HBox(false, 6);
+                    var label = new DataLabel.schema_field(schema, field);
+                    hb.pack_start(label, false, true, 0);
+                    sg.add_widget(label);
+
+                    /* Selection box */
+                    var combo = new Gtk.ComboBox.with_model(model);
+                    var renderer_t = new Gtk.CellRendererText();
+                    combo.pack_start(renderer_t, true);
+                    combo.add_attribute(renderer_t, "text", 0);
+                    hb.pack_start(combo, true, true, 0);
+
+                    import_page.pack_start(hb, false, true, 0);
+
+                    combo.set_data_full("field-id", (void *)field.dup(), g_free);
+                    matching.prepend(combo);
+                }
+
+                import_page.show_all();
+            }else{
+                GLib.debug("not the import page\n");
+                ass.set_page_complete(import_page, false);
+                foreach(Gtk.Widget child in import_page.get_children()) {
+                    child.destroy();
+                }
+
+            }
+        });
 
         ass.cancel.connect((source)=>{ ass.destroy();stdout.printf("cancel\n");destroy_requested(); });
         
-        ass.apply.connect((source)=>{ ass.destroy();stdout.printf("apply\n");destroy_requested(); });
-        ass.close.connect((source)=>{ ass.destroy();stdout.printf("close\n");destroy_requested(); });
+        ass.apply.connect((source)=>
+        {
+            stdout.printf("apply\n");
+            var item = skdb.new_item(schema);
+            foreach(Gtk.ComboBox combo in matching) 
+            {
+                    TreeIter iter;
+                    string field_id = combo.get_data("field-id");
+                    var type = schema.get_field_type(field_id);
+                    if(combo.get_active_iter(out iter))
+                    {
+                        string field = null;
+                        combo.get_model().get(iter, 0, out field);
+                        string value = p.get_value(field);
+                        if(type == FieldType.STRING || type == FieldType.INTEGER 
+                            || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
+                            item.set_string(field_id, value);
+                        }else if (type == FieldType.BOOLEAN) {
+                            if(value == "true" || value == "1" || value == "yes" || value == "TRUE" || value == "YES") {
+                                item.set_boolean(field_id, true);
+                            }else{
+                                item.set_boolean(field_id, false);
+                            }
+                        }
+                    }
+            }
+
+            destroy_requested(); 
+        });
+        ass.close.connect((source)=>
+        { 
+            ass.destroy();stdout.printf("close\n");destroy_requested(); 
+        }
+        );
 
         /* Run */
         ass.show_all();

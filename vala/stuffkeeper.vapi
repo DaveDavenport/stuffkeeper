@@ -34,23 +34,25 @@ namespace Stuffkeeper {
 		ICON,
 		NAME
 	}
-	[CCode (cprefix = "FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
+	[CCode (cname="FieldType", cprefix = "FIELD_TYPE_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum FieldType {
-		STRING,
-		INTEGER,
-		BOOLEAN,
-		RATING,
-		LIST,
-		TEXT,
-		IMAGE,
-		LINK,
-		DATE,
-		EXPANDER,
-		END_EXPANDER,
-		VPACKING,
-		END,
-		HPACKING,
-		NUM_FIELDS
+        STRING = 0,
+        INTEGER = 1,
+        BOOLEAN = 2,
+        RATING = 3,
+        LIST = 4,
+        TEXT = 5,
+        IMAGE = 6,
+        LINK = 7,
+        DATE = 8,
+        EXPANDER = 9,
+        END_EXPANDER = 10,
+        VPACKING = 11,
+        END= 12,
+        HPACKING = 13,
+        PASSWORD = 14,
+        FILES = 15,
+        NUM_FIELDS
 	}
 	[CCode (cprefix = "PLUGIN_", has_type_id = "0", cheader_filename = "stuffkeeper-plugin.h")]
 	public enum PluginType {
@@ -109,7 +111,7 @@ namespace Stuffkeeper {
 		public void load (string db_path);
 		public unowned Stuffkeeper.DataSchema load_from_xml (string path);
 		public DataBackend ();
-		public DataBackend.item (Stuffkeeper.DataBackend self, Stuffkeeper.DataSchema schema);
+		public unowned DataItem new_item (Stuffkeeper.DataSchema schema);
 		public DataBackend.schema (Stuffkeeper.DataBackend self);
 		public DataBackend.search (Stuffkeeper.DataBackend self);
 		public DataBackend.tag (Stuffkeeper.DataBackend self);
@@ -162,7 +164,7 @@ namespace Stuffkeeper {
 		public static unowned Stuffkeeper.DataItem open_from_id (GLib.Object skdb, int id, int schemaid);
 		public void remove_tag (Stuffkeeper.DataTag tag);
 		public void save_yourself ();
-		public void set_boolean (string field, int value);
+		public void set_boolean (string field, bool value);
 		public void set_integer (string id, int title);
 		public void set_list (string field, string[] value);
 		public void append_list (string field, string[] value);
@@ -224,7 +226,7 @@ namespace Stuffkeeper {
 		public unowned string get_field_name (string id);
 		public int get_field_pos (string id);
 		public Stuffkeeper.FieldType get_field_type (string id);
-		public unowned string get_fields (ulong size);
+		public string[] get_fields ();
 		public int get_id ();
 		public unowned GLib.List get_items ();
 		public unowned Gdk.Pixbuf get_pixbuf ();
@@ -380,6 +382,9 @@ namespace Stuffkeeper {
     public class DataLabel : Gtk.Label 
     {
         public DataLabel.tag (DataTag tag);
+        public DataLabel.schema(DataSchema schema);
+        public DataLabel.schema_field(DataSchema schema,string field);
+
 
     }
 
