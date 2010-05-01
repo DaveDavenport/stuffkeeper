@@ -84,30 +84,30 @@ namespace Stuffkeeper {
 		public int field_id;
 		public Stuffkeeper.SearchFieldType field_type;
 		public Stuffkeeper.SearchType type;
-		public weak string value;
+		public unowned string value;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataBackend : GLib.Object {
-		public weak Stuffkeeper.DataTag add_tag (int id);
+		public unowned Stuffkeeper.DataTag add_tag (int id);
 		public void begin_transaction ();
 		public void close_yourself ();
 		public void end_transaction ();
 		public void* get_handle ();
-		public weak Stuffkeeper.DataItem get_item (int id);
-		public weak GLib.List get_items ();
+		public unowned Stuffkeeper.DataItem get_item (int id);
+		public unowned GLib.List get_items ();
 		public bool get_locked ();
 		public uint get_num_items ();
 		public uint get_num_searches ();
-		public weak string get_path ();
-		public weak Stuffkeeper.DataSchema get_schema (int id);
-		public weak GLib.List get_schemas ();
-		public weak Stuffkeeper.DataItemSearch get_search (int id);
-		public weak GLib.List get_searches ();
-		public weak Stuffkeeper.DataTag get_tag (int id);
-		public GLib.List<weak DataTag> get_tags ();
+		public unowned string get_path ();
+		public unowned Stuffkeeper.DataSchema get_schema (int id);
+		public GLib.List<unowned DataSchema> get_schemas ();
+		public unowned Stuffkeeper.DataItemSearch get_search (int id);
+		public unowned GLib.List get_searches ();
+		public unowned Stuffkeeper.DataTag get_tag (int id);
+		public GLib.List<unowned DataTag> get_tags ();
 		public void load (string db_path);
-		public weak Stuffkeeper.DataSchema load_from_xml (string path);
+		public unowned Stuffkeeper.DataSchema load_from_xml (string path);
 		public DataBackend ();
 		public DataBackend.item (Stuffkeeper.DataBackend self, Stuffkeeper.DataSchema schema);
 		public DataBackend.schema (Stuffkeeper.DataBackend self);
@@ -126,40 +126,40 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataBackendClass {
-		public weak GLib.Callback search_changed;
-		public weak GLib.Callback search_added;
-		public weak GLib.Callback search_removed;
-		public weak GLib.Callback item_changed;
-		public weak GLib.Callback item_added;
-		public weak GLib.Callback item_removed;
-		public weak GLib.Callback schema_changed;
-		public weak GLib.Callback schema_added;
-		public weak GLib.Callback schema_removed;
-		public weak GLib.Callback tag_changed;
+		public unowned GLib.Callback search_changed;
+		public unowned GLib.Callback search_added;
+		public unowned GLib.Callback search_removed;
+		public unowned GLib.Callback item_changed;
+		public unowned GLib.Callback item_added;
+		public unowned GLib.Callback item_removed;
+		public unowned GLib.Callback schema_changed;
+		public unowned GLib.Callback schema_added;
+		public unowned GLib.Callback schema_removed;
+		public unowned GLib.Callback tag_changed;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItem : GLib.Object{
 		public void add_tag (Stuffkeeper.DataTag tag);
 		public void delete_yourself ();
-		public weak Stuffkeeper.DataBackend get_backend ();
+		public unowned Stuffkeeper.DataBackend get_backend ();
 		public int get_boolean (string field);
 		public int get_creation_time ();
 		public int get_id ();
 		public int get_integer (string field);
 		public bool get_integer_real (string field, int @out);
-		public weak string[] get_list (string field);
+		public unowned string[] get_list (string field);
 		public int get_modification_time ();
-		public weak Stuffkeeper.DataSchema get_schema ();
-		public weak string get_string (string field);
-		public weak GLib.List get_tags ();
+		public unowned Stuffkeeper.DataSchema get_schema ();
+		public unowned string get_string (string field);
+		public unowned GLib.List get_tags ();
 		public string get_title ();
 		public int has_generated_title ();
 		public bool has_tag (Stuffkeeper.DataTag tag);
 		public bool has_value (string value);
 		public bool has_value_exact (string value);
 		public DataItem (GLib.Object skdb, Stuffkeeper.DataSchema schema);
-		public static weak Stuffkeeper.DataItem open_from_id (GLib.Object skdb, int id, int schemaid);
+		public static unowned Stuffkeeper.DataItem open_from_id (GLib.Object skdb, int id, int schemaid);
 		public void remove_tag (Stuffkeeper.DataTag tag);
 		public void save_yourself ();
 		public void set_boolean (string field, int value);
@@ -179,8 +179,8 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItemClass {
-		public weak GLib.Callback item_changed;
-		public weak GLib.Callback item_tags_changed;
+		public unowned GLib.Callback item_changed;
+		public unowned GLib.Callback item_tags_changed;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
@@ -191,13 +191,13 @@ namespace Stuffkeeper {
 		public void edit_search_gui ();
 		public static void free_search_field (Stuffkeeper.SearchField field);
 		public int get_id ();
-		public weak GLib.List get_search_fields ();
-		public weak string get_title ();
+		public unowned GLib.List get_search_fields ();
+		public unowned string get_title ();
 		public int match (Stuffkeeper.DataItem item);
 		public DataItemSearch (GLib.Object skdb);
 		public DataItemSearch.dummy ();
 		public DataItemSearch.search_field (Stuffkeeper.DataItemSearch self, Stuffkeeper.SearchType searchtype, Stuffkeeper.SearchFieldType fieldtype, string value);
-		public static weak GLib.Object open_from_id (GLib.Object skdb, int id);
+		public static unowned GLib.Object open_from_id (GLib.Object skdb, int id);
 		public void remove_field (Gtk.Widget button);
 		public void remove_search_field (Stuffkeeper.SearchField field);
 		public void search_changed (Stuffkeeper.SearchField field);
@@ -209,7 +209,7 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataItemSearchClass {
-		public weak GLib.Callback search_changed;
+		public unowned GLib.Callback search_changed;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
@@ -217,24 +217,24 @@ namespace Stuffkeeper {
 		public void add_field (Stuffkeeper.FieldType field, string name, int in_title);
 		public void add_item (GLib.Object item);
 		public void delete_yourself ();
-		public void field_reorder (out weak string fields);
+		public void field_reorder (out unowned string fields);
 		public void field_schemas_set_field_string (int fieldtype, string id, string title);
-		public weak GLib.Object get_backend ();
+		public unowned GLib.Object get_backend ();
 		public int get_field_in_title (string id);
-		public weak string get_field_name (string id);
+		public unowned string get_field_name (string id);
 		public int get_field_pos (string id);
 		public Stuffkeeper.FieldType get_field_type (string id);
-		public weak string get_fields (ulong size);
+		public unowned string get_fields (ulong size);
 		public int get_id ();
-		public weak GLib.List get_items ();
-		public weak Gdk.Pixbuf get_pixbuf ();
-		public weak string get_title ();
+		public unowned GLib.List get_items ();
+		public unowned Gdk.Pixbuf get_pixbuf ();
+		public unowned string get_title ();
 		public int has_generated_title ();
-		public static weak Stuffkeeper.DataSchema load_from_xml (GLib.Object skdb, string path);
+		public static unowned Stuffkeeper.DataSchema load_from_xml (GLib.Object skdb, string path);
 		public DataSchema (GLib.Object skdb);
 		public DataSchema.with_id (GLib.Object skdb, int id);
 		public int num_items ();
-		public static weak Stuffkeeper.DataSchema open_from_id (GLib.Object skdb, int id);
+		public static unowned Stuffkeeper.DataSchema open_from_id (GLib.Object skdb, int id);
 		public void remove_field (string id);
 		public void remove_item (GLib.Object item);
 		public bool save_to_xml (string path);
@@ -262,11 +262,11 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataSchemaClass {
-		public weak GLib.Callback schema_changed;
-		public weak GLib.Callback schema_field_changed;
-		public weak GLib.Callback schema_field_added;
-		public weak GLib.Callback schema_fields_reordered;
-		public weak GLib.Callback schema_field_removed;
+		public unowned GLib.Callback schema_changed;
+		public unowned GLib.Callback schema_field_changed;
+		public unowned GLib.Callback schema_field_added;
+		public unowned GLib.Callback schema_fields_reordered;
+		public unowned GLib.Callback schema_field_removed;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
@@ -274,18 +274,18 @@ namespace Stuffkeeper {
 		public void add_item (GLib.Object item);
 		public void delete_yourself ();
 		public int get_id ();
-		public weak string get_title ();
+		public unowned string get_title ();
 		public DataTag (GLib.Object skdb);
 		public DataTag.with_id (GLib.Object skdb, int id);
 		public int num_items ();
-		public static weak Stuffkeeper.DataTag open_from_id (GLib.Object skdb, int id);
+		public static unowned Stuffkeeper.DataTag open_from_id (GLib.Object skdb, int id);
 		public void remove_item (GLib.Object item);
 		public void set_title (string title);
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class DataTagClass {
-		public weak GLib.Callback tag_changed;
+		public unowned GLib.Callback tag_changed;
 	}
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
@@ -349,8 +349,8 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class Plugin : GLib.Object {
-		public virtual weak Gdk.Pixbuf get_icon ();
-		public virtual weak string get_name ();
+		public virtual unowned Gdk.Pixbuf get_icon ();
+		public virtual unowned string get_name ();
 		public virtual Stuffkeeper.PluginType get_plugin_type ();
 		public virtual void run_background (Stuffkeeper.DataBackend skdb);
 		public virtual void run_item (Stuffkeeper.DataItem item);
@@ -359,12 +359,12 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class PluginClass {
-		public weak GLib.Callback get_plugin_type;
-		public weak GLib.Callback get_name;
-		public weak GLib.Callback run_item;
-		public weak GLib.Callback run_menu;
-		public weak GLib.Callback run_background;
-		public weak GLib.Callback get_icon;
+		public unowned GLib.Callback get_plugin_type;
+		public unowned GLib.Callback get_name;
+		public unowned GLib.Callback run_item;
+		public unowned GLib.Callback run_menu;
+		public unowned GLib.Callback run_background;
+		public unowned GLib.Callback get_icon;
 	}
 	[CCode (cname = "register_plugin", cheader_filename = "stuffkeeper-plugin.h")]
 	public static GLib.Type register_plugin ();
