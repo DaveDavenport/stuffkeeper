@@ -1,3 +1,9 @@
+/*
+TODO:
+* Somehow not all ref's to DataBackend are not released.
+* Remember (or auto) match field with entry.
+
+*/
 using GLib;
 using Gtk;
 using Stuffkeeper;
