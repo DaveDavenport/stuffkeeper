@@ -8,7 +8,7 @@ using GLib;
 using Gtk;
 using Stuffkeeper;
 
-errordomain ParserDataError {
+errordomain ItemParserDataError {
     NO_UTF8,
     INVALID_STRUCTURE,
     DUPLICATE_ENTRIES
@@ -24,7 +24,7 @@ errordomain ParserDataError {
  *   * All input data is valid utf-8!
  *   * Boolean data are (for true):  YES, yes, 1, true, TRUE
  */
-private class Parser {
+private class ItemParser {
     /* The key pair combination */
     private GLib.HashTable<string, string> values = new HashTable<string, string>.full(str_hash, str_equal, g_free, g_free);
 
@@ -34,13 +34,13 @@ private class Parser {
 
 
     /* Take the input string and parse it. */
-    public Parser(string data) throws ParserDataError
+    public ItemParser(string data) throws ItemParserDataError
     {
         /* Validate if the input data is utf8 */
         if(!data.validate())
         {
             /* Make this an GError, with trowing errors and so */
-            throw new ParserDataError.NO_UTF8("Input data is not valid utf8");              
+            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");              
         }
 
 
@@ -58,14 +58,14 @@ private class Parser {
             /* If the line does not consist of 2 entries, we bail out and throw an error. */
             if(entries.length != 2) {
                 GLib.warning("The splitted line: '%s' has only one entry", line);
-                throw new ParserDataError.INVALID_STRUCTURE("Input data has invalid structure");              
+                throw new ItemParserDataError.INVALID_STRUCTURE("Input data has invalid structure");              
             }
             GLib.debug("parsed line: %s -> %s '%s'", line, entries[0], entries[1]);
             /* Insert into hash key */
             if(!values.lookup_extended(entries[0], null, null)){
                 values.insert(entries[0], entries[1]);
             }else{
-                throw new ParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");        
+                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");        
             }
         }
     }
@@ -95,7 +95,7 @@ private class GenericInputDialog:GLib.Object
 	private DataBackend skdb  = null;
     private DataSchema schema = null;
     private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf)); 
-    private Parser p = null;
+    private ItemParser p = null;
 
     public GenericInputDialog(DataBackend skdb_e)
     {
@@ -169,7 +169,7 @@ private class GenericInputDialog:GLib.Object
                         GLib.FileUtils.get_contents(a, out contents, out size);
                         stdout.printf("%s\n", contents); 
                         try{
-                        p = new Parser(contents);
+                        p = new ItemParser(contents);
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
                             p = null;

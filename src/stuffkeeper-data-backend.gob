@@ -352,6 +352,44 @@ class Stuffkeeper:Data:Backend from G:Object
         {
             g_error("Failed to open the db: %s because of '%s'", path, sqlite3_errmsg(self->_priv->sqlHandle));
         }
+
+        /* Set up the db */
+        /**
+         * Do integrety check, if failed, bail out
+         */
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, "PRAGMA integrety_check;", -1,  &stmt,  &tail);
+        if (r != SQLITE_OK)
+        {
+            g_error("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        else
+        {
+            r = sqlite3_step(stmt);
+            while(r == SQLITE_ROW || r == SQLITE_BUSY)
+            {
+                if(r == SQLITE_ROW) {
+                    const gchar *value = (const gchar *)sqlite3_column_text(stmt, 0);
+                    if(strcmp(value, "ok") != 0){
+                        g_error("%s: Sqlite database integrety check failed: %s\n",
+                                __FUNCTION__,
+                                value);
+                    }
+                }
+            }
+        }
+        sqlite3_finalize(stmt);
+        g_debug("Database integrety_check: ok");
+        /* Set sync */
+
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, "PRAGMA synchronous = 0;", -1,  &stmt,  &tail);
+        do{
+            r = sqlite3_step(stmt);
+        }while(r == SQLITE_BUSY);
+        if(r != SQLITE_DONE) {
+            g_error("%s: sqlite3_step() failed: %s",__FUNCTION__,
+				sqlite3_errmsg(self->_priv->sqlHandle));
+        }
+        g_debug("Database synchronious transactions: ok");
         /* Check the db */
         self_check_sqlite_db(self);
         g_free(path);
@@ -364,7 +402,15 @@ class Stuffkeeper:Data:Backend from G:Object
         }
         g_free(path);
 
+
+
+
+
         TOC("time elapsed open & check db");
+
+
+
+
         /**
          * Read Schemas 
          */
