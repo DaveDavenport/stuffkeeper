@@ -89,19 +89,18 @@ private class ItemParser {
  * 2. Input (script/file)
  * 3. Import (where the user selects what data to be added in what field)
  */
-private class GenericInputDialog:GLib.Object
+private class GenericInputDialog:Gtk.Assistant
 {
-    private Gtk.Assistant ass = new Gtk.Assistant();
-	private DataBackend skdb  = null;
     private DataSchema schema = null;
     private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf)); 
     private ItemParser p = null;
+    private List<unowned Gtk.ComboBox> matching = null;
+    private DataBackend skdb = null;
+    private Gtk.VBox import_page = null;
 
-    public GenericInputDialog(DataBackend skdb_e)
+    public void setup(DataBackend skdb_e)
     {
-        List<unowned Gtk.ComboBox> matching = null;
-        Gtk.VBox import_page = null;
-        this.skdb = skdb_e;
+        skdb = skdb_e;
         Gtk.ComboBox schema_selection = null;
         /* Setup schemas */
         List<unowned DataSchema> ss = skdb.get_schemas();
@@ -135,16 +134,16 @@ private class GenericInputDialog:GLib.Object
                 TreeIter iter;
                 if(source.get_active_iter(out iter)){
                     schemas.get(iter, 0, out schema); 
-                    ass.set_page_complete(vbox_select_type, true);
+                    this.set_page_complete(vbox_select_type, true);
                 } else {
                     schema = null;
-                    ass.set_page_complete(vbox_select_type, false);
+                    this.set_page_complete(vbox_select_type, false);
                 }
             });
 
-            ass.append_page(vbox_select_type);
-            ass.set_page_title(vbox_select_type, "Select type");
-            ass.set_page_complete(vbox_select_type, false);
+            this.append_page(vbox_select_type);
+            this.set_page_title(vbox_select_type, "Select type");
+            this.set_page_complete(vbox_select_type, false);
             vbox_select_type.show_all();
         }
 
@@ -182,16 +181,16 @@ private class GenericInputDialog:GLib.Object
                     p = null;
                 }
                 if(p != null){
-                    ass.set_page_complete(v, true);
+                    this.set_page_complete(v, true);
                 }else{
-                    ass.set_page_complete(v, false);
+                    this.set_page_complete(v, false);
                 }
             });
 
             v.show_all();
-            ass.append_page(v);
-            ass.set_page_title(v, "Select input");
-            ass.set_page_complete(v, false);
+            this.append_page(v);
+            this.set_page_title(v, "Select input");
+            this.set_page_complete(v, false);
         }
 
         /* Import page */
@@ -200,110 +199,141 @@ private class GenericInputDialog:GLib.Object
 
 
             import_page.show();
-            ass.append_page(import_page);
-            ass.set_page_title(import_page, "Import");
-            ass.set_page_complete(import_page, false);
-            ass.set_page_type(import_page, Gtk.AssistantPageType.CONFIRM);
+            this.append_page(import_page);
+            this.set_page_title(import_page, "Import");
+            this.set_page_complete(import_page, false);
+            this.set_page_type(import_page, Gtk.AssistantPageType.CONFIRM);
         }
-        ass.prepare.connect((source, page) => {
-            /* Clear previous matching tables */
-            matching = null;
-
-            if(page == import_page) {
-                /* Allow the user to finish te page */
-                ass.set_page_complete(import_page, true);
-
-                GLib.debug("hitting the import page\n");
-                /* Create model with entries from parser */
-                var model = new Gtk.ListStore(1, typeof(string));
-                foreach(string a in p.get_fields()) {
-                    TreeIter iter;
-                    model.insert_with_values(out iter, 0, 0, a);
-                }
-
-                /* we want to create the page here: */
-                var sg = new Gtk.SizeGroup(Gtk.SizeGroupMode.HORIZONTAL);
-                string[] fields = schema.get_fields();
-                foreach(string field in fields)
-                {
-                    var type = schema.get_field_type(field);
-                    if(type != FieldType.STRING && type != FieldType.INTEGER && type != FieldType.BOOLEAN 
-                        && type != FieldType.RATING && type != FieldType.TEXT && type != FieldType.LINK) continue;
-                    var hb = new Gtk.HBox(false, 6);
-                    var label = new DataLabel.schema_field(schema, field);
-                    hb.pack_start(label, false, true, 0);
-                    sg.add_widget(label);
-
-                    /* Selection box */
-                    var combo = new Gtk.ComboBox.with_model(model);
-                    var renderer_t = new Gtk.CellRendererText();
-                    combo.pack_start(renderer_t, true);
-                    combo.add_attribute(renderer_t, "text", 0);
-                    hb.pack_start(combo, true, true, 0);
-
-                    import_page.pack_start(hb, false, true, 0);
-
-                    combo.set_data_full("field-id", (void *)field.dup(), g_free);
-                    matching.prepend(combo);
-                }
-
-                import_page.show_all();
-            }else{
-                GLib.debug("not the import page\n");
-                ass.set_page_complete(import_page, false);
-                foreach(Gtk.Widget child in import_page.get_children()) {
-                    child.destroy();
-                }
-
-            }
-        });
-
-        ass.cancel.connect((source)=>{ ass.destroy();stdout.printf("cancel\n");destroy_requested(); });
-        
-        ass.apply.connect((source)=>
-        {
-            stdout.printf("apply\n");
-            var item = skdb.new_item(schema);
-            foreach(Gtk.ComboBox combo in matching) 
-            {
-                    TreeIter iter;
-                    string field_id = combo.get_data("field-id");
-                    var type = schema.get_field_type(field_id);
-                    if(combo.get_active_iter(out iter))
-                    {
-                        string field = null;
-                        combo.get_model().get(iter, 0, out field);
-                        string value = p.get_value(field);
-                        if(type == FieldType.STRING || type == FieldType.INTEGER 
-                            || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
-                            item.set_string(field_id, value);
-                        }else if (type == FieldType.BOOLEAN) {
-                            if(value == "true" || value == "1" || value == "yes" || value == "TRUE" || value == "YES") {
-                                item.set_boolean(field_id, true);
-                            }else{
-                                item.set_boolean(field_id, false);
-                            }
-                        }
-                    }
-            }
-
-            destroy_requested(); 
-        });
-        ass.close.connect((source)=>
-        { 
-            ass.destroy();stdout.printf("close\n");destroy_requested(); 
-        }
-        );
 
         /* Run */
-        ass.show_all();
+        this.show_all();
 
+    }
+
+    override void prepare (Gtk.Widget page) 
+    {
+        /* Clear previous matching tables */
+        matching = null;
+
+        if(page == import_page) {
+            /* Allow the user to finish te page */
+            this.set_page_complete(import_page, true);
+
+            GLib.debug("hitting the import page\n");
+            /* Create model with entries from parser */
+            var model = new Gtk.ListStore(2, typeof(string), typeof(int));
+            foreach(string a in p.get_fields()) {
+                TreeIter iter;
+                model.insert_with_values(out iter, 0, 0, a, 1,1);
+            }
+            TreeIter iter;
+            model.insert_with_values(out iter, 0, 0, "n/a", 1,  0);
+
+            /* we want to create the page here: */
+            var sg = new Gtk.SizeGroup(Gtk.SizeGroupMode.HORIZONTAL);
+            string[] fields = schema.get_fields();
+            foreach(string field in fields)
+            {
+                var type = schema.get_field_type(field);
+                if(type != FieldType.STRING && type != FieldType.INTEGER && type != FieldType.BOOLEAN 
+                        && type != FieldType.RATING && type != FieldType.TEXT && type != FieldType.LINK) continue;
+                var hb = new Gtk.HBox(false, 6);
+                var label = new DataLabel.schema_field(schema, field);
+                hb.pack_start(label, false, true, 0);
+                sg.add_widget(label);
+
+                /* Selection box */
+                var combo = new Gtk.ComboBox.with_model(model);
+                var renderer_t = new Gtk.CellRendererText();
+                combo.pack_start(renderer_t, true);
+                combo.add_attribute(renderer_t, "text", 0);
+                hb.pack_start(combo, true, true, 0);
+
+                import_page.pack_start(hb, false, true, 0);
+                combo.set_active_iter(iter);
+                TreeIter piter;
+                if(model.get_iter_first(out piter)) {
+                    do{
+                        string a;
+                        int skip=0;
+                        model.get(piter, 0, out a, 1, out skip);
+                        if (skip == 1 &&  a.down().collate(schema.get_field_name(field).down()) == 0) {
+                            combo.set_active_iter(piter);
+                        }
+                    }while(model.iter_next(ref piter));
+                }
+                combo.set_data_full("field-id", (void *)field.dup(), g_free);
+                matching.prepend(combo);
+            }
+
+
+            import_page.show_all();
+        }else{
+            GLib.debug("not the import page\n");
+            this.set_page_complete(import_page, false);
+            foreach(Gtk.Widget child in import_page.get_children()) {
+                child.destroy();
+            }
+
+        }
+
+    }
+    override void close()
+    {
+        stdout.printf("close\n");
+        destroy_requested(); 
+        /* Hack to break the ref cycle */
+        this.get_nth_page(2).destroy();
+        this.get_nth_page(1).destroy();
+        this.get_nth_page(0).destroy();
+        this.destroy();
+    }
+
+    override void cancel()
+    {
+        stdout.printf("cancel\n");
+        destroy_requested(); 
+        /* Hack to break the ref cycle */
+        this.get_nth_page(2).destroy();
+        this.get_nth_page(1).destroy();
+        this.get_nth_page(0).destroy();
+        this.destroy();
+    }
+    override void apply()
+    {
+        debug("Apply()");
+        var item = skdb.new_item(schema);
+        foreach(Gtk.ComboBox combo in matching) 
+        {
+            TreeIter iter;
+            string field_id = combo.get_data("field-id");
+            var type = schema.get_field_type(field_id);
+            if(combo.get_active_iter(out iter))
+            {
+                string field = null;
+                int skip = 0;
+                combo.get_model().get(iter, 0, out field, 1,out skip);
+                /* Skip if it is N/A */
+                if(skip == 0) continue;
+
+                string value = p.get_value(field);
+                if(type == FieldType.STRING || type == FieldType.INTEGER 
+                        || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
+                    item.set_string(field_id, value);
+                }else if (type == FieldType.BOOLEAN) {
+                    if(value == "true" || value == "1" || value == "yes" || value == "TRUE" || value == "YES") {
+                        item.set_boolean(field_id, true);
+                    }else{
+                        item.set_boolean(field_id, false);
+                    }
+                }
+            }
+        }
     }
 
     ~GenericInputDialog()
     {
-        stdout.printf("Destroy\n");
-        ass = null;
+        stdout.printf("Destroy object callback\n");
     }
 
     public signal void destroy_requested();
@@ -325,21 +355,26 @@ public class GenericInput : Stuffkeeper.Plugin {
 		return "Generic Input";
 	}
 
+    private void d_r(GenericInputDialog a)
+    {
+            stdout.printf("Destroy\n");
+            a.destroy_requested.disconnect(d_r);
+            a.destroy();
+            a = null;
+    }
 	public override void run_menu(Stuffkeeper.DataBackend skdb_e)
 	{
         /* Quick hack to make sure it does not get destroyed to early */
-        var a = new GenericInputDialog(skdb_e);
+        var a = new GenericInputDialog();
+        a.setup(skdb_e);
 
-        a.destroy_requested.connect((source) => {
-            stdout.printf("Destroy\n");
-            a = null;
-        });
-
+      //  a.destroy_requested.connect(d_r);
 	}
 
 	/* Destruction */
 	~Test ()
 	{
+        debug("Generic Input destroy");
 	}
 
 }

@@ -303,7 +303,9 @@ int main ( int argc, char **argv )
     /* save locked state */
     g_key_file_set_boolean(config_file, "BACKEND", "locked", stuffkeeper_data_backend_get_locked(skdb));
     /* cleanup  */
+    printf("References to skdb remaining: %u\n", G_OBJECT(skdb)->ref_count);
     g_object_unref(skdb);
+
 
     /* clean spm */
     g_object_unref(spm);
