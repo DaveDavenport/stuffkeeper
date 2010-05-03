@@ -49,12 +49,14 @@ private class Parser
     {
         /* Split data into lines */
         string[] entries = data.split(ItemSeparator,-1);
+	debug("entries: %i", entries.length);
         foreach(string entry in entries)
         {
             try {
+		debug("New item :%s", entry);
                 /* Create new item */
-                var p = new ItemParser(entry);
-                items.prepend(p);
+                var pi = new ItemParser(entry);
+                items.prepend(pi);
             }catch (ItemParserDataError e) {
                 /* Fallthrough error */
                 throw e;
@@ -138,7 +140,7 @@ private class ItemParser {
             if(!values.lookup_extended(entries[0], null, null)){
                 values.insert(entries[0], entries[1]);
             }else{
-                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");
+                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries: %s", line);
             }
         }
     }
@@ -413,7 +415,7 @@ private class GenericInputDialog:Gtk.Assistant
             foreach(Gtk.ComboBox combo in matching)
             {
                 TreeIter iter;
-                string field_id = (string)combo.get_data("field-id");
+                string field_id = (string)combo.get_data<string>("field-id");
                 var type = schema.get_field_type(field_id);
                 if(combo.get_active_iter(out iter))
                 {
