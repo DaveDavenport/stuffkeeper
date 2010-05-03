@@ -15,10 +15,10 @@ errordomain ItemParserDataError {
 }
 /**
  * Data format:
- * * Contains data for 1 item. 
+ * * Contains data for 1 item.
  * * There is one entry per line (matching a entry in the type)
- * * The line is  <field>::<data> 
- *   * <field> is simple alfanumeric. 
+ * * The line is  <field>::<data>
+ *   * <field> is simple alfanumeric.
  *   * <field> is unique,
  *   * <data> is simple string where newline is escaped. \n
  *   * All input data is valid utf-8!
@@ -40,7 +40,7 @@ private class ItemParser {
         if(!data.validate())
         {
             /* Make this an GError, with trowing errors and so */
-            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");              
+            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");             
         }
 
 
@@ -58,14 +58,14 @@ private class ItemParser {
             /* If the line does not consist of 2 entries, we bail out and throw an error. */
             if(entries.length != 2) {
                 GLib.warning("The splitted line: '%s' has only one entry", line);
-                throw new ItemParserDataError.INVALID_STRUCTURE("Input data has invalid structure");              
+                throw new ItemParserDataError.INVALID_STRUCTURE("Input data has invalid structure");             
             }
             GLib.debug("parsed line: %s -> %s '%s'", line, entries[0], entries[1]);
             /* Insert into hash key */
             if(!values.lookup_extended(entries[0], null, null)){
                 values.insert(entries[0], entries[1]);
             }else{
-                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");        
+                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");       
             }
         }
     }
@@ -92,7 +92,7 @@ private class ItemParser {
 private class GenericInputDialog:Gtk.Assistant
 {
     private DataSchema schema = null;
-    private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf)); 
+    private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf));
     private ItemParser p = null;
     private List<unowned Gtk.ComboBox> matching = null;
     private DataBackend skdb = null;
@@ -128,12 +128,12 @@ private class GenericInputDialog:Gtk.Assistant
             var renderer2 = new Gtk.CellRendererText();
             schema_selection.pack_start(renderer2, true);
             schema_selection.add_attribute(renderer2, "text", 1);
-            
+           
             /* If user selected a type, unlock the next page */
             schema_selection.changed.connect((source) => {
                 TreeIter iter;
                 if(source.get_active_iter(out iter)){
-                    schemas.get(iter, 0, out schema); 
+                    schemas.get(iter, 0, out schema);
                     this.set_page_complete(vbox_select_type, true);
                 } else {
                     schema = null;
@@ -157,7 +157,7 @@ private class GenericInputDialog:Gtk.Assistant
             var check_button = new Gtk.Button.from_stock(Gtk.STOCK_APPLY);
             v.pack_start(check_button, false, true, 0);
             /**
-             * Read the file content and feed it to the parser 
+             * Read the file content and feed it to the parser
              */
             check_button.clicked.connect((source) => {
                 string a = file_entry.get_text();
@@ -166,7 +166,7 @@ private class GenericInputDialog:Gtk.Assistant
                         string contents;
                         size_t size;
                         GLib.FileUtils.get_contents(a, out contents, out size);
-                        stdout.printf("%s\n", contents); 
+                        stdout.printf("%s\n", contents);
                         try{
                         p = new ItemParser(contents);
                         }catch (Error e) {
@@ -210,7 +210,7 @@ private class GenericInputDialog:Gtk.Assistant
 
     }
 
-    override void prepare (Gtk.Widget page) 
+    override void prepare (Gtk.Widget page)
     {
         /* Clear previous matching tables */
         matching = null;
@@ -235,7 +235,7 @@ private class GenericInputDialog:Gtk.Assistant
             foreach(string field in fields)
             {
                 var type = schema.get_field_type(field);
-                if(type != FieldType.STRING && type != FieldType.INTEGER && type != FieldType.BOOLEAN 
+                if(type != FieldType.STRING && type != FieldType.INTEGER && type != FieldType.BOOLEAN
                         && type != FieldType.RATING && type != FieldType.TEXT && type != FieldType.LINK) continue;
                 var hb = new Gtk.HBox(false, 6);
                 var label = new DataLabel.schema_field(schema, field);
@@ -281,7 +281,7 @@ private class GenericInputDialog:Gtk.Assistant
     override void close()
     {
         stdout.printf("close\n");
-        destroy_requested(); 
+        destroy_requested();
         /* Hack to break the ref cycle */
         this.get_nth_page(2).destroy();
         this.get_nth_page(1).destroy();
@@ -292,7 +292,7 @@ private class GenericInputDialog:Gtk.Assistant
     override void cancel()
     {
         stdout.printf("cancel\n");
-        destroy_requested(); 
+        destroy_requested();
         /* Hack to break the ref cycle */
         this.get_nth_page(2).destroy();
         this.get_nth_page(1).destroy();
@@ -303,10 +303,10 @@ private class GenericInputDialog:Gtk.Assistant
     {
         debug("Apply()");
         var item = skdb.new_item(schema);
-        foreach(Gtk.ComboBox combo in matching) 
+        foreach(Gtk.ComboBox combo in matching)
         {
             TreeIter iter;
-            string field_id = combo.get_data("field-id");
+            string field_id = (string)combo.get_data("field-id");
             var type = schema.get_field_type(field_id);
             if(combo.get_active_iter(out iter))
             {
@@ -317,7 +317,7 @@ private class GenericInputDialog:Gtk.Assistant
                 if(skip == 0) continue;
 
                 string value = p.get_value(field);
-                if(type == FieldType.STRING || type == FieldType.INTEGER 
+                if(type == FieldType.STRING || type == FieldType.INTEGER
                         || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
                     item.set_string(field_id, value);
                 }else if (type == FieldType.BOOLEAN) {
