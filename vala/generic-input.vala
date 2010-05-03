@@ -140,7 +140,12 @@ private class ItemParser {
             if(!values.lookup_extended(entries[0], null, null)){
                 values.insert(entries[0], entries[1]);
             }else{
-                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries: %s", line);
+                string a = values.lookup(entries[0]);
+                string b = a+";"+entries[1]; 
+                values.remove(entries[0]);
+                values.insert(entries[0], b);
+
+      /*          throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries: %s", line);*/
             }
         }
     }
@@ -243,14 +248,12 @@ private class GenericInputDialog:Gtk.Assistant
                         p = new Parser(contents);
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
-                            /* TODO: Show an error dialog here */
                             var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to create parser: %s", e.message);
                             md.run(); md.destroy();
                             p = null;
                         }
                     }catch(Error e) {
                         GLib.warning("Failed to execute file: %s", e.message);
-                        /* TODO: Show an error dialog here */
                             var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to execute script: %s", e.message);
                             md.run(); md.destroy();
                         p = null;
@@ -279,14 +282,12 @@ private class GenericInputDialog:Gtk.Assistant
                         p = new Parser(contents);
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
-                            /* TODO: Show an error dialog here */
                             var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to create parser: %s", e.message);
                             md.run(); md.destroy();
                             p = null;
                         }
                     }catch(Error e) {
                         GLib.warning("Failed to open file: %s", e.message);
-                        /* TODO: Show an error dialog here */
                         var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to open file: %s", e.message);
                         md.run(); md.destroy();
                         p = null;
@@ -467,7 +468,11 @@ private class GenericInputDialog:Gtk.Assistant
 }
 
 
-public class GenericInput : Stuffkeeper.Plugin {
+public class GenericInput : Stuffkeeper.Plugin 
+{
+    construct {
+
+    }
 	public override PluginType get_plugin_type()
 	{
 		return PluginType.MENU;
