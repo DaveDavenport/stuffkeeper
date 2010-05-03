@@ -4,5 +4,8 @@ https://bugzilla.gnome.org/show_bug.cgi?id=617358
 inside HashTable object in glib-2.0.vapi add:
 public bool lookup_extended(string key, out string orig_value, out string
 value);
+or:
+
+		public bool lookup_extended(string key, out K orig_value, out K value);
 
 line 3374
