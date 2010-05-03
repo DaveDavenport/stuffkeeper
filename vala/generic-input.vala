@@ -15,6 +15,23 @@ errordomain ItemParserDataError {
 /* The separator used */
 const string Separator = "::";
 const string ItemSeparator = "<EOI>";
+/**
+ * Executes a script and puts the output in a string
+ */
+private string? execute_script(string commandline) throws SpawnError
+{
+    string output, error;
+    try{
+        if(Process.spawn_command_line_sync(commandline, out output, out error))
+        {
+            return output;
+        }
+    }catch (SpawnError e) {
+        throw e;
+    }
+    return null;
+}
+
 
 /**
  * Parse multiple items in a file
@@ -211,6 +228,35 @@ private class GenericInputDialog:Gtk.Assistant
             v.pack_start(file_entry, false, true, 0);
             var check_button = new Gtk.Button.from_stock(Gtk.STOCK_APPLY);
             v.pack_start(check_button, false, true, 0);
+            var execute_button = new Gtk.Button.with_label("Execute");
+            v.pack_start(execute_button, false, true, 0);
+            execute_button.clicked.connect((source) => {
+                string a = file_entry.get_text();
+                if(a.length > 0) {
+                    try {
+                        string contents = execute_script(a);
+                        stdout.printf("%s\n", contents);
+                        try{
+                        p = new Parser(contents);
+                        }catch (Error e) {
+                            GLib.warning("Failed to create parser: %s\n", e.message);
+                            /* TODO: Show an error dialog here */
+                            p = null;
+                        }
+                    }catch(Error e) {
+                        GLib.warning("Failed to execute file: %s", e.message);
+                        /* TODO: Show an error dialog here */
+                        p = null;
+                    }
+                }else{
+                    p = null;
+                }
+                if(p != null){
+                    this.set_page_complete(v, true);
+                }else{
+                    this.set_page_complete(v, false);
+                }
+            });
             /**
              * Read the file content and feed it to the parser
              */
