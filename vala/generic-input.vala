@@ -1,7 +1,5 @@
 /*
 TODO:
-* Somehow not all ref's to DataBackend are not released.
-* Remember (or auto) match field with entry.
 
 */
 using GLib;
@@ -97,8 +95,7 @@ private class ItemParser {
         /* Validate if the input data is utf8 */
         if(!data.validate())
         {
-            /* Make this an GError, with trowing errors and so */
-            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");            
+            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");
         }
 
 
@@ -229,10 +226,12 @@ private class GenericInputDialog:Gtk.Assistant
                         p = new Parser(contents);
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
+                            /* TODO: Show an error dialog here */
                             p = null;
                         }
                     }catch(Error e) {
                         GLib.warning("Failed to open file: %s", e.message);
+                        /* TODO: Show an error dialog here */
                         p = null;
                     }
                 }else{
