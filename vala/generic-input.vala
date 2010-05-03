@@ -13,6 +13,66 @@ errordomain ItemParserDataError {
     INVALID_STRUCTURE,
     DUPLICATE_ENTRIES
 }
+
+/* The separator used */
+const string Separator = "::";
+const string ItemSeparator = "<EOI>";
+
+/**
+ * Parse multiple items in a file
+ * Foreach item a ItemParser is created.
+ * It also keeps a list of unique fields.
+ * Items are separated by "<EOI>";
+ */
+private class Parser
+{
+    private List<ItemParser> items = null;
+    private List<string> fields = null;
+
+    public Parser(string data) throws ItemParserDataError
+    {
+        /* Split data into lines */
+        string[] entries = data.split(ItemSeparator,-1);
+        foreach(string entry in entries)
+        {
+            try {
+                /* Create new item */
+                var p = new ItemParser(entry);
+                items.prepend(p);
+            }catch (ItemParserDataError e) {
+                /* Fallthrough error */
+                throw e;
+            }
+        }
+        /**
+         * Collect list of unique fields (inefficient)
+         * Might want to use some fast lookup table here..
+         */
+        foreach(ItemParser p in items) {
+            List<weak string> fds = p.get_fields();
+            foreach(string field in fds)
+            {
+                if(fields.find_custom(field, strcmp) == null)
+                {
+                    fields.prepend(field);
+                }
+            }
+        }
+    }
+    public List<unowned string> get_fields()
+    {
+        return fields.copy();
+    }
+    public List<weak ItemParser> get_items()
+    {
+        return items.copy();
+    }
+    public uint num_items()
+    {
+        return items.length();
+    }
+
+}
 /**
  * Data format:
  * * Contains data for 1 item.
@@ -29,8 +89,6 @@ private class ItemParser {
     private GLib.HashTable<string, string> values = new HashTable<string, string>.full(str_hash, str_equal, g_free, g_free);
 
 
-    /* The separator used */
-    private const string Separator = "::";
 
 
     /* Take the input string and parse it. */
@@ -40,7 +98,7 @@ private class ItemParser {
         if(!data.validate())
         {
             /* Make this an GError, with trowing errors and so */
-            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");             
+            throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");            
         }
 
 
@@ -58,14 +116,14 @@ private class ItemParser {
             /* If the line does not consist of 2 entries, we bail out and throw an error. */
             if(entries.length != 2) {
                 GLib.warning("The splitted line: '%s' has only one entry", line);
-                throw new ItemParserDataError.INVALID_STRUCTURE("Input data has invalid structure");             
+                throw new ItemParserDataError.INVALID_STRUCTURE("Input data has invalid structure");
             }
             GLib.debug("parsed line: %s -> %s '%s'", line, entries[0], entries[1]);
             /* Insert into hash key */
             if(!values.lookup_extended(entries[0], null, null)){
                 values.insert(entries[0], entries[1]);
             }else{
-                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");       
+                throw new ItemParserDataError.DUPLICATE_ENTRIES("Input data contained duplicate entries");
             }
         }
     }
@@ -93,7 +151,7 @@ private class GenericInputDialog:Gtk.Assistant
 {
     private DataSchema schema = null;
     private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf));
-    private ItemParser p = null;
+    private Parser p = null;
     private List<unowned Gtk.ComboBox> matching = null;
     private DataBackend skdb = null;
     private Gtk.VBox import_page = null;
@@ -128,7 +186,7 @@ private class GenericInputDialog:Gtk.Assistant
             var renderer2 = new Gtk.CellRendererText();
             schema_selection.pack_start(renderer2, true);
             schema_selection.add_attribute(renderer2, "text", 1);
-           
+
             /* If user selected a type, unlock the next page */
             schema_selection.changed.connect((source) => {
                 TreeIter iter;
@@ -168,7 +226,7 @@ private class GenericInputDialog:Gtk.Assistant
                         GLib.FileUtils.get_contents(a, out contents, out size);
                         stdout.printf("%s\n", contents);
                         try{
-                        p = new ItemParser(contents);
+                        p = new Parser(contents);
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
                             p = null;
@@ -302,29 +360,32 @@ private class GenericInputDialog:Gtk.Assistant
     override void apply()
     {
         debug("Apply()");
-        var item = skdb.new_item(schema);
-        foreach(Gtk.ComboBox combo in matching)
+        foreach(ItemParser ip in p.get_items())
         {
-            TreeIter iter;
-            string field_id = (string)combo.get_data("field-id");
-            var type = schema.get_field_type(field_id);
-            if(combo.get_active_iter(out iter))
+            var item = skdb.new_item(schema);
+            foreach(Gtk.ComboBox combo in matching)
             {
-                string field = null;
-                int skip = 0;
-                combo.get_model().get(iter, 0, out field, 1,out skip);
-                /* Skip if it is N/A */
-                if(skip == 0) continue;
+                TreeIter iter;
+                string field_id = (string)combo.get_data("field-id");
+                var type = schema.get_field_type(field_id);
+                if(combo.get_active_iter(out iter))
+                {
+                    string field = null;
+                    int skip = 0;
+                    combo.get_model().get(iter, 0, out field, 1,out skip);
+                    /* Skip if it is N/A */
+                    if(skip == 0) continue;
 
-                string value = p.get_value(field);
-                if(type == FieldType.STRING || type == FieldType.INTEGER
-                        || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
-                    item.set_string(field_id, value);
-                }else if (type == FieldType.BOOLEAN) {
-                    if(value == "true" || value == "1" || value == "yes" || value == "TRUE" || value == "YES") {
-                        item.set_boolean(field_id, true);
-                    }else{
-                        item.set_boolean(field_id, false);
+                    string value = ip.get_value(field);
+                    if(type == FieldType.STRING || type == FieldType.INTEGER
+                            || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
+                        item.set_string(field_id, value);
+                    }else if (type == FieldType.BOOLEAN) {
+                        if(value == "true" || value == "1" || value == "yes" || value == "TRUE" || value == "YES") {
+                            item.set_boolean(field_id, true);
+                        }else{
+                            item.set_boolean(field_id, false);
+                        }
                     }
                 }
             }
