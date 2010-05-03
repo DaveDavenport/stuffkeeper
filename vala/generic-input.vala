@@ -49,14 +49,16 @@ private class Parser
     {
         /* Split data into lines */
         string[] entries = data.split(ItemSeparator,-1);
-	debug("entries: %i", entries.length);
         foreach(string entry in entries)
         {
             try {
-		debug("New item :%s", entry);
+                debug("New item :%s", entry);
                 /* Create new item */
                 var pi = new ItemParser(entry);
-                items.prepend(pi);
+                if(pi.num_items() > 0)
+                {
+                    items.prepend(pi);
+                }
             }catch (ItemParserDataError e) {
                 /* Fallthrough error */
                 throw e;
@@ -108,7 +110,10 @@ private class ItemParser {
     /* The key pair combination */
     private GLib.HashTable<string, string> values = new HashTable<string, string>.full(str_hash, str_equal, g_free, g_free);
 
-
+    public uint num_items()
+    {
+        return values.size();
+    }
 
 
     /* Take the input string and parse it. */
