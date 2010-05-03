@@ -15,6 +15,7 @@ errordomain ItemParserDataError {
 /* The separator used */
 const string Separator = "::";
 const string ItemSeparator = "<EOI>";
+const string ListSeparator = ";";
 /**
  * Executes a script and puts the output in a string
  */
@@ -88,6 +89,7 @@ private class Parser
     }
 
 }
+
 /**
  * Data format:
  * * Contains data for 1 item.
@@ -96,6 +98,7 @@ private class Parser
  *   * <field> is simple alfanumeric.
  *   * <field> is unique,
  *   * <data> is simple string where newline is escaped. \n
+ *    * <data> is type list, then ; is separator.
  *   * All input data is valid utf-8!
  *   * Boolean data are (for true):  YES, yes, 1, true, TRUE
  */
@@ -115,10 +118,8 @@ private class ItemParser {
             throw new ItemParserDataError.NO_UTF8("Input data is not valid utf8");
         }
 
-
         /* Split data into lines */
         string[] lines = data.split("\n",-1);
-
 
         /* Parse each line */
         foreach(string line in lines)
@@ -241,11 +242,15 @@ private class GenericInputDialog:Gtk.Assistant
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
                             /* TODO: Show an error dialog here */
+                            var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to create parser: %s", e.message);
+                            md.run(); md.destroy();
                             p = null;
                         }
                     }catch(Error e) {
                         GLib.warning("Failed to execute file: %s", e.message);
                         /* TODO: Show an error dialog here */
+                            var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to execute script: %s", e.message);
+                            md.run(); md.destroy();
                         p = null;
                     }
                 }else{
@@ -273,11 +278,15 @@ private class GenericInputDialog:Gtk.Assistant
                         }catch (Error e) {
                             GLib.warning("Failed to create parser: %s\n", e.message);
                             /* TODO: Show an error dialog here */
+                            var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to create parser: %s", e.message);
+                            md.run(); md.destroy();
                             p = null;
                         }
                     }catch(Error e) {
                         GLib.warning("Failed to open file: %s", e.message);
                         /* TODO: Show an error dialog here */
+                        var md = new MessageDialog(this, Gtk.DialogFlags.MODAL,Gtk.MessageType.WARNING, Gtk.ButtonsType.CLOSE, "Failed to open file: %s", e.message);
+                        md.run(); md.destroy();
                         p = null;
                     }
                 }else{
@@ -339,7 +348,8 @@ private class GenericInputDialog:Gtk.Assistant
             {
                 var type = schema.get_field_type(field);
                 if(type != FieldType.STRING && type != FieldType.INTEGER && type != FieldType.BOOLEAN
-                        && type != FieldType.RATING && type != FieldType.TEXT && type != FieldType.LINK) continue;
+                        && type != FieldType.RATING && type != FieldType.TEXT && type != FieldType.LINK
+                        && type != FieldType.LIST && type != FieldType.FILES && type != FieldType.DATE) continue;
                 var hb = new Gtk.HBox(false, 6);
                 var label = new DataLabel.schema_field(schema, field);
                 hb.pack_start(label, false, true, 0);
@@ -369,7 +379,6 @@ private class GenericInputDialog:Gtk.Assistant
                 matching.prepend(combo);
             }
 
-
             import_page.show_all();
         }else{
             GLib.debug("not the import page\n");
@@ -379,23 +388,16 @@ private class GenericInputDialog:Gtk.Assistant
             }
 
         }
-
     }
     override void close()
     {
         stdout.printf("close\n");
-        destroy_requested();
-        /* Hack to break the ref cycle */
-        this.get_nth_page(2).destroy();
-        this.get_nth_page(1).destroy();
-        this.get_nth_page(0).destroy();
-        this.destroy();
+        this.cancel();
     }
 
     override void cancel()
     {
         stdout.printf("cancel\n");
-        destroy_requested();
         /* Hack to break the ref cycle */
         this.get_nth_page(2).destroy();
         this.get_nth_page(1).destroy();
@@ -422,15 +424,32 @@ private class GenericInputDialog:Gtk.Assistant
                     if(skip == 0) continue;
 
                     string value = ip.get_value(field);
+                    /* Skip if no value */
+                    if(value == null) continue;
+                    /* Parse string/integer type. (sqlite will do conversion when displaying */
                     if(type == FieldType.STRING || type == FieldType.INTEGER
                             || type == FieldType.RATING || type == FieldType.TEXT || type == FieldType.LINK){
                         item.set_string(field_id, value);
+                    /* Parse boolean type */
                     }else if (type == FieldType.BOOLEAN) {
                         if(value == "true" || value == "1" || value == "yes" || value == "TRUE" || value == "YES") {
                             item.set_boolean(field_id, true);
                         }else{
                             item.set_boolean(field_id, false);
                         }
+                    /* Parse list or files (uses same data type ) */
+                    }else if (type == FieldType.LIST || type == FieldType.FILES) {
+                            string[] list = value.split(ListSeparator, -1);
+                            item.set_list(field_id,list);
+                    /* Parse date using glib's Date function */
+                    } else if (type == FieldType.DATE) {
+                            Date  d = Date();
+                            d.set_parse(value);
+                            if(d.valid()) {
+                                Time tm;
+                                d.to_time(out tm);
+                                item.set_integer(field_id, (int)tm.mktime());
+                            }
                     }
                 }
             }
@@ -442,15 +461,11 @@ private class GenericInputDialog:Gtk.Assistant
         stdout.printf("Destroy object callback\n");
     }
 
-    public signal void destroy_requested();
 
 }
 
 
 public class GenericInput : Stuffkeeper.Plugin {
-
-    construct{
-    }
 	public override PluginType get_plugin_type()
 	{
 		return PluginType.MENU;
@@ -460,21 +475,11 @@ public class GenericInput : Stuffkeeper.Plugin {
 	{
 		return "Generic Input";
 	}
-
-    private void d_r(GenericInputDialog a)
-    {
-            stdout.printf("Destroy\n");
-            a.destroy_requested.disconnect(d_r);
-            a.destroy();
-            a = null;
-    }
 	public override void run_menu(Stuffkeeper.DataBackend skdb_e)
 	{
         /* Quick hack to make sure it does not get destroyed to early */
         var a = new GenericInputDialog();
         a.setup(skdb_e);
-
-      //  a.destroy_requested.connect(d_r);
 	}
 
 	/* Destruction */
@@ -482,7 +487,6 @@ public class GenericInput : Stuffkeeper.Plugin {
 	{
         debug("Generic Input destroy");
 	}
-
 }
 
 [ModuleInit]
