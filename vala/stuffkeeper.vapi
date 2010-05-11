@@ -351,7 +351,7 @@ namespace Stuffkeeper {
 	[Compact]
 	[CCode (cheader_filename = "stuffkeeper-plugin.h")]
 	public class Plugin : GLib.Object {
-		public virtual unowned Gdk.Pixbuf get_icon ();
+		public virtual Gdk.Pixbuf? get_icon ();
 		public virtual unowned string get_name ();
 		public virtual Stuffkeeper.PluginType get_plugin_type ();
 		public virtual void run_background (Stuffkeeper.DataBackend skdb);

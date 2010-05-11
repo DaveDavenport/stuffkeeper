@@ -80,8 +80,6 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
             GtkTextIter start, stop;
             gchar *text = NULL;
             gchar *value;
-            guint8      *spew;
-            gsize        spew_length;
 
             gtk_text_buffer_get_start_iter(self->_priv->buffer, &start);
             gtk_text_buffer_get_end_iter(self->_priv->buffer, &stop);

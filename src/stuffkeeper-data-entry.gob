@@ -12,7 +12,7 @@
 %}
 
 %{
-	typedef enum {
+	enum {
 		PRIVATE_FIELD_DEFAULT = 0
 	};
 
@@ -118,7 +118,7 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
 	    }
 	    else {
 		/* Normal case: match colors with parent (hereby making enrty "transparent") */
-		GtkBin *parent_bin = NULL;
+		GtkWidget *parent_bin = NULL;
 
 		debug_printf("Matching colors for StuffkeeperDataEntry with parent\n");
 		parent_bin = wid->parent; 

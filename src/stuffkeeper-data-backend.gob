@@ -1169,11 +1169,11 @@ class Stuffkeeper:Data:Backend from G:Object
         sqlite3_free(query);
         if((r = sqlite3_step(stmt)) == SQLITE_ROW)
         {
-            const char *value = sqlite3_column_text(stmt, 0);
+            const gchar *value = (const gchar *)sqlite3_column_text(stmt, 0);
             gsize out;
             if(value != NULL && value[0] != '\0')
             {
-                gchar *base64 = g_base64_decode(value, &out);
+                guchar *base64 = g_base64_decode(value, &out);
                 if(base64 && out > 0)
                 {
 
@@ -1184,6 +1184,7 @@ class Stuffkeeper:Data:Backend from G:Object
                             base64, out,NULL);
                     if(result)
                     {
+                        char *tail;
                         gtk_text_buffer_get_start_iter(buffer, &start);
                         gtk_text_buffer_get_end_iter(buffer, &end);
                         gchar *re = gtk_text_buffer_get_text(buffer,&start,&end, FALSE);
@@ -1195,7 +1196,7 @@ class Stuffkeeper:Data:Backend from G:Object
                                 re,
                                 rowid 
                                 );
-                        sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &value);
+                        sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &tail);
                         printf("%i: Converted from rich to normal\n",rowid);
 
                         sqlite3_free(query);
@@ -1213,7 +1214,6 @@ class Stuffkeeper:Data:Backend from G:Object
     update_005_db(self)
     {
         char *query = NULL;
-        gboolean set = FALSE;
         int r;
         sqlite3_stmt *stmt;
         const char *tail;

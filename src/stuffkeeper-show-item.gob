@@ -127,7 +127,7 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
 		    label1 = stuffkeeper_data_password_new(self->_priv->item,self->_priv->retv[i]);
 	    }else if (type == FIELD_TYPE_FILES) {
             gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
-            label1 = stuffkeeper_data_files_new(self->_priv->item,self->_priv->retv[i]);
+            label1 = (GtkWidget *)stuffkeeper_data_files_new(self->_priv->item,self->_priv->retv[i]);
         }else {
                 label1 = gtk_label_new("not supported\n");
         }

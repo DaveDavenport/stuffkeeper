@@ -507,6 +507,11 @@ public class GenericInput : Stuffkeeper.Plugin
 	{
         debug("Generic Input destroy");
 	}
+
+    public override Gdk.Pixbuf? get_icon()
+    {
+        return null;
+    }
 }
 
 [ModuleInit]
