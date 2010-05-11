@@ -1,15 +1,15 @@
 plugindir=${libdir}/stuffkeeper/
 
 plugin_LTLIBRARIES =\
-	libgenericinput.la\
-	libtagcloud.la
+	genericinput.la\
+	tagcloud.la
 
 EXTRA_DIST=stuffkeeper.vapi
 
-libgenericinput_la_SOURCES=\
+genericinput_la_SOURCES=\
 	genericinput.c
 
-libtagcloud_la_SOURCES=\
+tagcloud_la_SOURCES=\
 	tagcloud.c
 
 BUILT_SOURCES=\
@@ -25,6 +25,7 @@ LIBS= \
 	@libglade_LIBS@\
 	@gthread_LIBS@
 
+AM_LDFLAGS = -module -avoid-version
 
 AM_CFLAGS = \
 	@CFLAGS@ \
