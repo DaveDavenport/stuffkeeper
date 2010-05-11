@@ -1,5 +1,4 @@
 /*
-TODO:
 
 */
 using GLib;
@@ -473,7 +472,7 @@ private class GenericInputDialog:Gtk.Assistant
 }
 
 
-public class GenericInput : Stuffkeeper.Plugin 
+public class GenericInput : Stuffkeeper.Plugin
 {
     construct {
 
@@ -489,6 +488,15 @@ public class GenericInput : Stuffkeeper.Plugin
 	}
 	public override void run_menu(Stuffkeeper.DataBackend skdb_e)
 	{
+        if(skdb_e.get_locked())
+        {
+
+            var md = new MessageDialog(null,
+                    Gtk.DialogFlags.MODAL,Gtk.MessageType.INFO, Gtk.ButtonsType.CLOSE,
+                    "You cannot import items if the database is locked.");
+            md.run(); md.destroy();
+            return;
+        }
         /* Quick hack to make sure it does not get destroyed to early */
         var a = new GenericInputDialog();
         a.setup(skdb_e);
