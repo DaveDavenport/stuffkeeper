@@ -3,6 +3,8 @@ requires 2.0.10
 %h{
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <cairo.h>
+#include <cairo-ps.h>
 #include "debug.h"
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-label.h"
@@ -19,6 +21,15 @@ requires 2.0.10
 #include "stuffkeeper-data-taglist2.h"
 #include "stuffkeeper-data-expander.h"
 #include "stuffkeeper-data-files.h"
+#define IMAGE_SIZE 250
+
+typedef struct state {
+    int hpacking;
+    int left_offset;
+    int top_offset;
+    int column_width;
+    int block_height;
+}state;
 %}
 
 class Stuffkeeper:Show:Item from Gtk:Event:Box
@@ -216,6 +227,8 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
 
         /* update */
         self_field_changed(self, NULL, self->_priv->schema);
+
+        self_draw(self);
         return GTK_WIDGET(self);
     }
 
@@ -255,4 +268,214 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
         }
         PARENT_HANDLER(obj);
     }
+
+    /* Custom drawing function */
+    public void draw(self)
+    {
+        cairo_surface_t *surface = cairo_ps_surface_create("test.ps", 800,800);
+        self_draw_item(self, surface, 800, 800);
+        cairo_surface_write_to_png(surface, "aap.png");
+        cairo_surface_destroy(surface);
+    }
+
+    private void draw_item(self,cairo_surface_t *surface, int width, int height)
+    {
+        GQueue *queue = g_queue_new(); 
+        cairo_t *ct = cairo_create(surface);
+        PangoLayout *layout = pango_cairo_create_layout(ct);
+        gint field_name_width=0;
+        int i;
+        gint field_width = width;
+        /* Get the max width of the field name */
+
+        PangoFontDescription *fd = pango_context_get_font_description(pango_layout_get_context(layout));
+        fd = pango_font_description_copy(fd);
+        pango_font_description_set_weight(fd, PANGO_WEIGHT_ULTRABOLD);
+        pango_layout_set_font_description(layout, fd);
+        for(i=0;i<self->_priv->length;i++) 
+        {
+            gint lw=0, lh=0;
+            FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
+            if(type < FIELD_TYPE_EXPANDER || type >= FIELD_TYPE_FILES)
+            {
+               gchar *name = stuffkeeper_data_schema_get_field_name(self->_priv->schema, self->_priv->retv[i]);
+               pango_layout_set_text(layout, name, -1);
+               pango_layout_get_pixel_size(layout, &lw, &lh);
+               field_name_width = MAX(field_name_width, lw);
+               g_free(name);
+            }
+        }
+        pango_layout_set_font_description(layout, NULL);
+        pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
+        {
+            state *s = g_malloc0(sizeof *s);
+            g_queue_push_head(queue, s); 
+            s->hpacking = 0;
+            s->left_offset = 10;
+            s->top_offset = 10;
+            s->column_width = field_width-20;
+        }
+        gint hpacking = 0;
+        gint left_offset = 10;
+        gint top_offset = 10;
+        field_width-=20;
+        GQueue *hpack = g_queue_new();
+
+        for(i=0;i<self->_priv->length;i++) 
+        {
+          
+            int w = 0;
+            gint lw=0, lh=0;
+            gint rh=0;
+            FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
+            if(type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_VPACKING  || type == FIELD_TYPE_EXPANDER) {
+                /* want  to track here how many columns */
+                state *l,*s = g_malloc0(sizeof *s);
+                l = g_queue_peek_head(queue);
+                g_queue_push_head(queue, s); 
+                s->hpacking = hpacking;
+                s->left_offset = left_offset;
+                s->top_offset = top_offset;
+                s->column_width = field_width;
+                s->block_height = 0;
+
+                if(type == FIELD_TYPE_HPACKING) {
+                    field_width /=2;
+                    hpacking = 1;
+                    g_queue_push_head(hpack, s);
+                    continue;
+                }else {
+                    hpacking = 0;
+                }
+            }
+            if(type == FIELD_TYPE_END) {
+                state *l = g_queue_peek_head(hpack);
+                if(l){
+        //            l->block_height= MAX(l->block_height, top_offset);
+                }
+                state *s = g_queue_pop_head(queue);
+                left_offset = s->left_offset;
+                field_width = s->column_width;
+                top_offset = s->top_offset;
+                {
+                    top_offset += l->block_height;
+                }
+                if(hpacking){
+                    g_queue_pop_head(hpack);
+                }
+                hpacking = s->hpacking;
+                g_free(s);
+            }
+            if(hpacking){
+                top_offset = ((state *)(g_queue_peek_head(hpack)))->top_offset;
+            }
+
+            pango_layout_set_width(layout, (field_name_width)*PANGO_SCALE);
+            if(type < FIELD_TYPE_EXPANDER || type >= FIELD_TYPE_FILES)
+            {
+                gchar *name = stuffkeeper_data_schema_get_field_name(self->_priv->schema, self->_priv->retv[i]);
+                PangoFontDescription *fd = pango_context_get_font_description(pango_layout_get_context(layout));
+                fd = pango_font_description_copy(fd);
+                pango_font_description_set_weight(fd, PANGO_WEIGHT_ULTRABOLD);
+                pango_layout_set_font_description(layout, fd);
+                pango_layout_set_text(layout, name, -1);
+                pango_layout_get_pixel_size(layout, &lw, &lh);
+                cairo_move_to(ct,left_offset+ field_name_width-lw, top_offset);
+                pango_cairo_show_layout(ct, layout);
+                rh = MAX(rh, lh);
+                w+=lw+5;
+                pango_font_description_free(fd);
+                pango_layout_set_font_description(layout, NULL);
+                g_free(name);
+            }
+            pango_layout_set_width(layout, (field_width-field_name_width)*PANGO_SCALE);
+            if(type == FIELD_TYPE_STRING || type == FIELD_TYPE_LINK || type == FIELD_TYPE_INTEGER || type == FIELD_TYPE_RATING)
+            {
+                gchar *name = stuffkeeper_data_item_get_string(self->_priv->item,  self->_priv->retv[i]);
+                if(name) {
+                    pango_layout_set_text(layout, name, -1);
+                    pango_layout_get_pixel_size(layout, &lw, &lh);
+                    cairo_move_to(ct,left_offset+ field_name_width+5, top_offset);
+                    pango_cairo_show_layout(ct, layout);
+                    rh = MAX(rh, lh);
+                    w+=lw+5;
+                    g_free(name);
+                }
+            }else if (type == FIELD_TYPE_TEXT)
+            {
+                gchar *name = stuffkeeper_data_item_get_string(self->_priv->item,  self->_priv->retv[i]);
+                if(name) {
+                pango_layout_set_text(layout, name, -1);
+                pango_layout_get_pixel_size(layout, &lw, &lh);
+                cairo_move_to(ct,left_offset+ field_name_width+5, top_offset);
+                pango_cairo_show_layout(ct, layout);
+                rh = MAX(rh,lh);
+                w+=lw+5;
+                g_free(name);
+                }
+            }else if (type == FIELD_TYPE_BOOLEAN)
+            {
+                gboolean val = stuffkeeper_data_item_get_boolean(self->_priv->item,  self->_priv->retv[i]);
+                if(val) {
+                    pango_layout_set_text(layout, "✓",-1);
+                }else{
+                    pango_layout_set_text(layout, "✗",-1);
+                }
+                pango_layout_get_pixel_size(layout, &lw, &lh);
+                cairo_move_to(ct,left_offset+ field_name_width+5, top_offset);
+                pango_cairo_show_layout(ct, layout);
+                rh = MAX(rh, lh);
+                w+=lw+5;
+            }else if (type == FIELD_TYPE_IMAGE)
+            {
+                const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+                gchar *name = stuffkeeper_data_item_get_string(self->_priv->item,  self->_priv->retv[i]);
+                if(path && name){
+                    gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", name,NULL); 
+                    gint size = MIN(IMAGE_SIZE, field_width-field_name_width-5);
+                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, size);
+                    lw= gdk_pixbuf_get_width(pb);
+                    lh= gdk_pixbuf_get_height(pb);
+                    gdk_cairo_set_source_pixbuf(ct, pb, left_offset+field_name_width+5,top_offset);
+                    cairo_rectangle(ct,left_offset+ field_name_width+5,top_offset, lw, lh);
+                    cairo_fill(ct);
+                    cairo_set_source_rgb(ct, 0.0,0.0,0.0);
+                    rh = MAX(rh, lh);
+                    g_object_unref(pb);
+                    g_free(fpath);
+                    g_free(name);
+                }
+            }else if (type == FIELD_TYPE_LIST) {
+                gsize length =0;
+                int j;
+                int offset = 0;
+                gchar **value = stuffkeeper_data_item_get_list(self->_priv->item, self->_priv->retv[i], &length);
+                for(j=0; j < length; j++){
+                    pango_layout_set_text(layout, value[j], -1);
+                    pango_layout_get_pixel_size(layout, &lw, &lh);
+                    cairo_move_to(ct,left_offset+ field_name_width+5, top_offset+offset);
+                    offset+=lh;
+                    pango_cairo_show_layout(ct, layout);
+                }
+                if(value) g_strfreev(value);
+                rh = MAX(offset, rh);
+            }
+            if(hpacking) {
+                left_offset += field_width;
+            }
+            top_offset += rh;
+
+            if(g_queue_peek_head(hpack)){
+                state *l = g_queue_peek_head(hpack);
+                 l->block_height = MAX(top_offset-l->top_offset, (l)->block_height);
+            }
+        }
+
+        {
+            state *l = g_queue_peek_head(queue);
+            printf("Block height: %i\n", top_offset);
+        }
+        cairo_destroy(ct);
+    }
+
 }
