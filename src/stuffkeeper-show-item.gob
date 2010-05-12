@@ -228,7 +228,7 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
         /* update */
         self_field_changed(self, NULL, self->_priv->schema);
 
-        self_draw(self);
+        //self_draw(self);
         return GTK_WIDGET(self);
     }
 
