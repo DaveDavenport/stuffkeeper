@@ -29,6 +29,21 @@ GList *interface_list = NULL;
 GKeyFile *config_file = NULL;
 
 /**
+ * parses UID and tries to open right item
+ */
+static void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
+{
+    if(strncmp(uid, "item:", 5) == 0)
+    {
+       StuffkeeperDataItem *item = stuffkeeper_data_backend_get_item(skdb, atoi(&uid[5]));
+       if(item) {
+           stuffkeeper_item_window_new(skdb, item,config_file);
+       }
+    }
+
+}
+
+/**
  * Handle ipc messages
  */
 static void bacon_on_message_received(const char *message, gpointer data)
@@ -47,6 +62,11 @@ static void bacon_on_message_received(const char *message, gpointer data)
                 stuffkeeper_interface_new_window(ski);
                 debug_printf("IPC: Requested new window\n");
             }
+        }
+        else if (strncmp(message,"uid:", 4) == 0)
+        {
+            /* Open task */
+            open_uid(&message[4], STUFFKEEPER_DATA_BACKEND(data));
         }
     }
 }
@@ -70,6 +90,7 @@ int main ( int argc, char **argv )
     GError                      *error                  = NULL;
     gchar                       *path                   = NULL;
     gchar                       *config_path            = NULL;
+    gchar                       *uid                    = NULL;
     /**
      * Interprocess communication. Used to make sure
      * only one instance is running
@@ -90,9 +111,10 @@ int main ( int argc, char **argv )
 
     GOptionEntry entries[] = 
     {
-        { "db-path", 'd', 0, G_OPTION_ARG_FILENAME, &db_path,     _("Path to the database"),                                 "Path" },
+        { "db-path", 'd', 0, G_OPTION_ARG_FILENAME, &db_path,     _("Path to the database"),                               "Path" },
         { "version", 'v', 0, G_OPTION_ARG_NONE,   &version,     _("Version"),                                              NULL},
         { "firstrun",'f', 0, G_OPTION_ARG_NONE,   &first_run,   _("Act like it is the first time stuffkeeper is ran"),     NULL},
+        { "uid",     'u', 0, G_OPTION_ARG_STRING,   &uid,   _("Open item,tag,schema with uid."),                           NULL},
         { NULL }
     };
 
@@ -173,9 +195,16 @@ int main ( int argc, char **argv )
         /* Check if we are the only instance, this can be checked by looking if we are the server */
         if (!bacon_message_connection_get_is_server (bacon_connection)) 
         {
-            /* There is an instant already running */
-            /* message the running instance, to show a new window */
-            bacon_message_connection_send(bacon_connection, "New Window");
+            if(uid != NULL) {
+                gchar *command = g_strdup_printf("uid:%s",  uid);
+                /* message the running instance, to show a item*/
+                bacon_message_connection_send(bacon_connection,command); 
+                g_free(command);
+            }else{
+                /* There is an instant already running */
+                /* message the running instance, to show a new window */
+                bacon_message_connection_send(bacon_connection, "New Window");
+            }
 
             /* Close the connection */
             bacon_message_connection_free (bacon_connection);
@@ -254,6 +283,7 @@ int main ( int argc, char **argv )
     ski= stuffkeeper_interface_new(config_file);
     interface_list = g_list_append(interface_list, ski);
 
+
     TAC("Time elapsed until creating gui");
 
     /* This tells the backend to populate itself */
@@ -261,7 +291,9 @@ int main ( int argc, char **argv )
 
     TAC("time elapsed until backend load");
     
-    stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
+    if(ski) {
+        stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
+    }
 
     /* path */
     g_free(path);
@@ -269,8 +301,11 @@ int main ( int argc, char **argv )
 
     TAC("time elapsed until gtk_main()");
 
+    if(uid != NULL) {
+        open_uid(uid,skdb);
+    }
 
-    if(first_run)
+    if(first_run && ski)
     {
         printf("Initial run of stuffkeeper\n");
         stuffkeeper_interface_first_run(ski);
