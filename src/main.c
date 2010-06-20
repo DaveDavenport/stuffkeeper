@@ -36,6 +36,9 @@ GKeyFile *config_file = NULL;
 void interface_element_destroyed(GtkWidget *win, gpointer data)
 {
     interface_list = g_list_remove(interface_list, win);
+    if(interface_list == NULL){
+        gtk_main_quit();
+    }
 }
 
 /**
