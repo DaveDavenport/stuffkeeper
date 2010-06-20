@@ -29,6 +29,18 @@ GList *interface_list = NULL;
 GKeyFile *config_file = NULL;
 
 /**
+ * Remove window from interface list, if empty, quit stuffkeeper
+ */
+void interface_element_destroyed(GtkWidget *win, gpointer data)
+{
+    interface_list = g_list_remove(interface_list, win);
+    if(interface_list == NULL) {
+        gtk_main_quit();
+    }
+
+}
+
+/**
  * parses UID and tries to open right item
  */
 static void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
@@ -37,7 +49,9 @@ static void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
     {
        StuffkeeperDataItem *item = stuffkeeper_data_backend_get_item(skdb, atoi(&uid[5]));
        if(item) {
-           stuffkeeper_item_window_new(skdb, item,config_file);
+          GtkWidget *win = stuffkeeper_item_window_new(skdb, item,config_file);
+          interface_list = g_list_append(interface_list, win);
+          g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(interface_element_destroyed), NULL);
        }
     }
 
@@ -280,8 +294,10 @@ int main ( int argc, char **argv )
     }
 
     /* Create a main interface */
-    ski= stuffkeeper_interface_new(config_file);
-    interface_list = g_list_append(interface_list, ski);
+    if(uid == NULL) {
+        ski= stuffkeeper_interface_new(config_file);
+        interface_list = g_list_append(interface_list, ski);
+    }
 
 
     TAC("Time elapsed until creating gui");

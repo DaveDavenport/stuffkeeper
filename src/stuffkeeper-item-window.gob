@@ -87,7 +87,7 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
      * Popup an item list
      */
     public
-        void 
+    Gtk:Widget * 
         new (Stuffkeeper:Data:Backend *skdb, Stuffkeeper:Data:Item *item, GKeyFile *config_file)
         {                                                                                                                                            
             Self *self = GET_NEW;
@@ -128,5 +128,6 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
 
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
             gtk_widget_show_all(dialog);
+            return self;
         }
 }
