@@ -14,6 +14,8 @@
 #include "revision.h"
 
 /* Include the database */
+
+#include "stuffkeeper-item-window.h"
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-interface.h"
 #include "stuffkeeper-plugin-manager.h"
@@ -34,10 +36,6 @@ GKeyFile *config_file = NULL;
 void interface_element_destroyed(GtkWidget *win, gpointer data)
 {
     interface_list = g_list_remove(interface_list, win);
-    if(interface_list == NULL) {
-        gtk_main_quit();
-    }
-
 }
 
 /**
@@ -345,7 +343,9 @@ int main ( int argc, char **argv )
     }
 
     /* Start the main loop */
-    gtk_main();
+    if(interface_list != NULL) {
+        gtk_main();
+    }
 
     /* close open interfaces */
     g_list_foreach(interface_list, (GFunc)interface_clear, NULL);
