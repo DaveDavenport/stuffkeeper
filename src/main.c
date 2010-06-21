@@ -44,7 +44,7 @@ void interface_element_destroyed(GtkWidget *win, gpointer data)
 /**
  * parses UID and tries to open right item
  */
-static void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
+void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 {
     if(strncmp(uid, "item:", 5) == 0)
     {
