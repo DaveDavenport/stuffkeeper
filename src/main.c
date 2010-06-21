@@ -162,6 +162,8 @@ int main ( int argc, char **argv )
     }
 	printf("GPGME Version: %s\n",gpgme_check_version(NULL));
     /* Initialize gtk */
+
+    gdk_threads_init();
     if(!gtk_init_check(&argc, &argv))
     {
         /* If we failed to initialize gtk+*/
