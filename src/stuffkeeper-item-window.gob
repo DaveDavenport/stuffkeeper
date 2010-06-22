@@ -130,4 +130,47 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
             gtk_widget_show_all(dialog);
             return self;
         }
+    public
+    Gtk:Widget * 
+        new_multiple (Stuffkeeper:Data:Backend *skdb, GList *items, GKeyFile *config_file)
+        {                                                                                                                                            
+            Self *self = GET_NEW;
+            GError *error = NULL;
+            gint width, height;
+            GtkWidget *dialog = GTK_WIDGET(self);
+            gtk_dialog_add_button(GTK_DIALOG(self), "gtk-close", GTK_RESPONSE_CLOSE);
+            gtk_dialog_set_has_separator(GTK_DIALOG(self), FALSE);
+
+            /**/
+            GtkWidget *container = gtk_vbox_new(FALSE, 6);
+
+            self->_priv->config_file = config_file;
+            self->_priv->skdb = skdb;
+            self->_priv->signal_item_removed = g_signal_connect_swapped(G_OBJECT(skdb), "item-removed",
+                    G_CALLBACK(self_item_removed), self);
+
+
+            /* set size */
+            gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
+            width = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "width", &error);
+            if(error) {
+                g_error_free(error);
+                error = NULL;
+            } else {
+                height = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "height", &error);
+                if(error) {
+                    g_error_free(error);
+                    error = NULL;
+                } else {
+                    gtk_window_resize(GTK_WINDOW(self), width, height);
+                }
+            }
+
+            container = stuffkeeper_multiple_item_view_new(items);
+            gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), container, TRUE, TRUE, 0);
+
+            g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
+            gtk_widget_show_all(dialog);
+            return self;
+        }
 }

@@ -209,4 +209,11 @@ class Stuffkeeper:Data:Tag from G:Object
             debug_printf("destroying tag\n");
             PARENT_HANDLER(obj);
         }
+
+	public
+	GList *
+	get_items(self)
+	{
+		return g_list_copy(self->_priv->items);
+	}
 }

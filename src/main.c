@@ -54,6 +54,19 @@ void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
           interface_list = g_list_append(interface_list, win);
           g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(interface_element_destroyed), NULL);
        }
+    }else if (strncmp(uid, "tag:", 4) == 0) 
+    {
+	StuffkeeperDataTag *tag = stuffkeeper_data_backend_get_tag(skdb, atoi(&uid[4]));
+	if(tag) {
+		GList *items = stuffkeeper_data_tag_get_items(tag);
+		if(items) {
+			printf("Window items\n");
+			GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
+			gtk_widget_show(win);
+			interface_list = g_list_append(interface_list, win);
+			g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(interface_element_destroyed), NULL);
+		}
+	}
     }
 
 }
