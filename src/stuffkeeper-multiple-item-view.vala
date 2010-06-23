@@ -127,12 +127,26 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
         sw_vbox.pack_start(title_labels, false, false, 0);
         foreach(DataItem item in this.items) {
             var hbox = new Gtk.HBox(false, 6);
-            var arrow = new Gtk.Image.from_pixbuf(item.get_schema().get_pixbuf());
+	    var button = new Gtk.Button();
+	    var arrow = new Gtk.Image.from_pixbuf(item.get_schema().get_pixbuf());
+	    button.relief = Gtk.ReliefStyle.NONE;
+	    this.style_set.connect((source, style) => {
+			    Gdk.Color color =source.style.white;//light[Gtk.StateType.NORMAL];
+			    button.modify_bg(Gtk.StateType.NORMAL, color);
+			    });
             /** TODO image needs updating when schema changed it icon! */
             hbox.pack_start(arrow, false, false,0);
             var title = new Stuffkeeper.DataEntry(item, null);
             hbox.pack_start(title, true, true, 0);
-            sw_vbox.pack_start(hbox, false, false, 0);
+	    button.add(hbox);
+            sw_vbox.pack_start(button, false, false, 0);
+	    button.set_data<weak DataItem>("item", item);
+	    button.clicked.connect((source) => {
+			DataItem fitem = button.get_data<weak DataItem>("item");
+			Gtk.Window win = new Stuffkeeper.ItemWindow(fitem.get_backend(), fitem, Stuffkeeper.config_file);
+			interface_list.append(win);	
+			win.destroy.connect(interface_element_destroyed);
+		});
         }
 
         /* Tag Setup */
