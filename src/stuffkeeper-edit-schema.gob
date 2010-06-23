@@ -22,7 +22,6 @@ requires 2.0.10
 #include "stuffkeeper-data-boolean-config.h"
 #include "stuffkeeper-data-rating-config.h"
 #include "stuffkeeper-data-password-config.h"
-extern GList *interface_list;
 %}
 %ph{
     typedef enum _StoreFields
@@ -625,8 +624,8 @@ class Stuffkeeper:Edit:Schema from G:Object
 
             glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             gtk_widget_show(GTK_WIDGET(self->_priv->win));
-
-            return self;
+	    interface_element_add(self->_priv->win);
+	    return self;
         }
 
     private

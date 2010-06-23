@@ -31,7 +31,6 @@ requires 2.0.10
 
 #include "stuffkeeper-multiple-item-view.h"
 
-extern GList *interface_list;
 %}
 
 %ph{
@@ -702,14 +701,8 @@ class Stuffkeeper:Interface from G:Object
     close_window(self)
     {
         int n;
-        interface_list = g_list_remove(interface_list, self);
-        n = g_list_length(interface_list);
-        g_object_unref(self);
-
-        if(n == 0)
-        {
-           gtk_main_quit();
-        }
+	self_destroy(self);
+	g_object_unref(self);
         return TRUE;
     }
     public
@@ -718,7 +711,6 @@ class Stuffkeeper:Interface from G:Object
     {
         Self *ski;
         ski= stuffkeeper_interface_new(self->config_file);
-        interface_list = g_list_append(interface_list, ski);
         stuffkeeper_interface_initialize_interface(ski,self->_priv->skdbg,G_OBJECT(self->_priv->spm));
     }
 
@@ -1419,7 +1411,7 @@ class Stuffkeeper:Interface from G:Object
             GtkAccelGroup *agroup = NULL;
             int value,width,height;
             GError *error = NULL;
-            Self *self = GET_NEW;
+            Self *self = g_object_ref_sink(GET_NEW);
 
             self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","win",NULL);
 
@@ -1554,6 +1546,8 @@ class Stuffkeeper:Interface from G:Object
             gtk_widget_show(self->_priv->win);
             /* put this after the show, or it will turn up black, for some oddball reason */
             self_interface_item_selection_changed(self, gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2)));
+
+	    interface_element_add(self);
 
             return self;
         }
@@ -2185,7 +2179,7 @@ class Stuffkeeper:Interface from G:Object
         {
             int value;
             Self *self = SELF(obj);
-            debug_printf("** Finalize stuffkeeper interface\n");
+	    debug_printf("** Finalize stuffkeeper interface\n");
             if(self->_priv->signal_backend_locked) { 
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_backend_locked);
                 self->_priv->signal_backend_locked = 0;
@@ -3041,4 +3035,12 @@ class Stuffkeeper:Interface from G:Object
             self_set_alternative_layout(self, active);
 
         }
+
+	public	
+	signal last NONE (NONE)
+	void
+	destroy(self)
+	{
+
+	}
 }

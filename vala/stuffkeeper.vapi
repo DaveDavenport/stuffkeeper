@@ -394,8 +394,6 @@ namespace Stuffkeeper {
     }
 	[CCode (cname="config_file")]
     public GLib.KeyFile config_file;
-	[CCode (cname="interface_list")]
-	public GLib.List<weak Gtk.Window> interface_list;
-	[CCode (cname="interface_element_destroyed")]
-	public void interface_element_destroyed(Gtk.Object win);
+	[CCode (cname="interface_element_add")]
+	public void interface_element_add(Gtk.Window *win);
 }

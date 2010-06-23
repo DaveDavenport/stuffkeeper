@@ -30,6 +30,13 @@ GList *interface_list = NULL;
  */
 GKeyFile *config_file = NULL;
 
+void interface_element_destroyed(GtkWidget *win, gpointer data);
+void interface_element_add(GtkWidget *win)
+{
+	interface_list = g_list_append(interface_list, win);
+	g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(interface_element_destroyed), NULL);
+}
+
 /**
  * Remove window from interface list, if empty, quit stuffkeeper
  */
@@ -51,8 +58,6 @@ void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
        StuffkeeperDataItem *item = stuffkeeper_data_backend_get_item(skdb, atoi(&uid[5]));
        if(item) {
           GtkWidget *win = stuffkeeper_item_window_new(skdb, item,config_file);
-          interface_list = g_list_append(interface_list, win);
-          g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(interface_element_destroyed), NULL);
        }
     }else if (strncmp(uid, "tag:", 4) == 0) 
     {
@@ -63,8 +68,6 @@ void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 			printf("Window items\n");
 			GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
 			gtk_widget_show(win);
-			interface_list = g_list_append(interface_list, win);
-			g_signal_connect(G_OBJECT(win), "destroy", G_CALLBACK(interface_element_destroyed), NULL);
 		}
 	}
     }
@@ -312,7 +315,6 @@ int main ( int argc, char **argv )
     /* Create a main interface */
     if(uid == NULL) {
         ski= stuffkeeper_interface_new(config_file);
-        interface_list = g_list_append(interface_list, ski);
     }
 
 
