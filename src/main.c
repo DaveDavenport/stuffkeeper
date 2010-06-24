@@ -53,25 +53,40 @@ void interface_element_destroyed(GtkWidget *win, gpointer data)
  */
 void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 {
-    if(strncmp(uid, "item:", 5) == 0)
+    gchar **entries = g_strsplit(uid, ":",2);
+    if(entries && entries[0] && entries[1])
     {
-       StuffkeeperDataItem *item = stuffkeeper_data_backend_get_item(skdb, atoi(&uid[5]));
-       if(item) {
-          GtkWidget *win = stuffkeeper_item_window_new(skdb, item,config_file);
-       }
-    }else if (strncmp(uid, "tag:", 4) == 0) 
-    {
-	StuffkeeperDataTag *tag = stuffkeeper_data_backend_get_tag(skdb, atoi(&uid[4]));
-	if(tag) {
-		GList *items = stuffkeeper_data_tag_get_items(tag);
-		if(items) {
-			printf("Window items\n");
-			GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
-			gtk_widget_show(win);
-		}
-	}
+	    if(strcmp(entries[0], "item") == 0)
+	    {
+		    StuffkeeperDataItem *item = stuffkeeper_data_backend_get_item(skdb, atoi(entries[1]));
+		    if(item) {
+			    GtkWidget *win = stuffkeeper_item_window_new(skdb, item,config_file);
+		    }
+	    }else if (strcmp(entries[0], "tag") == 0) 
+	    {
+		    StuffkeeperDataTag *tag = stuffkeeper_data_backend_get_tag(skdb, atoi(entries[1]));
+		    if(tag) {
+			    GList *items = stuffkeeper_data_tag_get_items(tag);
+			    if(items) {
+				    printf("Window items\n");
+				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
+				    gtk_widget_show(win);
+			    }
+		    }
+	    }else if (strcmp(entries[0], "schema") == 0) 
+	    {
+		    StuffkeeperDataSchema *schema = stuffkeeper_data_backend_get_schema(skdb, atoi(entries[1]));
+		    if(schema) {
+			    GList *items = stuffkeeper_data_schema_get_items(schema);
+			    if(items) {
+				    printf("Window items\n");
+				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
+				    gtk_widget_show(win);
+			    }
+		    }
+	    }
     }
-
+    g_strfreev(entries);
 }
 
 /**
