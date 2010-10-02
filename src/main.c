@@ -24,6 +24,7 @@
 
 /* List of active interface objects */
 GList *interface_list = NULL;
+StuffkeeperPluginManager    *spm                    = NULL;
 
 /**
  * Config system
@@ -51,9 +52,10 @@ void interface_element_destroyed(GtkWidget *win, gpointer data)
 /**
  * parses UID and tries to open right item
  */
-void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
+gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 {
     gchar **entries = g_strsplit(uid, ":",2);
+    gboolean retv = FALSE;
     if(entries && entries[0] && entries[1])
     {
 	    if(strcmp(entries[0], "item") == 0)
@@ -85,8 +87,17 @@ void open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 			    }
 		    }
 	    }
+        else if (g_utf8_collate(entries[0], "plugin") == 0)
+        {
+            GObject *o = stuffkeeper_plugin_manager_get_plugin_by_name(spm, entries[1]);
+            if(o != NULL) {
+                stuffkeeper_plugin_run_menu(STUFFKEEPER_PLUGIN(o), skdb);
+                retv = TRUE;
+            }
+        }
     }
     g_strfreev(entries);
+    return retv;
 }
 
 /**
@@ -146,7 +157,6 @@ int main ( int argc, char **argv )
     /* pointer holding the backend */
     StuffkeeperDataBackend      *skdb                   = NULL;
     StuffkeeperInterface        *ski                    = NULL;
-    StuffkeeperPluginManager    *spm                    = NULL;
     /**
      * Command line parsing stuff 
      */
@@ -154,6 +164,7 @@ int main ( int argc, char **argv )
     gchar                       *db_path                = NULL;
     gboolean                    version                 = FALSE;
     gboolean                    first_run               = FALSE;
+    gboolean                    run_interface           = TRUE;
 
     GOptionEntry entries[] = 
     {
@@ -327,18 +338,23 @@ int main ( int argc, char **argv )
         stuffkeeper_data_backend_set_locked(skdb, TRUE);
     }
 
-    /* Create a main interface */
-    if(uid == NULL) {
-        ski= stuffkeeper_interface_new(config_file);
-    }
-
-
-    TAC("Time elapsed until creating gui");
 
     /* This tells the backend to populate itself */
     stuffkeeper_data_backend_load(skdb,path);
 
     TAC("time elapsed until backend load");
+
+    if(uid != NULL) {
+        run_interface = open_uid(uid,skdb);
+    }
+
+    /* Create a main interface */
+    if(run_interface) {
+        ski= stuffkeeper_interface_new(config_file);
+    }
+
+
+    TAC("Time elapsed until creating gui");
     
     if(ski) {
         stuffkeeper_interface_initialize_interface(ski,skdb,G_OBJECT(spm));
@@ -349,10 +365,6 @@ int main ( int argc, char **argv )
 
 
     TAC("time elapsed until gtk_main()");
-
-    if(uid != NULL) {
-        open_uid(uid,skdb);
-    }
 
     if(first_run && ski)
     {

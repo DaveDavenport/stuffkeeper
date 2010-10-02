@@ -35,6 +35,21 @@ class Stuffkeeper:Plugin:Manager from G:Object
     }
 
     public
+    GObject *
+    get_plugin_by_name(self, const char *name)
+    {
+        GList *iter;
+        for(iter = g_list_first(self->_priv->plugins);iter;iter =g_list_next(iter))
+        {
+            FS *f = iter->data;
+            if(g_utf8_collate(f->name, name) == 0){
+                return f->object;
+            }
+        }
+        return NULL;
+    }
+
+    public
     GList *
     get_loaded_plugins(self)
     {
