@@ -514,8 +514,8 @@ public class GenericInput : Stuffkeeper.Plugin
     }
 }
 
-[ModuleInit]
-public GLib.Type register_plugin()
+//[ModuleInit]
+public Type register_plugin(Module module)
 {
     return typeof(GenericInput);
 }
