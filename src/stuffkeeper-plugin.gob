@@ -6,7 +6,8 @@ typedef enum _StuffkeeperPluginType {
     PLUGIN_NONE = 0,
     PLUGIN_ITEM = 1,        /* this works on a single item */
     PLUGIN_BACKGROUND = 2,  /* This gets called at startup */
-    PLUGIN_MENU = 4         /* Gets called from the menu */
+    PLUGIN_MENU = 4,         /* Gets called from the menu */
+    PLUGIN_TAG = 8
 }StuffkeeperPluginType;
 
 %}
@@ -69,10 +70,18 @@ class Stuffkeeper:Plugin from G:Object
         printf("This function should be overrided by the plugin\n");
     }
 
+    /* Runs on a tag */
+    virtual 
+    void
+    run_tag(self, StuffkeeperDataBackend *skdb)
+    {
+        printf("This function should be overrided by the plugin\n");
+    }
+
     /* background */
     virtual
     void
-    run_background(self,StuffkeeperDataBackend *skdb)
+    run_background(self,StuffkeeperDataTag *tag)
     {
         printf("This function should be overrided by the plugin\n");
     }

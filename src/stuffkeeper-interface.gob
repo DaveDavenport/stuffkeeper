@@ -1178,6 +1178,41 @@ class Stuffkeeper:Interface from G:Object
             }
         }
     }
+    private
+    void
+    menu_plugin_tag_called(self, GtkWidget *item)
+    {
+        StuffkeeperPlugin *plugin = g_object_get_data(G_OBJECT(item), "plugin");
+        if(plugin)
+        {
+            GtkWidget *tree = self->_priv->treeview1;
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
+            GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree));
+            GtkTreeIter iter;
+//            if(gtk_tree_selection_get_selected(selection, &model, &iter))
+            if(gtk_tree_selection_count_selected_rows(selection) == 1)
+            {
+                GList *list;
+                StuffkeeperDataTag *tag;
+
+                list = gtk_tree_selection_get_selected_rows(selection, &model);
+                if(gtk_tree_model_get_iter(model, &iter, (GtkTreePath *)list->data))
+                {
+                    gtk_tree_model_get(model, &iter, 3, &tag, -1);
+                    if(item)
+                    {
+                        stuffkeeper_plugin_run_tag(STUFFKEEPER_PLUGIN(plugin), tag);
+                        return;
+                    }
+                }
+                if(list)
+                {
+                    g_list_foreach(list, (GFunc) gtk_tree_path_free, NULL);
+                    g_list_free(list);
+                }
+            }
+        }
+    }
 
     public
     gboolean 
@@ -1311,6 +1346,37 @@ class Stuffkeeper:Interface from G:Object
                         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
                     }
                 }
+                {
+                    GList *iter, *node = stuffkeeper_plugin_manager_get_loaded_plugins(self->_priv->spm); 
+                    if(node)
+                    {
+                        for(iter = g_list_first(node);iter;iter = g_list_next(iter))
+                        {
+                            StuffkeeperPlugin *plugin = iter->data; 
+                            if(stuffkeeper_plugin_get_plugin_type(plugin)&PLUGIN_TAG)
+                            {
+                                gint width = 16, height=16;
+                                GdkPixbuf *pb = stuffkeeper_plugin_get_icon(plugin);
+                                menu_item = gtk_image_menu_item_new_with_label(stuffkeeper_plugin_get_name(plugin));
+                                if(pb)
+                                {
+                                    GdkPixbuf *scale = gdk_pixbuf_scale_simple(pb,
+                                            width, height, GDK_INTERP_BILINEAR);
+                                    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item),
+                                            gtk_image_new_from_pixbuf(scale));
+                                    g_object_unref(scale);
+                                }
+
+                                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", 
+                                        G_CALLBACK(self_menu_plugin_tag_called), self);
+                                g_object_set_data(G_OBJECT(menu_item), "plugin", plugin);
+                                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+                            }
+                        }
+                        g_list_free(node);
+                    }
+                }
+
             }
             else if (type == LP_TYPE_SCHEMA) 
             {
