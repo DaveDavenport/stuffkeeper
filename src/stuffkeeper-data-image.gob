@@ -11,7 +11,7 @@ requires 2.0.10
 #include "debug.h"
 #include "misc.h"    
 #include "stuffkeeper-data-backend.h"
-#define IMAGE_SIZE 250
+#define DEFAULT_IMAGE_SIZE 250
 %}
 /* top of the file */
 %{
@@ -23,6 +23,10 @@ static GtkTargetEntry data_image_drag_target[] =
 	{ "text/uri-list", 0, 3},
     { "_NETSCAPE_URL", 0,4},
     { "x-url/http", 0,5}
+
+};
+enum {
+		PRIVATE_FIELD_IMAGE_SIZE = 0
 };
 %}
 class Stuffkeeper:Data:Image from Gtk:Event:Box
@@ -49,35 +53,39 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
     {
         int set = FALSE;
         if(field && self->_priv->field && strcmp(field, self->_priv->field) == 0)
-        {
-            gchar *value = stuffkeeper_data_item_get_string(item, self->_priv->field);        
-            if(value && strlen(value))
-            {
-                const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
-                if(path)
-                {
-                    gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
-                    if(fpath)
-                    {
-                        GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, IMAGE_SIZE);
-                        //gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
-                        debug_printf("Trying to load: %s %p\n", fpath,pb);
-                        if(pb)
-                        {
-                            screenshot_add_border(&pb);
-                            screenshot_add_shadow(&pb); 
-                            gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
-                            g_object_unref(pb);
-                            set = TRUE;
-                        }
-                        g_free(fpath);
-                    }
-                }
-                g_free(value);
-            }
-            if(!set)
-                gtk_image_set_from_stock(GTK_IMAGE(self->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
-        }
+		{
+				gchar *value = stuffkeeper_data_item_get_string(item, self->_priv->field);        
+				if(value && strlen(value))
+				{
+						const gchar *path = stuffkeeper_data_backend_get_path(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item)));
+						if(path)
+						{
+								gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
+								if(fpath)
+								{
+										StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(item);
+										int image_size;
+										if(!stuffkeeper_data_schema_get_custom_field_integer(schema, field,PRIVATE_FIELD_IMAGE_SIZE, &image_size)) {
+												image_size = DEFAULT_IMAGE_SIZE;
+										} 
+										GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, image_size);
+										debug_printf("Trying to load: %s %p\n", fpath,pb);
+										if(pb)
+										{
+												screenshot_add_border(&pb);
+												screenshot_add_shadow(&pb); 
+												gtk_image_set_from_pixbuf(GTK_IMAGE(self->_priv->image), pb);
+												g_object_unref(pb);
+												set = TRUE;
+										}
+										g_free(fpath);
+								}
+						}
+						g_free(value);
+				}
+				if(!set)
+						gtk_image_set_from_stock(GTK_IMAGE(self->_priv->image), GTK_STOCK_MISSING_IMAGE, GTK_ICON_SIZE_DIALOG);
+		}
     
     }
     private
@@ -89,11 +97,16 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
         {
 			if(gdk_pixbuf_get_file_info(original_path, NULL,NULL))
 			{
+				StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->item);
+				int image_size;
+				if(!stuffkeeper_data_schema_get_custom_field_integer(schema, self->_priv->field,PRIVATE_FIELD_IMAGE_SIZE, &image_size)) {
+					image_size = DEFAULT_IMAGE_SIZE;
+				} 
 				gchar *id = g_strdup_printf("%i-%s.jpg", stuffkeeper_data_item_get_id(self->_priv->item), self->_priv->field);
 				gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
 
 				debug_printf("From '%s' --> '%s'\n", original_path, fpath);
-				GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(original_path, IMAGE_SIZE);
+				GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(original_path, image_size);
 				debug_printf("%p\n",pb);
 				gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
 				g_object_unref(pb);
@@ -133,35 +146,41 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
         if(stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             return;
         if(event->button == 1)
-        {
-            GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick an image", 
-                        NULL, 
-                        GTK_FILE_CHOOSER_ACTION_OPEN,
-                        GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
-                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                        GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
-                        NULL);
-		file_chooser_enable_image_preview(dialog,IMAGE_SIZE); 
-            switch(gtk_dialog_run(GTK_DIALOG(dialog)))
-            {
-                case GTK_RESPONSE_NO:
-                    stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
-                    break;
-                case GTK_RESPONSE_OK:
-                    {
-                        gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
-                        if(file)
-                        {
-                            debug_printf("Saving file: %s\n", file);
-                            self_copy_path(self, file);
-                            g_free(file);
-                        }
-                    }
-                default:
-                    break;
-            }
-            gtk_widget_destroy(dialog);
-        }
+		{
+				StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(self->_priv->item);
+				GtkWidget *dialog = gtk_file_chooser_dialog_new("Pick an image", 
+								NULL, 
+								GTK_FILE_CHOOSER_ACTION_OPEN,
+								GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
+								GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+								GTK_STOCK_OPEN, GTK_RESPONSE_OK, 
+								NULL);
+
+				int image_size;
+				if(!stuffkeeper_data_schema_get_custom_field_integer(schema, self->_priv->field,PRIVATE_FIELD_IMAGE_SIZE, &image_size)) {
+						image_size = DEFAULT_IMAGE_SIZE;
+				} 
+				file_chooser_enable_image_preview(dialog,image_size); 
+				switch(gtk_dialog_run(GTK_DIALOG(dialog)))
+				{
+						case GTK_RESPONSE_NO:
+								stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
+								break;
+						case GTK_RESPONSE_OK:
+								{
+										gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+										if(file)
+										{
+												debug_printf("Saving file: %s\n", file);
+												self_copy_path(self, file);
+												g_free(file);
+										}
+								}
+						default:
+								break;
+				}
+				gtk_widget_destroy(dialog);
+		}
         else
         {
             stuffkeeper_data_item_set_string(self->_priv->item, self->_priv->field,"");
@@ -202,18 +221,23 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 
                 gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images", value,NULL); 
                 if(fpath)
-                {
-                    //GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_scale(fpath, IMAGE_SIZE,IMAGE_SIZE, TRUE, NULL);
-                    GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, IMAGE_SIZE);
-                    if(pb)
-                    {
-                        screenshot_add_border(&pb);
-                        screenshot_add_shadow(&pb); 
-                        gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
-                        g_object_unref(pb);
-                    }
-                    g_free(fpath);
-                }
+				{
+						GdkPixbuf *pb;
+						StuffkeeperDataSchema *schema = stuffkeeper_data_item_get_schema(obj->_priv->item);
+						int image_size;
+						if(!stuffkeeper_data_schema_get_custom_field_integer(schema, obj->_priv->field,PRIVATE_FIELD_IMAGE_SIZE, &image_size)) {
+								image_size = DEFAULT_IMAGE_SIZE;
+						} 
+						pb = gdk_pixbuf_new_from_file_at_max_size(fpath, image_size);
+						if(pb)
+						{
+								screenshot_add_border(&pb);
+								screenshot_add_shadow(&pb); 
+								gtk_image_set_from_pixbuf(GTK_IMAGE(obj->_priv->image), pb);
+								g_object_unref(pb);
+						}
+						g_free(fpath);
+				}
             }
             g_free(value);
         }

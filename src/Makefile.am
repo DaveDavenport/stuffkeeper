@@ -52,6 +52,7 @@ stuffkeeper_VALAFILES=\
 	stuffkeeper-data-boolean-config.vala \
 	stuffkeeper-data-rating-config.vala \
     stuffkeeper-multiple-item-view.vala \
+    stuffkeeper-data-image-config.vala \
 	$(NULL)
 
 stuffkeeper_VALASOURCES=\

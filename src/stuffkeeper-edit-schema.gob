@@ -22,6 +22,7 @@ requires 2.0.10
 #include "stuffkeeper-data-boolean-config.h"
 #include "stuffkeeper-data-rating-config.h"
 #include "stuffkeeper-data-password-config.h"
+#include "stuffkeeper-data-image-config.h"
 %}
 %ph{
     typedef enum _StoreFields
@@ -987,6 +988,9 @@ class Stuffkeeper:Edit:Schema from G:Object
 						widget = stuffkeeper_data_entry_config_new(self->_priv->schema, id);
 					} else if (type == FIELD_TYPE_INTEGER) {
 						widget = stuffkeeper_data_spinbutton_config_new(self->_priv->schema, id);
+					} else if (type == FIELD_TYPE_IMAGE) {
+						widget = stuffkeeper_data_image_config_new();
+						stuffkeeper_data_image_config_setup(STUFFKEEPER_DATA_IMAGE_CONFIG(widget),self->_priv->schema, id);
 					} else if (type == FIELD_TYPE_BOOLEAN) {
 						widget = (GtkWidget *)stuffkeeper_data_boolean_config_new();
 						stuffkeeper_data_boolean_config_setup(STUFFKEEPER_DATA_BOOLEAN_CONFIG(widget),self->_priv->schema, id);
