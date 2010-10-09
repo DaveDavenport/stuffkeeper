@@ -73,7 +73,7 @@ class Stuffkeeper:Plugin from G:Object
     /* Runs on a tag */
     virtual 
     void
-    run_tag(self, StuffkeeperDataBackend *skdb)
+    run_tag(self, StuffkeeperDataTag *tag)
     {
         printf("This function should be overrided by the plugin\n");
     }
@@ -81,7 +81,7 @@ class Stuffkeeper:Plugin from G:Object
     /* background */
     virtual
     void
-    run_background(self,StuffkeeperDataTag *tag)
+    run_background(self,StuffkeeperDataBackend *skdb)
     {
         printf("This function should be overrided by the plugin\n");
     }

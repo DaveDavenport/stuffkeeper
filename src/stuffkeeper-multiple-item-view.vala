@@ -2,7 +2,7 @@ using GLib;
 using Gtk;
 using Stuffkeeper;
 
-private class MultipleItemTag : Gtk.CheckButton
+public class MultipleItemTag : Gtk.CheckButton
 {
     private weak Stuffkeeper.DataBackend backend = null;
     private weak List <weak Stuffkeeper.DataItem> items = null;

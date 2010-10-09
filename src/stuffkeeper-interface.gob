@@ -700,9 +700,8 @@ class Stuffkeeper:Interface from G:Object
     gboolean 
     close_window(self)
     {
-        int n;
-	self_destroy(self);
-	g_object_unref(self);
+        self_destroy(self);
+        g_object_unref(self);
         return TRUE;
     }
     public
@@ -1613,7 +1612,7 @@ class Stuffkeeper:Interface from G:Object
             /* put this after the show, or it will turn up black, for some oddball reason */
             self_interface_item_selection_changed(self, gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2)));
 
-	    interface_element_add(self);
+            interface_element_add(GTK_WIDGET(self));
 
             return self;
         }

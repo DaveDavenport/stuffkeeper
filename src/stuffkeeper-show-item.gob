@@ -21,8 +21,11 @@ requires 2.0.10
 #include "stuffkeeper-data-taglist2.h"
 #include "stuffkeeper-data-expander.h"
 #include "stuffkeeper-data-files.h"
+#include "stuffkeeper-plugin-manager.h"
+#include "stuffkeeper-plugin.h"
 #define IMAGE_SIZE 250
 
+extern StuffkeeperPluginManager *spm;
 typedef struct state {
     int hpacking;
     int left_offset;
@@ -166,10 +169,60 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
         gtk_box_pack_start(GTK_BOX(hbox), label1, TRUE, TRUE, 0);
 
         gtk_box_pack_start(GTK_BOX(self->_priv->vbox), hbox, FALSE, TRUE, 0);
+
+
+
+
+        node = stuffkeeper_plugin_manager_get_loaded_plugins(spm); 
+        if(node)
+        {
+            GtkWidget *ali = gtk_alignment_new(0.0f, 0.0f, 0.0f, 0.0f);
+            GtkWidget *bbox = gtk_hbox_new(FALSE, 6);
+            GList *iter;
+            label1 = gtk_label_new("");
+            gtk_label_set_markup(GTK_LABEL(label1),_("<b>Plugins</b>"));
+            gtk_widget_modify_fg(GTK_WIDGET(label1), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->black));
+            gtk_misc_set_alignment(GTK_MISC(label1), 1,0.5);
+            gtk_size_group_add_widget(self->_priv->group, label1);
+            gtk_box_pack_start(GTK_BOX(bbox), label1, FALSE, FALSE, 0);
+            for(iter = g_list_first(node); iter != NULL; iter = g_list_next(iter))
+            {
+                StuffkeeperPlugin *plugin = STUFFKEEPER_PLUGIN(iter->data);
+                if(stuffkeeper_plugin_get_plugin_type(plugin)&PLUGIN_ITEM)
+                {
+                    GtkWidget *button = gtk_button_new_with_label(stuffkeeper_plugin_get_name(plugin));
+                    const GdkPixbuf *pb = stuffkeeper_plugin_get_icon(plugin);
+                    if(pb) {
+                        GdkPixbuf *scaled = gdk_pixbuf_scale_simple(pb, 24,24, GDK_INTERP_BILINEAR);
+                        GtkWidget *image = gtk_image_new_from_pixbuf(scaled);
+                        g_object_unref(scaled);
+                        gtk_button_set_image(GTK_BUTTON(button), image);
+                    }
+                    
+                    g_object_set_data(G_OBJECT(button), "plugin", plugin);
+                    g_signal_connect_swapped(G_OBJECT(button), "clicked", G_CALLBACK(self_item_plugin_called), self);
+                    gtk_box_pack_start(GTK_BOX(bbox), button, FALSE, FALSE, 0);
+                }
+            }
+            gtk_container_add(GTK_CONTAINER(ali), bbox);
+            gtk_box_pack_start(GTK_BOX(self->_priv->vbox), ali, TRUE, TRUE, 0);
+            g_list_free(node);
+        }
+
         gtk_widget_show_all(GTK_WIDGET(self));
         g_queue_free(queue);
     }
 
+    private 
+    void
+    item_plugin_called(self, GtkWidget *button)
+    {
+        StuffkeeperPlugin *plugin = g_object_get_data(G_OBJECT(button), "plugin");
+        if(plugin)
+        {
+            stuffkeeper_plugin_run_item(STUFFKEEPER_PLUGIN(plugin), self->_priv->item);
+        }
+    }
     private
     void
     fields_reordered(self, StuffkeeperDataSchema *schema)
@@ -269,7 +322,7 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
         PARENT_HANDLER(obj);
     }
 
-    /* Custom drawing function */
+    /* Custom drawing function 
     public void draw(self)
     {
         cairo_surface_t *surface = cairo_ps_surface_create("test.ps", 800,800);
@@ -286,7 +339,6 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
         gint field_name_width=0;
         int i;
         gint field_width = width;
-        /* Get the max width of the field name */
 
         PangoFontDescription *fd = pango_context_get_font_description(pango_layout_get_context(layout));
         fd = pango_font_description_copy(fd);
@@ -329,7 +381,6 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
             gint rh=0;
             FieldType type = stuffkeeper_data_schema_get_field_type(self->_priv->schema, self->_priv->retv[i]);
             if(type == FIELD_TYPE_HPACKING || type == FIELD_TYPE_VPACKING  || type == FIELD_TYPE_EXPANDER) {
-                /* want  to track here how many columns */
                 state *l,*s = g_malloc0(sizeof *s);
                 l = g_queue_peek_head(queue);
                 g_queue_push_head(queue, s); 
@@ -476,6 +527,6 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
             printf("Block height: %i\n", top_offset);
         }
         cairo_destroy(ct);
-    }
+    }*/
 
 }

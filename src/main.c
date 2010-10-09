@@ -62,7 +62,7 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 	    {
 		    StuffkeeperDataItem *item = stuffkeeper_data_backend_get_item(skdb, atoi(entries[1]));
 		    if(item) {
-			    GtkWidget *win = stuffkeeper_item_window_new(skdb, item,config_file);
+			    stuffkeeper_item_window_new(skdb, item,config_file);
 		    }
 	    }else if (strcmp(entries[0], "tag") == 0) 
 	    {

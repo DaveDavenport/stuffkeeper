@@ -3,7 +3,7 @@ using Gtk;
 using Stuffkeeper;
 
 namespace Stuffkeeper{
-    class Data.Files : Gtk.ScrolledWindow
+    public class Data.Files : Gtk.ScrolledWindow
     {
         private Gtk.IconView iv = new Gtk.IconView();
         private string field = null;

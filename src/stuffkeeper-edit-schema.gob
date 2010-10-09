@@ -989,7 +989,7 @@ class Stuffkeeper:Edit:Schema from G:Object
 					} else if (type == FIELD_TYPE_INTEGER) {
 						widget = stuffkeeper_data_spinbutton_config_new(self->_priv->schema, id);
 					} else if (type == FIELD_TYPE_IMAGE) {
-						widget = stuffkeeper_data_image_config_new();
+						widget = (GtkWidget *)stuffkeeper_data_image_config_new();
 						stuffkeeper_data_image_config_setup(STUFFKEEPER_DATA_IMAGE_CONFIG(widget),self->_priv->schema, id);
 					} else if (type == FIELD_TYPE_BOOLEAN) {
 						widget = (GtkWidget *)stuffkeeper_data_boolean_config_new();

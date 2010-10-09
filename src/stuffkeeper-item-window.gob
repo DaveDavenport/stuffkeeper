@@ -128,8 +128,8 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
 
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
             gtk_widget_show_all(dialog);
-		interface_element_add(self);
-            return self;
+            interface_element_add(GTK_WIDGET(self));
+            return GTK_WIDGET(self);
         }
     public
     Gtk:Widget * 
@@ -167,12 +167,12 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
                 }
             }
 
-            container = stuffkeeper_multiple_item_view_new(items);
+            container = (GtkWidget *)stuffkeeper_multiple_item_view_new(items);
             gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), container, TRUE, TRUE, 0);
 
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
             gtk_widget_show_all(dialog);
-	    interface_element_add(self);
-	    return self;
+            interface_element_add(GTK_WIDGET(self));
+            return GTK_WIDGET(self);
         }
 }

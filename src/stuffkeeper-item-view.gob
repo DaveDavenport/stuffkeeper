@@ -8,6 +8,8 @@ requires 2.0.10
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-edit-schema.h"
+#include "stuffkeeper-multiple-item-view.h"
+#include "stuffkeeperglue.h"
 %}
 
 class Stuffkeeper:Item:View from Gtk:VBox
