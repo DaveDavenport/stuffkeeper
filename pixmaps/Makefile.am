@@ -14,6 +14,23 @@ stuffkeepericonscalabledir= $(datadir)/icons/hicolor/scalable/apps
 stuffkeepericonscalable_DATA =\
 			      scalable/stuffkeeper.svg
 
+
+stuffkeepericon162dir= $(datadir)/stuffkeeper/icons/hicolor/16x16/apps
+stuffkeepericon162_DATA =\
+			16/stuffkeeper.png
+
+stuffkeepericon482dir= $(datadir)/stuffkeeper/icons/hicolor/48x48/apps
+stuffkeepericon482_DATA =\
+			48/stuffkeeper.png
+
+stuffkeepericon642dir= $(datadir)/stuffkeeper/icons/hicolor/64x64/apps
+stuffkeepericon642_DATA =\
+			64/stuffkeeper.png
+
+stuffkeepericonscalable2dir= $(datadir)/stuffkeeper/icons/hicolor/scalable/apps
+stuffkeepericonscalable2_DATA =\
+			      scalable/stuffkeeper.svg
+
 stuffkeepericoninterndir= $(datadir)/stuffkeeper/icons/hicolor/16x16/actions
 stuffkeepericonintern_DATA =\
 			    internet-mail.png\

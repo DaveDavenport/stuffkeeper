@@ -231,6 +231,7 @@ int main ( int argc, char **argv )
     /**
      * Add icon theme directory
      */
+     printf("Add icon path: %s\n", PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
     gtk_icon_theme_append_search_path(gtk_icon_theme_get_default (),
                                    PACKAGE_DATADIR G_DIR_SEPARATOR_S "icons");
 
