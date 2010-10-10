@@ -66,6 +66,7 @@ requires 2.0.10
 class Stuffkeeper:Interface from G:Object 
 {
     private GtkTreeModel        *model_tags         = {NULL};
+    private GtkTreeModel        *model_tags_filter  = {NULL};
     private GtkTreeModel        *model_items        = {NULL};
     private GtkTreeModel        *model_schemas      = {NULL};
     /* search items */
@@ -625,11 +626,27 @@ class Stuffkeeper:Interface from G:Object
                     }
                 }
             }
+            else if (type == LP_TYPE_TAG)
+            {
+
+                if(gtk_tree_model_get_iter_from_string(model, &iter, path))
+                {
+                    GtkTreeIter child;
+                    gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
+                    gtk_tree_model_filter_convert_iter_to_child_iter(GTK_TREE_MODEL_FILTER(model), &child, &iter);
+
+                    gtk_list_store_set(GTK_LIST_STORE(self->_priv->model_tags), &child, LP_SELECTED, value, -1);
+                    /* refilter the items list */
+                    gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_items_filter));
+                }
+
+            }
             else
             {
                 if(gtk_tree_model_get_iter_from_string(model, &iter, path))
                 {
                     gboolean value = !gtk_cell_renderer_toggle_get_active(renderer);
+
                     gtk_list_store_set(GTK_LIST_STORE(model), &iter, LP_SELECTED,value,-1);
 
                     /* refilter the items list */
@@ -1623,16 +1640,19 @@ class Stuffkeeper:Interface from G:Object
     void
     left_pane_changed(self, GtkComboBox *box)
     {
+        GtkWidget *entry = (GtkWidget *)glade_xml_get_widget(self->_priv->xml, "LeftPaneFilterEntry");
         int i = gtk_combo_box_get_active(box);
 
         gtk_tree_view_column_set_visible(self->_priv->column_lv_pixbuf, FALSE);
         if(i==0){
-            gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags));
+            gtk_widget_show(entry);
+            gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_tags_filter));
         }else if (i == 1){
-
+            gtk_widget_hide(entry);
             gtk_tree_view_column_set_visible(self->_priv->column_lv_pixbuf, TRUE);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_schemas));
         }else if ( i == 2) {
+            gtk_widget_hide(entry);
             gtk_tree_view_set_model(GTK_TREE_VIEW(self->_priv->treeview1), GTK_TREE_MODEL(self->_priv->model_searches));
         }
 
@@ -1908,6 +1928,52 @@ class Stuffkeeper:Interface from G:Object
         }
         return FALSE;
     }
+    public void left_pane_filter_entry_clear(self, GtkEntryIconPosition pos, GdkEvent *event, GtkEntry *entry)
+    {
+        if(pos == GTK_ENTRY_ICON_SECONDARY) {
+            gtk_entry_set_text(entry, "");
+        }
+
+    }
+    public void left_pane_filter_changed(self, GtkEditable *editable)
+    {
+        gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_tags_filter));
+    }
+
+    private gboolean left_pane_filter_function(GtkTreeModel *model, GtkTreeIter *iter,gpointer data)
+    {
+        Self *self = SELF(data);
+        gboolean visible = FALSE;
+        const gchar *data;
+        gchar *compare = NULL;
+
+        GtkEntry *entry = (GtkEntry *)glade_xml_get_widget(self->_priv->xml, "LeftPaneFilterEntry");
+        if(entry == NULL  || gtk_entry_buffer_get_length (gtk_entry_get_buffer (entry)) == 0)
+        {
+            /* if nothing entered, allow everything */
+            return TRUE;
+        }
+        data = gtk_entry_get_text(entry);
+        gtk_tree_model_get (model, iter, 1, &compare, -1);
+        if(compare)
+        {
+            gchar *asmall = g_utf8_normalize(compare, -1, G_NORMALIZE_ALL);
+            gchar *bsmall = g_utf8_normalize(data, -1, G_NORMALIZE_ALL);
+            gchar *alower = g_utf8_casefold(asmall, -1);
+            gchar *blower = g_utf8_casefold(bsmall, -1);
+
+            visible = strstr(alower, blower) != NULL;
+            g_free(alower);
+            g_free(blower);
+            g_free(asmall);
+            g_free(bsmall);
+            g_free(compare);
+        }
+
+
+        return visible;
+    }
+
     /**
      * Initialize the main gui
      */
@@ -1966,6 +2032,11 @@ class Stuffkeeper:Interface from G:Object
             /* Tags */
             self->_priv->model_tags = (GtkTreeModel *)gtk_list_store_new(5, G_TYPE_INT,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_POINTER,G_TYPE_INT);
             gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_tags), 1, GTK_SORT_ASCENDING);
+            /* Setup filtering */
+            self->_priv->model_tags_filter = (GtkTreeModel *)gtk_tree_model_filter_new(GTK_TREE_MODEL(self->_priv->model_tags),NULL);
+            gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(self->_priv->model_tags_filter), self_left_pane_filter_function, self, NULL);
+
+
             /** Load the tags */
             node = stuffkeeper_data_backend_get_tags(self->_priv->skdbg);
             for(iter = node;iter;iter = g_list_next(iter))

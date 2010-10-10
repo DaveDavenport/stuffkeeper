@@ -1,6 +1,6 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <glade-interface>
-  <!-- interface-requires gtk+ 2.6 -->
+  <!-- interface-requires gtk+ 2.16 -->
   <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkWindow" id="win">
     <property name="title" translatable="yes">StuffKeeper</property>
@@ -11,7 +11,6 @@
     <child>
       <widget class="GtkVBox" id="mainwindow_vbox">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <child>
           <widget class="GtkMenuBar" id="menubar1">
             <property name="visible">True</property>
@@ -457,7 +456,6 @@
             <child>
               <widget class="GtkVBox" id="vbox2">
                 <property name="visible">True</property>
-                <property name="orientation">vertical</property>
                 <property name="spacing">6</property>
                 <child>
                   <widget class="GtkHBox" id="hbox4">
@@ -508,6 +506,24 @@ Filters</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
+                <child>
+                  <widget class="GtkEntry" id="LeftPaneFilterEntry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="invisible_char">•</property>
+                    <property name="primary_icon_stock">gtk-find</property>
+                    <property name="secondary_icon_stock">gtk-clear</property>
+                    <property name="secondary_icon_activatable">True</property>
+                    <property name="secondary_icon_sensitive">True</property>
+                    <signal name="changed" handler="left_pane_filter_changed"/>
+                    <signal name="icon_press" handler="left_pane_filter_entry_clear"/>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </widget>
               <packing>
                 <property name="resize">False</property>
@@ -522,7 +538,6 @@ Filters</property>
                 <child>
                   <widget class="GtkVBox" id="vbox3">
                     <property name="visible">True</property>
-                    <property name="orientation">vertical</property>
                     <property name="spacing">6</property>
                     <child>
                       <widget class="GtkHBox" id="hbox3">
@@ -668,18 +683,15 @@ Filters</property>
     <property name="window_position">center-on-parent</property>
     <property name="icon_name">stuffkeeper</property>
     <property name="type_hint">dialog</property>
-    <property name="has_separator">False</property>
     <signal name="response" handler="close"/>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
-        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
             <property name="border_width">9</property>
-            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="eventbox">
@@ -764,7 +776,7 @@ Filters</property>
                   <widget class="GtkEntry" id="title_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                   </widget>
                   <packing>
                     <property name="position">1</property>
@@ -809,7 +821,6 @@ Filters</property>
                     <child>
                       <widget class="GtkVButtonBox" id="vbuttonbox1">
                         <property name="visible">True</property>
-                        <property name="orientation">vertical</property>
                         <property name="spacing">6</property>
                         <property name="layout_style">start</property>
                         <child>
@@ -1048,7 +1059,6 @@ Filters</property>
     <property name="window_position">center-on-parent</property>
     <property name="icon_name">stuffkeeper</property>
     <property name="type_hint">dialog</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox2">
         <property name="visible">True</property>
@@ -1091,7 +1101,7 @@ Filters</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                     <signal name="changed" handler="filename_changed"/>
                   </widget>
                   <packing>
@@ -1194,7 +1204,6 @@ Filters</property>
     <property name="title" translatable="yes">Export to CSV</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
@@ -1283,7 +1292,7 @@ Filters</property>
                       <widget class="GtkEntry" id="filename_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="invisible_char">&#x25CF;</property>
+                        <property name="invisible_char">●</property>
                         <property name="text" translatable="yes">database.csv</property>
                       </widget>
                       <packing>
@@ -1428,7 +1437,6 @@ Filters</property>
     <property name="title" translatable="yes">Export to CSV</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox7">
         <property name="visible">True</property>
@@ -1574,7 +1582,7 @@ Filters</property>
                       <widget class="GtkEntry" id="filename_entry1">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="invisible_char">&#x25CF;</property>
+                        <property name="invisible_char">●</property>
                         <property name="text" translatable="yes">database.html</property>
                       </widget>
                       <packing>
@@ -1726,7 +1734,6 @@ Filters</property>
     <property name="default_width">500</property>
     <property name="default_height">400</property>
     <property name="type_hint">dialog</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox5">
         <property name="visible">True</property>
@@ -1795,7 +1802,7 @@ Filters</property>
                   <widget class="GtkEntry" id="title_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                     <signal name="changed" handler="search_title_changed"/>
                   </widget>
                   <packing>
@@ -1915,7 +1922,6 @@ Filters</property>
     <property name="border_width">5</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
-    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox6">
         <property name="visible">True</property>
@@ -2015,7 +2021,7 @@ Filters</property>
                   <widget class="GtkEntry" id="entry_name">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                   </widget>
                   <packing>
                     <property name="left_attach">1</property>
