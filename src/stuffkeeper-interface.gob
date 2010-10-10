@@ -153,6 +153,8 @@ class Stuffkeeper:Interface from G:Object
                 debug_printf("Moving cursor to new item\n");
                 gtk_tree_view_set_cursor(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL, FALSE);
                 gtk_tree_path_free(path);
+            }else {
+                self_popup_item(self, item);
             }
         }
     }
@@ -476,9 +478,9 @@ class Stuffkeeper:Interface from G:Object
 
             }while(gtk_tree_model_iter_next(self->_priv->model_tags, &iter));
         }
-	/* signal to other window components that the item was added on this
-	 * window */
-	self_item_added_here(self, item);
+        /* signal to other window components that the item was added on this
+         * window */
+        self_item_added_here(self, item);
     }
     /**
      * Add item button clicked 
