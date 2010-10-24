@@ -75,6 +75,7 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file, title);
                     g_free(title);
 				    gtk_widget_show(win);
+                    g_list_free(items);
 			    }
 		    }
 	    }else if (strcmp(entries[0], "schema") == 0) 
@@ -88,6 +89,7 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file,title);
                     g_free(title);
 				    gtk_widget_show(win);
+                    g_list_free(items);
 			    }
 		    }
 	    }

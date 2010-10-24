@@ -517,6 +517,7 @@ Filters</property>
                     <property name="secondary_icon_sensitive">True</property>
                     <signal name="changed" handler="left_pane_filter_changed"/>
                     <signal name="icon_press" handler="left_pane_filter_entry_clear"/>
+                    <signal name="activate" handler="left_pane_filter_entry_activate"/>
                   </widget>
                   <packing>
                     <property name="expand">False</property>

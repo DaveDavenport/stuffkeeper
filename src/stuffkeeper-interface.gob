@@ -1939,6 +1939,67 @@ class Stuffkeeper:Interface from G:Object
     {
         gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(self->_priv->model_tags_filter));
     }
+   
+    /*
+     * React if the user presses enter in the filter entry. 
+     * 1 item visible -> open it.
+     * 2 or more items visible -> do nothing.
+     * 3 items visible -> ask user to add it as tag.
+     *
+     */
+    public void left_pane_filter_entry_activate(self, GtkEntry *entry)
+    {
+        gboolean locked = stuffkeeper_data_backend_get_locked(self->_priv->skdbg);
+        int type = gtk_combo_box_get_active(GTK_COMBO_BOX(self->_priv->LeftPaneCB));
+        int num_items = gtk_tree_model_iter_n_children(GTK_TREE_MODEL(self->_priv->model_tags_filter), NULL);
+        if(type != 0) return;
+        if( num_items == 0) {
+            if(!locked) {
+                GtkDialog * dialog = gtk_message_dialog_new_with_markup(self->_priv->win,
+                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_INFO,
+                        GTK_BUTTONS_OK_CANCEL,
+                        "Add tag with name: <i>%s</i>?",
+                        gtk_entry_get_text(entry));
+                switch(gtk_dialog_run(dialog))
+                {
+                    case GTK_RESPONSE_OK:
+                    {
+                        StuffkeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdbg);
+                        stuffkeeper_data_tag_set_title(tag, gtk_entry_get_text(entry));
+                    }
+                    default:
+                        gtk_widget_destroy(dialog);
+                        break;
+                }
+            }
+        }else if (num_items == 1) {
+            GtkTreeIter iter;
+            if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->model_tags_filter), &iter))
+            {
+                StuffkeeperDataTag *tag;
+                gtk_tree_model_get(GTK_TREE_MODEL(self->_priv->model_tags_filter), &iter,3, &tag, -1);
+                if(tag)
+                {
+                    if(tag) {
+                        GList *items = stuffkeeper_data_tag_get_items(tag);
+                        if(items) {
+                            gchar *title = stuffkeeper_data_tag_get_title(tag);
+                            printf("Window items\n");
+                            GtkWidget *win = stuffkeeper_item_window_new_multiple(self->_priv->skdbg, items,config_file, title);
+                            g_free(title);
+                            gtk_widget_show(win);
+                            g_list_free(items);
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+    }
+
 
     private gboolean left_pane_filter_function(GtkTreeModel *model, GtkTreeIter *iter,gpointer data)
     {
