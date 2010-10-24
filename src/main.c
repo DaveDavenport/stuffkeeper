@@ -70,8 +70,10 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 		    if(tag) {
 			    GList *items = stuffkeeper_data_tag_get_items(tag);
 			    if(items) {
+                    gchar *title = stuffkeeper_data_tag_get_title(tag);
 				    printf("Window items\n");
-				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
+				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file, title);
+                    g_free(title);
 				    gtk_widget_show(win);
 			    }
 		    }
@@ -81,8 +83,10 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 		    if(schema) {
 			    GList *items = stuffkeeper_data_schema_get_items(schema);
 			    if(items) {
+                    gchar *title = stuffkeeper_data_schema_get_title(schema);
 				    printf("Window items\n");
-				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file);
+				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file,title);
+                    g_free(title);
 				    gtk_widget_show(win);
 			    }
 		    }

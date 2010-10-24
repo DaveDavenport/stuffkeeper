@@ -133,7 +133,7 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
         }
     public
     Gtk:Widget * 
-        new_multiple (Stuffkeeper:Data:Backend *skdb, GList *items, GKeyFile *config_file)
+        new_multiple (Stuffkeeper:Data:Backend *skdb, GList *items, GKeyFile *config_file, const gchar *title)
         {                                                                                                                                            
             Self *self = GET_NEW;
             GError *error = NULL;
@@ -167,7 +167,7 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
                 }
             }
 
-            container = (GtkWidget *)stuffkeeper_multiple_item_view_new(items);
+            container = (GtkWidget *)stuffkeeper_multiple_item_view_new(items, title);
             gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), container, TRUE, TRUE, 0);
 
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);

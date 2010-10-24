@@ -940,7 +940,7 @@ class Stuffkeeper:Interface from G:Object
                 }
                 if(mitems) mitems = g_list_reverse(mitems);
                 /* Edit multiple items widget */
-                wid = (GtkWidget *)stuffkeeper_multiple_item_view_new(mitems);
+                wid = (GtkWidget *)stuffkeeper_multiple_item_view_new(mitems, NULL);
                 gtk_container_add(GTK_CONTAINER(self->_priv->item_view_container), wid);
                 gtk_widget_show_all(self->_priv->item_view_container);
                 /* cleanup */

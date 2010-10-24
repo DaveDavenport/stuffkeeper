@@ -77,7 +77,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
     private Gtk.VBox sw_vbox = null;
     private Gtk.Table tag_vbox = null;
 
-    public MultipleItemView (List<weak Stuffkeeper.DataItem> items)
+    public MultipleItemView (List<weak Stuffkeeper.DataItem> items, string? custom_title)
     {
         /* Copy the list */
         this.items = items.copy();
@@ -94,11 +94,29 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
             this.header.get_child().modify_text(Gtk.StateType.NORMAL, color);
         });
 
-        var header_label = new Gtk.Label("");
-        header_label.set_markup(GLib.Markup.printf_escaped("<span size='x-large' weight='bold'>%u %s</span>", this.items.length(), "Selected items"));
-        header_label.set_alignment(0.0f, 0.5f);
-        header_label.set_padding(8,8);
-        header.add(header_label);
+        if(custom_title != null) {
+            var vbox = new Gtk.VBox(false, 6);
+            var header_label = new Gtk.Label("");
+
+            header_label.set_markup(GLib.Markup.printf_escaped("<span size='x-large' weight='bold'>%s</span>",custom_title)); 
+            header_label.set_alignment(0.0f, 0.5f);
+            header_label.set_padding(8,0);
+            vbox.pack_start(header_label, true, true, 0);
+            
+            header_label = new Gtk.Label("");
+            header_label.set_markup(GLib.Markup.printf_escaped("<span size='small'>%u %s</span>", this.items.length(), "Selected items"));
+            header_label.set_alignment(0.0f, 0.5f);
+            header_label.set_padding(8,0);
+            vbox.pack_start(header_label, false, false, 0);
+            header.add(vbox);
+        } else {
+            var header_label = new Gtk.Label("");
+            header_label.set_markup(GLib.Markup.printf_escaped("<span size='x-large' weight='bold'>%u %s</span>", this.items.length(), "Selected items"));
+            header_label.set_alignment(0.0f, 0.5f);
+            header_label.set_padding(8,8);
+
+            header.add(header_label);
+        }
         this.pack_start(header, false, false, 0);
 
         /* The view below */
