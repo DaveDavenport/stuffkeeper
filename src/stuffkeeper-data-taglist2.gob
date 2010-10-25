@@ -11,6 +11,14 @@ requires 2.0.10
 
 %ph{
 #include "stuffkeeper-data-backend.h"
+    typedef enum _LPColumnType{
+        LP_ID, 
+        LP_TITLE,
+        LP_SELECTED,
+        LP_ITEM,
+        LP_AMOUNT,
+        LP_NUM_ROWS
+    } LPColumnType;
 %}
 
 class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
@@ -27,6 +35,17 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
     /* button for adding tags */
     private GtkWidget *add_button = {NULL};
     private GtkWidget *remove_button = {NULL};
+
+
+    private GtkWidget *ac_entry = {NULL};
+    private GtkEntryCompletion *ac_entry_completion = {NULL};
+    private GtkTreeModel *model_tags = {NULL};
+
+
+    /* item */
+    private gulong signal_tag_added = {0};
+    private gulong signal_tag_changed = {0};
+    private gulong signal_tag_removed = {0};
 
     /* lock signal */
     private gulong signal_backend_locked = {0};
@@ -264,6 +283,13 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
     new(StuffkeeperDataItem *item)
     {
         Self *obj = GET_NEW;
+        GList *node,*iter;
+
+
+        /* store item */
+        obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item));
+        obj->_priv->item = item; 
+
         gtk_event_box_set_visible_window(GTK_EVENT_BOX(obj), FALSE);
         //        g_signal_connect(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set), obj);
         /* hbox */
@@ -281,6 +307,57 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         gtk_widget_set_no_show_all(obj->_priv->add_button, TRUE);
 
 
+
+
+        /* Add a quick entry box */
+        obj->_priv->ac_entry = gtk_entry_new();
+        obj->_priv->ac_entry_completion= gtk_entry_completion_new();
+        obj->_priv->model_tags = (GtkTreeModel *)gtk_list_store_new(5, 
+                G_TYPE_INT,
+                G_TYPE_STRING,
+                G_TYPE_BOOLEAN,
+                G_TYPE_POINTER,
+                G_TYPE_INT);
+        gtk_entry_completion_set_inline_selection(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
+                TRUE);
+        gtk_entry_completion_set_inline_completion(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
+                TRUE);
+
+        gtk_entry_completion_set_model(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
+                GTK_TREE_MODEL(obj->_priv->model_tags));
+        gtk_entry_completion_set_text_column(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
+                LP_TITLE);
+        gtk_entry_set_completion(GTK_ENTRY(obj->_priv->ac_entry), 
+                obj->_priv->ac_entry_completion);
+        gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->ac_entry, FALSE, TRUE, 0);
+
+        /** Load the tags */
+        node = stuffkeeper_data_backend_get_tags(obj->_priv->skdb);
+        for(iter = node;iter;iter = g_list_next(iter))
+        {
+            self_tag_added(obj->_priv->skdb, iter->data,obj->_priv->model_tags);
+        }
+        if(node) g_list_free(node);
+
+        g_signal_connect_swapped(G_OBJECT(obj->_priv->ac_entry), 
+                "activate",
+                G_CALLBACK(self_tag_entry_activated), 
+                obj);
+
+        obj->_priv->signal_tag_added = g_signal_connect(G_OBJECT(obj->_priv->skdb),
+                "tag-added",
+                G_CALLBACK(self_tag_added),
+                obj->_priv->model_tags);
+        obj->_priv->signal_tag_changed = g_signal_connect(G_OBJECT(obj->_priv->skdb),
+                "tag-changed",
+                G_CALLBACK(self_tag_changed),
+                obj->_priv->model_tags);
+        obj->_priv->signal_tag_removed = g_signal_connect(G_OBJECT(obj->_priv->skdb),
+                "tag-removed",
+                G_CALLBACK(self_tag_removed),
+                obj->_priv->model_tags);
+
+
         /* Remove button */
         obj->_priv->remove_button = gtk_button_new();
         gtk_button_set_relief(GTK_BUTTON(obj->_priv->remove_button), GTK_RELIEF_NONE);
@@ -290,9 +367,6 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         g_signal_connect_swapped(G_OBJECT(obj->_priv->remove_button), "clicked", G_CALLBACK(self_remove_button_clicked), obj);
         gtk_widget_set_no_show_all(obj->_priv->remove_button, TRUE);
 
-        /* store item */
-        obj->_priv->skdb = STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(item));
-        obj->_priv->item = item; 
 
 
         self_reload_list(obj);
@@ -312,6 +386,18 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         finalize (G:Object *obj)
         {
             Self *self = SELF(obj);
+            if(self->_priv->signal_tag_added) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_tag_added);
+                self->_priv->signal_tag_added = 0;
+            }
+            if(self->_priv->signal_tag_changed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_tag_changed);
+                self->_priv->signal_tag_changed = 0;
+            }
+            if(self->_priv->signal_tag_removed) { 
+                g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_tag_removed);
+                self->_priv->signal_tag_removed = 0;
+            }
             if(self->_priv->signal_backend_locked) {                                                                     
                 g_signal_handler_disconnect(G_OBJECT(stuffkeeper_data_item_get_backend(self->_priv->item)), self->_priv->signal_backend_locked);
                 self->_priv->signal_backend_locked = 0;
@@ -324,4 +410,104 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
             PARENT_HANDLER(obj);
         }
 
+    /**
+     * Keep Tag's GtkListStore up2date
+     */
+    private
+    void 
+    tag_added(StuffkeeperDataBackend *skdb, StuffkeeperDataTag *tag, GtkTreeModel *store)
+    {
+        GtkTreeIter iter;
+        gchar *title = stuffkeeper_data_tag_get_title(tag);
+        gtk_list_store_insert_with_values(GTK_LIST_STORE(store), &iter, -1,
+                    LP_ID, stuffkeeper_data_tag_get_id(tag),
+                    LP_TITLE,title,
+                    LP_ITEM,tag, 
+                    LP_AMOUNT, stuffkeeper_data_tag_num_items(tag),
+                    -1);
+        g_free(title);
+    }
+    private
+    void 
+    tag_changed(StuffkeeperDataBackend *skdb, StuffkeeperDataTag *tag, GtkTreeModel *store)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(store);
+        gint id = stuffkeeper_data_tag_get_id(tag);
+        if(gtk_tree_model_get_iter_first(model, &iter))
+        {
+            do{
+                gint oid;
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
+                if(oid == id)
+                {
+                    gchar *title = stuffkeeper_data_tag_get_title(tag);
+                    gtk_list_store_set(GTK_LIST_STORE(store), &iter, 
+                            LP_TITLE,title, 
+                            LP_AMOUNT, stuffkeeper_data_tag_num_items(tag),
+                            -1);
+                    g_free(title);
+                    return;
+                }
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
+    }
+    private
+    void 
+    tag_removed(StuffkeeperDataBackend *skdb, gint id, GtkListStore *store)
+    {
+        GtkTreeIter iter;
+        GtkTreeModel *model = GTK_TREE_MODEL(store);
+        if(gtk_tree_model_get_iter_first(model, &iter))
+        {
+            do{
+                gint oid;
+                gtk_tree_model_get(model, &iter, LP_ID, &oid, -1);
+                if(oid == id)
+                {
+                    gtk_list_store_remove(store, &iter);
+                    return;
+                }
+            }while(gtk_tree_model_iter_next(model, &iter));
+        }
+    }
+
+    private
+    void
+    tag_entry_activated(self, GObject *obj)
+    {
+        const gchar * test = gtk_entry_get_text(GTK_ENTRY(self->_priv->ac_entry));
+        if(test != NULL) {
+            StuffkeeperDataTag *tag = stuffkeeper_data_backend_find_tag(
+                    self->_priv->skdb, test); 
+            if(tag) {
+                /* if the item does not allready have the tag, add it */
+                if(!stuffkeeper_data_item_has_tag(self->_priv->item, tag))
+                {
+                    stuffkeeper_data_item_add_tag(self->_priv->item, tag);
+                }else {
+                    stuffkeeper_data_item_remove_tag(self->_priv->item, tag);
+                }
+            }else {
+                GtkDialog * dialog = gtk_message_dialog_new_with_markup(NULL,
+                        GTK_DIALOG_DESTROY_WITH_PARENT,
+                        GTK_MESSAGE_INFO,
+                        GTK_BUTTONS_OK_CANCEL,
+                        "Add tag with name: <i>%s</i>?",
+                        test);
+                switch(gtk_dialog_run(dialog))
+                {
+                    case GTK_RESPONSE_OK:
+                        {
+                            StuffkeeperDataTag *tag = stuffkeeper_data_backend_new_tag(self->_priv->skdb);
+                            stuffkeeper_data_tag_set_title(tag, test);
+                            stuffkeeper_data_item_add_tag(self->_priv->item, tag);
+                        }
+                    default:
+                        gtk_widget_destroy(dialog);
+                        break;
+                }
+            }
+        } 
+    }
 }

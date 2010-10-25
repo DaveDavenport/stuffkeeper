@@ -786,6 +786,28 @@ class Stuffkeeper:Data:Backend from G:Object
         return tag;
     }
 
+
+    public
+    StuffkeeperDataTag *
+    find_tag(self, const char *tag_name)
+    {
+        GHashTableIter iter;
+        gpointer key, value;
+        g_hash_table_iter_init (&iter, self->_priv->tags);
+        while (g_hash_table_iter_next (&iter, &key, &value)) 
+        {
+            /* do something with key and value */
+            StuffkeeperDataTag *tag = (StuffkeeperDataTag *)value;
+            gchar *title = stuffkeeper_data_tag_get_title(tag);
+            if(title && g_utf8_collate(title, tag_name) == 0) {
+                g_free(title);
+                return tag;
+            }
+            if(title)g_free(title);
+        }
+        return NULL;
+    }
+
     public
         StuffkeeperDataTag *
     get_tag(self, const int id)
