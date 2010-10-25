@@ -186,6 +186,7 @@ nodist_stuffkeeperinclude_HEADERS = \
 	stuffkeeper-data-schema.h\
 	stuffkeeper-data-backend.h\
 	stuffkeeper-data-tag.h\
+    stuffkeeper-item-window.h\
 	stuffkeeper-plugin.h\
 	stuffkeeper-interface.h\
 	stuffkeeper-data-item-search.h\

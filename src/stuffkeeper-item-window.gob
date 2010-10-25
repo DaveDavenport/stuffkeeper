@@ -2,13 +2,16 @@ requires 2.0.10
 
 %h{
 #include <gtk/gtk.h>
-#include "debug.h"
     #include "stuffkeeper-data-backend.h"
     #include "stuffkeeper-data-item.h"
     #include "stuffkeeper-data-schema.h"
-    #include "stuffkeeper-edit-schema.h"
-    #include "stuffkeeper-show-item.h"
-    #include "stuffkeeper-item-view.h"
+%}
+
+%{
+#include "stuffkeeper-edit-schema.h"
+#include "stuffkeeper-show-item.h"
+#include "stuffkeeper-item-view.h"
+#include "debug.h"
 %}
 
 class Stuffkeeper:Item:Window from Gtk:Dialog
