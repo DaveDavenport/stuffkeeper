@@ -120,20 +120,8 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
     item_changed(self, StuffkeeperDataItem *item)
     {
         self_reload_list(self);
+        self_tag_entry_changed(self, NULL);
     }
-/*
-    private
-    void
-    style_set(self, GtkStyle *old,GtkWidget *event)
-    {
-        printf("style-set\n");
-        g_signal_handlers_block_by_func(G_OBJECT(self), self_style_set, event);
-        
-        gtk_widget_modify_bg(GTK_WIDGET(self), GTK_STATE_NORMAL, &(GTK_WIDGET(self)->style->light[GTK_STATE_NORMAL]));
-
-        g_signal_handlers_unblock_by_func(G_OBJECT(self), self_style_set, event);
-    }
-*/
     /**
      * Utility
      */
@@ -272,9 +260,11 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         {
             gtk_widget_hide(self->_priv->add_button);
             gtk_widget_hide(self->_priv->remove_button);
+            gtk_widget_hide(self->_priv->ac_entry);
         }else{
             gtk_widget_show(self->_priv->add_button);
             gtk_widget_show(self->_priv->remove_button);
+            gtk_widget_show(self->_priv->ac_entry);
         }
     }
 
@@ -309,29 +299,57 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
 
 
 
-        /* Add a quick entry box */
+
+        /* Remove button */
+        obj->_priv->remove_button = gtk_button_new();
+        gtk_button_set_relief(GTK_BUTTON(obj->_priv->remove_button), GTK_RELIEF_NONE);
+        gtk_button_set_image(GTK_BUTTON(obj->_priv->remove_button), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
+        gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->remove_button, FALSE, TRUE, 0);
+
+        g_signal_connect_swapped(G_OBJECT(obj->_priv->remove_button), "clicked", G_CALLBACK(self_remove_button_clicked), obj);
+        gtk_widget_set_no_show_all(obj->_priv->remove_button, TRUE);
+
+
+        /* Add an entry box for quick adding/removing creation of tags*/
+        /* The entry box can autocomplete existing tags */
         obj->_priv->ac_entry = gtk_entry_new();
+        gtk_widget_set_tooltip_text(GTK_WIDGET(obj->_priv->ac_entry),
+            _("Quick adding, removing and creating of tags"));
+
         obj->_priv->ac_entry_completion= gtk_entry_completion_new();
+        /* Create tag model, code is copied from Stuffkeeper.Interface */
         obj->_priv->model_tags = (GtkTreeModel *)gtk_list_store_new(5, 
                 G_TYPE_INT,
                 G_TYPE_STRING,
                 G_TYPE_BOOLEAN,
                 G_TYPE_POINTER,
                 G_TYPE_INT);
+        /* Make it inline complete and select the completion. */
         gtk_entry_completion_set_inline_selection(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
                 TRUE);
         gtk_entry_completion_set_inline_completion(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
                 TRUE);
 
+        /* Set the icon to be non-clickable, it is only indication of what is going to happen  */
+        gtk_entry_set_icon_sensitive(GTK_ENTRY(obj->_priv->ac_entry), GTK_ENTRY_ICON_SECONDARY, FALSE);
+        /* Set the completion model */
         gtk_entry_completion_set_model(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
                 GTK_TREE_MODEL(obj->_priv->model_tags));
+        /* Set the colum it should complete against. (it should complete the title */
         gtk_entry_completion_set_text_column(GTK_ENTRY_COMPLETION(obj->_priv->ac_entry_completion),
                 LP_TITLE);
+
+        /* Set the completion on the entry  */
         gtk_entry_set_completion(GTK_ENTRY(obj->_priv->ac_entry), 
                 obj->_priv->ac_entry_completion);
+
+        /* Add the entry to the view */
         gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->ac_entry, FALSE, TRUE, 0);
 
-        /** Load the tags */
+        /* only explicitely show/hide the entry (needed for db locking */
+        gtk_widget_set_no_show_all(obj->_priv->ac_entry, TRUE);
+
+        /* Initial loading of the tags */
         node = stuffkeeper_data_backend_get_tags(obj->_priv->skdb);
         for(iter = node;iter;iter = g_list_next(iter))
         {
@@ -339,11 +357,17 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         }
         if(node) g_list_free(node);
 
+        /* Catch enter, activation on the entry */
         g_signal_connect_swapped(G_OBJECT(obj->_priv->ac_entry), 
                 "activate",
                 G_CALLBACK(self_tag_entry_activated), 
                 obj);
-
+        /* react if the entry changes */
+        g_signal_connect_swapped(G_OBJECT(obj->_priv->ac_entry),
+                "changed",
+                G_CALLBACK(self_tag_entry_changed),
+                obj);
+        /* Catch changes on the tags, and update the completion list*/
         obj->_priv->signal_tag_added = g_signal_connect(G_OBJECT(obj->_priv->skdb),
                 "tag-added",
                 G_CALLBACK(self_tag_added),
@@ -356,17 +380,6 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
                 "tag-removed",
                 G_CALLBACK(self_tag_removed),
                 obj->_priv->model_tags);
-
-
-        /* Remove button */
-        obj->_priv->remove_button = gtk_button_new();
-        gtk_button_set_relief(GTK_BUTTON(obj->_priv->remove_button), GTK_RELIEF_NONE);
-        gtk_button_set_image(GTK_BUTTON(obj->_priv->remove_button), gtk_image_new_from_stock(GTK_STOCK_REMOVE, GTK_ICON_SIZE_MENU));
-        gtk_box_pack_end(GTK_BOX(obj->_priv->hbox), obj->_priv->remove_button, FALSE, TRUE, 0);
-
-        g_signal_connect_swapped(G_OBJECT(obj->_priv->remove_button), "clicked", G_CALLBACK(self_remove_button_clicked), obj);
-        gtk_widget_set_no_show_all(obj->_priv->remove_button, TRUE);
-
 
 
         self_reload_list(obj);
@@ -472,12 +485,18 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         }
     }
 
+    /**
+     * Do the action on activate  
+     * If tag exists, add it. 
+     * If tag exists and item is allready tagged by it, remove it from item. 
+     * If tag does not exists, ask user to create it, then add it.
+     */
     private
     void
     tag_entry_activated(self, GObject *obj)
     {
         const gchar * test = gtk_entry_get_text(GTK_ENTRY(self->_priv->ac_entry));
-        if(test != NULL) {
+        if(test != NULL && strlen(test) > 0) {
             StuffkeeperDataTag *tag = stuffkeeper_data_backend_find_tag(
                     self->_priv->skdb, test); 
             if(tag) {
@@ -493,7 +512,7 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
                         GTK_DIALOG_DESTROY_WITH_PARENT,
                         GTK_MESSAGE_INFO,
                         GTK_BUTTONS_OK_CANCEL,
-                        "Add tag with name: <i>%s</i>?",
+                        _("Add tag with name: <i>%s</i>?"),
                         test);
                 switch(gtk_dialog_run(dialog))
                 {
@@ -509,5 +528,47 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
                 }
             }
         } 
+        self_tag_entry_changed(self, obj);
+    }
+
+
+    /**
+     * update the action icon in the entry box
+     * If tag is going to be added to the item, show add icon.
+     * If tag is going to be  removed show remove icon.
+     * If tag does not exists, show new icon 
+     * If nothing entered, show nothing */
+    private
+    void
+    tag_entry_changed(self, GObject *obj)
+    {
+        const gchar * test = gtk_entry_get_text(GTK_ENTRY(self->_priv->ac_entry));
+        if(test != NULL && strlen(test) > 0) {
+            StuffkeeperDataTag *tag = stuffkeeper_data_backend_find_tag(
+                    self->_priv->skdb, test); 
+            if(tag) {
+                /* if the item does not allready have the tag, add it */
+                if(!stuffkeeper_data_item_has_tag(self->_priv->item, tag))
+                {
+                gtk_entry_set_icon_from_stock(GTK_ENTRY(self->_priv->ac_entry),
+                    GTK_ENTRY_ICON_SECONDARY,
+                    GTK_STOCK_ADD);
+                }else {
+                    gtk_entry_set_icon_from_stock(GTK_ENTRY(self->_priv->ac_entry),
+                            GTK_ENTRY_ICON_SECONDARY,
+                            GTK_STOCK_REMOVE);
+                }
+            }else {
+                gtk_entry_set_icon_from_stock(GTK_ENTRY(self->_priv->ac_entry),
+                    GTK_ENTRY_ICON_SECONDARY,
+                    GTK_STOCK_NEW);
+            }
+        } 
+        else{
+
+                gtk_entry_set_icon_from_stock(GTK_ENTRY(self->_priv->ac_entry),
+                    GTK_ENTRY_ICON_SECONDARY,
+                    NULL);
+        }
     }
 }
