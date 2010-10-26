@@ -67,17 +67,13 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 	    }else if (strcmp(entries[0], "tag") == 0) 
 	    {
 		    StuffkeeperDataTag *tag = stuffkeeper_data_backend_get_tag(skdb, atoi(entries[1]));
-		    if(tag) {
-			    GList *items = stuffkeeper_data_tag_get_items(tag);
-			    if(items) {
-                    gchar *title = stuffkeeper_data_tag_get_title(tag);
-				    printf("Window items\n");
-				    GtkWidget *win = stuffkeeper_item_window_new_multiple(skdb, items,config_file, title);
-                    g_free(title);
-				    gtk_widget_show(win);
-                    g_list_free(items);
-			    }
-		    }
+            if(tag) {
+                gchar *title = stuffkeeper_data_tag_get_title(tag);
+                printf("Window items\n");
+                GtkWidget *win = stuffkeeper_item_window_new_tag_list(skdb, tag,config_file, title);
+                g_free(title);
+                gtk_widget_show(win);
+            }
 	    }else if (strcmp(entries[0], "schema") == 0) 
 	    {
 		    StuffkeeperDataSchema *schema = stuffkeeper_data_backend_get_schema(skdb, atoi(entries[1]));

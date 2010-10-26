@@ -313,6 +313,7 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
         /* Add an entry box for quick adding/removing creation of tags*/
         /* The entry box can autocomplete existing tags */
         obj->_priv->ac_entry = gtk_entry_new();
+        gtk_entry_set_width_chars(GTK_ENTRY(obj->_priv->ac_entry), 12);
         gtk_widget_set_tooltip_text(GTK_WIDGET(obj->_priv->ac_entry),
             _("Quick adding, removing and creating of tags"));
 
@@ -496,6 +497,8 @@ class Stuffkeeper:Data:TagList2 from Gtk:Event:Box
     tag_entry_activated(self, GObject *obj)
     {
         const gchar * test = gtk_entry_get_text(GTK_ENTRY(self->_priv->ac_entry));
+        if(stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
+            return;
         if(test != NULL && strlen(test) > 0) {
             StuffkeeperDataTag *tag = stuffkeeper_data_backend_find_tag(
                     self->_priv->skdb, test); 

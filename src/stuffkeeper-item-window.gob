@@ -1,26 +1,23 @@
 requires 2.0.10
-
 %h{
 #include <gtk/gtk.h>
     #include "stuffkeeper-data-backend.h"
     #include "stuffkeeper-data-item.h"
     #include "stuffkeeper-data-schema.h"
 %}
-
 %{
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-view.h"
 #include "debug.h"
 %}
-
 class Stuffkeeper:Item:Window from Gtk:Dialog
 {
     private guint signal_item_removed = {0};
     private StuffkeeperDataItem *item = {NULL};
     private StuffkeeperDataBackend *skdb= {NULL};
     private GKeyFile *config_file = {NULL};
-    private 
+    private
     void
     interface_header_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
     {
@@ -28,7 +25,6 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
         gtk_widget_modify_bg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->bg[GTK_STATE_SELECTED]));
         gtk_widget_modify_fg(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->fg[GTK_STATE_SELECTED]));
         gtk_widget_modify_text(GTK_WIDGET(wid), GTK_STATE_NORMAL, &(widget->style->text[GTK_STATE_SELECTED]));
-
         g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_header_changed , wid);
     }
     private
@@ -37,7 +33,7 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
     {
         g_signal_connect(G_OBJECT(wid), "style-set", G_CALLBACK(self_interface_header_changed), wid);
     }
-    private 
+    private
     void
     interface_background_changed(GtkWidget *widget, GtkStyle *old, GtkWidget *wid)
     {
@@ -45,7 +41,6 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
         gtk_widget_modify_bg(widget, GTK_STATE_NORMAL, &(widget->style->light[GTK_STATE_NORMAL]));
         g_signal_handlers_unblock_by_func(G_OBJECT(widget),self_interface_background_changed, wid);
     }
-
     private
     void
     item_removed(self, gint id, StuffkeeperDataBackend *skdb)
@@ -58,13 +53,12 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
             gtk_dialog_response(GTK_DIALOG(self), GTK_RESPONSE_CLOSE);
         }
     }
-
-    private 
+    private
     void
     response(self, int response, gpointer data)
     {
         int size_w, size_h;
-        if(self->_priv->signal_item_removed) { 
+        if(self->_priv->signal_item_removed) {
             g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_item_removed);
             self->_priv->signal_item_removed = 0;
         }
@@ -72,10 +66,9 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
         gtk_window_get_size(GTK_WINDOW(self), &size_w, &size_h);
         g_key_file_set_integer(self->_priv->config_file, "ITEM_WINDOW", "width", size_w);
         g_key_file_set_integer(self->_priv->config_file, "ITEM_WINDOW", "height", size_h);
-
         gtk_widget_destroy(GTK_WIDGET(self));
     }
-    private 
+    private
     void
     schema_edit_button_clicked(self, GtkWidget *button)
     {
@@ -90,26 +83,22 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
      * Popup an item list
      */
     public
-    Gtk:Widget * 
+    Gtk:Widget *
         new (Stuffkeeper:Data:Backend *skdb, Stuffkeeper:Data:Item *item, GKeyFile *config_file)
-        {                                                                                                                                            
+        {
             Self *self = GET_NEW;
             GError *error = NULL;
             gint width, height;
             GtkWidget *dialog = GTK_WIDGET(self);
             gtk_dialog_add_button(GTK_DIALOG(self), "gtk-close", GTK_RESPONSE_CLOSE);
             gtk_dialog_set_has_separator(GTK_DIALOG(self), FALSE);
-
             /**/
             GtkWidget *container = gtk_vbox_new(FALSE, 6);
-
             self->_priv->config_file = config_file;
             self->_priv->item = item;
             self->_priv->skdb = skdb;
             self->_priv->signal_item_removed = g_signal_connect_swapped(G_OBJECT(skdb), "item-removed",
                     G_CALLBACK(self_item_removed), self);
-
-
             /* set size */
             gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
             width = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "width", &error);
@@ -125,35 +114,29 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
                     gtk_window_resize(GTK_WINDOW(self), width, height);
                 }
             }
-
             container = stuffkeeper_item_view_new(item);
             gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), container, TRUE, TRUE, 0);
-
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
             gtk_widget_show_all(dialog);
             interface_element_add(GTK_WIDGET(self));
             return GTK_WIDGET(self);
         }
     public
-    Gtk:Widget * 
+    Gtk:Widget *
         new_multiple (Stuffkeeper:Data:Backend *skdb, GList *items, GKeyFile *config_file, const gchar *title)
-        {                                                                                                                                            
+        {
             Self *self = GET_NEW;
             GError *error = NULL;
             gint width, height;
             GtkWidget *dialog = GTK_WIDGET(self);
             gtk_dialog_add_button(GTK_DIALOG(self), "gtk-close", GTK_RESPONSE_CLOSE);
             gtk_dialog_set_has_separator(GTK_DIALOG(self), FALSE);
-
             /**/
             GtkWidget *container = gtk_vbox_new(FALSE, 6);
-
             self->_priv->config_file = config_file;
             self->_priv->skdb = skdb;
             self->_priv->signal_item_removed = g_signal_connect_swapped(G_OBJECT(skdb), "item-removed",
                     G_CALLBACK(self_item_removed), self);
-
-
             /* set size */
             gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
             width = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "width", &error);
@@ -169,10 +152,65 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
                     gtk_window_resize(GTK_WINDOW(self), width, height);
                 }
             }
-
-            container = (GtkWidget *)stuffkeeper_multiple_item_view_new(items, title);
+            container = (GtkWidget *)stuffkeeper_multiple_item_view_new(self->_priv->skdb,items, title);
             gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), container, TRUE, TRUE, 0);
-
+            g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
+            gtk_widget_show_all(dialog);
+            interface_element_add(GTK_WIDGET(self));
+            return GTK_WIDGET(self);
+        }
+        /**
+         * Show a list of items in a tag
+         */
+         private Stuffkeeper:Data:Tag *tag = {NULL};
+         private Gtk:Widget *mpitem = {NULL};
+         private void
+         tag_list_tag_changed(self, Stuffkeeper:Data:Tag *tag)
+         {
+             if(self->_priv->tag) {
+                 GList *items = stuffkeeper_data_tag_get_items(self->_priv->tag);
+                 stuffkeeper_multiple_item_view_reload_items(STUFFKEEPER_MULTIPLE_ITEM_VIEW(self->_priv->mpitem), items);
+                 if(items) {
+                     g_list_free(items);
+                 }
+             }
+         }
+    public
+        Gtk:Widget *
+        new_tag_list (Stuffkeeper:Data:Backend *skdb, Stuffkeeper:Data:Tag *tag, GKeyFile *config_file, const gchar *title)
+        {
+            Self *self = GET_NEW;
+            GError *error = NULL;
+            gint width, height;
+            GtkWidget *dialog = GTK_WIDGET(self);
+            gtk_dialog_add_button(GTK_DIALOG(self), "gtk-close", GTK_RESPONSE_CLOSE);
+            gtk_dialog_set_has_separator(GTK_DIALOG(self), FALSE);
+            /**/
+            self->_priv->config_file = config_file;
+            self->_priv->skdb = skdb;
+            self->_priv->tag = tag;
+            g_signal_connect_swapped(G_OBJECT(self->_priv->tag),
+                    "tag-changed",
+                    G_CALLBACK(self_tag_list_tag_changed),
+                    self);
+            /* set size */
+            gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
+            width = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "width", &error);
+            if(error) {
+                g_error_free(error);
+                error = NULL;
+            } else {
+                height = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "height", &error);
+                if(error) {
+                    g_error_free(error);
+                    error = NULL;
+                } else {
+                    gtk_window_resize(GTK_WINDOW(self), width, height);
+                }
+            }
+            self->_priv->mpitem= (GtkWidget *)stuffkeeper_multiple_item_view_new(self->_priv->skdb,NULL, title);
+            gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), self->_priv->mpitem, TRUE, TRUE, 0);
+            self_tag_list_tag_changed(self,self->_priv->tag);
             g_signal_connect(G_OBJECT(dialog), "response", G_CALLBACK(self_response), NULL);
             gtk_widget_show_all(dialog);
             interface_element_add(GTK_WIDGET(self));
