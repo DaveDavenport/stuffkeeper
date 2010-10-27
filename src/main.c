@@ -112,15 +112,9 @@ static void bacon_on_message_received(const char *message, gpointer data)
     {
         if(strcmp(message, "New Window") == 0)
         {
-            /* Get open window */
-            GList *node = g_list_first(interface_list);
-            if(node)
-            {
-                StuffkeeperInterface *ski=  node->data;
-                /* tell the open window to create new one */
-                stuffkeeper_interface_new_window(ski);
-                debug_printf("IPC: Requested new window\n");
-            }
+            StuffkeeperInterface *win = stuffkeeper_interface_new(config_file);
+            stuffkeeper_interface_initialize_interface(STUFFKEEPER_INTERFACE(win),STUFFKEEPER_DATA_BACKEND(data),G_OBJECT(spm));
+            debug_printf("IPC: Requested new window\n");
         }
         else if (strncmp(message,"uid:", 4) == 0)
         {
