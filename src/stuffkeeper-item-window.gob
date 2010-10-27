@@ -162,8 +162,10 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
         /**
          * Show a list of items in a tag
          */
-         private Stuffkeeper:Data:Tag *tag = {NULL};
+         private Stuffkeeper:Data:Tag *tag = {NULL} destroywith g_object_unref;
          private Gtk:Widget *mpitem = {NULL};
+
+         /* Reload the view if the tag changed */
          private void
          tag_list_tag_changed(self, Stuffkeeper:Data:Tag *tag)
          {
@@ -175,6 +177,19 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
                  }
              }
          }
+
+         /* 
+          *  Check if the tag we are showing is going to be removed. If so Destroy the window.
+          */
+         private
+         void
+         tag_list_tag_removed(self, const int id, gpointer data)
+         {
+            if(id == stuffkeeper_data_tag_get_id(self->_priv->tag)) {
+                gtk_widget_destroy(GTK_WIDGET(self));
+            }
+         }
+
     public
         Gtk:Widget *
         new_tag_list (Stuffkeeper:Data:Backend *skdb, Stuffkeeper:Data:Tag *tag, GKeyFile *config_file, const gchar *title)
@@ -188,11 +203,18 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
             /**/
             self->_priv->config_file = config_file;
             self->_priv->skdb = skdb;
-            self->_priv->tag = tag;
+            self->_priv->tag = g_object_ref(tag);
+            /* Connect relevant signals */
             g_signal_connect_swapped(G_OBJECT(self->_priv->tag),
                     "tag-changed",
                     G_CALLBACK(self_tag_list_tag_changed),
                     self);
+
+            g_signal_connect_swapped(G_OBJECT(self->_priv->skdb), 
+                    "tag-removed",
+                    G_CALLBACK(self_tag_list_tag_removed),
+                    self);
+
             /* set size */
             gtk_window_set_default_size(GTK_WINDOW(dialog), 500,600);
             width = g_key_file_get_integer(self->_priv->config_file, "ITEM_WINDOW", "width", &error);
