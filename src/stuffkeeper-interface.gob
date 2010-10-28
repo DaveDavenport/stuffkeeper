@@ -5,6 +5,7 @@ requires 2.0.10
 #include "stuffkeeper-data-schema.h"
 #include "stuffkeeper-data-tag.h"
 #include "stuffkeeper-data-item-search.h"
+#include "stuffkeeper-item-view.h"
 %}
 
 %ph{
@@ -1043,6 +1044,27 @@ class Stuffkeeper:Interface from G:Object
              }
          }
      }
+     private 
+     void
+     open_tag(self, GtkMenuItem *item)
+     {
+         GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview1));
+         GtkTreeIter iter;
+         if(gtk_tree_selection_get_selected(selection,&model, &iter))
+         {
+             StuffkeeperDataTag *tag = NULL;
+             /* Get id and items */
+             gtk_tree_model_get(model, &iter,3,&tag, -1);
+             if(tag) {
+                 gchar *title = stuffkeeper_data_tag_get_title(tag);
+                 GtkWidget *win = stuffkeeper_item_window_new_tag_list(self->_priv->skdbg, tag,config_file, title);
+                 g_free(title);
+                 gtk_widget_show(win);
+             }
+         }
+     }
+
 
     /* Types */
 
@@ -1342,6 +1364,10 @@ class Stuffkeeper:Interface from G:Object
 
             if(type == LP_TYPE_TAG)
             {
+                menu_item = gtk_image_menu_item_new_from_stock(GTK_STOCK_OPEN, NULL);
+                g_signal_connect_swapped(G_OBJECT(menu_item), "activate", G_CALLBACK(self_open_tag), self);
+                gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+
                 /* Add tag */
                 menu_item = gtk_image_menu_item_new_with_label(_("New tag"));
                 gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), 
@@ -1955,13 +1981,13 @@ class Stuffkeeper:Interface from G:Object
         if(type != 0) return;
         if( num_items == 0) {
             if(!locked) {
-                GtkDialog * dialog = gtk_message_dialog_new_with_markup(self->_priv->win,
+                GtkWidget * dialog = gtk_message_dialog_new_with_markup(GTK_WINDOW(self->_priv->win),
                         GTK_DIALOG_DESTROY_WITH_PARENT,
                         GTK_MESSAGE_INFO,
                         GTK_BUTTONS_OK_CANCEL,
                         "Add tag with name: <i>%s</i>?",
-                        gtk_entry_get_text(entry));
-                switch(gtk_dialog_run(dialog))
+                        gtk_entry_get_text(GTK_ENTRY(entry)));
+                switch(gtk_dialog_run(GTK_DIALOG(dialog)))
                 {
                     case GTK_RESPONSE_OK:
                     {
