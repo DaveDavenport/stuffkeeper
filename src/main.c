@@ -19,8 +19,16 @@
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-interface.h"
 #include "stuffkeeper-plugin-manager.h"
-#include "bacon-message-connection.h"
 
+
+#include <unique/unique.h>
+
+enum UniqueCommands
+{
+    UNIQUE_COMMAND_0, // forbidden
+    UNIQUE_COMMAND_NEW_WINDOW,
+    UNIQUE_COMMAND_UID
+};
 
 /* List of active interface objects */
 GList *interface_list = NULL;
@@ -105,23 +113,41 @@ gboolean open_uid(const char *uid, StuffkeeperDataBackend *skdb)
 /**
  * Handle ipc messages
  */
-static void bacon_on_message_received(const char *message, gpointer data)
+ static UniqueResponse
+message_received_cb (UniqueApp         *app,
+        UniqueCommand      command,
+        UniqueMessageData *message,
+        guint              time_,
+        gpointer           data)
 {
-    debug_printf("IPC: got '%s'\n", (message)?message:"(null)");
-    if(message)
+    UniqueResponse res = UNIQUE_RESPONSE_FAIL;
+
+    /* Cast to (int) to avoid stupid compile warning */
+    switch ((int)command)
     {
-        if(strcmp(message, "New Window") == 0)
+        case UNIQUE_ACTIVATE:
+        case UNIQUE_COMMAND_NEW_WINDOW: // new window
+        {
+            gchar *uidc= unique_message_data_get_text(message);
+            if(uidc)
+            {
+                open_uid(uidc, STUFFKEEPER_DATA_BACKEND(data));
+                g_free(uidc);
+                res = UNIQUE_RESPONSE_OK;
+            }
+            break;
+        }
+        case UNIQUE_COMMAND_UID:
         {
             StuffkeeperInterface *win = stuffkeeper_interface_new(config_file);
             stuffkeeper_interface_initialize_interface(STUFFKEEPER_INTERFACE(win),STUFFKEEPER_DATA_BACKEND(data),G_OBJECT(spm));
             debug_printf("IPC: Requested new window\n");
+            res = UNIQUE_RESPONSE_OK;
         }
-        else if (strncmp(message,"uid:", 4) == 0)
-        {
-            /* Open task */
-            open_uid(&message[4], STUFFKEEPER_DATA_BACKEND(data));
-        }
+        default:
+            break;
     }
+    return res;
 }
 
 /**
@@ -148,7 +174,7 @@ int main ( int argc, char **argv )
      * Interprocess communication. Used to make sure
      * only one instance is running
      */
-    BaconMessageConnection      *bacon_connection       = NULL;
+    UniqueApp                   *unique_app             = NULL;
 
     /* pointer holding the backend */
     StuffkeeperDataBackend      *skdb                   = NULL;
@@ -245,42 +271,53 @@ int main ( int argc, char **argv )
     }
 
 
-    /* Setup the interprocess communication. this does not work in win32! */ 
-    bacon_connection = bacon_message_connection_new("stuffkeeper");
-    if(bacon_connection) {
-        /* Check if we are the only instance, this can be checked by looking if we are the server */
-        if (!bacon_message_connection_get_is_server (bacon_connection)) 
+    /* Setup IPC using libunique */
+    unique_app = unique_app_new_with_commands("org.stuffkeeper.IPC", NULL,
+            "new window"    , UNIQUE_COMMAND_NEW_WINDOW,
+            "uid"           , UNIQUE_COMMAND_UID,
+            NULL);
+    /* Check if another instance off this application is running.
+     * If it is, message our current command to it
+     */
+    if(unique_app_is_running(unique_app))
+    {
+        UniqueResponse response; /* the response to our command */
+        if(uid) 
         {
-            if(uid != NULL) {
-                gchar *command = g_strdup_printf("uid:%s",  uid);
-                /* message the running instance, to show a item*/
-                bacon_message_connection_send(bacon_connection,command); 
-                g_free(command);
-            }else{
-                /* There is an instant already running */
-                /* message the running instance, to show a new window */
-                bacon_message_connection_send(bacon_connection, "New Window");
-            }
+            gchar *command = g_strdup_printf("uid:%s",  uid);
+            UniqueMessageData *message; /* the payload for the command */
 
-            /* Close the connection */
-            bacon_message_connection_free (bacon_connection);
-            /* Returning */
-            debug_printf(_("There is already an instance running. Quitting."));
-            g_object_unref(skdb); 
-            exit(EXIT_SUCCESS);
+            message = unique_message_data_new();
+            unique_message_data_set_text(message, uid,-1);
+
+            response = unique_app_send_message(unique_app, 1, message);
+            if(response  == UNIQUE_RESPONSE_FAIL) printf("Failed to send UID command\n");
+            /* the message is copied, so we need to free it before returning */
+            unique_message_data_free (message);
+            g_free(command);
+
+
+        }else{
+            response = unique_app_send_message(unique_app, 0, NULL);
+            if(response !=  UNIQUE_RESPONSE_OK) {
+                    g_warning( 
+                        "Failed to send new-window command");
+            }
         }
-        /* setup signal handler */
-        /* Listen for incoming messages */
-        bacon_message_connection_set_callback (bacon_connection,
-                bacon_on_message_received,
-                skdb);
-    } else {
-        /* print an error and quit */
-        debug_printf("Failed to setup IPC, quitting\n");
+        /* Returning */
+        debug_printf(_("There is already an instance running. Quitting."));
         g_object_unref(skdb); 
-        /* Return error code */
-        exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
+    /* using this signal we get notifications from the newly launched instances
+     * and we can reply to them; the default signal handler will just return
+     * UNIQUE_RESPONSE_OK and terminate the startup notification sequence on each
+     * watched window, so you can connect to the message-received signal only if
+     * you want to handle the commands and responses
+     */
+    g_signal_connect (unique_app, 
+            "message-received", 
+            G_CALLBACK (message_received_cb), G_OBJECT(skdb));
 
 
     /**
@@ -405,12 +442,6 @@ int main ( int argc, char **argv )
     /* clean spm */
     g_object_unref(spm);
 
-    /* Close the IPC bus */
-    if(bacon_connection)
-    {
-        bacon_message_connection_free (bacon_connection);
-    }
-
     /* Savin config */
     if(config_path)
     {
@@ -442,6 +473,10 @@ int main ( int argc, char **argv )
 
         /* Free config path */
         g_free(config_path);
+    }
+    /* Close the IPC bus */
+    if(unique_app) {
+        g_object_unref(unique_app);
     }
 
     /* exit */

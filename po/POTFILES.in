@@ -40,6 +40,5 @@ src/main.c
 
 # 3rd party files
 src/sexy-icon-entry.c
-src/bacon-message-connection.c
 
 

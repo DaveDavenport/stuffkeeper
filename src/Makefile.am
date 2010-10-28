@@ -75,8 +75,6 @@ nodist_stuffkeeper_SOURCES=\
 # Sources that should be in the distribution 
 ##
 stuffkeeper_SOURCES=\
-	bacon-message-connection.c \
-	bacon-message-connection.h \
 	debug.c \
 	debug.h \
 	main.c \
@@ -152,6 +150,7 @@ LIBS= \
 	@gthread_LIBS@\
 	@gio_LIBS@\
 	@GPGME_LIBS@ \
+    @unique_LIBS@\
 	$(NULL)
 
 
@@ -169,6 +168,7 @@ AM_CFLAGS = \
 	@sqlite3_CFLAGS@ \
 	@gthread_CFLAGS@ \
 	@gio_CFLAGS@ \
+    @unique_CFLAGS@\
 	@GPGME_CFLAGS@ \
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\" \
 	-Wall\

@@ -133,6 +133,10 @@ PKG_CHECK_MODULES([gthread], gthread-2.0)
 AC_SUBST(gthread_LIBS)
 AC_SUBST(gthread_CFLAGS)
 
+PKG_CHECK_MODULES([unique], unique-1.0)
+AC_SUBST(unique_LIBS)
+AC_SUBST(unique_CFLAGS)
+
 AM_PATH_GPGME
 
 # Check for gtk-doc
