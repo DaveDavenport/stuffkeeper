@@ -1,3 +1,5 @@
 * save custom schema fields in export..
 * Multiple item view should track removed items. 
-* 
+* Fix valac version check in configure.ac (the test doesn't seem to
+  work at all)
+
