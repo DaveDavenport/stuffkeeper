@@ -842,7 +842,7 @@ class Stuffkeeper:Interface from G:Object
             g_source_remove(self->_priv->search_timeout);
             self->_priv->search_timeout = 0;
         }
-        self->_priv->search_timeout = g_timeout_add(1000,(GSourceFunc)self_search_entry_changed_timeout, self);
+        self->_priv->search_timeout = g_timeout_add(100,(GSourceFunc)self_search_entry_changed_timeout, self);
     }
    
     private 
