@@ -435,6 +435,31 @@ class Stuffkeeper:Data:Schema from G:Object
 
     }
     private 
+    gchar *
+    field_schemas_get_field_id_by_name(self, int fieldtype, const char *name)
+    {
+        char *retv = NULL;
+        char *query = sqlite3_mprintf("SELECT FieldId FROM SchemasFields WHERE SchemaId=%i and type=%i and value LIKE '%q'", 
+                    self->_priv->id,
+                    fieldtype,
+                    name);
+        sqlite3_stmt *stmt;
+        const char *tail;
+        int r;
+        r = sqlite3_prepare_v2(self->_priv->sqlHandle, query, -1,  &stmt,  &tail);
+        if (r == SQLITE_OK)
+        {
+            if((r = sqlite3_step(stmt)) == SQLITE_ROW)
+            {
+                retv = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        sqlite3_free(query);
+        return retv; 
+    }
+    private 
     gboolean
     field_schemas_get_field_integer(self, int fieldtype, const char *field, int *out)
     {
@@ -709,6 +734,16 @@ class Stuffkeeper:Data:Schema from G:Object
     get_field_name(self, const gchar *id)
     {
         char *retv = self_field_schemas_get_field_string(self, DB_SCHEMAS_FIELD_TYPE_NAME, id);
+        if(!retv)
+            retv = g_strdup("N/A");
+        return retv; 
+    }
+
+    public
+    gchar *
+    get_field_id_by_name(self, const gchar *name)
+    {
+        char *retv = self_field_schemas_get_field_id_by_name(self, DB_SCHEMAS_FIELD_TYPE_NAME, name);
         if(!retv)
             retv = g_strdup("N/A");
         return retv; 
