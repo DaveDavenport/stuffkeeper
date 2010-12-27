@@ -702,6 +702,9 @@ class Stuffkeeper:Data:Item from G:Object
         sqlite3_free(query);
 
         self->_priv->id = 0;
+
+	self_item_changed(self,NULL);
+
     }
 
     public StuffkeeperDataItem *new(StuffkeeperDataBackend *skdb, 

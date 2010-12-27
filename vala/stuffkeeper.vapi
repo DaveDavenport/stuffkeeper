@@ -224,6 +224,7 @@ namespace Stuffkeeper {
 		public unowned GLib.Object get_backend ();
 		public int get_field_in_title (string id);
 		public unowned string get_field_name (string id);
+		public unowned string get_field_id_by_name(string name);
 		public int get_field_pos (string id);
 		public Stuffkeeper.FieldType get_field_type (string id);
 		public string[] get_fields ();
