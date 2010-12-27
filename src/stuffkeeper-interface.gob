@@ -842,7 +842,7 @@ class Stuffkeeper:Interface from G:Object
             g_source_remove(self->_priv->search_timeout);
             self->_priv->search_timeout = 0;
         }
-        self->_priv->search_timeout = g_timeout_add(1000,(GSourceFunc)self_search_entry_changed_timeout, self);
+        self->_priv->search_timeout = g_timeout_add(100,(GSourceFunc)self_search_entry_changed_timeout, self);
     }
    
     private 
@@ -1569,7 +1569,7 @@ class Stuffkeeper:Interface from G:Object
             sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self->_priv->search_entry),SEXY_ICON_ENTRY_PRIMARY, 
                 GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_FIND, GTK_ICON_SIZE_MENU)));
 
-            gtk_box_pack_end(GTK_BOX(glade_xml_get_widget(self->_priv->xml,"hbox3")), self->_priv->search_entry, FALSE, TRUE,0);
+            gtk_box_pack_end(GTK_BOX(glade_xml_get_widget(self->_priv->xml,"hbox3")), self->_priv->search_entry, TRUE, TRUE, 0);
             g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "changed", G_CALLBACK(self_search_entry_changed), self);
 
             gtk_widget_show_all(GTK_WIDGET(self->_priv->search_entry));
