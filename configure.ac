@@ -105,7 +105,7 @@ AC_SUBST(gobject_LIBS)
 AC_SUBST(gobject_CFLAGS)
 
 #gtk
-PKG_CHECK_MODULES([gtk], gtk+-2.0 >= 2.12)
+PKG_CHECK_MODULES([gtk], gtk+-2.0 >= 2.16)
 AC_SUBST(gtk_LIBS)
 AC_SUBST(gtk_CFLAGS)
 
@@ -188,7 +188,7 @@ GOB2_CHECK(2.0.10)
 if test x${GOB2} = x""; then
 	exit 0;
 fi
-VALA_PROG_VALAC([7.0.0])
+VALA_PROG_VALAC([0.10.0])
 
 STUFFKEEPER_PLUGIN_DIR="${PACKAGE_PREFIX}/lib/stuffkeeper_name/"
 AC_DEFINE_UNQUOTED(STUFFKEEPER_PLUGIN_DIR,"$STUFFKEEPER_PLUGIN_DIR",[The directory the plugins are installed]) 
