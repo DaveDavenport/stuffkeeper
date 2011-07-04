@@ -80,8 +80,6 @@ stuffkeeper_SOURCES=\
 	main.c \
 	misc.c \
 	misc.h \
-	sexy-icon-entry.c \
-	sexy-icon-entry.h \
 	stuffkeeperglue.h \
 	$(NULL)
 

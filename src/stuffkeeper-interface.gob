@@ -14,7 +14,6 @@ requires 2.0.10
 #include <gdk/gdkkeysyms.h>
 #include <glib/gi18n.h>
 #include <glade/glade.h>
-#include "sexy-icon-entry.h"
 #include <config.h>
 #include "debug.h"
 #include "misc.h"
@@ -833,6 +832,14 @@ class Stuffkeeper:Interface from G:Object
         /* remove it */
         return FALSE;
     }
+    private
+	void
+	search_entry_icon_clicked(self,GtkEntryIconPosition pos, GdkEvent *event, GtkEntry *entry)
+    {
+		if(pos == GTK_ENTRY_ICON_SECONDARY) {
+			gtk_entry_set_text(entry, "");
+		}	
+    }
     
     public
     void
@@ -1559,15 +1566,17 @@ class Stuffkeeper:Interface from G:Object
             gtk_widget_hide_on_delete(self->_priv->win);
 
             /**
-             * Custom search widget, glade does not support, sexy-icon and screws up alignment 
+             * Custom search widget, glade screws up alignment 
              */
-            /* sexy icon + setup */
-            self->_priv->search_entry = sexy_icon_entry_new();
+            self->_priv->search_entry = gtk_entry_new();
             /* Add clear button */
-            sexy_icon_entry_add_clear_button(SEXY_ICON_ENTRY(self->_priv->search_entry));
+            gtk_entry_set_icon_from_stock(GTK_ENTRY(self->_priv->search_entry),GTK_ENTRY_ICON_SECONDARY, 
+			    GTK_STOCK_CLEAR);
             /* Add find icon */
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self->_priv->search_entry),SEXY_ICON_ENTRY_PRIMARY, 
-                GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_FIND, GTK_ICON_SIZE_MENU)));
+            gtk_entry_set_icon_from_stock(GTK_ENTRY(self->_priv->search_entry),GTK_ENTRY_ICON_PRIMARY, 
+			    GTK_STOCK_FIND);
+			g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "icon-release" , 
+							G_CALLBACK(self_search_entry_icon_clicked), self);
 
             gtk_box_pack_end(GTK_BOX(glade_xml_get_widget(self->_priv->xml,"hbox3")), self->_priv->search_entry, TRUE, TRUE, 0);
             g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "changed", G_CALLBACK(self_search_entry_changed), self);

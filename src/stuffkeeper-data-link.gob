@@ -4,13 +4,12 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include "config.h"
 #include "misc.h"
-#include "sexy-icon-entry.h"
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-item.h"
 %}
 
 
-class Stuffkeeper:Data:Link from Sexy:Icon:Entry 
+class Stuffkeeper:Data:Link from Gtk:Entry 
 {
     private StuffkeeperDataItem *item = {NULL};
     private gchar *field = {NULL} destroywith g_free;
@@ -35,17 +34,12 @@ class Stuffkeeper:Data:Link from Sexy:Icon:Entry
 
         if(type == URL_EMAIL)
         {
-            GtkWidget *image = gtk_image_new_from_icon_name("internet-mail", GTK_ICON_SIZE_MENU);
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,GTK_IMAGE(image));
+            gtk_entry_set_icon_from_icon_name(GTK_ENTRY(self), GTK_ENTRY_ICON_PRIMARY,"internet-mail");
         } else if ( type == URL_HTTP )
         {
-            GtkWidget *image = gtk_image_new_from_icon_name("internet-web-browser", GTK_ICON_SIZE_MENU);
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
-                    GTK_IMAGE(image));
+            gtk_entry_set_icon_from_icon_name(GTK_ENTRY(self), GTK_ENTRY_ICON_PRIMARY,"internet-web-browser");
         } else {
-            sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(self), SEXY_ICON_ENTRY_PRIMARY,
-                    GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
-
+            gtk_entry_set_icon_from_stock(GTK_ENTRY(self), GTK_ENTRY_ICON_PRIMARY, GTK_STOCK_JUMP_TO);
         }
     }
     private
@@ -136,9 +130,9 @@ class Stuffkeeper:Data:Link from Sexy:Icon:Entry
 
     private
     void
-    link_icon_clicked(self, SexyIconEntryPosition icon_pos, int button, SexyIconEntry *icon_entry)
+    link_icon_clicked(self, GtkEntryIconPosition icon_pos, GdkEventButton *event, GtkEntry *icon_entry)
     {
-        if(button == 1 && icon_pos == SEXY_ICON_ENTRY_PRIMARY)
+        if(event->button == 1 && icon_pos == GTK_ENTRY_ICON_PRIMARY)
         {
             self_open_link(self, GTK_ENTRY(icon_entry));
         }
@@ -189,18 +183,15 @@ class Stuffkeeper:Data:Link from Sexy:Icon:Entry
         g_signal_connect_swapped(G_OBJECT(obj), "style-set", G_CALLBACK(self_style_set), obj);
 
 
-        sexy_icon_entry_set_icon(SEXY_ICON_ENTRY(obj), SEXY_ICON_ENTRY_PRIMARY,
-                GTK_IMAGE(gtk_image_new_from_stock(GTK_STOCK_JUMP_TO, GTK_ICON_SIZE_MENU)));
+        gtk_entry_set_icon_from_stock(GTK_ENTRY(obj), GTK_ENTRY_ICON_PRIMARY, GTK_STOCK_JUMP_TO);
 
 
 
 
-        sexy_icon_entry_set_icon_highlight(SEXY_ICON_ENTRY(obj),
-                SEXY_ICON_ENTRY_PRIMARY, TRUE);
         if(!g_key_file_get_boolean(config_file, "interface", "has-border",NULL))
         gtk_entry_set_has_frame(GTK_ENTRY(obj), FALSE);
 
-        g_signal_connect_swapped(G_OBJECT(obj), "icon_released", G_CALLBACK(self_link_icon_clicked), obj);
+        g_signal_connect_swapped(G_OBJECT(obj), "icon-release", G_CALLBACK(self_link_icon_clicked), obj);
 
         /* store item */
         obj->_priv->item = item; 
