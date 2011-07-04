@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <glade-interface>
   <!-- interface-requires gtk+ 2.16 -->
   <!-- interface-naming-policy toplevel-contextual -->
@@ -11,6 +11,7 @@
     <child>
       <widget class="GtkVBox" id="mainwindow_vbox">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <child>
           <widget class="GtkMenuBar" id="menubar1">
             <property name="visible">True</property>
@@ -26,18 +27,29 @@
                         <property name="label">New Window</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="new_window"/>
                         <accelerator key="N" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="image1">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-new</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                     <child>
                       <widget class="GtkImageMenuItem" id="menuitem2">
-                        <property name="label">gtk-close</property>
+                        <property name="label">close</property>
                         <property name="visible">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="close_window"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="image1">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-close</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                     <child>
@@ -50,8 +62,14 @@
                         <property name="label">Export</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="export_to_html"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="image11">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-save</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                     <child>
@@ -59,8 +77,14 @@
                         <property name="label">Backup</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="make_backup"/>
+                                                <child internal-child="image">
+                          <widget class="GtkImage" id="image11">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-save-as</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                     <child>
@@ -68,8 +92,15 @@
                         <property name="label">Restore</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="restore_backup"/>
+                                                                        <child internal-child="image">
+                          <widget class="GtkImage" id="image11">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-harddisk</property>
+                          </widget>
+                        </child>
+
                       </widget>
                     </child>
                     <child>
@@ -82,8 +113,14 @@
                         <property name="label">Reload</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="reload"/>
+                                 <child internal-child="image">
+                          <widget class="GtkImage" id="image11">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-refresh</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                     <child>
@@ -256,7 +293,7 @@
                         <property name="label">_Clone</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="interface_item_clone"/>
                         <accelerator key="C" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
                       </widget>
@@ -271,8 +308,14 @@
                         <property name="label">_Export</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="export_html_item"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="image11">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-save</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                   </widget>
@@ -288,7 +331,7 @@
                   <widget class="GtkMenu" id="menuitem_filter_menu">
                     <child>
                       <widget class="GtkImageMenuItem" id="menuitem_filter_new">
-                        <property name="label">_New</property>
+                        <property name="label">gtk-new</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
@@ -326,7 +369,7 @@
                   <widget class="GtkMenu" id="menuitem_type_menu">
                     <child>
                       <widget class="GtkImageMenuItem" id="menuitem_type_new">
-                        <property name="label">_New</property>
+                        <property name="label">gtk-new</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
@@ -338,7 +381,7 @@
                         <property name="label">_Import</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="schema_import"/>
                       </widget>
                     </child>
@@ -347,7 +390,7 @@
                         <property name="label">_Export</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="schema_export"/>
                       </widget>
                     </child>
@@ -374,7 +417,7 @@
                         <property name="label">Visit Website</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
+                        <property name="use_stock">False</property>
                         <signal name="activate" handler="visit_homepage"/>
                       </widget>
                     </child>
@@ -456,6 +499,7 @@
             <child>
               <widget class="GtkVBox" id="vbox2">
                 <property name="visible">True</property>
+                <property name="orientation">vertical</property>
                 <property name="spacing">6</property>
                 <child>
                   <widget class="GtkHBox" id="hbox4">
@@ -510,14 +554,14 @@ Filters</property>
                   <widget class="GtkEntry" id="LeftPaneFilterEntry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">•</property>
+                    <property name="invisible_char">&#x2022;</property>
                     <property name="primary_icon_stock">gtk-find</property>
                     <property name="secondary_icon_stock">gtk-clear</property>
                     <property name="secondary_icon_activatable">True</property>
                     <property name="secondary_icon_sensitive">True</property>
                     <signal name="changed" handler="left_pane_filter_changed"/>
-                    <signal name="icon_press" handler="left_pane_filter_entry_clear"/>
                     <signal name="activate" handler="left_pane_filter_entry_activate"/>
+                    <signal name="icon_press" handler="left_pane_filter_entry_clear"/>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
@@ -539,6 +583,7 @@ Filters</property>
                 <child>
                   <widget class="GtkVBox" id="vbox3">
                     <property name="visible">True</property>
+                    <property name="orientation">vertical</property>
                     <property name="spacing">6</property>
                     <child>
                       <widget class="GtkHBox" id="hbox3">
@@ -693,6 +738,7 @@ Filters</property>
           <widget class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
             <property name="border_width">9</property>
+            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="eventbox">
@@ -777,7 +823,7 @@ Filters</property>
                   <widget class="GtkEntry" id="title_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">●</property>
+                    <property name="invisible_char">&#x25CF;</property>
                   </widget>
                   <packing>
                     <property name="position">1</property>
@@ -822,6 +868,7 @@ Filters</property>
                     <child>
                       <widget class="GtkVButtonBox" id="vbuttonbox1">
                         <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
                         <property name="spacing">6</property>
                         <property name="layout_style">start</property>
                         <child>
@@ -1102,7 +1149,7 @@ Filters</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="invisible_char">●</property>
+                    <property name="invisible_char">&#x25CF;</property>
                     <signal name="changed" handler="filename_changed"/>
                   </widget>
                   <packing>
@@ -1132,7 +1179,7 @@ Filters</property>
                   <packing>
                     <property name="top_attach">1</property>
                     <property name="bottom_attach">2</property>
-                    <property name="x_options"></property>
+                    <property name="x_options"/>
                   </packing>
                 </child>
                 <child>
@@ -1143,7 +1190,7 @@ Filters</property>
                     <property name="use_markup">True</property>
                   </widget>
                   <packing>
-                    <property name="x_options"></property>
+                    <property name="x_options"/>
                   </packing>
                 </child>
               </widget>
@@ -1208,11 +1255,13 @@ Filters</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox4">
             <property name="visible">True</property>
             <property name="border_width">5</property>
+            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="event_box_header">
@@ -1272,7 +1321,7 @@ Filters</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
-                        <property name="y_options"></property>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1285,21 +1334,21 @@ Filters</property>
                       <packing>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkEntry" id="filename_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="invisible_char">●</property>
+                        <property name="invisible_char">&#x25CF;</property>
                         <property name="text" translatable="yes">database.csv</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="y_options"></property>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1310,8 +1359,8 @@ Filters</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1325,7 +1374,7 @@ Filters</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">1</property>
                         <property name="bottom_attach">2</property>
-                        <property name="y_options"></property>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1338,8 +1387,8 @@ Filters</property>
                       <packing>
                         <property name="top_attach">1</property>
                         <property name="bottom_attach">2</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1352,8 +1401,8 @@ Filters</property>
                       <packing>
                         <property name="top_attach">3</property>
                         <property name="bottom_attach">4</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1371,8 +1420,8 @@ Filters</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">3</property>
                         <property name="bottom_attach">4</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                   </widget>
@@ -1534,8 +1583,8 @@ Filters</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">1</property>
                         <property name="bottom_attach">2</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1549,8 +1598,8 @@ Filters</property>
                       <packing>
                         <property name="top_attach">1</property>
                         <property name="bottom_attach">2</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1562,7 +1611,7 @@ Filters</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">4</property>
                         <property name="bottom_attach">5</property>
-                        <property name="y_options"></property>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1575,21 +1624,21 @@ Filters</property>
                       <packing>
                         <property name="top_attach">4</property>
                         <property name="bottom_attach">5</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
                       <widget class="GtkEntry" id="filename_entry1">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="invisible_char">●</property>
+                        <property name="invisible_char">&#x25CF;</property>
                         <property name="text" translatable="yes">database.html</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="y_options"></property>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1600,8 +1649,8 @@ Filters</property>
                         <property name="use_markup">True</property>
                       </widget>
                       <packing>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1615,7 +1664,7 @@ Filters</property>
                         <property name="right_attach">2</property>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
-                        <property name="y_options"></property>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1628,8 +1677,8 @@ Filters</property>
                       <packing>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
-                        <property name="x_options"></property>
-                        <property name="y_options"></property>
+                        <property name="x_options"/>
+                        <property name="y_options"/>
                       </packing>
                     </child>
                     <child>
@@ -1738,11 +1787,13 @@ Filters</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox5">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox5">
             <property name="visible">True</property>
             <property name="border_width">5</property>
+            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="eventbox_label">
@@ -1803,7 +1854,7 @@ Filters</property>
                   <widget class="GtkEntry" id="title_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">●</property>
+                    <property name="invisible_char">&#x25CF;</property>
                     <signal name="changed" handler="search_title_changed"/>
                   </widget>
                   <packing>
@@ -1926,10 +1977,12 @@ Filters</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox6">
         <property name="visible">True</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
           <widget class="GtkVBox" id="vbox7">
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
               <widget class="GtkEventBox" id="eventbox_schema">
@@ -2022,7 +2075,7 @@ Filters</property>
                   <widget class="GtkEntry" id="entry_name">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">●</property>
+                    <property name="invisible_char">&#x25CF;</property>
                   </widget>
                   <packing>
                     <property name="left_attach">1</property>
