@@ -107,6 +107,7 @@ BUILT_SOURCES=\
 #	@mv -f stuffkeeper.vala.tmp $@
 
 %.vala.stamp: %.vala
+	$(info Building $^)
 	@VALAC@ -b $(top_builddir)/src/ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 --pkg=gio-2.0 \
 	--pkg=gmodule-2.0 --pkg=stuffkeeper --use-header $^ -H $(notdir $(^:.vala=.h))
 	@touch -f $@

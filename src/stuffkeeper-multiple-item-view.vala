@@ -199,7 +199,7 @@ public class Stuffkeeper.MultipleItemView : Gtk.VBox
             button.set_data<weak DataItem>("item", item);
             button.clicked.connect((source) => {
                     DataItem fitem = button.get_data<weak DataItem>("item");
-                    Gtk.Window win = new Stuffkeeper.ItemWindow(fitem.get_backend(), fitem, Stuffkeeper.config_file);
+                    new Stuffkeeper.ItemWindow(fitem.get_backend(), fitem, Stuffkeeper.config_file);
                     });
         }
         items_vbox.show_all();

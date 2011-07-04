@@ -28,11 +28,11 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 			{
 				if(min_spin.value != (double)value)
 				{
-					min_spin.value_changed -= spin_changed;		
+					min_spin.value_changed.disconnect(spin_changed);	
 					min_spin.value = (double)value;	
 					max_spin.set_range(min_spin.value+1, int.MAX);
-                    default_spin.set_range((double)value, max_spin.value);
-					min_spin.value_changed += spin_changed;					
+					default_spin.set_range((double)value, max_spin.value);
+					min_spin.value_changed.connect(spin_changed);					
 				}
 			}
 		}	
@@ -44,11 +44,11 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 			{
 				if(max_spin.value != (double)value)
 				{
-					max_spin.value_changed -= spin_changed;		
+					max_spin.value_changed.disconnect(spin_changed);		
 					max_spin.value = (double)value;	
 					min_spin.set_range(int.MIN, max_spin.value-1);
-                    default_spin.set_range(min_spin.value, (double)value);
-					max_spin.value_changed += spin_changed;					
+					default_spin.set_range(min_spin.value, (double)value);
+					max_spin.value_changed.connect(spin_changed);					
 				}
 			}
 		}	
@@ -59,9 +59,9 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 			{
 				if(default_spin.value != (double)(value/10.0))
 				{
-					default_spin.value_changed -= spin_changed;		
+					default_spin.value_changed.disconnect(spin_changed);		
 					default_spin.value = (double)value/10.0;	
-					default_spin.value_changed += spin_changed;					
+					default_spin.value_changed.connect(spin_changed);					
 				}
 			}
 		}
@@ -93,17 +93,15 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 	~DataRatingConfig() {
 		stdout.printf("Dispose\n");
 
-		/* This gets called twice.. 
-		 * Hack it to have it run only once*/
-			schema.schema_custom_field_changed -= field_changed;
-			if(update_timeout > 0)
-			{
-                stdout.printf("force saving\n");
-				Source.remove(update_timeout);
-				update_timeout = 0;
-				save_changes();	
-			}
-        stdout.printf("kdispose_done\n");
+		schema.schema_custom_field_changed.disconnect(field_changed);
+		if(update_timeout > 0)
+		{
+			stdout.printf("force saving\n");
+			Source.remove(update_timeout);
+			update_timeout = 0;
+			save_changes();	
+		}
+		stdout.printf("kdispose_done\n");
 	}
 	/**
 	 * Construct 
@@ -142,7 +140,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 					AttachOptions.SHRINK,0,0);
 
 		min_spin.value =  0.0;
-		min_spin.value_changed += spin_changed;
+		min_spin.value_changed.connect(spin_changed);
 
 		label = new Gtk.Label("Maximum value");
 		label.set_alignment(1.0f,0.5f);
@@ -157,7 +155,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 				AttachOptions.SHRINK|AttachOptions.FILL,
 				AttachOptions.SHRINK,0,0);
 		max_spin.value = 10.0;
-		max_spin.value_changed += spin_changed;
+		max_spin.value_changed.connect(spin_changed);
 
         label = new Gtk.Label("Default value");
 		label.set_alignment(1.0f,0.5f);
@@ -172,7 +170,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 				AttachOptions.SHRINK|AttachOptions.FILL,
 				AttachOptions.SHRINK,0,0);
 		default_spin.value = 5.0;
-		default_spin.value_changed += spin_changed;
+		default_spin.value_changed.connect(spin_changed);
 
 
 		this.show_all();
@@ -191,7 +189,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		field_changed(schema,field, CustomFields.DEFAULT_VALUE);
 
 		/* connect signals */
-		schema.schema_custom_field_changed += field_changed;
+		schema.schema_custom_field_changed.connect(field_changed);
 	}
 
 }

@@ -7,7 +7,6 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 	private DataSchema schema = null;
 	private Gtk.CheckButton checkbox = null;
 	/* hack to fix vala bug */
-	static bool quit = false;
 
 	/**
 	 * Listen to changes to this field
@@ -21,11 +20,9 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 			{
 				if(checkbox.active != (bool)value)
 				{
-					//schema.schema_custom_field_changed -= field_changed;
-					this.checkbox.toggled += toggled;	
+					this.checkbox.toggled.disconnect(toggled);	
 					checkbox.active = (bool)value;	
-					//schema.schema_custom_field_changed += field_changed;
-					this.checkbox.toggled += toggled;	
+					this.checkbox.toggled.connect(toggled);	
 				}
 			}
 		}	
@@ -49,14 +46,7 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 	 */
 	~DataBooleanConfig() {
 		stdout.printf("Dispose data boolean config\n");
-
-		/* This gets called twice.. 
-		 * Hack it to have it run only once*/
-		if(!quit)
-		{
-			schema.schema_custom_field_changed -= field_changed;
-		}
-		quit = true;
+		schema.schema_custom_field_changed.disconnect(field_changed);
 	}
 	/**
 	 * Construct 
@@ -83,8 +73,8 @@ public class Stuffkeeper.DataBooleanConfig : Gtk.HBox {
 			this.checkbox.active = (bool)value;
 		}
 		/* connect signals */
-		this.checkbox.toggled += toggled;	
-		schema.schema_custom_field_changed += field_changed;
+		this.checkbox.toggled.connect(toggled);	
+		schema.schema_custom_field_changed.connect(field_changed);
 	}
 
 }
