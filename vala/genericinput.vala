@@ -329,7 +329,7 @@ private class GenericInputDialog:Gtk.Assistant
 
     }
 
-    override void prepare (Gtk.Widget page)
+    public override void prepare (Gtk.Widget page)
     {
         /* Clear previous matching tables */
         matching = null;
@@ -396,13 +396,13 @@ private class GenericInputDialog:Gtk.Assistant
 
         }
     }
-    override void close()
+    public override void close()
     {
         stdout.printf("close\n");
         this.cancel();
     }
 
-    override void cancel()
+    public override void cancel()
     {
         stdout.printf("cancel\n");
         /* Hack to break the ref cycle */
@@ -411,7 +411,7 @@ private class GenericInputDialog:Gtk.Assistant
         this.get_nth_page(0).destroy();
         this.destroy();
     }
-    override void apply()
+    public override void apply()
     {
         debug("Apply()");
         foreach(ItemParser ip in p.get_items())

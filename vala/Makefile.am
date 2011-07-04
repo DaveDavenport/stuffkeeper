@@ -4,7 +4,9 @@ plugin_LTLIBRARIES =\
 	genericinput.la\
 	tagcloud.la
 
-EXTRA_DIST=stuffkeeper.vapi
+EXTRA_DIST=stuffkeeper.vapi\
+	genericinput.vala\
+	tagcloud.vala
 
 genericinput_la_SOURCES=\
 	genericinput.c
@@ -40,8 +42,9 @@ AM_CFLAGS = \
 	-DPIXMAP_PATH=\""$(pkgdatadir)"\" \
 	-DGLADE_PATH=\""$(pkgdatadir)"\" \
 	-DVERSION=\"@VERSION@\" \
-	-I $(top_srcdir)/src/
+	-I $(top_srcdir)/src/\
+	-I $(top_builddir)/src/
 
 %.vala.stamp: %.vala
 	$(VALAC) -b $(top_builddir)/vala/ -C --vapidir=$(top_srcdir)/vala/ --pkg=gtk+-2.0 --pkg=glib-2.0 --pkg=gmodule-2.0 --pkg=stuffkeeper $^ 
-	@touch -f $@
+	@touch -f $(top_builddir)/vala/$@
