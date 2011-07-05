@@ -626,7 +626,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                 }
             }
 
-            gtk_builder_connect_signals_full(self->_priv->xml, (GtkBuilderConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            gtk_builder_connect_signals_full(self->_priv->xml, (GtkBuilderConnectFunc)self____builder_xml_connect_foreach, (gpointer)self);
             gtk_widget_show(GTK_WIDGET(self->_priv->win));
 	    interface_element_add(self->_priv->win);
 	    return self;
@@ -634,7 +634,7 @@ class Stuffkeeper:Edit:Schema from G:Object
 
     private
     void
-    ___glade_xml_connect_foreach(
+    ___builder_xml_connect_foreach(
 		    GtkBuilder *builder,
 		    GObject *object,
 		    const gchar *signal_name,

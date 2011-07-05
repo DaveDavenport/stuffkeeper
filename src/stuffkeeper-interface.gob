@@ -2656,29 +2656,58 @@ class Stuffkeeper:Interface from G:Object
         /** 
          * Backup
          */
-        public
-        void
-        filename_changed(self, GtkWidget *entry)
+	private
+		void
+		___builder_xml_connect_foreach(
+				GtkBuilder *builder,
+		    GObject *object,
+		    const gchar *signal_name,
+		    const gchar *handler_name,
+		    GObject *connect_object,
+		    GConnectFlags flags,
+		    gpointer user_data)
         {
-            GladeXML *xml =glade_get_widget_tree(entry);
-            GtkWidget *button =  glade_xml_get_widget(xml,"save_button"); 
-            const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
-            gtk_widget_set_sensitive(button, (strlen(text) > 0)?TRUE:FALSE);
-        }
+            static GModule * allsymbols = NULL;
 
+		printf("%s - %s\n", signal_name, handler_name);
+            if (!allsymbols) allsymbols = g_module_open(NULL, 0);
+            if (allsymbols) {
+                gchar * func_name = g_strdup_printf("stuffkeeper_interface_%s", handler_name);
+                GCallback func;
+
+                if (!g_module_symbol(allsymbols, func_name, (gpointer)&func)){
+                    if (!g_module_symbol(allsymbols, handler_name, (gpointer)&func)) {
+                        g_warning("could not find signal handler '%s'.", func_name);
+                        g_free(func_name);
+                        return;
+                    }
+                }
+		g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED | flags);
+		g_free(func_name);
+            }
+        }
         public
         void
         make_backup(self)
         {
             GError *error = NULL;
             gchar *value = NULL;
-            GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","dialog_backup",NULL);
-            GtkWidget *dialog = glade_xml_get_widget(xml,"dialog_backup");
+            GtkBuilder *xml = gtk_builder_new();            
+	    GtkWidget *dialog;
+
+	    gtk_builder_add_from_file(xml, PACKAGE_DATADIR"/backup-dialog.ui",&error);
+	    if(error != NULL) {
+		g_error("Failed to open ui description file: %s\n", error->message);
+		g_error_free(error);
+		return;
+	    }
+
+	    dialog = (GtkWidget *)gtk_builder_get_object(xml,"dialog_backup");
             /* Restore previous location */ 
             value = g_key_file_get_string(self->config_file, "BACKUP", "directory", &error);
             if(error == NULL) {
                 if(value ) {
-                    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "location_chooser")), value);
+                    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(gtk_builder_get_object(xml, "location_chooser")), value);
                     g_free(value);
                 }
             }else{
@@ -2689,7 +2718,7 @@ class Stuffkeeper:Interface from G:Object
             value = g_key_file_get_string(self->config_file, "BACKUP", "filename", &error);
             if(error == NULL) {
                 if(value ) {
-                    gtk_entry_set_text(GTK_ENTRY(glade_xml_get_widget(xml, "entry_filename")), value);
+                    gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(xml, "entry_filename")), value);
                     g_free(value);
                 }
             }else{
@@ -2697,13 +2726,13 @@ class Stuffkeeper:Interface from G:Object
                 error = NULL;
             }
 
-            glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            gtk_builder_connect_signals_full(xml, (GtkBuilderConnectFunc)self____builder_xml_connect_foreach, (gpointer)self);
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
                 case -5:
                     {
-                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "location_chooser")));
-                        GtkWidget *entry = glade_xml_get_widget(xml, "entry_filename"); 
+                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(gtk_builder_get_object(xml, "location_chooser")));
+                        GtkWidget *entry = (GtkWidget *)gtk_builder_get_object(xml, "entry_filename"); 
                         const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
                         const gchar *source = stuffkeeper_data_backend_get_path(self->_priv->skdbg);
                         /* Store for next time */
