@@ -4,7 +4,6 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
-#include <glade/glade.h>
 #include <config.h>
 #include "stuffkeeperglue.h"
 #include "stuffkeeper-data-backend.h"
@@ -30,7 +29,7 @@ ESCAPE_NONE
 
 class Stuffkeeper:Export:HTML from G:Object
 {
-    private GladeXML *xml;
+    private GtkBuilder *xml;
     private StuffkeeperInterface  *interface = {NULL};
     /* Parser values */
     private StuffkeeperDataBackend *skdb = {NULL};
@@ -91,6 +90,7 @@ class Stuffkeeper:Export:HTML from G:Object
         GtkWidget *wid;
         GtkCellRenderer *renderer;
         gchar *directory = NULL;
+	GError *error = NULL;
 
         self->_priv->skdb = skdb;
         self->_priv->interface = STUFFKEEPER_INTERFACE(interface);
@@ -98,18 +98,26 @@ class Stuffkeeper:Export:HTML from G:Object
         /**
          * Open the dialog 
          */
-        self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
-        dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
+        self->_priv->xml = gtk_builder_new();
+	gtk_builder_add_from_file(self->_priv->xml, PACKAGE_DATADIR"/export-html-full.ui",&error);
+	if(error) {
+		g_error("Failed to load export html ui description: %s\n", error->message);
+		g_error_free(error);
+		g_object_unref(self);
+		return NULL;
+	}
+
+        dialog = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "export_html_full");
 
         directory = g_key_file_get_string(self->_priv->interface->config_file, "export-html", "export-directory",NULL);
         if(directory)
         {
-            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml, "file_chooser_button1")),directory);
+            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(gtk_builder_get_object(self->_priv->xml, "file_chooser_button1")),directory);
             g_free(directory); 
             directory = NULL;
         }
        
-        self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
+        self->_priv->fc_template = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE_FULL);
 
         gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
@@ -117,28 +125,28 @@ class Stuffkeeper:Export:HTML from G:Object
         gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(self->_priv->fc_template), self->_priv->ffilter);
 
         /* header */
-        self->_priv->button_export = glade_xml_get_widget(self->_priv->xml, "button_export2");
-        self->_priv->progress_bar = glade_xml_get_widget(self->_priv->xml, "progress_bar");
-       self->_priv->chk_cdb = glade_xml_get_widget(self->_priv->xml, "chk_cdb");
-       self->_priv->chk_vis = glade_xml_get_widget(self->_priv->xml, "chk_vis");
-       wid = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
+        self->_priv->button_export = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "button_export2");
+        self->_priv->progress_bar = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "progress_bar");
+       self->_priv->chk_cdb = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "chk_cdb");
+       self->_priv->chk_vis = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "chk_vis");
+       wid = self->_priv->cb_type = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "cb_type1");
         gtk_combo_box_set_model(GTK_COMBO_BOX(wid), GTK_TREE_MODEL(store));
         gtk_combo_box_set_active(GTK_COMBO_BOX(wid), 0);
         renderer = gtk_cell_renderer_text_new();
         gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(wid),renderer, TRUE);
         gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(wid),renderer, "text",1 );
 
-        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "event_box_header_html")), 
+        g_signal_connect_swapped(G_OBJECT(gtk_builder_get_object(self->_priv->xml, "event_box_header_html")), 
                 "style-set",
                 G_CALLBACK(self_style_set), 
                 self);
-        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "filename_entry1")), 
+        g_signal_connect_swapped(G_OBJECT(gtk_builder_get_object(self->_priv->xml, "filename_entry1")), 
                 "changed",
                 G_CALLBACK(self_filename_changed), 
                 self);
 
         g_signal_connect_swapped(G_OBJECT(self->_priv->chk_cdb), "toggled", G_CALLBACK(self_complete_db_checked), self);
-        self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
+        self_filename_changed(self,GTK_ENTRY(gtk_builder_get_object(self->_priv->xml, "filename_entry1")));
 
 
         gtk_widget_show(GTK_WIDGET(dialog));
@@ -152,6 +160,7 @@ class Stuffkeeper:Export:HTML from G:Object
     G:Object *
     new(StuffkeeperInterface *interface, StuffkeeperDataBackend *skdb,Stuffkeeper:Data:Item  *item)
     {
+	GError *error = NULL;
         GtkWidget *dialog = NULL;
         gchar *directory = NULL;
         Self *self = GET_NEW;
@@ -161,47 +170,55 @@ class Stuffkeeper:Export:HTML from G:Object
         /**
          * Open the dialog 
          */
-        self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_html_full",NULL);
-        dialog = glade_xml_get_widget(self->_priv->xml, "export_html_full");
+
+        self->_priv->xml = gtk_builder_new();
+	gtk_builder_add_from_file(self->_priv->xml, PACKAGE_DATADIR"/export-html-full.ui",&error);
+	if(error) {
+		g_error("Failed to load export html ui description: %s\n", error->message);
+		g_error_free(error);
+		g_object_unref(self);
+		return NULL;
+	}
+        dialog = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "export_html_full");
         /* file chooser */
         directory = g_key_file_get_string(self->_priv->interface->config_file, "export-html", "export-directory",NULL);
         if(directory)
         {
-            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml, "file_chooser_button1")),directory);
+            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(gtk_builder_get_object(self->_priv->xml, "file_chooser_button1")),directory);
             g_free(directory); 
             directory = NULL;
         }
-        self->_priv->fc_template = glade_xml_get_widget(self->_priv->xml, "fc_template");
+        self->_priv->fc_template = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "fc_template");
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(self->_priv->fc_template), PACKAGE_DATADIR PACKAGE_HTML_TEMPLATE);
         gtk_file_filter_add_pattern(self->_priv->ffilter, "*.template");
         gtk_file_filter_set_name(GTK_FILE_FILTER(self->_priv->ffilter), _("Export templates"));
         gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(self->_priv->fc_template), self->_priv->ffilter);
 
         /* */
-        self->_priv->button_export = self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "button_export2");
-        self->_priv->progress_bar = glade_xml_get_widget(self->_priv->xml, "progress_bar");
-        self->_priv->cb_type = glade_xml_get_widget(self->_priv->xml, "cb_type1");
-        self->_priv->chk_cdb = glade_xml_get_widget(self->_priv->xml, "chk_cdb");
-        self->_priv->chk_vis = glade_xml_get_widget(self->_priv->xml, "chk_vis");
+        self->_priv->button_export = self->_priv->cb_type = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "button_export2");
+        self->_priv->progress_bar = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "progress_bar");
+        self->_priv->cb_type = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "cb_type1");
+        self->_priv->chk_cdb = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "chk_cdb");
+        self->_priv->chk_vis = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "chk_vis");
         gtk_widget_hide(self->_priv->cb_type);
-        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_type"));
+        gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "label_type"));
 
-        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_cdb"));
-        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "chk_cdb"));
-        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "label_vis"));
-        gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "chk_vis"));
+        gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "label_cdb"));
+        gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "chk_cdb"));
+        gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "label_vis"));
+        gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "chk_vis"));
 
         /* header */
-        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "event_box_header_html")), 
+        g_signal_connect_swapped(G_OBJECT(gtk_builder_get_object(self->_priv->xml, "event_box_header_html")), 
                 "style-set",
                 G_CALLBACK(self_style_set), 
                 self);
-        g_signal_connect_swapped(G_OBJECT(glade_xml_get_widget(self->_priv->xml, "filename_entry1")), 
+        g_signal_connect_swapped(G_OBJECT(gtk_builder_get_object(self->_priv->xml, "filename_entry1")), 
                 "changed",
                 G_CALLBACK(self_filename_changed), 
                 self);
         g_signal_connect_swapped(G_OBJECT(self->_priv->chk_cdb), "toggled", G_CALLBACK(self_complete_db_checked), self);
-        self_filename_changed(self,GTK_ENTRY(glade_xml_get_widget(self->_priv->xml, "filename_entry1")));
+        self_filename_changed(self,GTK_ENTRY(gtk_builder_get_object(self->_priv->xml, "filename_entry1")));
 
         gtk_widget_show(GTK_WIDGET(dialog));
         /* */
@@ -225,9 +242,9 @@ class Stuffkeeper:Export:HTML from G:Object
                     GtkTreeModel *model = gtk_combo_box_get_model(GTK_COMBO_BOX(self->_priv->cb_type));
                     have_schema = gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_type),&iter);
                     {
-                        const gchar *filename = gtk_entry_get_text(GTK_ENTRY(glade_xml_get_widget(self->_priv->xml,"filename_entry1")));
+                        const gchar *filename = gtk_entry_get_text(GTK_ENTRY(gtk_builder_get_object(self->_priv->xml,"filename_entry1")));
                         gchar *directory = gtk_file_chooser_get_filename(
-                                    GTK_FILE_CHOOSER(glade_xml_get_widget(self->_priv->xml,"file_chooser_button1")));
+                                    GTK_FILE_CHOOSER(gtk_builder_get_object(self->_priv->xml,"file_chooser_button1")));
                         gchar *template = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(self->_priv->fc_template));
                         StuffkeeperDataSchema *schema = NULL;
                         g_key_file_set_string(self->_priv->interface->config_file, "export-html", "export-directory",directory);
@@ -275,10 +292,10 @@ class Stuffkeeper:Export:HTML from G:Object
         gtk_widget_modify_bg(wid,
                 GTK_STATE_NORMAL, 
                 &((wid)->style->bg[GTK_STATE_SELECTED]));
-        gtk_widget_modify_text(glade_xml_get_widget(self->_priv->xml, "label_title_html"), 
+        gtk_widget_modify_text((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "label_title_html"), 
                 GTK_STATE_NORMAL, 
                 &((wid)->style->text[GTK_STATE_SELECTED]));
-        gtk_widget_modify_fg(glade_xml_get_widget(self->_priv->xml, "label_title_html"), 
+        gtk_widget_modify_fg((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "label_title_html"), 
                 GTK_STATE_NORMAL, 
                 &((wid)->style->fg[GTK_STATE_SELECTED]));
         g_signal_handlers_unblock_by_func(G_OBJECT(wid), self_style_set,self);
