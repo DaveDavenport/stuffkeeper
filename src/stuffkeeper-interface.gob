@@ -3035,11 +3035,11 @@ class Stuffkeeper:Interface from G:Object
         /* storing saving schemas */
         private
         void
-        schema_style_set(GtkWidget *event, GtkStyle *style, GladeXML *xml)
+        schema_style_set(GtkWidget *event, GtkStyle *style, GtkBuilder *xml)
         {
-            GtkWidget *dialog = glade_xml_get_widget(xml,"export_schema_dialog");
-            GtkWidget *event = glade_xml_get_widget(xml, "eventbox_schema");
-            GtkWidget *label =  glade_xml_get_widget(xml, "label_title_schema");
+            GtkWidget *dialog = (GtkWidget *)gtk_builder_get_object(xml,"export_schema_dialog");
+            GtkWidget *event = (GtkWidget *)gtk_builder_get_object(xml, "eventbox_schema");
+            GtkWidget *label =  (GtkWidget *)gtk_builder_get_object(xml, "label_title_schema");
             gtk_widget_modify_bg(event,
                     GTK_STATE_NORMAL, 
                     &((dialog)->style->bg[GTK_STATE_SELECTED]));
@@ -3117,15 +3117,26 @@ class Stuffkeeper:Interface from G:Object
         {
             GtkCellRenderer *renderer;
             GtkWidget *entry, *cb_schema;
-            GladeXML *xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","export_schema_dialog",NULL);
-            GtkWidget *dialog = glade_xml_get_widget(xml,"export_schema_dialog");
+            GtkBuilder *xml = gtk_builder_new();
+            GtkWidget *dialog; 
+	    GError *error= NULL;
+	    gtk_builder_add_from_file(xml, PACKAGE_DATADIR"/export-schema-dialog.ui",&error);
+	    if(error) {
+		g_error("Failed to open ui file: %s\n", error->message);
+		g_error_free(error);
+		g_object_unref(xml);
+		return;
+	    }
+
+	    dialog = (GtkWidget *)gtk_builder_get_object(xml,"export_schema_dialog");
 
             g_signal_connect(G_OBJECT(dialog), "style-set", G_CALLBACK(self_schema_style_set),xml);
 
             /* entry */
-            entry = glade_xml_get_widget(xml, "entry_name");
-            g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(self_entry_changed), glade_xml_get_widget(xml, "save_button1"));
-            cb_schema = glade_xml_get_widget(xml, "cb_schema");
+            entry = (GtkWidget *)gtk_builder_get_object(xml, "entry_name");
+            g_signal_connect(G_OBJECT(entry), "changed", G_CALLBACK(self_entry_changed),
+			    (GtkWidget *)gtk_builder_get_object(xml, "save_button1"));
+	    cb_schema = (GtkWidget *)gtk_builder_get_object(xml, "cb_schema");
 
             gtk_combo_box_set_model(GTK_COMBO_BOX(cb_schema), GTK_TREE_MODEL(self->_priv->model_schemas));
             gtk_combo_box_set_active(GTK_COMBO_BOX(cb_schema), 0);
@@ -3134,13 +3145,14 @@ class Stuffkeeper:Interface from G:Object
             gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(cb_schema),renderer, "text",1 );
 
 
-            glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            //glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            gtk_builder_connect_signals_full(xml, (GtkBuilderConnectFunc)self____builder_xml_connect_foreach, (gpointer)self);
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {
                 case -5:
                     {
                         GtkTreeIter iter;
-                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(glade_xml_get_widget(xml, "fc_directory")));
+                        gchar *directory = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(gtk_builder_get_object(xml, "fc_directory")));
                         const gchar *file = gtk_entry_get_text(GTK_ENTRY(entry)); 
                         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(cb_schema),&iter))
                         {

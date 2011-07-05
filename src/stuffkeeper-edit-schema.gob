@@ -4,7 +4,6 @@ requires 2.0.10
 /* Include gtk */
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-#include <glade/glade.h>
 #include "config.h"
 #include "debug.h"
 /* Include the database */

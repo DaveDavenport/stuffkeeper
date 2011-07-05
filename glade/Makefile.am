@@ -4,6 +4,7 @@ appglade_DATA =\
 	schema-edit-dialog.ui\
 	backup-dialog.ui\
 	export-html-full.ui\
-	edit-search-dialog.ui
+	edit-search-dialog.ui\
+	export-schema-dialog.ui
 
 EXTRA_DIST = stuffkeeper.glade
