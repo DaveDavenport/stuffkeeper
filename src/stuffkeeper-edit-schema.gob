@@ -44,7 +44,7 @@ class Stuffkeeper:Edit:Schema from G:Object
     private Stuffkeeper:Data:Schema *schema = {NULL};
     private GtkListStore *store = {gtk_list_store_new(NUM_ROWS,G_TYPE_STRING, G_TYPE_INT,G_TYPE_STRING,G_TYPE_STRING,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,G_TYPE_BOOLEAN,GTK_TYPE_TREE_MODEL)}  destroywith g_object_unref;
     private GtkCellRenderer *renderer_model= NULL;
-    private GladeXML *xml;
+    private GtkBuilder *xml;
     private GtkWidget *tree;
     private GtkWidget *win;
     private GtkWidget *preview_box;
@@ -93,8 +93,8 @@ class Stuffkeeper:Edit:Schema from G:Object
     void
     schema_changed(self, StuffkeeperDataSchema *schema)
     {
-        GtkWidget *label = glade_xml_get_widget(self->_priv->xml, "title_label");
-        GtkWidget *image = glade_xml_get_widget(self->_priv->xml, "type_image");
+        GtkWidget *label = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "title_label");
+        GtkWidget *image = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "type_image");
         GdkPixbuf *pixbuf = stuffkeeper_data_schema_get_pixbuf(schema);
         /**
          * update title
@@ -334,13 +334,13 @@ class Stuffkeeper:Edit:Schema from G:Object
     void
     style_set(self, GtkStyle *style, GtkWidget *win)
     {
-      gtk_widget_modify_bg(glade_xml_get_widget(self->_priv->xml, "eventbox"), 
+      gtk_widget_modify_bg((GtkWidget*)gtk_builder_get_object(self->_priv->xml, "eventbox"), 
             GTK_STATE_NORMAL, 
             &((self->_priv->win)->style->bg[GTK_STATE_SELECTED]));
-      gtk_widget_modify_text(glade_xml_get_widget(self->_priv->xml, "title_label"), 
+      gtk_widget_modify_text((GtkWidget*)gtk_builder_get_object(self->_priv->xml, "title_label"), 
             GTK_STATE_NORMAL, 
             &((self->_priv->win)->style->text[GTK_STATE_SELECTED]));
-      gtk_widget_modify_fg(glade_xml_get_widget(self->_priv->xml, "title_label"), 
+      gtk_widget_modify_fg((GtkWidget*)gtk_builder_get_object(self->_priv->xml, "title_label"), 
             GTK_STATE_NORMAL, 
             &((self->_priv->win)->style->fg[GTK_STATE_SELECTED]));
 
@@ -534,15 +534,18 @@ class Stuffkeeper:Edit:Schema from G:Object
             GError *error = NULL;
             
 
-            self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","edit_schema_dialog",NULL);
-            if(self->_priv->xml == NULL)
+            self->_priv->xml = gtk_builder_new();
+
+	    gtk_builder_add_from_file(self->_priv->xml, PACKAGE_DATADIR"/schema-edit-dialog.ui",&error);
+	    if(error)
             {
                 g_object_unref(self);
-                debug_printf("Failed top open xml file\n");
-                return NULL;
+                debug_printf("Failed to open xml file: %s\n", error->message);
+		g_error_free(error);
+		return NULL;
             }
-            self->_priv->tree = glade_xml_get_widget(self->_priv->xml, "tree");
-            self->_priv->win = glade_xml_get_widget(self->_priv->xml, "edit_schema_dialog");
+            self->_priv->tree = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "tree");
+            self->_priv->win = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "edit_schema_dialog");
             gtk_widget_hide_on_delete(self->_priv->win);
 
             self->_priv->preview_box = gtk_viewport_new(NULL, NULL);
@@ -550,7 +553,7 @@ class Stuffkeeper:Edit:Schema from G:Object
             sw = gtk_scrolled_window_new(NULL, NULL);
             gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
             gtk_container_add(GTK_CONTAINER(sw), self->_priv->preview_box);
-            gtk_paned_add2(GTK_PANED(glade_xml_get_widget(self->_priv->xml, "hpaned2")),
+            gtk_paned_add2(GTK_PANED(gtk_builder_get_object(self->_priv->xml, "hpaned2")),
                     sw);
             gtk_widget_show(sw);
 
@@ -623,7 +626,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                 }
             }
 
-            glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            gtk_builder_connect_signals_full(self->_priv->xml, (GtkBuilderConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             gtk_widget_show(GTK_WIDGET(self->_priv->win));
 	    interface_element_add(self->_priv->win);
 	    return self;
@@ -631,16 +634,18 @@ class Stuffkeeper:Edit:Schema from G:Object
 
     private
     void
-        ___glade_xml_connect_foreach(const gchar *handler_name,
-                GObject *object,
-                const gchar *signal_name,
-                const gchar *signal_data,
-                GObject *connect_object,
-                gboolean after,
-                gpointer user_data)
+    ___glade_xml_connect_foreach(
+		    GtkBuilder *builder,
+		    GObject *object,
+		    const gchar *signal_name,
+		    const gchar *handler_name,
+		    GObject *connect_object,
+		    GConnectFlags flags,
+		    gpointer user_data)
         {
             static GModule * allsymbols = NULL;
 
+		printf("%s - %s\n", signal_name, handler_name);
             if (!allsymbols) allsymbols = g_module_open(NULL, 0);
             if (allsymbols) {
                 gchar * func_name = g_strdup_printf("stuffkeeper_edit_schema_%s", handler_name);
@@ -653,11 +658,8 @@ class Stuffkeeper:Edit:Schema from G:Object
                         return;
                     }
                 }
-                if (after)
-                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
-                else
-                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED);
-                g_free(func_name);
+		g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED | flags);
+		g_free(func_name);
             }
         }
 
@@ -938,7 +940,7 @@ class Stuffkeeper:Edit:Schema from G:Object
                             G_CALLBACK(self_schema_fields_reordered),
                             self);
 
-        self->_priv->title_entry = glade_xml_get_widget(self->_priv->xml, "title_entry");
+        self->_priv->title_entry = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "title_entry");
         self->_priv->field_title_entry_changed_signal = g_signal_connect_swapped(G_OBJECT(self->_priv->title_entry), "changed", G_CALLBACK(self_title_changed_real), self);
         self_schema_changed(self, schema);
 
@@ -965,8 +967,8 @@ class Stuffkeeper:Edit:Schema from G:Object
 		update_field_config(self)
 		{
 			GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->tree));
-			GtkWidget *container = glade_xml_get_widget(self->_priv->xml, "field_box");
-            GtkWidget *frame = glade_xml_get_widget(self->_priv->xml, "field_box_frame");
+			GtkWidget *container = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "field_box");
+			GtkWidget *frame = (GtkWidget*)gtk_builder_get_object(self->_priv->xml, "field_box_frame");
 			GtkWidget *child = gtk_bin_get_child(GTK_BIN(container));
 			GtkTreeIter iter;
 			/* Cleanup */
