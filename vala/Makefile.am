@@ -24,7 +24,7 @@ LIBS= \
 	@gobject_LIBS@\
 	@gtk_LIBS@\
 	@gmodule_LIBS@\
-	@libglade_LIBS@\
+	@libxml_LIBS@\
 	@gthread_LIBS@
 
 AM_LDFLAGS = -module -avoid-version
@@ -35,7 +35,7 @@ AM_CFLAGS = \
 	@gobject_CFLAGS@ \
 	@gtk_CFLAGS@ \
 	@gmodule_CFLAGS@ \
-	@libglade_CFLAGS@ \
+	@libxml_CFLAGS@ \
 	@gthread_CFLAGS@ \
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\" \
 	-Wall\

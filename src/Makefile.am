@@ -144,8 +144,8 @@ LIBS= \
 	@gobject_LIBS@\
 	@gtk_LIBS@\
 	@gmodule_LIBS@\
-	@libglade_LIBS@\
 	@sqlite3_LIBS@\
+	@libxml_LIBS@\
 	@gthread_LIBS@\
 	@gio_LIBS@\
 	@GPGME_LIBS@ \
@@ -163,8 +163,8 @@ AM_CFLAGS = \
 	@gobject_CFLAGS@ \
 	@gtk_CFLAGS@ \
 	@gmodule_CFLAGS@ \
-	@libglade_CFLAGS@ \
 	@sqlite3_CFLAGS@ \
+	@libxml_CFLAGS@\
 	@gthread_CFLAGS@ \
 	@gio_CFLAGS@ \
     @unique_CFLAGS@\

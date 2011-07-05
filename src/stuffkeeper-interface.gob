@@ -13,7 +13,6 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib/gi18n.h>
-#include <glade/glade.h>
 #include <config.h>
 #include "debug.h"
 #include "misc.h"
@@ -81,7 +80,7 @@ class Stuffkeeper:Interface from G:Object
     /**
      * Treeview 1 & 2
      */
-    private GladeXML            *xml;
+    private GtkBuilder            *xml;
     private GtkWidget           *win;
     private GtkWidget           *LeftPaneCB;
     private GtkWidget           *treeview1;
@@ -1530,34 +1529,35 @@ class Stuffkeeper:Interface from G:Object
             GError *error = NULL;
             Self *self = g_object_ref_sink(GET_NEW);
 
-            self->_priv->xml = glade_xml_new(PACKAGE_DATADIR"/stuffkeeper.glade","win",NULL);
+            self->_priv->xml = gtk_builder_new();
 
             self->config_file = config_file;
-
-            if(self->_priv->xml == NULL)
+	    gtk_builder_add_from_file(self->_priv->xml, PACKAGE_DATADIR"/stuffkeeper.ui", &error);
+	    if(error)
             {
                 g_object_unref(self);
-                debug_printf("Failed top open xml file\n");
-                return NULL;
+                debug_printf("Failed top open xml file: %s\n", error->message);
+		g_error_free(error);
+		return NULL;
             }
-            self->_priv->hpaned1 =  glade_xml_get_widget(self->_priv->xml, "hpaned1");
-            self->_priv->vpaned1 =  glade_xml_get_widget(self->_priv->xml, "vpaned1");
-            self->_priv->LeftPaneCB  = glade_xml_get_widget(self->_priv->xml, "LeftPaneCB");
-            self->_priv->treeview1 = glade_xml_get_widget(self->_priv->xml, "treeview1");
-            self->_priv->treeview2 = glade_xml_get_widget(self->_priv->xml, "treeview2");
+            self->_priv->hpaned1 =  (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "hpaned1");
+            self->_priv->vpaned1 =  (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "vpaned1");
+            self->_priv->LeftPaneCB  =(GtkWidget *) gtk_builder_get_object(self->_priv->xml, "LeftPaneCB");
+            self->_priv->treeview1 = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "treeview1");
+            self->_priv->treeview2 = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "treeview2");
 
-            self->_priv->LeftPane_edit = glade_xml_get_widget(self->_priv->xml, "LeftPane_edit");
-            self->_priv->AddMenuButton = glade_xml_get_widget(self->_priv->xml, "AddMenuButton");
+            self->_priv->LeftPane_edit = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "LeftPane_edit");
+            self->_priv->AddMenuButton = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "AddMenuButton");
 
-            self->_priv->item_label = glade_xml_get_widget(self->_priv->xml, "item_label");
-            self->_priv->item_view_container = glade_xml_get_widget(self->_priv->xml, "item_view_container");
-            self->_priv->show_item_pane_menu_item = glade_xml_get_widget(self->_priv->xml, "show_item_pane_menu_item");
+            self->_priv->item_label = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "item_label");
+            self->_priv->item_view_container = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "item_view_container");
+            self->_priv->show_item_pane_menu_item = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "show_item_pane_menu_item");
             
-             self->_priv->cb_search = glade_xml_get_widget(self->_priv->xml, "cb_search");
+             self->_priv->cb_search = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "cb_search");
             
-	    self->_priv->menuitem_item_add = glade_xml_get_widget(self->_priv->xml, "menuitem_item_add");
+	    self->_priv->menuitem_item_add = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_add");
 
-            self->_priv->win = glade_xml_get_widget(self->_priv->xml, "win");
+            self->_priv->win = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "win");
 
             /* Accel group */
             agroup = gtk_accel_group_new();
@@ -1566,7 +1566,7 @@ class Stuffkeeper:Interface from G:Object
             gtk_widget_hide_on_delete(self->_priv->win);
 
             /**
-             * Custom search widget, glade screws up alignment 
+             * Custom search widget, 
              */
             self->_priv->search_entry = gtk_entry_new();
             /* Add clear button */
@@ -1578,7 +1578,7 @@ class Stuffkeeper:Interface from G:Object
 			g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "icon-release" , 
 							G_CALLBACK(self_search_entry_icon_clicked), self);
 
-            gtk_box_pack_end(GTK_BOX(glade_xml_get_widget(self->_priv->xml,"hbox3")), self->_priv->search_entry, TRUE, TRUE, 0);
+            gtk_box_pack_end(GTK_BOX(gtk_builder_get_object(self->_priv->xml,"hbox3")), self->_priv->search_entry, TRUE, TRUE, 0);
             g_signal_connect_swapped(G_OBJECT(self->_priv->search_entry), "changed", G_CALLBACK(self_search_entry_changed), self);
 
             gtk_widget_show_all(GTK_WIDGET(self->_priv->search_entry));
@@ -1610,7 +1610,7 @@ class Stuffkeeper:Interface from G:Object
             }
             else
             {
-                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "alternative_layout_cb")), value);
+                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "alternative_layout_cb")), value);
                 self_set_alternative_layout(self, value);
                 /*
                 debug_printf("Setting position: %i\n", value);
@@ -1660,7 +1660,7 @@ class Stuffkeeper:Interface from G:Object
             gtk_tree_view_set_enable_search(GTK_TREE_VIEW(self->_priv->treeview2), FALSE);
 
 
-            glade_xml_signal_autoconnect_full(self->_priv->xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
+            gtk_builder_connect_signals_full(self->_priv->xml, (GtkBuilderConnectFunc)self____builder_xml_connect_foreach, (gpointer)self);
             /* some testing */
             gtk_widget_show(self->_priv->win);
             /* put this after the show, or it will turn up black, for some oddball reason */
@@ -1675,7 +1675,7 @@ class Stuffkeeper:Interface from G:Object
     void
     left_pane_changed(self, GtkComboBox *box)
     {
-        GtkWidget *entry = (GtkWidget *)glade_xml_get_widget(self->_priv->xml, "LeftPaneFilterEntry");
+        GtkWidget *entry = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "LeftPaneFilterEntry");
         int i = gtk_combo_box_get_active(box);
 
         gtk_tree_view_column_set_visible(self->_priv->column_lv_pixbuf, FALSE);
@@ -1703,8 +1703,8 @@ class Stuffkeeper:Interface from G:Object
         if(gtk_combo_box_get_active_iter(GTK_COMBO_BOX(self->_priv->cb_search), &iter))
         {
             StuffkeeperDataItemSearch *search;
-            GtkWidget *item = glade_xml_get_widget(self->_priv->xml, "menuitem_filter_remove");
-            GtkWidget *item1 = glade_xml_get_widget(self->_priv->xml, "menuitem_filter_edit");
+            GtkWidget *item = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_filter_remove");
+            GtkWidget *item1 = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_filter_edit");
             gint id;
             gtk_tree_model_get(self->_priv->model_searches, &iter,0,&id, 3, &search, -1);
 
@@ -1875,7 +1875,7 @@ class Stuffkeeper:Interface from G:Object
     void
     backend_locked(self, GParamSpec *arg1, StuffkeeperDataBackend *backend)
     {
-        GtkWidget *button = glade_xml_get_widget(self->_priv->xml, "toggle_locked");
+        GtkWidget *button = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "toggle_locked");
         gboolean value = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
         gboolean locked = stuffkeeper_data_backend_get_locked(backend);
 
@@ -1886,7 +1886,7 @@ class Stuffkeeper:Interface from G:Object
             g_signal_handler_unblock(self->_priv->skdbg,self->_priv->signal_backend_locked);
         }
 
-        button = glade_xml_get_widget(self->_priv->xml, "menuitem_view_locked");
+        button = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_view_locked");
         value = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(button));
         if(value != locked)
         {
@@ -1899,24 +1899,24 @@ class Stuffkeeper:Interface from G:Object
         if(locked)
         {
             g_object_set(G_OBJECT(self->_priv->treeview1_renderer), "editable", FALSE, NULL);
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "toolbar1"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_sep"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_add"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_remove"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_item_clone"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_filter"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_type_new"));
-            gtk_widget_hide(glade_xml_get_widget(self->_priv->xml, "menuitem_type_import"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "toolbar1"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_sep"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_add"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_remove"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_clone"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_filter"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_type_new"));
+            gtk_widget_hide((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_type_import"));
         } else {
             g_object_set(G_OBJECT(self->_priv->treeview1_renderer), "editable", TRUE, NULL);
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "toolbar1"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_sep"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_add"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_remove"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_item_clone"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_filter"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_type_new"));
-            gtk_widget_show(glade_xml_get_widget(self->_priv->xml, "menuitem_type_import"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "toolbar1"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_sep"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_add"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_remove"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_item_clone"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_filter"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_type_new"));
+            gtk_widget_show((GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_type_import"));
         }
 
 
@@ -2043,7 +2043,7 @@ class Stuffkeeper:Interface from G:Object
         const gchar *data;
         gchar *compare = NULL;
 
-        GtkEntry *entry = (GtkEntry *)glade_xml_get_widget(self->_priv->xml, "LeftPaneFilterEntry");
+        GtkEntry *entry = (GtkEntry *)gtk_builder_get_object(self->_priv->xml, "LeftPaneFilterEntry");
         if(entry == NULL  || gtk_entry_buffer_get_length (gtk_entry_get_buffer (entry)) == 0)
         {
             /* if nothing entered, allow everything */
@@ -2167,9 +2167,9 @@ class Stuffkeeper:Interface from G:Object
                 self->_priv->item_sort_order = sort_order;
                 if(sort_order == GTK_SORT_DESCENDING)
                 {
-                    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_descending")),TRUE);
+                    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "menu_sort_descending")),TRUE);
                 }else{
-                    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_ascending")),TRUE);
+                    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "menu_sort_ascending")),TRUE);
                 }
             }
             value = g_key_file_get_integer(self->config_file, "WINDOW", "item-sort-column", &error);
@@ -2178,16 +2178,16 @@ class Stuffkeeper:Interface from G:Object
                 gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(self->_priv->model_items), value, sort_order);
                 switch(value) {
                     case 1:
-                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_title")),TRUE);
+                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "menu_sort_by_title")),TRUE);
                         break;
                     case 4:
-                         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_schema")),TRUE);
+                         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "menu_sort_by_schema")),TRUE);
                         break;
                     case 5:
-                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_modification_time")),TRUE);
+                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "menu_sort_by_modification_time")),TRUE);
                         break;
                     default:
-                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(glade_xml_get_widget(self->_priv->xml, "menu_sort_by_creation_time")),TRUE);
+                        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "menu_sort_by_creation_time")),TRUE);
                         break;
                 }
             } else {
@@ -2363,7 +2363,7 @@ class Stuffkeeper:Interface from G:Object
 
             node = stuffkeeper_plugin_manager_get_loaded_plugins(STUFFKEEPER_PLUGIN_MANAGER(spm)); 
             if(node){
-                GtkWidget *parent = glade_xml_get_widget(self->_priv->xml, "menuitem_tools");
+                GtkWidget *parent = (GtkWidget *)gtk_builder_get_object(self->_priv->xml, "menuitem_tools");
                 GtkWidget *menu = gtk_menu_new();
                 gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), menu);
                 for(iter = node;iter;iter = g_list_next(iter))
@@ -2568,37 +2568,6 @@ class Stuffkeeper:Interface from G:Object
 
         }
 
-    private
-    void
-        ___glade_xml_connect_foreach(const gchar *handler_name,
-                GObject *object,
-                const gchar *signal_name,
-                const gchar *signal_data,
-                GObject *connect_object,
-                gboolean after,
-                gpointer user_data)
-        {
-            static GModule * allsymbols = NULL;
-
-            if (!allsymbols) allsymbols = g_module_open(NULL, 0);
-            if (allsymbols) {
-                gchar * func_name = g_strdup_printf("stuffkeeper_interface_%s", handler_name);
-                GCallback func;
-
-                if (!g_module_symbol(allsymbols, func_name, (gpointer)&func)){
-                    if (!g_module_symbol(allsymbols, handler_name, (gpointer)&func)) {
-                        g_warning("could not find signal handler '%s'.", func_name);
-                        g_free(func_name);
-                        return;
-                    }
-                }
-                if (after)
-                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
-                else
-                    g_signal_connect_data(object, signal_name, func, user_data, NULL, G_CONNECT_SWAPPED);
-                g_free(func_name);
-            }
-        }
 
         private 
         void
@@ -3145,7 +3114,6 @@ class Stuffkeeper:Interface from G:Object
             gtk_cell_layout_add_attribute(GTK_CELL_LAYOUT(cb_schema),renderer, "text",1 );
 
 
-            //glade_xml_signal_autoconnect_full(xml, (GladeXMLConnectFunc)self____glade_xml_connect_foreach, (gpointer)self);
             gtk_builder_connect_signals_full(xml, (GtkBuilderConnectFunc)self____builder_xml_connect_foreach, (gpointer)self);
             switch(gtk_dialog_run(GTK_DIALOG(dialog)))
             {

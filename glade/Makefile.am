@@ -1,6 +1,6 @@
 appgladedir = $(datadir)/stuffkeeper/
 appglade_DATA =\
-	stuffkeeper.glade\
+	stuffkeeper.ui\
 	schema-edit-dialog.ui\
 	backup-dialog.ui\
 	export-html-full.ui\

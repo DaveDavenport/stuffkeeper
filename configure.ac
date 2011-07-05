@@ -114,15 +114,16 @@ PKG_CHECK_MODULES([gmodule], gmodule-2.0 >= 2.4)
 AC_SUBST(gmodule_LIBS)
 AC_SUBST(gmodule_CFLAGS)
 
-# libglade
-PKG_CHECK_MODULES([libglade], libglade-2.0)
-AC_SUBST(libglade_LIBS)
-AC_SUBST(libglade_CFLAGS)
-
 # sqlite3
 PKG_CHECK_MODULES([sqlite3], sqlite3)
 AC_SUBST(sqlite3_LIBS)
 AC_SUBST(sqlite3_CFLAGS)
+
+# libxml2
+
+PKG_CHECK_MODULES([libxml], libxml-2.0)
+AC_SUBST(libxml_LIBS)
+AC_SUBST(libxml_CFLAGS)
 
 # libgio
 PKG_CHECK_MODULES([gio], gio-2.0)
