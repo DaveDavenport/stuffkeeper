@@ -9,7 +9,6 @@ requires 2.0.10
 %ph{
 #include <stdio.h>
 #include <sqlite3.h>
-#include "debug.h"
 #include <glib/gstdio.h>
 
 #include <libxml/tree.h>
@@ -1048,7 +1047,7 @@ class Stuffkeeper:Data:Schema from G:Object
         void
         finalize(G:Object *obj)
         {
-            debug_printf("destroying schema\n");
+            g_debug("destroying schema\n");
             PARENT_HANDLER(obj);
         }
         
@@ -1116,7 +1115,7 @@ class Stuffkeeper:Data:Schema from G:Object
                     g_free(filename);
                 if(error)
                 {
-                    debug_printf("error: %s\n", error->message);
+                    g_debug("error: %s\n", error->message);
 
                     g_error_free(error);
                 }

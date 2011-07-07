@@ -14,7 +14,6 @@ requires 2.0.10
 #include <gdk/gdkkeysyms.h>
 #include <glib/gi18n.h>
 #include <config.h>
-#include "debug.h"
 #include "misc.h"
 
 /* Include the database */
@@ -140,17 +139,17 @@ class Stuffkeeper:Interface from G:Object
 
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(store), &iter)) {
             StuffkeeperDataItem *found_item = NULL;
-            debug_printf("Searching new item in tree\n");
+            g_debug("Searching new item in tree\n");
             do {
                 gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 2, &found_item, -1);
                 if(found_item == item) {
-                    debug_printf("Found new item in tree\n");
+                    g_debug("Found new item in tree\n");
                     path = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
                     break;
                 }
             } while(gtk_tree_model_iter_next(GTK_TREE_MODEL(store), &iter));
             if(path) {
-                debug_printf("Moving cursor to new item\n");
+                g_debug("Moving cursor to new item\n");
                 gtk_tree_view_set_cursor(GTK_TREE_VIEW(self->_priv->treeview2), path, NULL, FALSE);
                 gtk_tree_path_free(path);
             }else {
@@ -1264,7 +1263,7 @@ class Stuffkeeper:Interface from G:Object
     gboolean 
     treeview2_button_release_event(self, GdkEventButton *event, GtkWidget *widget)
     {
-        debug_printf("treeview2 buttom release event\n");
+        g_debug("treeview2 buttom release event\n");
         if(event->button == 3)
         {
             GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(self->_priv->treeview2));
@@ -1364,7 +1363,7 @@ class Stuffkeeper:Interface from G:Object
             GtkWidget *menu;
             GtkWidget *menu_item;
 
-            debug_printf("treeview 1 button press event\n");
+            g_debug("treeview 1 button press event\n");
             /* Create menu */
             menu = gtk_menu_new();
 
@@ -1536,7 +1535,7 @@ class Stuffkeeper:Interface from G:Object
 	    if(error)
             {
                 g_object_unref(self);
-                debug_printf("Failed top open xml file: %s\n", error->message);
+                g_debug("Failed top open xml file: %s\n", error->message);
 		g_error_free(error);
 		return NULL;
             }
@@ -1589,21 +1588,21 @@ class Stuffkeeper:Interface from G:Object
 
             value = g_key_file_get_integer(self->config_file, "WINDOW", "hpane", &error);
             if(error ) {
-                debug_printf("No valid pane position: %s\n", error->message);
+                g_debug("No valid pane position: %s\n", error->message);
                 /* Free error */
                 g_error_free(error);
                 error = NULL;
             }
             else if(value > 50)
             {
-                debug_printf("Setting position: %i\n", value);
+                g_debug("Setting position: %i\n", value);
                 gtk_paned_set_position(GTK_PANED(self->_priv->hpaned1), value);
             }
             /* restore layout */
 
             value = g_key_file_get_integer(self->config_file, "WINDOW", "alternative-layout", &error);
             if(error ) {
-                debug_printf("No valid layout position: %s\n", error->message);
+                g_debug("No valid layout position: %s\n", error->message);
                 /* Free error */
                 g_error_free(error);
                 error = NULL;
@@ -1613,7 +1612,7 @@ class Stuffkeeper:Interface from G:Object
                 gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(self->_priv->xml, "alternative_layout_cb")), value);
                 self_set_alternative_layout(self, value);
                 /*
-                debug_printf("Setting position: %i\n", value);
+                g_debug("Setting position: %i\n", value);
                 gtk_paned_set_position(GTK_PANED(self->_priv->vpaned1), value);
                 */
             }
@@ -1847,7 +1846,7 @@ class Stuffkeeper:Interface from G:Object
     void
     style_changed(GtkWidget *tree,GtkStyle *old, GtkCellRenderer *renderer)
     {
-        debug_printf("style changed\n");
+        g_debug("style changed\n");
         g_object_set(G_OBJECT(renderer), 
                     "background-set", TRUE, "background-gdk",&(GTK_WIDGET(tree)->style->bg[GTK_STATE_SELECTED]), 
                     "foreground-set", TRUE, "foreground-gdk",&(GTK_WIDGET(tree)->style->fg[GTK_STATE_SELECTED]), 
@@ -2413,7 +2412,7 @@ class Stuffkeeper:Interface from G:Object
         {
             int value;
             Self *self = SELF(obj);
-	    debug_printf("** Finalize stuffkeeper interface\n");
+	    g_debug("** Finalize stuffkeeper interface\n");
             if(self->_priv->signal_backend_locked) { 
                 g_signal_handler_disconnect(G_OBJECT(self->_priv->skdbg), self->_priv->signal_backend_locked);
                 self->_priv->signal_backend_locked = 0;
@@ -2544,7 +2543,7 @@ class Stuffkeeper:Interface from G:Object
 
             GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(self->_priv->treeview2));
             GtkTreeIter iter;
-            debug_printf("item row activated\n");
+            g_debug("item row activated\n");
             if(gtk_tree_model_get_iter(model,&iter, path)) 
             {
                 StuffkeeperDataItem *item;
@@ -2638,7 +2637,6 @@ class Stuffkeeper:Interface from G:Object
         {
             static GModule * allsymbols = NULL;
 
-		printf("%s - %s\n", signal_name, handler_name);
             if (!allsymbols) allsymbols = g_module_open(NULL, 0);
             if (allsymbols) {
                 gchar * func_name = g_strdup_printf("stuffkeeper_interface_%s", handler_name);
@@ -3248,22 +3246,22 @@ class Stuffkeeper:Interface from G:Object
             if(GTK_IS_HPANED(self->_priv->vpaned1)){
                 value = g_key_file_get_integer(self->config_file, "WINDOW", "vpane-alternative", &error);
 
-                printf("restore position alternative: %i\n", value);
+                g_debug("restore position alternative: %i\n", value);
             }else{
                 value = g_key_file_get_integer(self->config_file, "WINDOW", "vpane", &error);
 
-                printf("restore position : %i\n", value);
+                g_debug("restore position : %i\n", value);
             }
             /* Restore pane position */
             if(error ) {
-                debug_printf("No valid vpane position: %s\n", error->message);
+                g_debug("No valid vpane position: %s\n", error->message);
                 /* Free error */
                 g_error_free(error);
                 error = NULL;
             }
             else if(value > 50)
             {
-                debug_printf("Setting position: %i\n", value);
+                g_debug("Setting position: %i\n", value);
                 gtk_paned_set_position(GTK_PANED(self->_priv->vpaned1), value);
             }
 

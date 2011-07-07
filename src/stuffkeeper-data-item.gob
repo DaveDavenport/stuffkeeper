@@ -3,7 +3,6 @@ requires 2.0.10
 %ph{
 #include <glib/gstdio.h>
 #include <sqlite3.h>
-#include "debug.h"
 #include "stuffkeeper-data-backend.h"
 %}
 %h{
@@ -85,7 +84,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -102,7 +101,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -119,7 +118,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -159,7 +158,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -176,7 +175,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -215,7 +214,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -232,7 +231,7 @@ class Stuffkeeper:Data:Item from G:Object
                 );
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-            debug_printf("failed: %s\n", error);
+            g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
         return (result == SQLITE_OK);
@@ -250,7 +249,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -267,7 +266,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -307,7 +306,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -324,7 +323,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
 	return (result == SQLITE_OK);
@@ -361,7 +360,7 @@ class Stuffkeeper:Data:Item from G:Object
     private gboolean get_core_field_integer(self, DbItemType fieldtype, int *value)
     {
 	if (fieldtype == DB_ITEMS_TYPE_TAG) {
-	    debug_printf("Shouldn't use this function with tags");
+	    g_debug("Shouldn't use this function with tags");
 	}
 	return self_dbcore_select_from_items_int_single(self, fieldtype, value);
     }
@@ -370,7 +369,7 @@ class Stuffkeeper:Data:Item from G:Object
 	int old_value;
 
 	if (fieldtype == DB_ITEMS_TYPE_TAG) {
-	    debug_printf("Shouldn't use this function with tags");
+	    g_debug("Shouldn't use this function with tags");
 	}
 	if(self_get_core_field_integer(self, fieldtype, &old_value)) {
 	    if(old_value != value) {
@@ -389,7 +388,7 @@ class Stuffkeeper:Data:Item from G:Object
 	char *value = NULL;
 
 	if (fieldtype == DB_ITEMS_TYPE_TAG) {
-	    debug_printf("Shouldn't use this function with tags");
+	    g_debug("Shouldn't use this function with tags");
 	}
 	self_dbcore_select_from_items_string_single(self, fieldtype, &value);
 	return value;
@@ -400,7 +399,7 @@ class Stuffkeeper:Data:Item from G:Object
 	gboolean value_changed;
 
 	if (fieldtype == DB_ITEMS_TYPE_TAG) {
-	    debug_printf("Shouldn't use this function with tags");
+	    g_debug("Shouldn't use this function with tags");
 	}
 	old_value = self_get_core_field_string(self, fieldtype);
 	/* no field, create it */
@@ -588,7 +587,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 
@@ -602,7 +601,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 
@@ -669,7 +668,7 @@ class Stuffkeeper:Data:Item from G:Object
      **************************************************************************/
     public void save_yourself(self)
     {
-        debug_printf("Deprecated\n");
+        g_debug("Deprecated\n");
     }
 
     public void delete_yourself(self)
@@ -691,13 +690,13 @@ class Stuffkeeper:Data:Item from G:Object
         query = sqlite3_mprintf("DELETE FROM Items WHERE ItemId=%i",self->_priv->id);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-            debug_printf("failed: %s\n", error);
+            g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
         query =  sqlite3_mprintf("DELETE FROM ItemsFields WHERE ItemId=%i",self->_priv->id);
         result = sqlite3_exec(self->_priv->sqlHandle, query, NULL, NULL, &error);
         if (result != SQLITE_OK) {
-            debug_printf("failed: %s\n", error);
+            g_debug("failed: %s\n", error);
         }
         sqlite3_free(query);
 
@@ -754,7 +753,7 @@ class Stuffkeeper:Data:Item from G:Object
 	);
 	result = sqlite3_exec(obj->_priv->sqlHandle, query, NULL, NULL, &error);
 	if (result != SQLITE_OK) {
-	    debug_printf("failed: %s\n", error);
+	    g_debug("failed: %s\n", error);
 	}
 	sqlite3_free(query);
 
@@ -811,16 +810,16 @@ class Stuffkeeper:Data:Item from G:Object
 	sqlite3_free(query);
 	if (r != SQLITE_OK)
 	{
-	    debug_printf("Failed: %s\n", sqlite3_errmsg(obj->_priv->sqlHandle));
+	    g_debug("Failed: %s\n", sqlite3_errmsg(obj->_priv->sqlHandle));
 	}
 	else
 	{
-	    debug_printf("stepping through rows\n");
+	    g_debug("stepping through rows\n");
 	    while((r = sqlite3_step(stmt)) == SQLITE_ROW)
 	    {
 		int tagid = sqlite3_column_int(stmt, 0); 
 		StuffkeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tagid);
-		debug_printf("adding tagid: %i\n", tagid);
+		g_debug("adding tagid: %i\n", tagid);
 		obj->_priv->tags = g_list_prepend(obj->_priv->tags, tag);
 		stuffkeeper_data_tag_add_item(tag, obj);
 	    }
@@ -966,11 +965,11 @@ class Stuffkeeper:Data:Item from G:Object
         }
         else
         {
-            debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+            g_debug("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
         }
         sqlite3_finalize(stmt);
         sqlite3_free(query);
-        debug_printf("%i fields found\n",fields);
+        g_debug("%i fields found\n",fields);
         /* if no rows, return */
         if(fields <= 0)
         {
@@ -988,15 +987,15 @@ class Stuffkeeper:Data:Item from G:Object
         sqlite3_free(query);
         if (r != SQLITE_OK)
         {
-            debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+            g_debug("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
         }
         else
         {
-            debug_printf("stepping through rows\n");
+            g_debug("stepping through rows\n");
             while((r = sqlite3_step(stmt)) == SQLITE_ROW)
             {
                 retv[i] = g_strdup((gchar *)sqlite3_column_text(stmt, 0));
-                debug_printf("adding id: %s\n", retv[i]);
+                g_debug("adding id: %s\n", retv[i]);
                 i++;
             }
         }
@@ -1085,7 +1084,7 @@ class Stuffkeeper:Data:Item from G:Object
             }
             else
             {
-                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+                g_debug("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
             }
             sqlite3_finalize(stmt);
             if(fields > 0)
@@ -1102,7 +1101,7 @@ class Stuffkeeper:Data:Item from G:Object
             }
             else
             {
-                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+                g_debug("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
             }
             sqlite3_finalize(stmt);
             return (fields> 0);
@@ -1130,7 +1129,7 @@ class Stuffkeeper:Data:Item from G:Object
             }
             else
             {
-                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+                g_debug("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
             }
             sqlite3_finalize(stmt);
             if(fields > 0)
@@ -1147,7 +1146,7 @@ class Stuffkeeper:Data:Item from G:Object
             }
             else
             {
-                debug_printf("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
+                g_debug("Failed: %s\n", sqlite3_errmsg(self->_priv->sqlHandle));
             }
             sqlite3_finalize(stmt);
             return (fields> 0);

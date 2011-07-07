@@ -12,7 +12,6 @@ requires 2.0.10
 #include <stdio.h>
 #include <sqlite3.h>
 #include "stuffkeeper-data-backend.h"
-#include "debug.h"
 
 
 #define KEYFILE_GENERAL "general"
@@ -206,7 +205,7 @@ class Stuffkeeper:Data:Tag from G:Object
         void
         finalize(G:Object *obj)
         {
-            debug_printf("destroying tag\n");
+            g_debug("destroying tag\n");
             PARENT_HANDLER(obj);
         }
 

@@ -2,7 +2,6 @@
 
 %h{
 #include <gtk/gtk.h>
-#include "debug.h"
 #include "misc.h"
 #include "stuffkeeper-data-item.h"
 %}
@@ -120,7 +119,7 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
 		/* Normal case: match colors with parent (hereby making enrty "transparent") */
 		GtkWidget *parent_bin = NULL;
 
-		debug_printf("Matching colors for StuffkeeperDataEntry with parent\n");
+		g_debug("Matching colors for StuffkeeperDataEntry with parent\n");
 		parent_bin = wid->parent; 
 		while(parent_bin && !GTK_IS_BIN(parent_bin)) {
 		    parent_bin = GTK_WIDGET(parent_bin)->parent;
@@ -134,7 +133,7 @@ class Stuffkeeper:Data:Entry from Gtk:Entry
 		    g_signal_handlers_unblock_by_func(G_OBJECT(self),self_style_set , wid);
 		}
 		else {
-		    debug_printf("No GtkBin parent found for StuffkeeperDataEntr\n");
+		    g_debug("No GtkBin parent found for StuffkeeperDataEntr\n");
 		}
 	    }
         }

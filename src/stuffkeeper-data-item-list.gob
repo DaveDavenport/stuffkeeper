@@ -3,7 +3,6 @@ requires 2.0.10
 %ph{
 #include <glib/gstdio.h>
 #include <sqlite3.h>
-#include "debug.h"
 #include "stuffkeeper-data-backend.h"
 #include "stuffkeeper-data-item.h"
 %}

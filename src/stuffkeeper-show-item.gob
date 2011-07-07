@@ -5,7 +5,6 @@ requires 2.0.10
 #include <glib/gi18n.h>
 #include <cairo.h>
 #include <cairo-ps.h>
-#include "debug.h"
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
@@ -24,6 +23,8 @@ requires 2.0.10
 #include "stuffkeeper-plugin-manager.h"
 #include "stuffkeeper-plugin.h"
 #define IMAGE_SIZE 250
+
+
 
 extern StuffkeeperPluginManager *spm;
 typedef struct state {

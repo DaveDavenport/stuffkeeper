@@ -8,7 +8,6 @@ requires 2.0.10
 %}
 
 %ph{
-#include "debug.h"
 #include "misc.h"    
 #include "stuffkeeper-data-backend.h"
 #define DEFAULT_IMAGE_SIZE 250
@@ -20,7 +19,7 @@ static GtkTargetEntry data_image_drag_target[] =
     { "image/jpeg", 0, 0 },
     { "image/png",  0, 1 },
     { "image/gif",  0, 2 },
-	{ "text/uri-list", 0, 3},
+    { "text/uri-list", 0, 3},
     { "_NETSCAPE_URL", 0,4},
     { "x-url/http", 0,5}
 
@@ -69,7 +68,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 												image_size = DEFAULT_IMAGE_SIZE;
 										} 
 										GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(fpath, image_size);
-										debug_printf("Trying to load: %s %p\n", fpath,pb);
+										g_debug("Trying to load: %s %p\n", fpath,pb);
 										if(pb)
 										{
 												screenshot_add_border(&pb);
@@ -105,9 +104,9 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 				gchar *id = g_strdup_printf("%i-%s.jpg", stuffkeeper_data_item_get_id(self->_priv->item), self->_priv->field);
 				gchar *fpath = g_build_path(G_DIR_SEPARATOR_S, path, "images",id ,NULL); 
 
-				debug_printf("From '%s' --> '%s'\n", original_path, fpath);
+				g_debug("From '%s' --> '%s'\n", original_path, fpath);
 				GdkPixbuf *pb = gdk_pixbuf_new_from_file_at_max_size(original_path, image_size);
-				debug_printf("%p\n",pb);
+				g_debug("%p\n",pb);
 				gdk_pixbuf_save(pb, fpath, "jpeg", NULL,"quality","100",NULL);
 				g_object_unref(pb);
 
@@ -142,7 +141,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
     private void 
     button_press_event(self, GdkEventButton *event, gpointer user_data)
     {
-        debug_printf("button-press event\n");
+        g_debug("button-press event\n");
         if(stuffkeeper_data_backend_get_locked(STUFFKEEPER_DATA_BACKEND(stuffkeeper_data_item_get_backend(self->_priv->item))))
             return;
         if(event->button == 1)
@@ -171,7 +170,7 @@ class Stuffkeeper:Data:Image from Gtk:Event:Box
 										gchar *file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 										if(file)
 										{
-												debug_printf("Saving file: %s\n", file);
+												g_debug("Saving file: %s\n", file);
 												self_copy_path(self, file);
 												g_free(file);
 										}

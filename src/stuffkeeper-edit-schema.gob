@@ -5,7 +5,6 @@ requires 2.0.10
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include "config.h"
-#include "debug.h"
 /* Include the database */
 
 #include "stuffkeeper-data-backend.h"
@@ -183,7 +182,7 @@ class Stuffkeeper:Edit:Schema from G:Object
         GtkTreeIter iter;
         
         GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
-        debug_printf("removing field from list\n");
+        g_debug("removing field from list\n");
         if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self->_priv->store), &iter))
         {
             do{
@@ -263,7 +262,7 @@ class Stuffkeeper:Edit:Schema from G:Object
             GtkTreeIter iter;
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
             printf("new: %s\n", new_text);
-            debug_printf("new: %s\n", new_text);
+            g_debug("new: %s\n", new_text);
             if(gtk_tree_model_get_iter_from_string(model, &iter, path))
             {
                 gchar *id;
@@ -288,7 +287,7 @@ class Stuffkeeper:Edit:Schema from G:Object
             GtkTreeIter iter;
             GtkTreeModel *model = GTK_TREE_MODEL(self->_priv->store);
             printf("new type: %s\n", new_text);
-            debug_printf("new: %s\n", new_text);
+            g_debug("new: %s\n", new_text);
             if(new_text)
             {
                 if(gtk_tree_model_get_iter_from_string(model, &iter, path))
@@ -377,7 +376,7 @@ class Stuffkeeper:Edit:Schema from G:Object
             }
             gtk_widget_destroy(dialog);
         }
-        debug_printf("clicked\n");
+        g_debug("clicked\n");
         return FALSE;
     }
 
@@ -539,7 +538,7 @@ class Stuffkeeper:Edit:Schema from G:Object
 	    if(error)
             {
                 g_object_unref(self);
-                debug_printf("Failed to open xml file: %s\n", error->message);
+                g_debug("Failed to open xml file: %s\n", error->message);
 		g_error_free(error);
 		return NULL;
             }
@@ -903,7 +902,7 @@ class Stuffkeeper:Edit:Schema from G:Object
     {
         if(self->_priv->schema != NULL)
         {
-            debug_printf("Allready have a schema attaches\n");
+            g_debug("Allready have a schema attaches\n");
             return;
         }
         self->_priv->schema = schema;
@@ -957,7 +956,7 @@ class Stuffkeeper:Edit:Schema from G:Object
     void
     finalize(G:Object *obj)
     {
-        debug_printf("** Finalize edit schema\n");
+        g_debug("** Finalize edit schema\n");
         PARENT_HANDLER(obj);
     }
 

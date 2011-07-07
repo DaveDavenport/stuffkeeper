@@ -75,8 +75,6 @@ nodist_stuffkeeper_SOURCES=\
 # Sources that should be in the distribution 
 ##
 stuffkeeper_SOURCES=\
-	debug.c \
-	debug.h \
 	main.c \
 	misc.c \
 	misc.h \
@@ -169,6 +167,7 @@ AM_CFLAGS = \
 	@gio_CFLAGS@ \
     @unique_CFLAGS@\
 	@GPGME_CFLAGS@ \
+	-DLOG_DOMAIN="\"StuffKeeper\""
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\" \
 	-Wall\
 	-DPIXMAP_PATH=\""$(pkgdatadir)"\" \

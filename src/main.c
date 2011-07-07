@@ -10,7 +10,6 @@
 #include <config.h>
 #include <gio/gio.h>
 #include <gpgme.h>
-#include "debug.h"
 #include "revision.h"
 
 /* Include the database */
@@ -141,7 +140,7 @@ message_received_cb (UniqueApp         *app,
         {
             StuffkeeperInterface *win = stuffkeeper_interface_new(config_file);
             stuffkeeper_interface_initialize_interface(STUFFKEEPER_INTERFACE(win),STUFFKEEPER_DATA_BACKEND(data),G_OBJECT(spm));
-            debug_printf("IPC: Requested new window\n");
+            g_debug("IPC: Requested new window\n");
             res = UNIQUE_RESPONSE_OK;
         }
         default:
@@ -232,7 +231,7 @@ int main ( int argc, char **argv )
     {
         /* If we failed to initialize gtk+*/
         /* Tell the user */
-        debug_printf("Failed to initialize gtk+\n");
+        g_debug("Failed to initialize gtk+\n");
         /* return a failure */
         return EXIT_FAILURE;
     }
@@ -266,7 +265,7 @@ int main ( int argc, char **argv )
     /* Check if creating the backend worked */
     if(!skdb)
     {
-        debug_printf("Failed to create a backend\n");
+        g_debug("Failed to create a backend\n");
         return EXIT_FAILURE;
     }
 
@@ -305,7 +304,7 @@ int main ( int argc, char **argv )
             }
         }
         /* Returning */
-        debug_printf(_("There is already an instance running. Quitting."));
+        g_debug(_("There is already an instance running. Quitting."));
         g_object_unref(skdb); 
         exit(EXIT_SUCCESS);
     }
@@ -346,20 +345,20 @@ int main ( int argc, char **argv )
 
 
     /* open config file */
-    debug_printf("Opening config file\n"); 
+    g_debug("Opening config file\n"); 
     config_file = g_key_file_new();
 
     config_path = g_build_path(G_DIR_SEPARATOR_S, path, "config.cfg", NULL);
     if(g_file_test(path, G_FILE_TEST_EXISTS))
     {
         GError *error = NULL;
-        debug_printf("Loading config file\n");
+        g_debug("Loading config file\n");
         if(!g_key_file_load_from_file(config_file, config_path, G_KEY_FILE_NONE, &error))
         {
-            debug_printf("Failed to load config file\n");
+            g_debug("Failed to load config file\n");
             if(error)
             {
-                debug_printf("Reported error: %s\n", error->message);
+                g_debug("Reported error: %s\n", error->message);
                 g_error_free(error); 
             }
         }
@@ -457,7 +456,7 @@ int main ( int argc, char **argv )
             /* replace file and make backup */
             if(!g_file_replace_contents(file, content, length, NULL, TRUE, G_FILE_COPY_OVERWRITE,NULL,NULL, &error2))
             {
-                debug_printf("Failed to save file '%s': %s\n", config_path, error2->message);
+                g_debug("Failed to save file '%s': %s\n", config_path, error2->message);
                 g_error_free(error2);
             }
 
@@ -466,7 +465,7 @@ int main ( int argc, char **argv )
         } else {
             if(error)
             {
-                debug_printf("Failed to serialize config file: %s\n", error->message);
+                g_debug("Failed to serialize config file: %s\n", error->message);
                 g_error_free(error);
             }
         }

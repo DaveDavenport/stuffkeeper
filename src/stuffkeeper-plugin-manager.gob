@@ -3,7 +3,6 @@ requires 2.0.10
 %h{
 #include <config.h>
 #include <glib.h>
-#include "debug.h"
 #include "stuffkeeper-plugin.h"
 %}
 
@@ -93,14 +92,14 @@ class Stuffkeeper:Plugin:Manager from G:Object
         if(dir)
         {
             const gchar *filename;
-            debug_printf("Loading plugin: %s\n", STUFFKEEPER_PLUGIN_DIR);
+            g_debug("Loading plugin: %s\n", STUFFKEEPER_PLUGIN_DIR);
             while((filename = g_dir_read_name(dir)) != NULL)
             {
                 if(strncmp(&filename[strlen(filename)-strlen(G_MODULE_SUFFIX)], G_MODULE_SUFFIX,strlen(G_MODULE_SUFFIX)) == 0)
                 {
                     gchar *path = g_build_path(G_DIR_SEPARATOR_S, STUFFKEEPER_PLUGIN_DIR, filename, NULL);
                     GModule *module;
-                    debug_printf("trying: %s\n", path);
+                    g_debug("trying: %s\n", path);
                     module = g_module_open(path, G_MODULE_BIND_LAZY);
                     if(module)
                     {
@@ -111,7 +110,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             FS *fs = g_malloc0(sizeof(*fs));
                             fs->gtype = gt();
                             fs->module = module;
-                            debug_printf("loaded: %i\n", fs->gtype);
+                            g_debug("loaded: %i\n", fs->gtype);
                             fs->object = g_object_new(fs->gtype, NULL);
                             if(fs->object)
                             {
@@ -121,22 +120,22 @@ class Stuffkeeper:Plugin:Manager from G:Object
                                 fs->name= stuffkeeper_plugin_get_name(STUFFKEEPER_PLUGIN(fs->object));
                                 /* add to list */
                                 self->_priv->plugins = g_list_prepend(self->_priv->plugins,fs);
-                                debug_printf("Plugin: %s succesfull loaded\n",fs->name);
+                                g_debug("Plugin: %s succesfull loaded\n",fs->name);
                             }else {
                                 /* unload module */
-																debug_printf("Plugin: %s failed to create object\n", fs->name);
+																g_debug("Plugin: %s failed to create object\n", fs->name);
                                 g_module_close(fs->module);
                                 g_free(fs);
                             }
                         }
                         else
                         {
-                            debug_printf("Failed: %s\n", g_module_error());
+                            g_debug("Failed: %s\n", g_module_error());
                             g_module_close(module);
                         }
 										}
 										else{
-											debug_printf("Failed to load plugin: %s\n", g_module_error()); 
+											g_debug("Failed to load plugin: %s\n", g_module_error()); 
 										}
                     g_free(path);
                 }

@@ -9,7 +9,6 @@ requires 2.0.10
 #include "stuffkeeper-edit-schema.h"
 #include "stuffkeeper-show-item.h"
 #include "stuffkeeper-item-view.h"
-#include "debug.h"
 %}
 class Stuffkeeper:Item:Window from Gtk:Dialog
 {
@@ -46,10 +45,10 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
     item_removed(self, gint id, StuffkeeperDataBackend *skdb)
     {
         gint gid = stuffkeeper_data_item_get_id(self->_priv->item);
-        debug_printf("%i-%i\n", gid, id);
+        g_debug("%i-%i\n", gid, id);
         if(gid == id)
         {
-            debug_printf("destroying\n");
+            g_debug("destroying\n");
             gtk_dialog_response(GTK_DIALOG(self), GTK_RESPONSE_CLOSE);
         }
     }
@@ -62,7 +61,7 @@ class Stuffkeeper:Item:Window from Gtk:Dialog
             g_signal_handler_disconnect(G_OBJECT(self->_priv->skdb), self->_priv->signal_item_removed);
             self->_priv->signal_item_removed = 0;
         }
-        debug_printf("response\n");
+        g_debug("response\n");
         gtk_window_get_size(GTK_WINDOW(self), &size_w, &size_h);
         g_key_file_set_integer(self->_priv->config_file, "ITEM_WINDOW", "width", size_w);
         g_key_file_set_integer(self->_priv->config_file, "ITEM_WINDOW", "height", size_h);

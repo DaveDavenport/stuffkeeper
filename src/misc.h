@@ -2,6 +2,33 @@
 #define __MISC_H__
 extern GKeyFile *config_file;
 
+#ifdef DEBUG_TIMING
+/* Tic Tac system */
+#define TIMER_SUB(start,stop,diff)  diff.tv_usec = stop.tv_usec - start.tv_usec;\
+        diff.tv_sec = stop.tv_sec - start.tv_sec;\
+        if(diff.tv_usec < 0) {\
+            diff.tv_sec -= 1; \
+            diff.tv_usec += G_USEC_PER_SEC; \
+        }
+
+#define INIT_TIC_TAC() GTimeVal start123, stop123,diff123;\
+    g_get_current_time(&start123);
+
+#define TAC(a) g_get_current_time(&stop123);\
+    TIMER_SUB(start123, stop123, diff123);\
+    g_debug(a": %lu s, %lu us", (unsigned long)( diff123.tv_sec),(unsigned long)( diff123.tv_usec));    
+
+#define TOC(a) TAC(a);\
+    start123 = stop123;
+
+#else // DEBUG_TIMING
+
+
+#define INIT_TIC_TAC() ;
+#define TAC(a) ;
+#define TOC(a) ;
+
+#endif // DEBUG_TIMING
 
 /**
  * @param uri   The http url to open.
