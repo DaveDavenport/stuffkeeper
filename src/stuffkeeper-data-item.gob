@@ -814,12 +814,10 @@ class Stuffkeeper:Data:Item from G:Object
 	}
 	else
 	{
-	    g_debug("stepping through rows\n");
 	    while((r = sqlite3_step(stmt)) == SQLITE_ROW)
 	    {
 		int tagid = sqlite3_column_int(stmt, 0); 
 		StuffkeeperDataTag *tag = stuffkeeper_data_backend_add_tag(obj->_priv->skdb,tagid);
-		g_debug("adding tagid: %i\n", tagid);
 		obj->_priv->tags = g_list_prepend(obj->_priv->tags, tag);
 		stuffkeeper_data_tag_add_item(tag, obj);
 	    }
