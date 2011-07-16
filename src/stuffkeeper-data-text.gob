@@ -97,6 +97,7 @@ class Stuffkeeper:Data:Text from Gtk:Scrolled:Window
             {
                 if(strcmp(text,value))
                 {
+                    g_signal_handler_block(self->_priv->buffer,self->_priv->changed_entry);
                     gtk_text_buffer_set_text(self->_priv->buffer, value, -1);
                     gtk_text_buffer_set_modified(self->_priv->buffer, FALSE);
                     g_signal_handler_unblock(self->_priv->buffer,self->_priv->changed_entry);
