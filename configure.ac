@@ -36,7 +36,7 @@ STUFFKEEPER_MICRO_VERSION=stuffkeeper_micro_version
 AC_DEFINE(STUFFKEEPER_MAJOR_VERSION, stuffkeeper_major_version, ["Major version of stuffkeeper"])
 AC_DEFINE(STUFFKEEPER_MINOR_VERSION, stuffkeeper_minor_version, ["Minor version of stuffkeeper"])
 AC_DEFINE(STUFFKEEPER_MICRO_VERSION, stuffkeeper_micro_version, ["Micro version of stuffkeeper"])
-AC_DEFINE(PROGRAM_VERSION, "stuffkeeper_version", ["Combined version of stuffkeeper"]) 
+AC_DEFINE(PROGRAM_VERSION, "stuffkeeper_version", ["Combined version of stuffkeeper"])
 
 
 # Checks for programs.
@@ -50,30 +50,30 @@ AC_PROG_CC
 # Parse extra command line options
 ##
 
-# Debug output 
-AC_ARG_ENABLE(debug, 
-              [ --enable-debug           Print extra debug output.], 
-              [ if test "x$enableval" = "xyes"; then 
-                    enable_debug=yes 
-                else 
-                    enable_debug=no 
+# Debug output
+AC_ARG_ENABLE(debug,
+              [ --enable-debug           Print extra debug output.],
+              [ if test "x$enableval" = "xyes"; then
+                    enable_debug=yes
+                else
+                    enable_debug=no
                 fi],enable_debug=no)
 
-if test x${enable_debug} = xyes; 
+if test x${enable_debug} = xyes;
 then
     AC_DEFINE(DEBUG, 1, [Enable debug output])
 fi
 
 # Timing output
-AC_ARG_ENABLE(timing, 
-              [ --enable-timing Print timing debug output.], 
-              [ if test "x$enableval" = "xyes"; then 
-                    enable_timing=yes 
-                else 
-                    enable_timing=no 
+AC_ARG_ENABLE(timing,
+              [ --enable-timing Print timing debug output.],
+              [ if test "x$enableval" = "xyes"; then
+                    enable_timing=yes
+                else
+                    enable_timing=no
                 fi],enable_timing=no)
 
-if test x${enable_timing} = xyes; 
+if test x${enable_timing} = xyes;
 then
     AC_DEFINE(DEBUG_TIMING, 1, [Enable timing output])
 fi
@@ -85,6 +85,10 @@ fi
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+
+
+# Checks for libraries
+AC_CHECK_LIB([m],[sqrt])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -141,8 +145,8 @@ AC_SUBST(unique_CFLAGS)
 AM_PATH_GPGME
 
 # Check for gtk-doc
-AC_ARG_ENABLE(documentation, 
-              [ --enable-doc Enable documentation.], 
+AC_ARG_ENABLE(documentation,
+              [ --enable-doc Enable documentation.],
               [case "${enableval}" in
                	yes)	enable_documentation=true;;
 		no)	enable_documentation=false;;
@@ -192,7 +196,7 @@ fi
 VALA_PROG_VALAC([0.10.0])
 
 STUFFKEEPER_PLUGIN_DIR="${PACKAGE_PREFIX}/lib/stuffkeeper_name/"
-AC_DEFINE_UNQUOTED(STUFFKEEPER_PLUGIN_DIR,"$STUFFKEEPER_PLUGIN_DIR",[The directory the plugins are installed]) 
+AC_DEFINE_UNQUOTED(STUFFKEEPER_PLUGIN_DIR,"$STUFFKEEPER_PLUGIN_DIR",[The directory the plugins are installed])
 
 
 
@@ -205,14 +209,14 @@ AC_ARG_ENABLE([shave],
                 esac],
               [enable_shave=no])
 if test x$enable_shave = xyes; then
-SHAVE_INIT([./]) 
+SHAVE_INIT([./])
 fi
 
 AC_OUTPUT([
 shave
 shave-libtool
-Makefile 
-src/Makefile 
+Makefile
+src/Makefile
 po/Makefile.in
 po/Makefile
 glade/Makefile
@@ -226,11 +230,11 @@ vala/Makefile
 ])
 
 echo "Now type make to build"
-if test x${enable_timing} = xyes; 
+if test x${enable_timing} = xyes;
 then
     echo "Timing output enabled";
 fi
-if test x${enable_debug} = xyes; 
+if test x${enable_debug} = xyes;
 then
     echo "Debug output enabled";
 fi
