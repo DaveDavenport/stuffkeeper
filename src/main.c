@@ -9,7 +9,6 @@
 #include <locale.h> /* For setlocale */
 #include <config.h>
 #include <gio/gio.h>
-#include <gpgme.h>
 #include "revision.h"
 
 /* Include the database */
@@ -223,7 +222,6 @@ int main ( int argc, char **argv )
     {
         g_thread_init(NULL);
     }
-	printf("GPGME Version: %s\n",gpgme_check_version(NULL));
     /* Initialize gtk */
 
     gdk_threads_init();

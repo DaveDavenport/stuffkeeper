@@ -19,7 +19,6 @@ requires 2.0.10
 #include "stuffkeeper-data-spinbutton-config.h"
 #include "stuffkeeper-data-boolean-config.h"
 #include "stuffkeeper-data-rating-config.h"
-#include "stuffkeeper-data-password-config.h"
 #include "stuffkeeper-data-image-config.h"
 %}
 %ph{
@@ -997,8 +996,6 @@ class Stuffkeeper:Edit:Schema from G:Object
 					}else if (type == FIELD_TYPE_RATING) {
 						widget = (GtkWidget *)stuffkeeper_data_rating_config_new();
 						stuffkeeper_data_rating_config_setup(STUFFKEEPER_DATA_RATING_CONFIG(widget),self->_priv->schema, id);
-					} else if (type == FIELD_TYPE_PASSWORD) {
-						widget = (GtkWidget *)stuffkeeper_data_password_config_new(self->_priv->schema, id);
 					}
 
 					if(widget){

@@ -8,7 +8,6 @@ requires 2.0.10
 #include "stuffkeeper-data-item.h"
 #include "stuffkeeper-data-label.h"
 #include "stuffkeeper-data-entry.h"
-#include "stuffkeeper-data-password.h"
 #include "stuffkeeper-data-boolean.h"
 #include "stuffkeeper-data-spinbutton.h"
 #include "stuffkeeper-data-rating.h"
@@ -138,8 +137,6 @@ class Stuffkeeper:Show:Item from Gtk:Event:Box
                 gtk_container_add(GTK_CONTAINER(ali), sub_part);
                 gtk_container_add(GTK_CONTAINER(label1), ali);
                 g_queue_push_head(queue, sub_part);
-	    }else if (type == FIELD_TYPE_PASSWORD) {
-		    label1 = stuffkeeper_data_password_new(self->_priv->item,self->_priv->retv[i]);
 	    }else if (type == FIELD_TYPE_FILES) {
             gtk_misc_set_alignment(GTK_MISC(label1), 1,0);
             label1 = (GtkWidget *)stuffkeeper_data_files_new(self->_priv->item,self->_priv->retv[i]);

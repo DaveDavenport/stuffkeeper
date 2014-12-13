@@ -19,8 +19,6 @@ stuffkeeper_GOBFILES=\
 	stuffkeeper-data-label.gob \
 	stuffkeeper-data-link.gob \
 	stuffkeeper-data-list2.gob \
-	stuffkeeper-data-password-config.gob \
-	stuffkeeper-data-password.gob \
 	stuffkeeper-data-rating.gob \
 	stuffkeeper-data-schema.gob \
 	stuffkeeper-data-spinbutton-config.gob \
@@ -146,7 +144,6 @@ LIBS= \
 	@libxml_LIBS@\
 	@gthread_LIBS@\
 	@gio_LIBS@\
-	@GPGME_LIBS@ \
     @unique_LIBS@\
 	$(NULL)
 
@@ -166,7 +163,6 @@ AM_CFLAGS = \
 	@gthread_CFLAGS@ \
 	@gio_CFLAGS@ \
     @unique_CFLAGS@\
-	@GPGME_CFLAGS@ \
 	-DLOG_DOMAIN="\"StuffKeeper\""
 	-DPACKAGE_LIB_DIR=\""$(pkglibdir)"\" \
 	-Wall\

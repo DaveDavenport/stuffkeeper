@@ -120,7 +120,7 @@ public class Stuffkeeper.DataRatingConfig : Gtk.Table {
 		{
 			Source.remove(update_timeout);	
 		}
-		update_timeout = Timeout.add_seconds(1, save_changes);
+		update_timeout = GLib.Timeout.add_seconds(1, save_changes);
 	}
 
 
