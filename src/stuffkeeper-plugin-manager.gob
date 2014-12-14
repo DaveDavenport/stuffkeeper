@@ -18,7 +18,7 @@ typedef struct _FS{
 %}
 
 %{
-typedef GType (*GetType)(void);
+typedef GType (*GetType)(GModule *module);
 
 %}
 
@@ -98,19 +98,17 @@ class Stuffkeeper:Plugin:Manager from G:Object
                 if(strncmp(&filename[strlen(filename)-strlen(G_MODULE_SUFFIX)], G_MODULE_SUFFIX,strlen(G_MODULE_SUFFIX)) == 0)
                 {
                     gchar *path = g_build_path(G_DIR_SEPARATOR_S, STUFFKEEPER_PLUGIN_DIR, filename, NULL);
-                    GModule *module;
-                    g_debug("trying: %s\n", path);
+                    GModule *module = NULL;
                     module = g_module_open(path, G_MODULE_BIND_LAZY);
-                    if(module)
+                    if(module != NULL)
                     {
                         gpointer function;
                         if(g_module_symbol(module,"register_plugin",&(function)))
                         {
                             GetType gt = function;
                             FS *fs = g_malloc0(sizeof(*fs));
-                            fs->gtype = gt();
+                            fs->gtype = gt(module);
                             fs->module = module;
-                            g_debug("loaded: %i\n", fs->gtype);
                             fs->object = g_object_new(fs->gtype, NULL);
                             if(fs->object)
                             {
@@ -123,7 +121,7 @@ class Stuffkeeper:Plugin:Manager from G:Object
                                 g_debug("Plugin: %s succesfull loaded\n",fs->name);
                             }else {
                                 /* unload module */
-																g_debug("Plugin: %s failed to create object\n", fs->name);
+                                g_debug("Plugin: %s failed to create object\n", fs->name);
                                 g_module_close(fs->module);
                                 g_free(fs);
                             }
@@ -133,10 +131,10 @@ class Stuffkeeper:Plugin:Manager from G:Object
                             g_debug("Failed: %s\n", g_module_error());
                             g_module_close(module);
                         }
-										}
-										else{
-											g_debug("Failed to load plugin: %s\n", g_module_error()); 
-										}
+                    }
+                    else{
+                        g_debug("Failed to load plugin: %s\n", g_module_error()); 
+                    }
                     g_free(path);
                 }
             }
