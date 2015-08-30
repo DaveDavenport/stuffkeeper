@@ -14,7 +14,7 @@ public class Test : Stuffkeeper.Plugin {
 		return PluginType.MENU;
 	}
 
-	public override weak string get_name()
+	public override unowned string get_name()
 	{
 		return "Tag Cloud";
 	}
@@ -44,13 +44,13 @@ public class Test : Stuffkeeper.Plugin {
 	private string generate_cloud(Stuffkeeper.DataBackend skdb_e, Gtk.VBox box)
 	{
 		string str = "";
-		List<weak DataTag> list = skdb_e.get_tags();
+		List<unowned DataTag> list = skdb_e.get_tags();
 		double max = -1;
 
 		/**
 		 * THIS NEEDS TO BE FIXED, BUG IN GTK VAPI FILE!
 	   */
-		List<weak Widget> children = box.get_children();
+		List<unowned Widget> children = box.get_children();
 		foreach (Widget child in children)
 		{
 			child.destroy();
@@ -127,18 +127,18 @@ public class Test : Stuffkeeper.Plugin {
 		/* create dialog */
 		win = new Dialog ();
 		win.title = "Tag cloud";
-		win.add_buttons(Gtk.STOCK_CLOSE, ResponseType.CLOSE);
+		win.add_buttons(Gtk.Stock.CLOSE, ResponseType.CLOSE);
 
 
 
 
-		win.response += this.response_window;
+		win.response.connect(this.response_window);
 		win.show();
 		/* Generate the cloud */
 		generate_cloud(skdb, win.vbox);
-		skdb.tag_added += tag_added;
-		skdb.tag_removed += tag_removed;
-		skdb.tag_changed += tag_changed;
+		skdb.tag_added.connect(tag_added);
+		skdb.tag_removed.connect(tag_removed);
+		skdb.tag_changed.connect(tag_changed);
 	}
 
 	private void response_window(Dialog dialog, int resonse_id)
@@ -147,9 +147,9 @@ public class Test : Stuffkeeper.Plugin {
 
 		stdout.printf("Close window\n");
 		win = null;
-		skdb.tag_added -= tag_added;
-		skdb.tag_removed -= tag_removed;
-		skdb.tag_changed -= tag_changed;
+		skdb.tag_added.disconnect(tag_added);
+		skdb.tag_removed.disconnect(tag_removed);
+		skdb.tag_changed.disconnect(tag_changed);
 	}
 }
 
