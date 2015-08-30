@@ -176,7 +176,7 @@ private class ItemParser {
 private class GenericInputDialog:Gtk.Assistant
 {
     private DataSchema schema = null;
-    private ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf));
+    private Gtk.ListStore schemas = new Gtk.ListStore(3,typeof(DataSchema),typeof(string), typeof(Gdk.Pixbuf));
     private Parser p = null;
     private List<unowned Gtk.ComboBox> matching = null;
     private DataBackend skdb = null;
@@ -503,7 +503,7 @@ public class GenericInput : Stuffkeeper.Plugin
 	}
 
 	/* Destruction */
-	~Test ()
+	~GenericInput ()
 	{
         debug("Generic Input destroy");
 	}
