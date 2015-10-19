@@ -101,7 +101,7 @@
         ]
         {item:tags <div id='name'>Tag</div> }{item:tags %, }{item:tags <BR />}
         </div>
-    
+    ]
     </div>
     </body>
 </html>
