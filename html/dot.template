@@ -1,0 +1,6 @@
+digraph SG \{
+  [s
+    {item:tags "Tag: %" -> {item:title %}
+    }
+  ]
+\}
