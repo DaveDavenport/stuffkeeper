@@ -379,7 +379,28 @@ class Stuffkeeper:Export:HTML from G:Object
                     g_free(esc);
 
                 }
-                else 
+                else if(buffer[i] == '{') {
+                    int a;
+                    int j = i+1;
+                    int depth = 0;
+                    while (buffer[j] || depth) {
+                        if (buffer[j]=='}')
+                        {
+                            if (!depth) break;
+                            depth--;
+                        }
+                        else if (buffer[j] == '{') depth++;
+                        j++;
+                    }
+                    // now i points to open { and  to matching close }
+                    if (i != j) // ensures buffer[j] doesn't segfault
+                    {
+                        buffer[j] = '\0';
+                        self_parse_field_buffer(self, buffer+i+1, fp_out);
+                        i=j;
+                    }
+                }
+                else
                 {
                     fputc(buffer[i], fp_out);
                 }
@@ -398,7 +419,7 @@ class Stuffkeeper:Export:HTML from G:Object
 
 
         a = fgetc(fp_in);
-        while(a != '}' && !depth) {
+        while(a != '}' || depth) {
             buffer[i] = a;
             i++;
             if(a == '}') depth--;
@@ -406,6 +427,12 @@ class Stuffkeeper:Export:HTML from G:Object
             a = fgetc(fp_in);
         };
         buffer[i] = '\0';
+        self_parse_field_buffer(self, buffer, fp_out);
+    }
+    private 
+    void 
+    parse_field_buffer(self,char* buffer, FILE *fp_out)
+    {
         if(strncasecmp(buffer, "escape:csv", 10) == 0)
         {
             self->_priv->etype = ESCAPE_CSV;
