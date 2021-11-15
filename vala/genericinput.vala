@@ -238,7 +238,7 @@ private class GenericInputDialog:Gtk.Assistant
             var v = new Gtk.VBox(false, 6);
 
             v.pack_start(file_entry, false, true, 0);
-            var check_button = new Gtk.Button.from_stock(Gtk.STOCK_APPLY);
+            var check_button = new Gtk.Button.from_stock("gtk-apply");
             v.pack_start(check_button, false, true, 0);
             var execute_button = new Gtk.Button.with_label("Execute");
             v.pack_start(execute_button, false, true, 0);

@@ -30,8 +30,8 @@ namespace Stuffkeeper{
             Gdk.Pixbuf pix = null;
             /* Code to figure out the icon to display */
             try{
-                var ic = file.query_info(GLib.FILE_ATTRIBUTE_STANDARD_ICON, GLib.FileQueryInfoFlags.NONE, null);
-                GLib.Icon icon = (GLib.Icon ) ic.get_attribute_object(GLib.FILE_ATTRIBUTE_STANDARD_ICON);
+                var ic = file.query_info(GLib.FileAttribute.STANDARD_ICON, GLib.FileQueryInfoFlags.NONE, null);
+                GLib.Icon icon = (GLib.Icon ) ic.get_attribute_object(GLib.FileAttribute.STANDARD_ICON);
                 var it = Gtk.IconTheme.get_default();
                 var icon_info = it.lookup_by_gicon(icon, 64, 0);
                 pix = icon_info.load_icon();
